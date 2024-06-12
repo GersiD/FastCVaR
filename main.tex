@@ -2,12 +2,13 @@
 \usepackage{graphicx} % Required for inserting images
 \usepackage{fullpage}
 \usepackage{mpemath}
+\usepackage{hyperref} % For hyperlinks in the PDF like citations
 \usepackage{dsfont}
 \usepackage{amsmath}
 \usepackage{algorithm,algorithmicx,algpseudocode}
 
 \newcommand{\red}[1]{\textcolor{red}{#1}}
-
+\bibliographystyle{abbrvnat}
 
 \title{Fast CVaR}
 \author{Palash Agrawal, Maeve Burwell, Gersi Doko, Marek Petrik}
@@ -29,7 +30,7 @@ Before describing CVaR and its solution we define the basic notation we use in t
 We use calligraphic letters to denote sets and a tilde to denote random variables. 
 We also adopt the standard convention that $\mathcal{A}^{\mathcal{B}}$ represents the set of all functions from a set $\mathcal{B}$ to a set $\mathcal{A}$ and 
 treat vectors as a function from indexes to real numbers. $\mathbf{1}$ denotes the vector of ones and $\mathds{1}(bool)$ denotes the indicator function. 
-Finally $\Delta^n$ denotes the standard $n$-simplex while $\Delta_k^n$ denotes the k-capped simplex \red{citation needed}.
+Finally, $\Delta^n$ denotes the standard $n$-simplex while $\Delta_k^n$ denotes the k-capped simplex~\cite{kcapped_ang}.
 
 \section{Formal Model}
 
@@ -109,5 +110,6 @@ Finally $\Delta^n$ denotes the standard $n$-simplex while $\Delta_k^n$ denotes t
   \end{algorithmic}
 \end{algorithm}
 
+\bibliography{fastcvar.bib}
 
 \end{document}

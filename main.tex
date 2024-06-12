@@ -3,6 +3,9 @@
 \usepackage{fullpage}
 \usepackage{mpemath}
 
+\usepackage{amsmath}
+\usepackage{algorithm,algorithmicx,algpseudocode}
+
 
 \title{Fast CVaR}
 \author{Palash Agrawal, Maeve Burwell, Gersi Doko, Marek Petrik}
@@ -20,9 +23,25 @@ https://arxiv.org/pdf/2310.07224
 
 \section{Formal Model}
 
-Gersi 
+\begin{equation}
+  \label{eq:primal_cvar}
+  CVaR_\alpha(\tilde{x}) = 
+  \begin{mprog}
+    \minimize{\xi \in \Real^n} \xi\tr \tilde{x} 
+    \stc \xi \leq \frac{1}{1-\alpha} p
+    \cs \xi\tr 1 = 1
+    \cs \xi \geq 0
+  \end{mprog}
+\end{equation}
 
-Formalation, and relationship to k-capped simplex
+\begin{equation}
+  \label{eq:k_capped_simplex}
+  \begin{mprog}
+    \minimize{\xi \in \Real^n} \lvert \lvert \xi - x \rvert \rvert_2^2
+    \stc \xi\tr 1 \leq k
+    \cs \xi \geq 0   
+  \end{mprog}
+\end{equation}
 
 \section{Algorithm}
 
@@ -30,8 +49,43 @@ Formalation, and relationship to k-capped simplex
 
 Gersi
 
-\subsection{Quickquantile}
+\subsection{Quick Quantile}
 
-Gersi test test
+\begin{algorithm}
+  \floatname{algorithm}{Quick Quantile}
+  \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ with probability mass function p and $\alpha \in [0,1]$}}
+  \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
+  \caption{}\label{alg:quick_quantile}
+  \begin{algorithmic}[1]
+    \Require 
+    \Ensure 
+    \If{$n = 1$}
+    \State \Return $x$
+    \EndIf
+    \State $pivot \gets rand(1:n)$
+    \State $tail \gets \sum_{i=0}^n \I{x[i] \leq x[pivot]} p[i]$
+    \If{$\alpha \leq tail$}
+    \State $state \gets qq(vals[\I{x[i] \leq x[pivot]}], p[\I{x[i] \leq x[pivot]}], \alpha)$
+    \Else
+    \State $state \gets qq(vals[\I{x[i] > x[pivot]}], p[\I{x[i] > x[pivot]}], \alpha - tail)$
+    \EndIf
+  \end{algorithmic}
+\end{algorithm}
+
+\subsection{Quick CVaR}
+
+\begin{algorithm}
+  \floatname{algorithm}{Quick CVaR}
+  \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ with probability mass function p and $\alpha \in [0,1]$}}
+  \algrenewcommand\algorithmicensure{\textbf{Output: $CVaR_\alpha(\tilde{X})$}}
+  \caption{}\label{alg:quick_cvar}
+  \begin{algorithmic}[1]
+    \Require 
+    \Ensure 
+    \State $q_\alpha = \text{quick\_quantile}(\tilde{X}, p, \alpha)$ 
+    \State return $\sum_{i=0}^n \I{x[i] \leq q_\alpha} x[i] p[i]$
+  \end{algorithmic}
+\end{algorithm}
+
 
 \end{document}

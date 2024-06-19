@@ -22,16 +22,16 @@
 
 Palash
 
-https://arxiv.org/pdf/2310.07224
+% https://arxiv.org/pdf/2310.07224
 (Top-k projection - note this is DIFFERENT than k-capped simplex because it does not have constraint that elements should be between 0 and 1 and it may not necessarily be looking at the sum of all elements, just the top k elements). The paper claims that this can be trivially extended to the superquantile (CVar), however this mainly seems to be the case other then if you are sampling from an unknown continous distribuiton. That being said, they have a Rockefellar-Ursalyev formulation (well known in Cvar literature) forumlation to the top-k operator in their prior work. They also have a quickselect formulation to solve this problem
 
-https://arxiv.org/pdf/1503.01002
+% https://arxiv.org/pdf/1503.01002
 A sorting and partitioning based approach to the k-capped simplex problem (with the constraint being the sum of the vector has to add up to k). Simple proof done with the KKT conditions.
 
-https://hal.science/hal-01056171v2/document
+% https://hal.science/hal-01056171v2/document
 Excellent paper covering the k-capped simplex problem in two forms (when the sum can be less than or equal to k or when it can be equal to k). Covers lots of prior algorithms used to solve the problem (I need to read this in more depth). This paper has a lemma that will come helpful in equating the inequality constraint in k-capped simplex problem to the eqauiltity of constraint of the sum of probability vector equal to 1 in Cvar case.
 
-https://bayen.berkeley.edu/sites/default/files/efficient_bregman_projections.pdf
+% https://bayen.berkeley.edu/sites/default/files/efficient_bregman_projections.pdf
 This paper seems to describe an algorithm for projection onto the unit simplex, NOT k-capped using a quickselect basesd approach, although this is not the primary contribution. 
 
 

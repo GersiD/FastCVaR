@@ -5,6 +5,8 @@
 \usepackage{hyperref} % For hyperlinks in the PDF like citations
 \usepackage{dsfont}
 \usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage[capitalise,noabbrev]{cleveref}
 \usepackage{algorithm,algorithmicx,algpseudocode}
 
 \newcommand{\gersi}[1]{\textcolor{red}{#1}}
@@ -13,7 +15,44 @@
 \newcommand{\maeve}[1]{\textcolor{blue}{[#1]}}
 \bibliographystyle{abbrvnat}
 
-\title{Fast CVaR}
+\DeclareMathOperator{\kl}{KL}
+\DeclareMathOperator{\ess}{ess}
+\DeclareMathOperator{\KL}{KL}
+\DeclareMathOperator{\ext}{ext}
+\DeclareMathOperator{\conv}{conv}
+\newcommand{\quant}{{\mathfrak{q}}}
+
+%\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+%\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
+\DeclarePairedDelimiter{\spannorm}{\lVert}{\rVert_s}
+
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,automata}
+% Define risk operator
+\newcommand{\risko}{\rho}
+\DeclareMathOperator{\varo}{VaR}
+\DeclareMathOperator{\cvaro}{CVaR}
+\DeclareMathOperator{\evaro}{EVaR}
+\DeclareMathOperator{\ermo}{ERM}
+
+\renewcommand{\exp}[1]{\operatorname{exp}\left( #1\right) }
+\renewcommand{\ss}{\mid}    % set separator
+\newcommand{\probs}[1]{\Delta_{#1}}  % probability space
+\newcommand{\Mc}{M_{\mathrm{C}}}
+\newcommand{\Me}{M_{\mathrm{E}}}
+
+\newcommand{\BellD}{\mathfrak{T}}
+\newcommand{\BellI}{\mathfrak{B}}
+
+%\newcommand{\Ex}[1]{\mathbb{E}\left[ #1 \right]}
+\newcommand{\risk}[1]{\rho \left[#1\right]}
+\newcommand{\erm}[2]{\ermo_{#1}\left[#2\right]}
+\newcommand{\var}[2]{\varo_{#1} \left[#2\right]}
+\newcommand{\cvar}[2]{\cvaro_{#1} \left[#2\right]}
+\newcommand{\evar}[2]{\evaro_{#1} \left[#2\right]}
+
+
+\title{CVaR in Linear Time}
 \author{Gersi Doko, Palash Agrawal, Maeve Burwell, Marek Petrik}
 \date{}
 
@@ -48,6 +87,29 @@ We also adopt the standard convention that $\mathcal{A}^{\mathcal{B}}$ represent
 treat vectors as a function from indexes to real numbers. $\mathbf{1}$ denotes the vector of ones and $\mathds{1}(bool)$ denotes the indicator function. We use the convention that comparison operators are defined on vector spaces element-wise, that is for $x, y \in \Real^n$ then $x \leq y \iff x_i \leq y_i \quad \; \forall \; i \in 1\dots n$.
 Finally, $\Delta^n$ denotes the standard $n$-simplex while $\Delta_k^n$ denotes the k-capped simplex~\cite{kcapped_ang}.
 
+\paragraph{Value-at-Risk and Quantiles}
+
+Quantile of a random variable $\tilde{x} \in \mathbb{X}$ at level $\alpha \in [0,1]$ is any value $\tau\in \Real$ such that $\P{\tilde{x} \le \tau} \ge \alpha$ and $\P{\tilde{x} \ge \tau} \ge 1-\alpha$. The quantile of a random variable may not be unique and lies in the interval $[\quant^-_{\alpha}(\tilde{x}), \quant^+_{\alpha}(\tilde{x})]$ where
+%\begin{subequations} 
+\begin{align} \label{eq:quantile-definition}
+%\label{eq:upper-quantile-definition}
+  \quant_{\alpha}^+(\tilde{x})
+  &\;:=\;
+    \max\; \left\{\tau \in \bar{\Real} \mid \P{ \tilde{x} < \tau } \le \alpha\right\}, 
+      %\label{eq:low-quantile-definition}
+  &\quant_{\alpha}^-(\tilde{x})
+  &\;:=\;
+    \min\; \left\{\tau \in \bar{\Real} \mid \P{ \tilde{x}  \le \tau } \ge \alpha\right\}.
+\end{align}
+%\end{subequations}
+The maximum in \eqref{eq:quantile-definition} exists because $\tau \mapsto \P{\tilde{x} < \tau}$ is lower semi-continuous and the minimum in \eqref{eq:quantile-definition} exists because $\tau \mapsto \P{\tilde{x} \le \tau}$ is upper semi-continuous. Note that $\quant^+_1(\tilde{x}) = \infty$, $\quant^-_0(\tilde{x}) = -\infty$ and the quantiles are bounded otherwise for all $\alpha \in [0,1]$.
+
+Monetary risk measures generalize the expectation operator to account for the uncertainty in the distribution. \emph{Value-at-Risk}~(VaR) is one of the oldest, simplest, and most common risk measures~\cite{Follmer2016, Shapiro2014}. Value-at-Risk $\varo \colon \mathbb{X} \to \bar{\Real}$ at a risk level $\alpha \in [0,1]$ of a random variable $\tilde{x}\in \mathbb{X}$ is defined as the largest $1-\alpha$ confidence lower bound on the value of the random variable:
+\begin{equation}
+  \label{eq:var-definition}
+\var{\alpha}{\tilde{x}} \;:=\;  \quant^+_{ \alpha }(\tilde{x}).  
+\end{equation}
+
 \section{Formal Model}
 
 I assume that if we are doing less than or equal too between two vectors, this is an element wise comparasion between these two vectors. We should note this in the prelimanires 
@@ -73,20 +135,32 @@ I assume that if we are doing less than or equal too between two vectors, this i
 
 \gersi{TODO write dual of CVaR}
 
-\begin{equation}
-  \label{eq:k_capped_simplex}
-  \psi(x, k) = 
-  \begin{mprog}
-    \minimize{\xi \in \Real^n} \lvert \lvert \xi - x \rvert \rvert_2^2
-    \stc \xi \in \Delta_k^n
-  \end{mprog}
-  =
-  \begin{mprog}
-    \minimize{\xi \in \Real^n} \lvert \lvert \xi - x \rvert \rvert_2^2
-    \stc \xi\tr \mathbf{1} \leq k
-    \cs \xi \geq 0   
-  \end{mprog}
-\end{equation}
+
+\begin{thm}
+\Cref{alg:quick_cvar} is correct and runs in linear time.
+\end{thm}
+
+
+\begin{lem}
+\Cref{alg:quick_quantile} computes $\quant^+$.
+\end{lem}
+\begin{proof}
+  \mm{Palash}
+\end{proof}
+
+\begin{lem}
+\Cref{alg:quick_quantile} runs in linear time.
+\end{lem}
+\begin{proof}
+  \mm{Maeve and prove it in Lean}
+\end{proof}
+
+\begin{lem}
+  If \cref{alg:quick_quantile} correctly computes $\quant^+$ then \cref{alg:quick_cvar} correctly computes CVaR. 
+\end{lem}
+\begin{proof}
+  \mm{TODO}
+\end{proof}
 
 \section{Algorithm}
 
@@ -136,6 +210,29 @@ I assume that if we are doing less than or equal too between two vectors, this i
   \end{algorithmic}
 \end{algorithm}
 
+\section{k-capped simplex}
+
+\begin{equation}
+  \label{eq:k_capped_simplex}
+  \psi(x, k) = 
+  \begin{mprog}
+    \minimize{\xi \in \Real^n} \lvert \lvert \xi - x \rvert \rvert_2^2
+    \stc \xi \in \Delta_k^n
+  \end{mprog}
+  =
+  \begin{mprog}
+    \minimize{\xi \in \Real^n} \lvert \lvert \xi - x \rvert \rvert_2^2
+    \stc \xi\tr \mathbf{1} \leq k
+    \cs \xi \geq 0   
+  \end{mprog}
+\end{equation}
+
+
 \bibliography{fastcvar.bib}
 
 \end{document}
+
+%%% Local Variables:
+%%% mode: LaTeX
+%%% TeX-master: t
+%%% End:

@@ -7,7 +7,10 @@
 \usepackage{amsmath}
 \usepackage{algorithm,algorithmicx,algpseudocode}
 
-\newcommand{\red}[1]{\textcolor{red}{#1}}
+\newcommand{\gersi}[1]{\textcolor{red}{#1}}
+\newcommand{\palash}[1]{\textcolor{green}{#1}}
+\newcommand{\mm}[1]{\textcolor{magenta}{[#1]}}
+\newcommand{\maeve}[1]{\textcolor{blue}{[#1]}}
 \bibliographystyle{abbrvnat}
 
 \title{Fast CVaR}
@@ -19,11 +22,12 @@
 \maketitle
 
 \section{Introduction}
+% https://www.researchgate.net/publication/2611689_A_One-Pass_Space-Efficient_Algorithm_for_Finding_Quantiles
+Approximate quantile algorithm but probability distribution is not known unlike our setting (really each element in the given dataset has an equal probability)
 
-Palash
 
 % https://arxiv.org/pdf/2310.07224
-(Top-k projection - note this is DIFFERENT than k-capped simplex because it does not have constraint that elements should be between 0 and 1 and it may not necessarily be looking at the sum of all elements, just the top k elements). The paper claims that this can be trivially extended to the superquantile (CVar), however this mainly seems to be the case other then if you are sampling from an unknown continous distribuiton. That being said, they have a Rockefellar-Ursalyev formulation (well known in Cvar literature) forumlation to the top-k operator in their prior work. They also have a quickselect formulation to solve this problem
+(Top-k projection - note this is DIFFERENT than k-capped simplex because it does not have constraint that elements should be between 0 and 1 and it may not necessarily be looking at the sum of all elements, just the top k elements). The paper claims that this can be trivially extended to the superquantile (CVar), however this mainly seems to be the case other then if you are sampling from an unknown continuous distribuiton. That being said, they have a Rockefellar-Ursalyev formulation (well known in Cvar literature) formulation to the top-k operator in their prior work. They also have a quickselect formulation to solve this problem
 
 % https://arxiv.org/pdf/1503.01002
 A sorting and partitioning based approach to the k-capped simplex problem (with the constraint being the sum of the vector has to add up to k). Simple proof done with the KKT conditions.
@@ -32,7 +36,7 @@ A sorting and partitioning based approach to the k-capped simplex problem (with 
 Excellent paper covering the k-capped simplex problem in two forms (when the sum can be less than or equal to k or when it can be equal to k). Covers lots of prior algorithms used to solve the problem (I need to read this in more depth). This paper has a lemma that will come helpful in equating the inequality constraint in k-capped simplex problem to the eqauiltity of constraint of the sum of probability vector equal to 1 in Cvar case.
 
 % https://bayen.berkeley.edu/sites/default/files/efficient_bregman_projections.pdf
-This paper seems to describe an algorithm for projection onto the unit simplex, NOT k-capped using a quickselect basesd approach, although this is not the primary contribution. 
+This paper seems to describe an algorithm for projection onto the unit simplex, NOT k-capped using a quickselect based approach, although this is not the primary contribution. 
 
 
 
@@ -41,14 +45,14 @@ This paper seems to describe an algorithm for projection onto the unit simplex, 
 Before describing CVaR and its solution we define the basic notation we use in the paper. 
 We use calligraphic letters to denote sets and a tilde to denote random variables. 
 We also adopt the standard convention that $\mathcal{A}^{\mathcal{B}}$ represents the set of all functions from a set $\mathcal{B}$ to a set $\mathcal{A}$ and 
-treat vectors as a function from indexes to real numbers. $\mathbf{1}$ denotes the vector of ones and $\mathds{1}(bool)$ denotes the indicator function. 
+treat vectors as a function from indexes to real numbers. $\mathbf{1}$ denotes the vector of ones and $\mathds{1}(bool)$ denotes the indicator function. We use the convention that comparison operators are defined on vector spaces element-wise, that is for $x, y \in \Real^n$ then $x \leq y \iff x_i \leq y_i \quad \; \forall \; i \in 1\dots n$.
 Finally, $\Delta^n$ denotes the standard $n$-simplex while $\Delta_k^n$ denotes the k-capped simplex~\cite{kcapped_ang}.
 
 \section{Formal Model}
 
-I assume that if we are doing less than or equal too between two vectors, this is an element wise comparasion between these two vectors. We should note this in the prelimanires - Palash.
-Also while CVar and k-capped problem might be related, I think we need a formal lemma to show how one problem can be formulated as an instance of the other problem. -Palash
-Lastly, it would be very nice to have a reference where the linear programming formulation for CVar is derived (I can't find one).
+I assume that if we are doing less than or equal too between two vectors, this is an element wise comparasion between these two vectors. We should note this in the prelimanires 
+\palash{Palash. Also while CVar and k-capped problem might be related, I think we need a formal lemma to show how one problem can be formulated as an instance of the other problem.} 
+\palash{TODO reference where the linear programming formulation for CVar is derived.}
 
 \begin{equation}
   \label{eq:primal_cvar}
@@ -66,6 +70,8 @@ Lastly, it would be very nice to have a reference where the linear programming f
     \cs \xi \geq 0
   \end{mprog}
 \end{equation}
+
+\gersi{TODO write dual of CVaR}
 
 \begin{equation}
   \label{eq:k_capped_simplex}
@@ -86,7 +92,11 @@ Lastly, it would be very nice to have a reference where the linear programming f
 
 \subsection{Piece-wise Linear Minimization}
 
-\red{Gersi doesn't know what to write here.}
+\maeve{Incorporate projection.jl }
+\begin{algorithm}
+\floatname{algorithm}{Piece-wise Linear Minimization}
+\end{algorithm}
+
 
 \subsection{Quick Quantile}
 

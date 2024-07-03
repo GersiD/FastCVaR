@@ -144,8 +144,9 @@ Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable and $\Omega
  \]
  The function $f$ has $N$ discrete values \mm{duplicates? worry about them later}.
  
- The domain for each output of the function other than $0$ and $1$ is $(\tau_k, \tau_{k + 1)}]$, where it is $(-\infty, \tau_1]$, and $(\tau_n, \infty)$ respectively. 
-
+ \mm{how does this follows from the previous paragraph?}
+ The domain for each output of the function other than $0$ and $1$ is $(\tau_k, \tau_{k + 1}]$, where it is $(-\infty, \tau_1]$, and $(\tau_n, \infty)$ respectively. 
+ \mm{how does this follow?}
  Therefore, for all probability values less than 1, the maximum domain for a given value will always be an element of the random variable element array x. 
  
  By extension, the maximum tau such that the function f will have a value is less than or equal to alpha is always going to be an element of the random element array x, except for when alpha is 1.
@@ -158,12 +159,10 @@ Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable and $\Omega
  Assumption 1: Algorithm is in while loop for so I can use loop invariant, although I doubt it changes for recursive case
  Assumption 2 (for now): Algorithm requires every outcome in random element array to be unique
  
-
  Step 2:
- Loop Invariant: At every element the quantile plus will remain in the array $x$.
- Termination Step: $x$ will always get smaller at each step, except for when $x$ only has one element. When it gets smaller, all the elements that will be removed are not going to be the max quantile. 
- In the case 
- 
+ Loop Invariant: At every element the quantile plus will remain in the array x.
+ Termination Step: x will always get smaller at each step, except for when x only has one element. When it gets smaller, all the elements that will be removed are not going to be the max quantile. 
+ In the case where alpha is less than or equal to tail, every element greater 
 \end{proof}
 
 \begin{lem}

@@ -90,7 +90,6 @@ Monetary risk measures generalize the expectation operator to account for the un
 
 \section{Formal Model}
 
-I assume that if we are doing less than or equal too between two vectors, this is an element wise comparasion between these two vectors. We should note this in the prelimanires 
 \palash{Palash. Also while CVar and k-capped problem might be related, I think we need a formal lemma to show how one problem can be formulated as an instance of the other problem.} 
 \palash{TODO reference where the linear programming formulation for CVar is derived.}
 
@@ -172,6 +171,28 @@ I assume that if we are doing less than or equal too between two vectors, this i
     \EndIf
   \end{algorithmic}
 \end{algorithm}
+
+\begin{algorithm}
+  \floatname{algorithm}{Quick Quantile Loopy}
+  \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ with domain $x$ and probability mass function $p$ and $\alpha \in [0,1]$}}
+  \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
+  \caption{}\label{alg:quick_quantile_loop}
+  \begin{algorithmic}[1]
+    \Require 
+    \Ensure 
+    \While{$n > 1$}
+      \State $pivot \gets rand(1:n)$
+      \State $tail \gets \sum_{i=0}^n \mathds{1}(x[i] \leq x[pivot]) p[i]$
+      \If{$\alpha \leq tail$}
+      \State $n \gets \sum_{i=0}^n \mathds{1}(x[i] \leq x[pivot])$
+      \Else
+      \State $n \gets \sum_{i=0}^n \mathds{1}(x[i] > x[pivot])$
+      \State $\alpha \gets \alpha - tail$
+      \EndIf
+    \EndWhile
+  \end{algorithmic}
+\end{algorithm}
+
 
 \subsection{Quick CVaR}
 

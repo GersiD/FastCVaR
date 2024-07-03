@@ -8,6 +8,7 @@
 \usepackage{mathtools}
 \usepackage[capitalise,noabbrev]{cleveref}
 \usepackage{algorithm,algorithmicx,algpseudocode}
+\usepackage{bm}
 
 \newcommand{\gersi}[1]{\textcolor{red}{#1}}
 \newcommand{\palash}[1]{\textcolor{green}{#1}}
@@ -44,7 +45,7 @@ Approximate quantile algorithm but probability distribution is not known unlike 
 
 
 % https://arxiv.org/pdf/2310.07224
-(Top-k projection - note this is DIFFERENT than k-capped simplex because it does not have constraint that elements should be between 0 and 1 and it may not necessarily be looking at the sum of all elements, just the top k elements). The paper claims that this can be trivially extended to the superquantile (CVar), however this mainly seems to be the case other then if you are sampling from an unknown continuous distribuiton. That being said, they have a Rockefellar-Ursalyev formulation (well known in Cvar literature) formulation to the top-k operator in their prior work. They also have a quickselect formulation to solve this problem
+(Top-k projection - note this is DIFFERENT than k-capped simplex because it does not have constraint that elements should be between 0 and 1 and it may not necessarily be looking at the sum of all elements, just the top k elements). The paper claims that this can be trivially extended to the superquantile (CVaR), however this mainly seems to be the case other then if you are sampling from an unknown continuous distribuiton. That being said, they have a Rockefellar-Ursalyev formulation (well known in Cvar literature) formulation to the top-k operator in their prior work. They also have a quickselect formulation to solve this problem
 
 % https://arxiv.org/pdf/1503.01002
 A sorting and partitioning based approach to the k-capped simplex problem (with the constraint being the sum of the vector has to add up to k). Simple proof done with the KKT conditions.
@@ -90,24 +91,27 @@ Monetary risk measures generalize the expectation operator to account for the un
 
 \section{Formal Model}
 
-\palash{Palash. Also while CVar and k-capped problem might be related, I think we need a formal lemma to show how one problem can be formulated as an instance of the other problem.} 
-\palash{TODO reference where the linear programming formulation for CVar is derived.}
 
-\begin{equation}
-  \label{eq:primal_cvar}
-  CVaR_\alpha(\tilde{x}) = 
-  \begin{mprog}
-    \minimize{\xi \in \Real^n} \xi\tr \tilde{x} 
-    \stc \xi \leq \frac{1}{1-\alpha} p
-    \cs \xi \in \Delta^n
-  \end{mprog}
-  =
-  \begin{mprog}
-    \minimize{\xi \in \Real^n} \xi\tr \tilde{x} 
-    \stc \xi \leq \frac{1}{1-\alpha} p
-    \cs \xi\tr \mathbf{1} = 1
-    \cs \xi \geq 0
-  \end{mprog}
+We can assume a probability space with $\Omega = \left\{ 1, \dots , N \right\}$ and we consider a random variable $\tilde{x}\colon \Omega \to \Real$. The probability function, unless specified otherwise is $\bm{p} \in \Real^N$.
+
+We will also treat random variables defined on $\Omega$ interchangeably as vectors. For example, the vector $\bm{x}\in \Real^N$ equivalent to $\tilde{x}$ is constructed as
+\[
+ x_w = \tilde{x}( \omega ), \quad\forall \omega \in \Omega .
+\]
+We assume the same equivalence for probability distributions. 
+
+\mm{Do we assume that $\bm{p} > 0$?}
+
+
+\palash{Palash. Also while CVaR and k-capped problem might be related, I think we need a formal lemma to show how one problem can be formulated as an instance of the other problem.} 
+\palash{TODO reference where the linear programming formulation for CVar is derived.}\begin{equation} \label{eq:primal_cvar}
+  \begin{aligned}
+    \cvaro_\alpha(\tilde{x})
+  &= \min \left\{  \Ex{\bm{\xi}}{ \tilde{x}  } \mid
+  \bm{\xi} \leq \frac{1}{1-\alpha} p, \bm{\xi} \in \Delta^n \right\} \\
+  &= \min \left\{\bm{\xi}\tr \bm{x} \mid \bm{\xi} \leq \frac{1}{1-\alpha} \bm{p},
+     \xi\tr \mathbf{1} = 1, \bm{\xi} \geq 0\right\}.
+  \end{aligned}
 \end{equation}
 
 \gersi{TODO write dual of CVaR}
@@ -117,28 +121,47 @@ Monetary risk measures generalize the expectation operator to account for the un
 \Cref{alg:quick_cvar} is correct and runs in linear time.
 \end{thm}
 
-
 \begin{lem}
-\Cref{alg:quick_quantile} computes $\quant^+$.
+Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable and $\Omega$ is finite. Then, there exist $\omega_1, \omega_2\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_1)$ for each $\alpha\in [0,1)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_2)$ for each $\alpha\in (0,1]$.
 \end{lem}
 \begin{proof}
- Assumption 1: Algorithm is in while loop for so I can use loop invariant, although I doubt it changes for recursive case
- Assumption 2 (for now): Algorithm requires every outcome in random element array to be unique
- Step 1 of proof(Can't find in the literature as of now):
-
- Show that $\quant^+$ is always an element of the random variable array $\tilde{x} $. First we recall the definition of $\quant^+$.
+  Recall the definition:
+ \[
+  \quant_{\alpha}^+(\tilde{x})
+  \;:=\;
+    \max\; \left\{\tau \in \bar{\Real} \mid \P{ \tilde{x} < \tau } \le \alpha\right\}, 
+ \] 
+ Suppose that there is no $\omega\in \Omega $ such that $\quant^+_{\alpha}(\tilde{x}) = \tilde{x}(\omega)$. That may mean:
+ \begin{enumerate}
+ \item $\exists x_1, x_2 \in \tilde{x}(\Omega)$ such that $\quant^+_{\alpha}(\tilde{x}) \in (x_1, x_2)$
+ \item $\quant^+_{\alpha}(\tilde{x}) < \min \tilde{x}$ 
+ \item $\quant^+_{\alpha}(\tilde{x}) > \max \tilde{x}$ 
+ \end{enumerate}
+ \todo{finish this?}
+ Let
+ \[
+   f(\tau) = \P{\tilde{x} < \tau}
+ \]
+ The function $f$ has $N$ discrete values \mm{duplicates? worry about them later}.
  
- The function f(tau) which equals \P${\tilde{x} < \tau}$ . This function has n discrete values, equivalent to the number of random outcomes the function can take on. 
- 
- The domain for each output of the function other than 0 and 1 is $(tau_k, tau_{k + 1)}]$, where it is $(-infinity, tau_1]$, and $(tau_n, infinity)$ respectively. 
+ The domain for each output of the function other than $0$ and $1$ is $(\tau_k, \tau_{k + 1)}]$, where it is $(-\infty, \tau_1]$, and $(\tau_n, \infty)$ respectively. 
 
  Therefore, for all probability values less than 1, the maximum domain for a given value will always be an element of the random variable element array x. 
  
  By extension, the maximum tau such that the function f will have a value is less than or equal to alpha is always going to be an element of the random element array x, except for when alpha is 1.
+\end{proof}
+
+\begin{thm}
+\Cref{alg:quick_quantile} computes $\quant^+$.
+\end{thm}
+\begin{proof}
+ Assumption 1: Algorithm is in while loop for so I can use loop invariant, although I doubt it changes for recursive case
+ Assumption 2 (for now): Algorithm requires every outcome in random element array to be unique
+ 
 
  Step 2:
- Loop Invariant: At every element the quantile plus will remain in the array x.
- Termination Step: x will always get smaller at each step, except for when x only has one element. When it gets smaller, all the elements that will be removed are not going to be the max quantile. 
+ Loop Invariant: At every element the quantile plus will remain in the array $x$.
+ Termination Step: $x$ will always get smaller at each step, except for when $x$ only has one element. When it gets smaller, all the elements that will be removed are not going to be the max quantile. 
  In the case 
  
 \end{proof}

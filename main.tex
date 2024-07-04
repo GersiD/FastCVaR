@@ -127,14 +127,9 @@ Let
  \[
    f(\tau) = \P{\tilde{x} < \tau}
  \]
-Assume the random variable \( x \) has \( n \) unique nonzero outcomes, such that \( x_1 < x_2 < \cdots < x_n \). Then for any two elements \( x_i \) and \( x_{i+1} \), any value \( y \) in the range \( (x_i, x_{i+1}) \) will have a probability of zero. This means that \( f(x_{i + 1}) equals f(y) \) for all \( y \) in the specified range, as the probability of \(x\) being less than any \(y\) and \(x_{i+1}\) means it only takes on the values of elements ranging from \(x_1\) to \(x_i\), which has a fixed probability of occurring. For \(y\) in the range \((-\infty, x_1]\), the value of \(f(y)\) must be 0 as there is no probability of any element occurring that is smaller than \(x_1\), so the random variable  \(x\) must always be \(\geq x_1\). 
-
-
-
-
+Assume the random variable \( x \) has \( n \) unique nonzero outcomes, such that \( x_1 < x_2 < \cdots < x_n \). Then for any two elements \( x_i \) and \( x_{i+1} \), any value \( y \) in the range \( (x_i, x_{i+1}) \) \gersi{(this range has no elements in it since its one after another in a discrete set.)} will have a probability of zero. This means that \( f(x_{i + 1}) equals f(y) \) for all \( y \) in the specified range, as the probability of \(x\) being less than any \(y\) and \(x_{i+1}\) means it only takes on the values of elements ranging from \(x_1\) to \(x_i\), which has a fixed probability of occurring. For \(y\) in the range \((-\infty, x_1]\), the value of \(f(y)\) must be 0 as there is no probability of any element occurring that is smaller than \(x_1\), so the random variable  \(x\) must always be \(\geq x_1\).
 
  The function $f$ has $N$ discrete values \mm{duplicates? worry about them later}.
- 
  \mm{how does this follows from the previous paragraph?}
  The domain for each output of the function other than $0$ and $1$ is $(\tau_k, \tau_{k + 1}]$, where it is $(-\infty, \tau_1]$, and $(\tau_n, \infty)$ respectively. 
  \mm{how does this follow?}

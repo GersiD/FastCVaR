@@ -119,11 +119,31 @@ We assume the same equivalence for probability distributions.
 
 \begin{thm}
 \Cref{alg:quick_cvar} is correct and runs in linear time.
+
 \end{thm}
 
 \begin{lem}
 Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable and $\Omega$ is finite. Then, there exist $\omega_1, \omega_2\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_1)$ for each $\alpha\in [0,1)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_2)$ for each $\alpha\in (0,1]$.
 \end{lem}
+\begin{proof}
+Let
+ \[
+   f(\tau) = \P{\tilde{x} < \tau}
+ \]
+Assume the random variable \( x \) has \( n \) unique nonzero outcomes, such that \( x_1 < x_2 < \cdots < x_n \). Then for any two elements \( x_i \) and \( x_{i+1} \), any value \( y \) in the range \( (x_i, x_{i+1}) \) will have a probability of zero. This means that \( f(x_{i + 1}) equals f(y) \) for all \( y \) in the specified range, as the probability of \(x\) being less than any \(y\) and \(x_{i+1}\) means it only takes on the values of elements ranging from \(x_1\) to \(x_i\), which has a fixed probability of occurring. 
+
+
+
+
+ The function $f$ has $N$ discrete values \mm{duplicates? worry about them later}.
+ 
+ \mm{how does this follows from the previous paragraph?}
+ The domain for each output of the function other than $0$ and $1$ is $(\tau_k, \tau_{k + 1}]$, where it is $(-\infty, \tau_1]$, and $(\tau_n, \infty)$ respectively. 
+ \mm{how does this follow?}
+ Therefore, for all probability values less than 1, the maximum domain for a given value will always be an element of the random variable element array x. 
+ 
+ By extension, the maximum tau such that the function f will have a value is less than or equal to alpha is always going to be an element of the random element array x, except for when alpha is 1.
+\end{proof}
 \begin{proof}
   Recall the definition:
  \[
@@ -138,18 +158,7 @@ Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable and $\Omega
  \item $\quant^+_{\alpha}(\tilde{x}) > \max \tilde{x}$ 
  \end{enumerate}
  \todo{finish this?}
- Let
- \[
-   f(\tau) = \P{\tilde{x} < \tau}
- \]
- The function $f$ has $N$ discrete values \mm{duplicates? worry about them later}.
  
- \mm{how does this follows from the previous paragraph?}
- The domain for each output of the function other than $0$ and $1$ is $(\tau_k, \tau_{k + 1}]$, where it is $(-\infty, \tau_1]$, and $(\tau_n, \infty)$ respectively. 
- \mm{how does this follow?}
- Therefore, for all probability values less than 1, the maximum domain for a given value will always be an element of the random variable element array x. 
- 
- By extension, the maximum tau such that the function f will have a value is less than or equal to alpha is always going to be an element of the random element array x, except for when alpha is 1.
 \end{proof}
 
 \begin{thm}

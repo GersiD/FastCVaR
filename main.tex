@@ -26,7 +26,9 @@
 %\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
 %\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
 \DeclarePairedDelimiter{\spannorm}{\lVert}{\rVert_s}
-
+\newtheoremstyle{case}{}{}{}{}{}{:}{ }{}
+\theoremstyle{case}
+\newtheorem{case}{Case}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,automata}
 
@@ -137,8 +139,6 @@ Now let's refer again to Definition 1. The term  $\P{\tilde{x} < \tau}$ , which 
  equals  0$, and $(x_i, x_{i+1})$ otherwise. The max element in the domain for every $v$ is an outcome of random variable $x$, therefore for Definition 1 to be satisfied, $\tau$  would have to be one of these values.
 \end{proof}
 \begin{proof}
-  This is the second proof of Lemma 1 and uses contradiction.
-  
   Recall the definition:
  \[
   \quant_{\alpha}^+(\tilde{x})
@@ -148,19 +148,24 @@ Now let's refer again to Definition 1. The term  $\P{\tilde{x} < \tau}$ , which 
  Assume the random variable \( x \) has \( n \) unique nonzero outcomes, such that \( x_1 < x_2 < \cdots < x_n \).
  
 
- Suppose that there is no $\omega\in \Omega $ such that $\quant^+_{\alpha}(\tilde{x}) = \tilde{x}(\omega)$. That may mean:
- \begin{enumerate}
- \item $\exists x_{i}, x_{i + 1} \in \tilde{x}(\Omega)$ such that $\quant^+_{\alpha}(\tilde{x}) \in (x_{i}, x_{i + 1})$
- \item $\quant^+_{\alpha}(\tilde{x}) < \min \tilde{x}$ 
- \item $\quant^+_{\alpha}(\tilde{x}) > \max \tilde{x}$ 
- \end{enumerate}
- Let's start by assuming item 1 is true. Then \( P[x < \quant_{\alpha}^+(\tilde{x})] \) is less than \( P[x < x_{i + 1}] \). Thus, there must exist \( y \) in the range \( (\quant_{\alpha}^+(\tilde{x}), x_{i + 1}) \) such that \( P[x = y] > 0 \). This is impossible since no value between \( x_i \) and \( x_{i + 1} \) can have a nonzero probability of occurring. Thus, this is false.
+ Suppose for the sake of contradiction, that there is no $\omega\in \Omega $ such that $\quant^+_{\alpha}(\tilde{x}) = \tilde{x}(\omega)$. That may mean:
+ \begin{case}
+  $\exists x_{i}, x_{i + 1} \in \tilde{x}(\Omega)$ such that $\quant^+_{\alpha}(\tilde{x}) \in (x_{i}, x_{i + 1})$
 
- Let us then assume item 2 is true. Then \( P[x < \quant_{\alpha}^+(\tilde{x})] \) is less than \( P[x < x_{1}] \). Thus, there must exist \( y \) in the range \( (\quant_{\alpha}^+(\tilde{x}), x_1) \) such that \( P[x = y] > 0 \). This is impossible since no value smaller than \( x_{i + 1} \) can have a nonzero probability of occurring. Thus, this is false.
+  Then \( P[x < \quant_{\alpha}^+(\tilde{x})] \) is less than \( P[x < x_{i + 1}] \). Thus, there must exist \( y \) in the range \( (\quant_{\alpha}^+(\tilde{x}), x_{i + 1}) \) such that \( P[x = y] > 0 \). This is impossible since no value between \( x_i \) and \( x_{i + 1} \) can have a nonzero probability of occurring.
+ \end{case}
 
-Let us then assume item 3 is true. Then \( P[x < \quant_{\alpha}^+(\tilde{x})] \) is greater than \( P[x < x_{n}] \). Thus, there must exist \( y \) in the range \( ( x_n, \quant_{\alpha}^+(\tilde{x})) \) such that \( P[x = y] > 0 \). This is impossible since no value larger than \( x_{n} \) can have a nonzero probability of occurring. Thus, this is false.
+ \begin{case}
+  $\quant^+_{\alpha}(\tilde{x}) < \min \tilde{x}$ 
+  
+  Then \( P[x < \quant_{\alpha}^+(\tilde{x})] \) is less than \( P[x < x_{1}] \). Thus, there must exist \( y \) in the range \( (\quant_{\alpha}^+(\tilde{x}), x_1) \) such that \( P[x = y] > 0 \). This is impossible since no value smaller than \( x_{i + 1} \) can have a nonzero probability of occurring.
+ \end{case}
 
-Therefore Lemma 1 is true.
+ \begin{case}
+  $\quant^+_{\alpha}(\tilde{x}) > \max \tilde{x}$ 
+
+  Then \( P[x < \quant_{\alpha}^+(\tilde{x})] \) is greater than \( P[x < x_{n}] \). Thus, there must exist \( y \) in the range \( ( x_n, \quant_{\alpha}^+(\tilde{x})) \) such that \( P[x = y] > 0 \). This is impossible since no value larger than \( x_{n} \) can have a nonzero probability of occurring.
+ \end{case}
  
 
  

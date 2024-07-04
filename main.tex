@@ -101,21 +101,18 @@ We will also treat random variables defined on $\Omega$ interchangeably as vecto
 We assume the same equivalence for probability distributions. 
 
 \mm{Do we assume that $\bm{p} > 0$?}
+\gersi{@Marek I think you mean $\bm{p} \geq 0$?}
 
-
-\palash{Palash. Also while CVaR and k-capped problem might be related, I think we need a formal lemma to show how one problem can be formulated as an instance of the other problem.} 
 \palash{TODO reference where the linear programming formulation for CVar is derived.}\begin{equation} \label{eq:primal_cvar}
   \begin{aligned}
     \cvaro_\alpha(\tilde{x})
   &= \min \left\{  \Ex{\bm{\xi}}{ \tilde{x}  } \mid
   \bm{\xi} \leq \frac{1}{1-\alpha} p, \bm{\xi} \in \Delta^n \right\} \\
   &= \min \left\{\bm{\xi}\tr \bm{x} \mid \bm{\xi} \leq \frac{1}{1-\alpha} \bm{p},
-     \xi\tr \mathbf{1} = 1, \bm{\xi} \geq 0\right\}.
+     \xi\tr \mathbf{1} = 1, \bm{\xi} \geq 0\right\}\\
+  &= \max \left\{ z - \frac{1}{1-\alpha} \Ex{\bm{p}}{z-x}_+ \mid z \in \Real\right\}.
   \end{aligned}
 \end{equation}
-
-\gersi{TODO write dual of CVaR}
-
 
 \begin{thm}
 \Cref{alg:quick_cvar} is correct and runs in linear time.

@@ -161,8 +161,9 @@ Now let's refer again to Definition 1. The term  $\P{\tilde{x} < \tau}$, which i
  \begin{case}
   $\quant^+_{\alpha}(\tilde{x}) > \max \tilde{x}$ 
 
-  Then $ P[x < \quant_{\alpha}^+(\tilde{x})] $ is greater than or equal to $ P[x < x_{n}] $. Remember that $\alpha$ must be less than 1.  Thus, there must exist $ y $ in the range $ ( x_n, \quant_{\alpha}^+(\tilde{x})) $ such that $ P[x = y] > 0 $. This is impossible since no value larger than $ x_{n} $ can have a nonzero probability of occurring.
+  Then $ P[x < \quant_{\alpha}^+(\tilde{x})] $ is greater than or equal to $ P[x < x_{n}] $. Remember that $\alpha$ must be less than 1 and $quant_{\alpha}^+(\tilde{x})$ is bounded for all $\alpha$ less than 1 and greater than or equal to 0, therefore $ P[x < \quant_{\alpha}^+(\tilde{x})] $ is less than 1. Then, there must exist $ y $ in the range $ [\quant_{\alpha}^+(\tilde{x}), \infty) $ such that $ P[x = y] > 0 $ . This is impossible by definition. 
  \end{case}
+ 
  
 
  

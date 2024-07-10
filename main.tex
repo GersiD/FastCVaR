@@ -102,7 +102,7 @@ We assume the same equivalence for probability distributions.
 \mm{Do we assume that $\bm{p} > 0$?}
 \gersi{@Marek $\bm{p} \in \Delta^n$}
 
-\palash{TODO reference where the linear programming formulation for CVar is derived.}\begin{equation} \label{eq:primal_cvar}
+\palash{TODO reference where the linear programming formulation for CVar is derived, lemma relating k-capped simple.}\begin{equation} \label{eq:primal_cvar}
   \begin{aligned}
     \cvaro_\alpha(\tilde{x})
   &= \min \left\{  \Ex{\bm{\xi}}{ \tilde{x}  } \mid
@@ -174,13 +174,32 @@ Now let's refer again to Definition 1. The term  $\P{\tilde{x} < \tau}$, which i
 \Cref{alg:quick_quantile} computes $\quant^+$.
 \end{thm}
 \begin{proof}
- Assumption 1: Algorithm is in while loop for so I can use loop invariant, although I doubt it changes for recursive case
- Assumption 2 (for now): Algorithm requires every outcome in random element array to be unique
+
+ Assumption 1 (for now): Algorithm requires every outcome in random element array to be unique
  
- Step 2:
- Loop Invariant: At every element the quantile plus will remain in the array x.
+ 
+ Loop Invariant: At every element $\quant^+$ will remain in the array x.
+
+ Before the loop: From Lemma 1, we can prove  $\quant^+$ exists in array $\tilde{x}$ at start of the loop. 
+
+
+ During the loop: There are three possible scenarios during iteration:
+ 
+ Case 1: Tail is selected such that $\alpha \leq \text{tail}$. In this case $P[x < x_{\text{pivot}}] \geq \alpha$. Thus, $\quant_{\alpha}^+(\tilde{x})$ is included in the set of values from x[0] to x[pivot] which are the only values that are not removed. Thus, $\quant_{\alpha}^+(\tilde{x})$ remains in x after iteration.
+
+ Case 2: Tail is selected such that $\alpha \ >\text{tail}$. In this case $P[x < x_{\text{pivot}}] \geq \alpha$. Thus, $\quant_{\alpha}^+(\tilde{x})$ is included in the set of values greater than x[pivot] which are the only values that are not removed. Thus, $\quant_{\alpha}^+(\tilde{x})$ remains in x after iteration. New LEMMA needed here, proving CVAR(alpha - tail) new x is equal to CVAR alpha (old x).
+
+ Case 3: The array x only has one element.
+ Two scenarios here. If the original element x contained more than one element, all the elements that were removed could not have been $\quant_{\alpha}^+(\tilde{x})$, and $\quant_{\alpha}^+(\tilde{x})$ must exist in x per lemma 1. Therefore this element that will be returned is $\quant_{\alpha}^+(\tilde{x})$.  If x had one element to begin with, the probability of this outcome occuring must be 1. Therefore, $\quant_{\alpha}^+(\tilde{x})$ equals this element for all admissble alpha. 
+
+ 
+ 
+
+
+  
+ 
  Termination Step: x will always get smaller at each step, except for when x only has one element. When it gets smaller, all the elements that will be removed are not going to be the max quantile. 
- In the case where alpha is less than or equal to tail, every element greater 
+ Proof: We can assume pivot will always be an element of the array x. If alpha is less than or equal to tail, every element greater than x[pivot] will be removed. There will therefore always be some elements that are removed unless x[pivot] is max element in the array. If alpha is greater than tail, than every element less than or equal to x[pivot] will be removed. Even if x[pivot] is the smallest element.
 \end{proof}
 
 \begin{lem}

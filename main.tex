@@ -26,9 +26,9 @@
 %\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
 %\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
 \DeclarePairedDelimiter{\spannorm}{\lVert}{\rVert_s}
-\newtheoremstyle{case}{}{}{}{}{}{:}{ }{}
-\theoremstyle{case}
-\newtheorem{case}{\textbf{Case}}
+% \newtheoremstyle{case}{}{}{}{}{}{:}{ }{}
+% \theoremstyle{case}
+% \newtheorem{case}{\textbf{Case}}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,automata}
 
@@ -119,51 +119,49 @@ We assume the same equivalence for probability distributions.
 \end{thm}
 
 \begin{lem}
-Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable and $\Omega$ is finite. Then, there exist $\omega_1, \omega_2\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_1)$ for each $\alpha\in [0,1)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_2)$ for each $\alpha\in (0,1]$.
+Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite $\Omega$, and $\alpha\in [0,1)$. Then, there exist $\omega_1, \omega_2\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_1)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_2)$ for each $\alpha\in (0,1]$.
 \end{lem}
+% \begin{proof}
+% Let
+%  \[
+%    f(\tau) = \P{\tilde{x} < \tau}
+%  \]
+
+%  Let $x \in \Real^n$, such that $x_1 < x_2 < \cdots < x_n$ \mm{TODO: relax this}. Then for any two elements $x_i$ and $x_{i+1}$, any value $y$ in the range $f(x_i, x_{i+1})$ will have a probability of zero. This means that $f(x_{i + 1}) equals f(y)$ for all $y$ in the specified range, as the probability of $x$ being less than any $y$ and $x_{i+1}$ means it only takes on the values of elements ranging from $x_1$ to $x_i$, which has a fixed probability of occurring. For $y$ in the range $(-\infty, x_1]$, the value of $f(y)$ must be 0 as there is no probability of any element occurring that is smaller than $x_1$, so the random variable  $x$ must always be $\geq x_1$. Likewise, for $y$ in the range $[x_n, \infty)$, the value of $f(y)$ must be 1 as there is no probability of any element occurring that is larger than $x_n$. 
+
+
+% There is thus $n + 1$ values that $f(\tau)$ can take on, including 0, 1, and $n - 1$ values between 0 and 1. Let us define these values as a set $S$. 
+
+% Now let's refer again to Definition 1. The term  $\P{\tilde{x} < \tau}$, which is equal to $f(\tau)$ must take on the maximum value in the set $S$ which is less than or equal to $\alpha$. $\P{\tilde{x} < \tau}$  can never take the value 1, however, because 1 is not an admissible value for $\alpha$. For every value $v$ in set $S$ other than 1, the domain for which $v$ holds on the function $f$ is either $(-\infty, x_1]$ if $v = 0$, and $(x_i, x_{i+1})$ otherwise. The max element in the domain for every $v$ is an outcome of random variable $x$, therefore for Definition 1 to be satisfied, $\tau$  would have to be one of these values.
+% \end{proof}
 \begin{proof}
-Let
- \[
-   f(\tau) = \P{\tilde{x} < \tau}
- \]
-
-
- Let $x \in \Real^n$, such that $x_1 < x_2 < \cdots < x_n$. Then for any two elements $x_i$ and $x_{i+1}$, any value $y$ in the range $f(x_i, x_{i+1})$ will have a probability of zero. This means that $f(x_{i + 1}) equals f(y)$ for all $y$ in the specified range, as the probability of $x$ being less than any $y$ and $x_{i+1}$ means it only takes on the values of elements ranging from $x_1$ to $x_i$, which has a fixed probability of occurring. For $y$ in the range $(-\infty, x_1]$, the value of $f(y)$ must be 0 as there is no probability of any element occurring that is smaller than $x_1$, so the random variable  $x$ must always be $\geq x_1$. Likewise, for $y$ in the range $[x_n, \infty)$, the value of $f(y)$ must be 1 as there is no probability of any element occurring that is larger than $x_n$. 
-
-
-There is thus $n + 1$ values that $f(\tau)$ can take on, including 0, 1, and $n - 1$ values between 0 and 1. Let us define these values as a set $S$. 
-
-Now let's refer again to Definition 1. The term  $\P{\tilde{x} < \tau}$, which is equal to $f(\tau)$ must take on the maximum value in the set $S$ which is less than or equal to $\alpha$. $\P{\tilde{x} < \tau}$  can never take the value 1, however, because 1 is not an admissible value for $\alpha$. For every value $v$ in set $S$ other than 1, the domain for which $v$ holds on the function $f$ is either $(-\infty, x_1]$ if $v = 0$, and $(x_i, x_{i+1})$ otherwise. The max element in the domain for every $v$ is an outcome of random variable $x$, therefore for Definition 1 to be satisfied, $\tau$  would have to be one of these values.
-\end{proof}
-\begin{proof}
-  Recall the definition:
+Recall the definition:
  \[
   \quant_{\alpha}^+(\tilde{x})
   \;:=\;
     \max\; \left\{\tau \in \bar{\Real} \mid \P{ \tilde{x} < \tau } \le \alpha\right\}, 
  \] 
- Assume the random variable $ x $ has $ n $ unique nonzero outcomes, such that $ x_1 < x_2 < \cdots < x_n $.
+Assume the random variable $ x $ has $ n $ unique values, such that $ x_1 < x_2 < \cdots < x_n $.  We can assume this without loss of generality because VaR is law invariant~\cite{Follmer2016}.  
  
 
- Suppose for the sake of contradiction, that there is no $\omega\in \Omega $ such that $\quant^+_{\alpha}(\tilde{x}) = \tilde{x}(\omega)$. That may mean:
- \begin{case}
-  $\exists x_{i}, x_{i + 1} \in \tilde{x}(\Omega)$ such that $\quant^+_{\alpha}(\tilde{x}) \in (x_{i}, x_{i + 1})$
-
-  Then $ P[x < \quant_{\alpha}^+(\tilde{x})] $ is less than $ P[x < x_{i + 1}] $. Thus, there must exist $ y $ in the range $ (\quant_{\alpha}^+(\tilde{x}), x_{i + 1}) $ such that $ P[x = y] > 0 $. This is impossible since $ \mathbb{P}[x \in (x_i, x_{i+1})] = 0 $ by definition.
- \end{case}
-
- \begin{case}
-  $\quant^+_{\alpha}(\tilde{x}) < \min \tilde{x}$ 
+Suppose for the sake of contradiction, that there is no $\omega\in \Omega $ such that $\quant^+_{\alpha}(\tilde{x}) = \tilde{x}(\omega)$. That may mean:
+\begin{enumerate}
+\item[Case 1] $\exists x_{i}, x_{i + 1} \in \tilde{x}(\Omega)$ such that $\quant^+_{\alpha}(\tilde{x}) \in (x_{i}, x_{i + 1})$.
+Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})  $. Then, let $\tau' = \tau\opt  + \frac{1}{2}(x_{i+1} - \tau\opt)$. Because $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition}, $\P{ \tilde{x} < \tau' } =  \P{ \tilde{x} < \tau\opt  }\le \alpha$, $\tau\opt $ cannot be optimal.
+\item[Case 2] $\quant^+_{\alpha}(\tilde{x}) < \min \tilde{x}$ 
   
   Then $ P[x < \quant_{\alpha}^+(\tilde{x})] $ is less than $ P[x < x_{1}] $. Thus, there must exist $ y $ in the range $ (\quant_{\alpha}^+(\tilde{x}), x_1) $ such that $ P[x = y] > 0 $. This is impossible since no value smaller than $ x_{i + 1} $ can have a nonzero probability of occurring.
- \end{case}
 
- \begin{case}
-  $\quant^+_{\alpha}(\tilde{x}) > \max \tilde{x}$ 
+\item[Case 3]  $\quant^+_{\alpha}(\tilde{x}) > \max \tilde{x}$ 
 
-  Then $ P[x < \quant_{\alpha}^+(\tilde{x})] $ is greater than or equal to $ P[x < x_{n}] $. Remember that $\alpha$ must be less than 1 and $quant_{\alpha}^+(\tilde{x})$ is bounded for all $\alpha$ less than 1 and greater than or equal to 0, therefore $ P[x < \quant_{\alpha}^+(\tilde{x})] $ is less than 1. Then, there must exist $ y $ in the range $ [\quant_{\alpha}^+(\tilde{x}), \infty) $ such that $ P[x = y] > 0 $ . This is impossible by definition. 
- \end{case}
+  Then $ P[x < \quant_{\alpha}^+(\tilde{x})] $ is greater than or equal to $ P[x < x_{n}] $. Remember that $\alpha$ must be less than 1 and $\quant_{\alpha}^+(\tilde{x})$ is bounded for all $\alpha$ less than 1 and greater than or equal to 0, therefore $ P[x < \quant_{\alpha}^+(\tilde{x})] $ is less than 1. Then, there must exist $ y $ in the range $ [\quant_{\alpha}^+(\tilde{x}), \infty) $ such that $ P[x = y] > 0 $ . This is impossible by definition. 
  
+\end{enumerate}
+   
+   
+
+
+
  
 
  

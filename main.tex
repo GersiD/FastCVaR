@@ -52,7 +52,7 @@ Approximate quantile algorithm but probability distribution is not known unlike 
 A sorting and partitioning based approach to the k-capped simplex problem (with the constraint being the sum of the vector has to add up to k). Simple proof done with the KKT conditions.
 
 % https://hal.science/hal-01056171v2/document
-Excellent paper covering the k-capped simplex problem in two forms (when the sum can be less than or equal to k or when it can be equal to k). Covers lots of prior algorithms used to solve the problem (I need to read this in more depth). This paper has a lemma that will come helpful in equating the inequality constraint in k-capped simplex problem to the eqauiltity of constraint of the sum of probability vector equal to 1 in Cvar case.
+Excellent paper covering the k-capped simplex problem in two forms (when the sum can be less than or equal to k or when it can be equal to k). Covers lots of prior algorithms used to solve the problem (I need to read this in more depth). This paper has a lemma that will come helpful in equating the inequality constraint in k-capped simplex problem to the equality of constraint of the sum of probability vector equal to 1 in Cvar case.
 
 % https://bayen.berkeley.edu/sites/default/files/efficient_bregman_projections.pdf
 This paper seems to describe an algorithm for projection onto the unit simplex, NOT k-capped using a quickselect based approach, although this is not the primary contribution. 
@@ -150,11 +150,17 @@ Suppose for the sake of contradiction, that there is no $\omega\in \Omega $ such
 Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})  $. Then, let $\tau' = \tau\opt  + \frac{1}{2}(x_{i+1} - \tau\opt)$. Because $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition}, $\P{ \tilde{x} < \tau' } =  \P{ \tilde{x} < \tau\opt  }\le \alpha$, $\tau\opt $ cannot be optimal.
 \item[Case 2] $\quant^+_{\alpha}(\tilde{x}) < \min \tilde{x}$ 
   
-  Then $ P[x < \quant_{\alpha}^+(\tilde{x})] $ is less than $ P[x < x_{1}] $. Thus, there must exist $ y $ in the range $ (\quant_{\alpha}^+(\tilde{x}), x_1) $ such that $ P[x = y] > 0 $. This is impossible since no value smaller than $ x_{i + 1} $ can have a nonzero probability of occurring.
+  Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})  $. Then, let $\tau' = \tau\opt + \frac{1}{2}(x_{1} - \tau\opt)$. Because $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition}, $\P{ \tilde{x} < \tau' } =  \P{ \tilde{x} < \tau\opt  }\le \alpha$, $\tau\opt $ cannot be optimal.
 
 \item[Case 3]  $\quant^+_{\alpha}(\tilde{x}) > \max \tilde{x}$ 
 
-  Then $ P[x < \quant_{\alpha}^+(\tilde{x})] $ is greater than or equal to $ P[x < x_{n}] $. Remember that $\alpha$ must be less than 1 and $\quant_{\alpha}^+(\tilde{x})$ is bounded for all $\alpha$ less than 1 and greater than or equal to 0, therefore $ P[x < \quant_{\alpha}^+(\tilde{x})] $ is less than 1. Then, there must exist $ y $ in the range $ [\quant_{\alpha}^+(\tilde{x}), \infty) $ such that $ P[x = y] > 0 $ . This is impossible by definition. 
+  
+  New Proof 1: Recall that $\alpha$ is less than 1 and  $\quant^+_{\alpha}(\tilde{x})$ is bounded for all admissible $\alpha$ values. For this case, $\P{\tilde{x} < \quant^+_{\alpha}(\tilde{x})} = 1$ which is not feasible in \eqref{eq:var-definition} for admissible $\alpha$ values.
+  
+  
+  New Proof 2: Recall that $\alpha$ is less than 1 and  $\quant^+_{\alpha}(\tilde{x})$ is bounded for all admissible $\alpha$ values. Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})  $. Then, let $\tau' = \tau\opt + 1$. Because $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition}, $\P{ \tilde{x} < \tau' } =  \P{ \tilde{x} < \tau\opt  }\le \alpha$, $\tau\opt $ cannot be optimal.
+
+  Old Proof: Then $ P[x < \quant_{\alpha}^+(\tilde{x})] $ is greater than or equal to $ P[x < x_{n}] $. Remember that $\alpha$ must be less than 1 and $\quant_{\alpha}^+(\tilde{x})$ is bounded for all $\alpha$ less than 1 and greater than or equal to 0, therefore $ P[x < \quant_{\alpha}^+(\tilde{x})] $ is less than 1. Then, there must exist $ y $ in the range $ [\quant_{\alpha}^+(\tilde{x}), \infty) $ such that $ P[x = y] > 0 $ . This is impossible by definition. 
  
 \end{enumerate}
    
@@ -183,12 +189,12 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
 
  During the loop: There are three possible scenarios during iteration:
  
- Case 1: Tail is selected such that $\alpha \leq \text{tail}$. In this case $P[x < x_{\text{pivot}}] \geq \alpha$. Thus, $\quant_{\alpha}^+(\tilde{x})$ is included in the set of values from x[0] to x[pivot] which are the only values that are not removed. Thus, $\quant_{\alpha}^+(\tilde{x})$ remains in x after iteration.
+ Case 1: Tail is selected such that $\alpha \leq \text{tail}$. In this case $P[x < x_{\text{pivot}}] \geq \alpha$. Therefore all x greater than x[pivot] are not feasible by \eqref{eq:var-definition} . Only x greater than x[pivot] will be removed (if they exist), therefore $\quant_{\alpha}^+(\tilde{x})$ remains in x.
 
- Case 2: Tail is selected such that $\alpha \ >\text{tail}$. In this case $P[x < x_{\text{pivot}}] \geq \alpha$. Thus, $\quant_{\alpha}^+(\tilde{x})$ is included in the set of values greater than x[pivot] which are the only values that are not removed. Thus, $\quant_{\alpha}^+(\tilde{x})$ remains in x after iteration. New LEMMA needed here, proving CVAR(alpha - tail) new x is equal to CVAR alpha (old x).
+ Case 2: Tail is selected such that $\alpha \ >\text{tail}$. In this case $P[x < x_{\text{pivot}}] \leq \alpha$.Therefore all x greater than x[pivot] are not feasible by \eqref{eq:var-definition} . Only these x are removed, thus $\quant_{\alpha}^+(\tilde{x})$ remains in x. Note since elements less than $\quant_{\alpha}^+(\tilde{x})$ with a probability value "Tail" of occurring are removed, $ P[x_{new} < \quant_{\alpha}^+(\tilde{x_old})] $ is $\alpha$ - tail.
 
  Case 3: The array x only has one element.
- Two scenarios here. If the original element x contained more than one element, all the elements that were removed could not have been $\quant_{\alpha}^+(\tilde{x})$, and $\quant_{\alpha}^+(\tilde{x})$ must exist in x per lemma 1. Therefore this element that will be returned is $\quant_{\alpha}^+(\tilde{x})$.  If x had one element to begin with, the probability of this outcome occuring must be 1. Therefore, $\quant_{\alpha}^+(\tilde{x})$ equals this element for all admissble alpha. 
+ Two scenarios here. If the original element x contained more than one element, all the elements that were removed could not have been $\quant_{\alpha}^+(\tilde{x})$, and $\quant_{\alpha}^+(\tilde{x})$ must exist in x per lemma 1. Therefore this element that will be returned is $\quant_{\alpha}^+(\tilde{x})$.  If x had one element to begin with, the probability of this outcome occurring must be 1. Therefore, $\quant_{\alpha}^+(\tilde{x})$ equals this element for all admissible alpha. 
 
  
  
@@ -196,12 +202,12 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
 
   
  
- Termination Step: x will always get smaller at each step, except for when x only has one element. When it gets smaller, all the elements that will be removed are not going to be the max quantile. 
- Proof: We can assume pivot will always be an element of the array x. If alpha is less than or equal to tail, every element greater than x[pivot] will be removed. There will therefore always be some elements that are removed unless x[pivot] is max element in the array. If alpha is greater than tail, than every element less than or equal to x[pivot] will be removed. Even if x[pivot] is the smallest element.
+ Termination Step:  
+ Proof: We can assume pivot will always be an element of the array x. If alpha is less than or equal to tail, every element greater than x[pivot] will be removed. There will therefore always be some elements that are removed unless x[pivot] is max element in the array. If alpha is greater than tail, than every element less than or equal to x[pivot] will be removed. Even if x[pivot] is the smallest element. Note: We need to deal with the edge case where x[pivot] is max element in the array and alpha is less than or equal to tail. One way to potentially overcome this is incorporating median of median elements.
 \end{proof}
 
 \begin{lem}
-\Cref{alg:quick_quantile} runs in linear time.
+\Cref{alg:quick_quantile}in \eqref{eq:var-definition} runs in linear time.
 \end{lem}
 \begin{proof}
   \mm{Maeve and prove it in Lean}

@@ -34,7 +34,7 @@ function qql(vals::AbstractVector{Float64}, p::AbstractVector{Float64}, α::Real
   end
   if f == b
     return vals[f]
-  else # 2 values
+  else # 2 values TODO: PROBABLY WRONG
     return vals[b]
   end
 end

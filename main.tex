@@ -257,27 +257,27 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
   \floatname{algorithm}{Quick Quantile}
   \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ and probability mass function $p$ and $\alpha \in [0,1]$}}
   \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
-  \caption{}\label{alg:quick_quantile_loop}
+  \caption{}\label{alg:quick_quantile}
   \begin{algorithmic}[1]
-    \Require 
-    \Ensure 
-    \State $front \gets 1$
-    \State $back \gets n$
+    \Require{}
+    \Ensure{}
+    \State{$front \gets 1$}
+    \State{ $back \gets n$ }
     \While{$back - front > 1$}
-    \State $ind \gets partition(x, p, f, b)$  \Comment{Lomuto partition scheme}
+    \State{$ind \gets partition(x, p, f, b)$  \Comment{Lomuto partition scheme}}
 
-      \State $tail \gets \sum_{i=0}^n \mathds{1}(x[i] \leq x[ind]) p[i]$
+    \State{$tail \gets \sum_{i=0}^n \mathds{1}(x[i] \leq x[ind]) p[i]$}
       \If{$\alpha \leq tail$}
-      \State $back \gets ind$
-      \Else
-      \State $front \gets ind$
-      \EndIf
-    \EndWhile
+      \State{$back \gets ind$}
+      \Else{}
+      \State{$front \gets ind$}
+      \EndIf{}
+    \EndWhile{}
     \If{$front = back$}
-    \State \Return $x[front]$
-    \Else \todo{This part right here is not correct}
-    \State \Return $x[back]$
-    \EndIf
+    \State{\Return{$x[front]$}}
+    \Else{} \todo{This part right here is not correct}
+    \State{\Return{$x[back]$}}
+    \EndIf{}
   \end{algorithmic}
 \end{algorithm}
 

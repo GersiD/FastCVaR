@@ -1,12 +1,12 @@
 using RiskMeasures
-using Test
+using Base.Threads
 
-function swap!(vals::AbstractVector{Float64}, p::AbstractVector{Float64}, i::Int, j::Int)
+function swap!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, i::Int, j::Int)
   vals[i], vals[j] = vals[j], vals[i]
   p[i], p[j] = p[j], p[i]
 end
 
-function partition!(vals::AbstractVector{Float64}, p::AbstractVector{Float64}, f::Int, b::Int)
+function partition!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, f::Int, b::Int)
   pivot = f + Int(ceil((b - f) / 2))
   pivot_val = vals[pivot]
   swap!(vals, p, pivot, b) # move pivot to back
@@ -23,7 +23,7 @@ end
 
 
 ## Quick Quantile (loopy version)
-function qql(vals::AbstractVector{Float64}, p::AbstractVector{Float64}, α::Real)
+function qql!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, α::Real)
   if iszero(α) # minimum
     return essinf_e(vals, p; check_inputs=true)[1]
   elseif isone(α) # maximum (it is unbounded)
@@ -31,11 +31,11 @@ function qql(vals::AbstractVector{Float64}, p::AbstractVector{Float64}, α::Real
   end
   i = 1
   j = length(vals)
-  while j - i > 1
+  @inbounds while j - i > 1
     ind = partition!(vals, p, i, j)
     le::Vector{Bool} = vals .<= vals[ind]
     tail::Float64 = sum(p[le])
-    α <= tail ? j = ind : i = ind # Cut off half of the random variable
+    α < tail ? j = ind : i = ind # Cut off half of the random variable
   end
   if i == j
     return vals[i]
@@ -44,45 +44,62 @@ function qql(vals::AbstractVector{Float64}, p::AbstractVector{Float64}, α::Real
   end
 end
 
+function qCVaR!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, α::Real)
+  T = eltype(p)
+  # handle special cases
+  if iszero(α)
+    minval = essinf_e(vals, p; check_inputs=false)
+    minpmf = zeros(T, length(p))
+    minpmf[minval.index] = one(T)
+    return minval.value
+  elseif isone(α)
+    return vals' * p
+  end
+  q = qql!(vals, p, α)
 
+  # From here on: α ∈ (0,1)
+  value = zero(T)                  # CVaR value
+  p_left = one(T)           # probabilities left for allocation
+  α̂ = α                      # probabilities to allocate
 
-
-
-@testset "Loopy tests" begin
-  x1::Vector{Float64} = Float64[1, 2, 3]
-  p1 = [1 / 3, 1 / 3, 1 / 3]
-  @test qql(x1, p1, 0.5) ≈ 2
-
-  x2 = Float64[10, 2, 4, 7, 8]
-  p2 = [0.1, 0.1, 0.3, 0.3, 0.2]
-  @test qql(x2, p2, 0.5) ≈ 7
-
-  x3 = Float64[4, 5, 1, 2, -1, -2]
-  p3 = [0.1, 0.2, 0.3, 0.1, 0.3, 0.0]
-
-  #@test VaR(x̃, 1) ≈ -1.0
-  #@test VaR(x̃, 0.99) ≈ -1.0
-  #@test VaR(x̃, 0.) ≈ Inf
-  #@test VaR(x̃, 0.5) ≈ 1.0
-  # @test VaR_e(x3, p3, 0.6)[1] ≈ 2.0
-
-  @test qql(x3, p3, 1) ≈ Inf
-  @test qql(x3, p3, 0.99) ≈ 5.0
-  @test qql(x3, p3, 0.5) ≈ 1.0
-  @test qql(x3, p3, 0.4) ≈ 1.0
-
-  x4 = [4.0, 5.0, 1.0, 2.0, -1.0]
-  p4 = [0.1, 0.2, 0.3, 0.1, 0.3]
-  #@test VaR(x̃, 1) ≈ -1.0
-  #@test VaR(x̃, 0.99) ≈ -1.0
-  #@test VaR(x̃, 0.0) ≈ Inf
-  #@test VaR(x̃, 0.5) ≈ 1.0
-  #@test VaR(x̃, 0.4) ≈ 2.0
-
-  @test qql(x4, p4, 1) ≈ Inf
-  @test qql(x4, p4, 0.99) ≈ 5.0
-  @test qql(x4, p4, 0) ≈ -1.0
-  # @test qql(x4, p4, 0.0) ≈ Inf
-  @test qql(x4, p4, 0.5) ≈ 1.0
-  @test qql(x4, p4, 0.4) ≈ 1.0
+  @inbounds for (i, _) ∈ enumerate(vals)
+    if vals[i] <= q
+      # update index's probability and probability left to sum to 1.0
+      increment = min(p[i] / α̂, p_left)
+      value += increment * vals[i]
+      p_left -= increment
+      p_left ≤ zero(p_left) && break
+    end
+  end
+  return value
 end
+
+# Time to plot
+using Plots
+using Random
+Random.seed!(1234)
+
+magnitude = 6
+len = 100
+experiments = range(start=10, stop=10^magnitude, length=len)
+qcvar_results = Float64[]
+cvar_results = Float64[]
+int(x) = Int(ceil(x))
+@threads for n ∈ experiments
+  n = int(n)
+  println("Experiment i / $len --- n = $n")
+  x = rand(Float64, n)
+  p = rand(Float64, n)
+  p ./= sum(p)
+  α = rand(Float64)
+  push!(qcvar_results, @elapsed qCVaR!(x, p, α))
+  push!(cvar_results, @elapsed CVaR_e(x, p, α)[1])
+end
+plot(experiments, qcvar_results, label="qCVaR", xaxis=:log, yaxis=:log, legend=:topleft)
+plot!(experiments, cvar_results, label="CVaR", xaxis=:log, yaxis=:log, legend=:topleft)
+plot!(title="qCVaR vs CVaR", xlabel="n", ylabel="Time (s)")
+savefig("code/res.png")
+println("Done!")
+
+
+

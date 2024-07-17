@@ -1,4 +1,4 @@
-include("loopy.jl")
+include("loop_cvar.jl")
 using Test
 
 @testset "Loopy tests" begin
@@ -40,6 +40,15 @@ using Test
   @test qql!(x4, p4, 0.5) ≈ 1.0
   @test VaR_e(x4, p4, 1 - 0.5)[1] ≈ 1.0
   @test qql!(x4, p4, 0.4) ≈ 1.0
+
+  x5 = [2.0, 1.0]
+  p5 = [0.5, 0.5]
+  @test qql!(x5, p5, 0.5) ≈ 2.0
+  @test VaR_e(x5, p5, 0.5)[1] ≈ 2.0
+  @test qql!(x5, p5, 0.1) ≈ 1.0
+  @test VaR_e(x5, p5, 0.9)[1] ≈ 1.0
+  @test qql!(x5, p5, 0.9) ≈ 2.0
+  @test VaR_e(x5, p5, 0.1)[1] ≈ 2.0
 end
 
 @testset "Fast CVaR Tests" begin

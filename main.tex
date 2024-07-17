@@ -261,6 +261,7 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
   \begin{algorithmic}[1]
     \Require{}
     \Ensure{}
+    \todo{Make absolutely sure that you tell the reader that we use 1 or 0 based indexing}
     \State{$front \gets 1$}
     \State{ $back \gets n$ }
     \While{$back - front > 1$}
@@ -276,7 +277,7 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
     \If{$front = back$}
     \State{\Return{$x[front]$}}
     \Else{} \todo{This part right here is not correct}
-    \State{\Return{$x[back]$}}
+    \State{\Return{$\max(x[front], x[back])$}}
     \EndIf{}
   \end{algorithmic}
 \end{algorithm}
@@ -286,14 +287,25 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
 
 \begin{algorithm}
   \floatname{algorithm}{Quick CVaR}
-  \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ with probability mass function p and $\alpha \in [0,1]$}}
+  \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ with probability mass function p and $\alpha \in [0,1]$}}
   \algrenewcommand\algorithmicensure{\textbf{Output: $CVaR_\alpha(\tilde{X})$}}
   \caption{}\label{alg:quick_cvar}
   \begin{algorithmic}[1]
-    \Require 
-    \Ensure 
-    \State $q_\alpha = \text{quick\_quantile}(\tilde{X}, p, \alpha)$ 
-    \State \Return $\sum_{i=0}^n \mathds{1}( x[i] \leq q_\alpha ) x[i] p[i]$
+    \Require{}
+    \Ensure{} 
+    \todo{Make absolutely sure that you tell the reader that we use 1 or 0 based indexing}
+    \State{$q^+_\alpha \gets \text{quick\_quantile}(x, p, \alpha)$}
+    \State{$val \gets 0$}
+    \State{$p_{left} \gets 1$}
+    \For{$i = 0 \dots n$}
+      \State{$inc \gets \min(\frac{p[i]}{\alpha}, p_{left})$}
+      \State{$val += x[i] * inc$}
+      \State{$p_{left} -= inc$}
+      \If{$p_{left} \leq 0$}
+        \State{Break}
+      \EndIf{}
+    \EndFor{}
+    \State{\Return{$val$}}
   \end{algorithmic}
 \end{algorithm}
 

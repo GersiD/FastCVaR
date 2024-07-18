@@ -9,9 +9,7 @@ fn run_experiment(n: usize) -> (usize, f64, f64) {
     let mut x: Vec<f64> = repeat_with(|| rng.f64()).take(n).collect();
     let mut p: Vec<f64> = x.clone();
     let psum: f64 = p.iter().sum();
-    (0..n).for_each(|i| {
-        p[i] /= psum;
-    });
+    p.iter_mut().for_each(|p_i| *p_i /= psum);
     let alpha: f64 = rng.f64();
     let start = Instant::now();
     qq::cvar(&mut x, &mut p, alpha);

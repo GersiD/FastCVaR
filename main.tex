@@ -179,22 +179,26 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
 \end{thm}
 \begin{proof}
 
- Assumption 1 (for now): Algorithm requires every outcome in random element array to be unique
  
  
- Loop Invariant: At every element $\quant^+$ will remain in the array x.
-
- Before the loop: From Lemma 1, we can prove  $\quant^+$ exists in array $\tilde{x}$ at start of the loop. 
-
-
- During the loop: There are three possible scenarios during iteration:
  
- Case 1: Tail is selected such that $\alpha \leq \text{tail}$. In this case $P[x < x_{\text{pivot}}] \geq \alpha$. Therefore all x greater than x[pivot] are not feasible by \eqref{eq:var-definition} . Only x greater than x[pivot] will be removed (if they exist), therefore $\quant_{\alpha}^+(\tilde{x})$ remains in x.
+ Loop Invariant: Befor and after every iteration $\quant^+$ will remain in the array $x$ at an index $i$ such that $ front \leq i \leq back $.
 
- Case 2: Tail is selected such that $\alpha \ >\text{tail}$. In this case $P[x < x_{\text{pivot}}] \leq \alpha$.Therefore all x greater than x[pivot] are not feasible by \eqref{eq:var-definition} . Only these x are removed, thus $\quant_{\alpha}^+(\tilde{x})$ remains in x. Note since elements less than $\quant_{\alpha}^+(\tilde{x})$ with a probability value "Tail" of occurring are removed, $ P[x_{new} < \quant_{\alpha}^+(\tilde{x_old})] $ is $\alpha$ - tail.
 
- Case 3: The array x only has one element.
- Two scenarios here. If the original element x contained more than one element, all the elements that were removed could not have been $\quant_{\alpha}^+(\tilde{x})$, and $\quant_{\alpha}^+(\tilde{x})$ must exist in x per lemma 1. Therefore this element that will be returned is $\quant_{\alpha}^+(\tilde{x})$.  If x had one element to begin with, the probability of this outcome occurring must be 1. Therefore, $\quant_{\alpha}^+(\tilde{x})$ equals this element for all admissible alpha. 
+ At the loop beginning: Every element in $x$ has an index $i$ such $ front \leq i \leq back $, since $front=1$ and $back=n$. By Lemma 1, there exists an element with index $i$ such that $ front \leq i \leq n $.
+
+
+ 
+ 
+ During the loop: There are three possible scenarios at each iteration:
+ 
+ Case 1: Tail is selected such that $\alpha < tail$. In this case $back$ is set to $ind$. Assume there exists $\tau\opt $ such that $\tau\opt > ind$, and $x[\tau\opt]=\quant^+$. Then $P[x < x[\tau\opt]] \geq tail > \alpha$, meaning that $x[\tau\opt]$ is not feasible by \eqref{eq:var-definition}. %However, if $\tau\opt $ such that $\tau\opt \leq ind$ , then $P[x < x[\tau\opt]]  < tail > \alpha$, meaning that $x[\tau\opt]$ is potentially feasible by \eqref{eq:var-definition}, so by Lemma 1 $\quant^+$ must remain in this range.% 
+ Since from Lemma 1 we know $\quant^+$ must be in $x$, the loop invariant must hold true.
+
+ Case 2: Tail is selected such that $\alpha \geq tail$. In this case $front$ is set to $ind + 1$. Assume there exists $\tau\opt $ such that $\tau\opt \leq ind$, and $x[\tau\opt]=\quant^+$. Let $\tau' = ind + 1$. $P[x < x[\tau']] = tail \leq \alpha$. If $x[\tau\opt] <  x[\tau']$ then $x[\tau\opt]$ can not be optimal by \eqref{eq:var-definition}. If $x[\tau\opt] =  x[\tau']$, then the value of $x[\tau\opt]$ remains in $x$ with indices of the range $[front, back]$. Therefore loop invariant remains true.
+
+ Case 3: $front - back = 0$.
+ Two scenarios here. If $x$ contains more than one element, all the elements are no longer in the range $[front, back]$ could not have been $\quant_{\alpha}^+(\tilde{x})$ (see Case 1 and Case 2), and $\quant_{\alpha}^+(\tilde{x})$ must exist in x per lemma 1. Therefore this element that will be returned is $\quant_{\alpha}^+(\tilde{x})$.  If $x$ had one element to begin with, $\quant_{\alpha}^+(\tilde{x})$ equals this element for all admissible alpha. 
 
  
  

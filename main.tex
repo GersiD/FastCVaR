@@ -272,14 +272,13 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
     \State{$front \gets 1$}
     \State{ $back \gets n$ }
     \While{$back - front \geq 1$}
-    \State{$ind \gets partition(x, p, f, b)$  \Comment{Lomuto partition scheme}}
+    \State{$ind \gets partition(x, p, f, b) - 1$  \Comment{Lomuto partition scheme}}
 
     \State{$tail \gets \sum_{i=1}^n \mathds{1}(x[i] \leq x[ind]) p[i]$}
-
       \If{$\alpha < tail$}
-      \State{$back \gets ind - 1$}
+      \State{$back \gets ind$}
       \Else{}
-      \State{$front \gets ind$}
+      \State{$front \gets ind + 1$}
       \EndIf{}
     \EndWhile{}
     \State{\Return{$x[front]$}}

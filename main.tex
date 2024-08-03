@@ -315,21 +315,24 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
 
 
 \begin{algorithm}
-\begin{algorithmic}[2]
-\caption{Partition}
-
-\Procedure{Partition}{A, lo, hi}
-    \State pivot := A[hi] \Comment{Choose the last element as the pivot}
-    \State i := lo \Comment{Temporary pivot index}
-    \For{j := lo to hi - 1}
-        \If{A[j] $\leq$ pivot}
-            \State swap A[i] with A[j]
-            \State i := i + 1
-        \EndIf
-    \EndFor
-    \State swap A[i] with A[hi]
-    \State \Return i \Comment{the pivot index}
-\EndProcedure{Partition}
+\floatname{algorithm}{Partition}
+\algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ with probability mass function p and $lo, hi \in \Real$}}
+\algrenewcommand\algorithmicensure{\textbf{Output: pivot index $i \in \Real$}}
+\begin{algorithmic}[1]
+  \Require{}
+  \Ensure{} 
+  \State{pivot = x[hi] \Comment{Choose the last element as the pivot}}
+  \State{i = lo \Comment{Temporary pivot index}}
+  \For{$j = lo \dots hi - 1$}
+      \If{x[j] $\leq$ pivot}
+        \State{swap x[i] with x[j]}
+        \State{swap p[i] with p[j]}
+        \State{i += 1}
+      \EndIf{}
+  \EndFor{}
+  \State{swap x[i] with x[hi]}
+  \State{swap p[i] with p[hi]}
+  \State{\Return{i \Comment{the pivot index}}}
 \end{algorithmic}
 \end{algorithm}
 

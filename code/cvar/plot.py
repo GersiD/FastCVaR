@@ -30,14 +30,18 @@ plt.ylabel('Time (s)')
 plt.legend()
 plt.savefig('plot.pdf')
 plt.clf()
-plt.plot(df['Size'], df['Slow_CVaR'] / df['Fast_CVaR'], label='Slow_CVaR / Fast_CVaR')
+# please plot the ratio of Slow_CVaR to Fast_CVaR
+ratios = np.array(means_slow_cvar) / np.array(means_fast_cvar)
+plt.plot(unique_sizes, ratios, label='Slow_CVaR / Fast_CVaR')
 plt.xlabel('Size')
 plt.ylabel('Slow_CVaR / Fast_CVaR')
 plt.legend()
 plt.savefig('plot_ratio.pdf')
 plt.clf()
 # please plot the moving average of the ratio of Slow_CVaR to Fast_CVaR
-plt.plot(df['Size'], df['Slow_CVaR'].rolling(window=1000).mean() / df['Fast_CVaR'].rolling(window=10).mean(), label='Slow_CVaR / Fast_CVaR')
+window_size = 10
+ratios_ma = np.convolve(ratios, np.ones(window_size), 'valid') / window_size
+plt.plot(unique_sizes[window_size-1:], ratios_ma, label='Slow_CVaR / Fast_CVaR')
 plt.xlabel('Size')
 plt.ylabel('Slow_CVaR / Fast_CVaR')
 plt.legend()

@@ -72,6 +72,22 @@ mod tests {
         assert_eq!(qq::qql(&mut x1, &mut p1, 1.0), f64::MAX);
         assert_eq!(qq::qql(&mut x1, &mut p1, 0.5), 2.0);
 
+        let mut x1 = vec![3.0, 1.0, 2.0];
+        let mut p1 = vec![1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0];
+        assert_eq!(qq::qql(&mut x1, &mut p1, 0.5), 2.0);
+
+        let mut x1 = vec![1.0, 2.0, 3.0];
+        let mut p1 = vec![1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0];
+        assert_eq!(qq::qql(&mut x1, &mut p1, 0.5), 2.0);
+
+        let mut x1 = vec![3.0, 2.0, 1.0];
+        let mut p1 = vec![1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0];
+        assert_eq!(qq::qql(&mut x1, &mut p1, 0.6), 2.0);
+
+        let mut x1 = vec![2.0, 3.0, 1.0];
+        let mut p1 = vec![1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0];
+        assert_eq!(qq::qql(&mut x1, &mut p1, 0.6), 2.0);
+
         let mut x2 = vec![10.0, 2.0, 4.0, 7.0, 8.0];
         let mut p2 = vec![0.1, 0.1, 0.3, 0.3, 0.2];
         assert_eq!(qq::qql(&mut x2, &mut p2, 0.5), 7.0);

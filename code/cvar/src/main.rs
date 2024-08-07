@@ -20,13 +20,18 @@ fn run_experiment(n: usize) -> (usize, f64, f64) {
     (n, fast_cvar_time, slow_cvar_time)
 }
 
+fn run_batch(n: usize, batch_size: usize) -> Vec<(usize, f64, f64)> {
+    (0..batch_size).map(|_| run_experiment(n)).collect()
+}
+
 fn main() -> Result<(), csv::Error> {
     let mut writer = Writer::from_path("experiments.csv").unwrap();
-    let step_size = 10;
+    let step_size = 100000;
     let start = 5;
-    let end = 100000;
+    let end = 10000000;
     let total = (end - start) / step_size;
-    // Header row
+    let batch_size = 10; // Number of experiments to run for each n
+                         // Header row
     writer.write_record(["Size", "Fast_CVaR", "Slow_CVaR"])?;
     // Generate a csv file with experiments
     let n_s = start..end;
@@ -34,8 +39,9 @@ fn main() -> Result<(), csv::Error> {
         .step_by(step_size)
         .map(|n| {
             println!("Running experiment {} / {}", n / step_size, total);
-            run_experiment(n)
+            run_batch(n, batch_size)
         })
+        .flatten()
         .collect::<Vec<(usize, f64, f64)>>()
         .iter()
         .for_each(|(n, fast_cvar_time, slow_cvar_time)| {
@@ -65,6 +71,22 @@ mod tests {
         assert_eq!(qq::qql(&mut x1, &mut p1, 0.0), 1.0);
         assert_eq!(qq::qql(&mut x1, &mut p1, 1.0), f64::MAX);
         assert_eq!(qq::qql(&mut x1, &mut p1, 0.5), 2.0);
+
+        let mut x1 = vec![3.0, 1.0, 2.0];
+        let mut p1 = vec![1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0];
+        assert_eq!(qq::qql(&mut x1, &mut p1, 0.5), 2.0);
+
+        let mut x1 = vec![1.0, 2.0, 3.0];
+        let mut p1 = vec![1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0];
+        assert_eq!(qq::qql(&mut x1, &mut p1, 0.5), 2.0);
+
+        let mut x1 = vec![3.0, 2.0, 1.0];
+        let mut p1 = vec![1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0];
+        assert_eq!(qq::qql(&mut x1, &mut p1, 0.6), 2.0);
+
+        let mut x1 = vec![2.0, 3.0, 1.0];
+        let mut p1 = vec![1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0];
+        assert_eq!(qq::qql(&mut x1, &mut p1, 0.6), 2.0);
 
         let mut x2 = vec![10.0, 2.0, 4.0, 7.0, 8.0];
         let mut p2 = vec![0.1, 0.1, 0.3, 0.3, 0.2];

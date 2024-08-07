@@ -191,12 +191,15 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
  
  
  During the loop: There are three possible scenarios at each iteration:
+
+  
  
- Case 1: Tail is selected such that $\alpha < tail$. In this case $back$ is set to $ind$. Assume there exists $\tau\opt $ such that $\tau\opt > ind$, and $x[\tau\opt]=\quant^+$. Then $P[x < x[\tau\opt]] \geq tail > \alpha$, meaning that $x[\tau\opt]$ is not feasible by \eqref{eq:var-definition}. %However, if $\tau\opt $ such that $\tau\opt \leq ind$ , then $P[x < x[\tau\opt]]  < tail > \alpha$, meaning that $x[\tau\opt]$ is potentially feasible by \eqref{eq:var-definition}, so by Lemma 1 $\quant^+$ must remain in this range.% 
+ Case 1: Tail is selected such that $\alpha < tail$. In this case $back$ is set to $ind - 1$. Assume there exists $\tau\opt $ such that $\tau\opt >= ind$, and $x[\tau\opt]=\quant^+$. Then $P[x < x[\tau\opt]] \geq tail > \alpha$, meaning that $x[\tau\opt]$ is not feasible by \eqref{eq:var-definition}. %However, if $\tau\opt $ such that $\tau\opt \leq ind$ , then $P[x < x[\tau\opt]]  < tail > \alpha$, meaning that $x[\tau\opt]$ is potentially feasible by \eqref{eq:var-definition}, so by Lemma 1 $\quant^+$ must remain in this range.% 
  Since from Lemma 1 we know $\quant^+$ must be in $x$, the loop invariant must hold true.
 
- Case 2: Tail is selected such that $\alpha \geq tail$. In this case $front$ is set to $ind + 1$. Assume there exists $\tau\opt $ such that $\tau\opt \leq ind$, and $x[\tau\opt]=\quant^+$. Let $\tau' = ind + 1$. $P[x < x[\tau']] = tail \leq \alpha$. If $x[\tau\opt] <  x[\tau']$ then $x[\tau\opt]$ can not be optimal by \eqref{eq:var-definition}. If $x[\tau\opt] =  x[\tau']$, then the value of $x[\tau\opt]$ remains in $x$ with indices of the range $[front, back]$. Therefore loop invariant remains true.
-
+ Case 2: Tail is selected such that $\alpha \geq tail$. In this case $front$ is set to $ind$. Assume there exists $\tau\opt $ such that $\tau\opt < ind$, and $x[\tau\opt]=\quant^+$. Let $\tau' = ind$. $P[x < x[\tau']] = tail \leq \alpha$. If $x[\tau\opt] <  x[\tau']$ then $x[\tau\opt]$ can not be optimal by \eqref{eq:var-definition}. If $x[\tau\opt] =  x[\tau']$, then the value of $x[\tau\opt]$ remains in $x$ with indices of the range $[front, back]$. Therefore loop invariant remains true.
+ 
+ 
  Case 3: $front - back = 0$.
  Two scenarios here. If $x$ contains more than one element, all the elements are no longer in the range $[front, back]$ could not have been $\quant_{\alpha}^+(\tilde{x})$ (see Case 1 and Case 2), and $\quant_{\alpha}^+(\tilde{x})$ must exist in x per lemma 1. Therefore this element that will be returned is $\quant_{\alpha}^+(\tilde{x})$.  If $x$ had one element to begin with, $\quant_{\alpha}^+(\tilde{x})$ equals this element for all admissible alpha. 
 
@@ -207,7 +210,7 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
   
  
  Termination Step:  
- Proof: We can assume pivot will always be an element of the array x. If alpha is less than or equal to tail, every element greater than x[pivot] will be removed. There will therefore always be some elements that are removed unless x[pivot] is max element in the array. If alpha is greater than tail, than every element less than or equal to x[pivot] will be removed. Even if x[pivot] is the smallest element. Note: We need to deal with the edge case where x[pivot] is max element in the array and alpha is less than or equal to tail. One way to potentially overcome this is incorporating median of median elements.
+ Proof: At every iteration, the algorithm will always hit case 1 or case 2 assuming $back - front >= 1$. If $alpha < tail$, $back$ will always get smaller assuming it is in the range $(front, back$. If $alpha \geq tail$ , then  $back - front$ will not get smaller if $ind = front$. However, in this case the elements at $front$ and $back$ will have been swapped in the partition scheme, such that at next iteration $ind$ will not be equal to $front$ (as the pivot selected will now no longer be the smallest element in the list). 
 \end{proof}
 
 \begin{lem}
@@ -248,9 +251,8 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
     \State{$front \gets 1$}
     \State{ $back \gets n$ }
     \While{$back - front \geq 1$}
-    \State{$ind \gets partition(x, p, f, b) - 1$  \Comment{Lomuto partition scheme}}
-
-    \State{$tail \gets \sum_{i=0}^n \mathds{1}(x[i] \leq x[ind]) p[i]$}
+    \State{$ind \gets partition(x, p, f, b) - 1$  \Comment{Lomuto partition scheme - works in the code but termination can not be proven}}
+    \State{$tail \gets \sum_{i=1}^n \mathds{1}(x[i] \leq x[ind]) p[i]$}
       \If{$\alpha < tail$}
       \State{$back \gets ind$}
       \Else{}
@@ -287,6 +289,34 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
     \State{\Return{$val$}}
   \end{algorithmic}
 \end{algorithm}
+
+
+
+\begin{algorithm}
+\floatname{algorithm}{Partition}
+\algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ with probability mass function p and $lo, hi \in \Real$}}
+\algrenewcommand\algorithmicensure{\textbf{Output: pivot index $i \in \Real$}}
+  \begin{algorithmic}[1]
+    \Require{}
+    \Ensure{} 
+    \State{pind = f + (b-f)/2}
+    \State{pivot = x[pind]}
+    \State{swap x[pind] with x[hi]}
+    \State{swap p[pind] with p[hi]}
+    \State{i = lo}
+    \For{$j = lo \dots hi - 1$}
+        \If{x[j] $\leq$ pivot}
+          \State{swap x[i] with x[j]}
+          \State{swap p[i] with p[j]}
+          \State{i += 1}
+        \EndIf{}
+    \EndFor{}
+    \State{swap x[i] with x[hi]}
+    \State{swap p[i] with p[hi]}
+    \State{\Return{i \Comment{the pivot index}}}
+  \end{algorithmic}
+\end{algorithm}
+
 
 \section{k-capped simplex}
 

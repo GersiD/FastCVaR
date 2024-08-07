@@ -16,11 +16,12 @@ fn swap(vals: &mut [f64], p: &mut [f64], i: usize, j: usize) {
 }
 
 fn partition(vals: &mut [f64], p: &mut [f64], i: usize, j: usize) -> usize {
-    let pivot = (i + j) / 2;
+    let pivot = i;
     let pivot_val = vals[pivot];
     swap(vals, p, pivot, j);
     let mut store_index = i;
-    for k in i..=j {
+    // WARN: This is non-inclusive if you have a bug check me!
+    for k in i..j {
         if vals[k] < pivot_val {
             swap(vals, p, store_index, k);
             store_index += 1;

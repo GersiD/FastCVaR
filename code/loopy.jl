@@ -5,10 +5,12 @@ using Plots
 using Random
 Random.seed!(1234)
 
-magnitude = 10
-len = 1000
+start = 5
+stop = 100000
+step = 10
 # experiments = range(start=5, stop=10^magnitude, length=len)
-experiments = range(start=1000, stop=1000000, step=1000)
+experiments = range(start=start, stop=stop, step=step)
+len = length(experiments)
 qcvar_results = Float64[]
 cvar_results = Float64[]
 int(x) = Int(ceil(x))

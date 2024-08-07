@@ -7,6 +7,10 @@ using Test
   @test qql!(x1, p1, 0.5) ≈ 2
   @test VaR_e(x1, p1, 0.5)[1] ≈ 2
 
+  x1 = Float64[3, 2, 1]
+  @test qql!(x1, p1, 0.5) ≈ 2
+  @test VaR_e(x1, p1, 0.5)[1] ≈ 2
+
   x2 = Float64[10, 2, 4, 7, 8]
   p2 = [0.1, 0.1, 0.3, 0.3, 0.2]
   @test qql!(x2, p2, 0.5) ≈ 7

@@ -236,32 +236,11 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
 
 \subsection{Quick Quantile}
 
-% \begin{algorithm}
-%   \floatname{algorithm}{Quick Quantile}
-%   \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ with domain $x$ and probability mass function $p$ and $\alpha \in [0,1]$}}
-%   \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
-%   \caption{}\label{alg:quick_quantile}
-%   \begin{algorithmic}[1]
-%     \Require 
-%     \Ensure 
-%     \If{$n = 1$}
-%     \State \Return $x$
-%     \EndIf
-%     \State $pivot \gets rand(1:n)$
-%     \State $tail \gets \sum_{i=0}^n \mathds{1}(x[i] \leq x[pivot]) p[i]$
-%     \If{$\alpha \leq tail$}
-%     \State \Return $qq(vals[\mathds{1}(x[i] \leq x[pivot])], p[\mathds{1}(x[i] \leq x[pivot])], \alpha)$
-%     \Else
-%     \State \Return $qq(vals[\mathds{1}(x[i] > x[pivot])], p[\mathds{1}(x[i] > x[pivot])], \alpha - tail)$
-%     \EndIf
-%   \end{algorithmic}
-% \end{algorithm}
 
 \begin{algorithm}
-  \floatname{algorithm}{Quick Quantile}
   \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ and probability mass function $p$ and $\alpha \in [0,1]$}}
   \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
-  \caption{}\label{alg:quick_quantile}
+  \caption{algorithm}{Quick Quantile}\label{alg:quick_quantile}
   \begin{algorithmic}[1]
     \Require{}
     \Ensure{}

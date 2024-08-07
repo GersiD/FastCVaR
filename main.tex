@@ -273,15 +273,11 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
     \State{ $back \gets n$ }
     \While{$back - front \geq 1$}
     \State{$ind \gets partition(x, p, f, b) - 1$  \Comment{Lomuto partition scheme - works in the code but termination can not be proven}}
-    \State{$ind \gets partition(x, p, f, b) $  \Comment{If the psuedocode is written like this I can prove termination (which I do in the proof)but Gersi claims it does not work in his code}
     \State{$tail \gets \sum_{i=1}^n \mathds{1}(x[i] \leq x[ind]) p[i]$}
       \If{$\alpha < tail$}
       \State{$back \gets ind$}
-      \State{$back \gets ind - 1$ \Comment This way of doing it allows me to gurantee termination but Gersi claims it does not work in his code}
       \Else{}
-     
       \State{$front \gets ind + 1$}
-       \State{$front \gets ind$ \Comment This way of doing it allows me to gurantee termination but Gersi claims it does not work in his code}
       \EndIf{}
     \EndWhile{}
     \State{\Return{$x[front]$}}
@@ -324,8 +320,11 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
   \begin{algorithmic}[1]
     \Require{}
     \Ensure{} 
-    \State{pivot = x[hi] \Comment{Choose the last element as the pivot}}
-    \State{i = lo \Comment{Temporary pivot index}}
+    \State{pind = f + (b-f)/2}
+    \State{pivot = x[pind]}
+    \State{swap x[pind] with x[hi]}
+    \State{swap p[pind] with p[hi]}
+    \State{i = lo}
     \For{$j = lo \dots hi - 1$}
         \If{x[j] $\leq$ pivot}
           \State{swap x[i] with x[j]}

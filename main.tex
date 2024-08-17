@@ -182,7 +182,7 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
  
  
  
- Loop Invariant: Befor and after every iteration $\quant^+$ will remain in the array $x$ at an index $i$ such that $ front \leq i \leq back $.
+ Loop Invariant: Before and after every iteration $\quant^+$ will remain in the array $x$ at an index $i$ such that $ front \leq i \leq back $.
 
 
  At the loop beginning: Every element in $x$ has an index $i$ such $ front \leq i \leq back $, since $front=1$ and $back=n$. By Lemma 1, there exists an element with index $i$ such that $ front \leq i \leq n $.
@@ -194,11 +194,10 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
 
   
  
- Case 1: Tail is selected such that $\alpha < tail$. In this case $back$ is set to $ind - 1$. Assume there exists $\tau\opt $ such that $\tau\opt >= ind$, and $x[\tau\opt]=\quant^+$. Then $P[x < x[\tau\opt]] \geq tail > \alpha$, meaning that $x[\tau\opt]$ is not feasible by \eqref{eq:var-definition}. %However, if $\tau\opt $ such that $\tau\opt \leq ind$ , then $P[x < x[\tau\opt]]  < tail > \alpha$, meaning that $x[\tau\opt]$ is potentially feasible by \eqref{eq:var-definition}, so by Lemma 1 $\quant^+$ must remain in this range.% 
+ Case 1: Tail is selected such that $\alpha < tail$. In this case $back$ is set to $ind$. Assume there exists $\tau\opt $ such that $\tau\opt >= $x[ind]$ $, and $x[\tau\opt]=\quant^+$. Then $P[x < x[\tau\opt]] \geq tail > \alpha$, meaning that $x[\tau\opt]$ is not feasible by \eqref{eq:var-definition}. %However, if $\tau\opt $ such that $\tau\opt \leq ind$ , then $P[x < x[\tau\opt]]  < tail > \alpha$, meaning that $x[\tau\opt]$ is potentially feasible by \eqref{eq:var-definition}, so by Lemma 1 $\quant^+$ must remain in this range.% 
  Since from Lemma 1 we know $\quant^+$ must be in $x$, the loop invariant must hold true.
 
- Case 2: Tail is selected such that $\alpha \geq tail$. In this case $front$ is set to $ind$. Assume there exists $\tau\opt $ such that $\tau\opt < ind$, and $x[\tau\opt]=\quant^+$. Let $\tau' = ind$. $P[x < x[\tau']] = tail \leq \alpha$. If $x[\tau\opt] <  x[\tau']$ then $x[\tau\opt]$ can not be optimal by \eqref{eq:var-definition}. If $x[\tau\opt] =  x[\tau']$, then the value of $x[\tau\opt]$ remains in $x$ with indices of the range $[front, back]$. Therefore loop invariant remains true.
- 
+ Case 2: Tail is selected such that $\alpha > tail$. In this case $front$ is set to $ind + 1$. Assume there exists $\tau\opt $ such that $\tau\opt \leq $x[ind]$ $, and $x[\tau\opt]=\quant^+$. Let $\tau' = ind$. $P[x < x[\tau']] \leq tail < \alpha$. If $x[\tau\opt] <  x[\tau']$ then $x[\tau\opt]$ can not be optimal by \eqref{eq:var-definition}. If $x[\tau\opt] =  x[\tau']$, then from the partitioning scheme we this is the optimal $\quant^+$ since 
  
  Case 3: $front - back = 0$.
  Two scenarios here. If $x$ contains more than one element, all the elements are no longer in the range $[front, back]$ could not have been $\quant_{\alpha}^+(\tilde{x})$ (see Case 1 and Case 2), and $\quant_{\alpha}^+(\tilde{x})$ must exist in x per lemma 1. Therefore this element that will be returned is $\quant_{\alpha}^+(\tilde{x})$.  If $x$ had one element to begin with, $\quant_{\alpha}^+(\tilde{x})$ equals this element for all admissible alpha. 
@@ -335,6 +334,35 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
   \end{mprog}
 \end{equation}
 
+\begin{algorithm}
+  \floatname{algorithm}{k-capped simplex linear time}
+  \algrenewcommand\algorithmicrequire{\textbf{Input: Original vector $\tilde{X}$ as vector $x$, , sum constraint $k$}}
+  
+  \algrenewcommand\algorithmicensure{\textbf{Output: solution vector $\tilde{Y}$}}
+  \caption{algorithm}{Linear capped simplex}
+  \begin{algorithmic}[1]
+    \Require{}
+    \Ensure{}
+    \todo{Make absolutely sure that you tell the reader that we use 1based indexing}
+    \State{$a$ = NULL}
+    \State{$front \gets 1$}
+    \State{ $back \gets n$ }
+    \While{$back - front \geq 1$}
+    \State{$ind \gets partition(x, f, b) - 1$  \Comment{Lomuto partition scheme - works in the code but termination can not be proven}}
+    \State {$\gamma \gets -2x[ind]$}
+    
+    \State{$sum \gets \sum_{i=ind + 1}^n \min\left(1, x_i + 0.5 \cdot \gamma\right)$}
+      \If{$\sum > k$}
+      \State{$front \gets ind$}
+      \Elseif{$\sum < k$}
+      \State{$back \gets ind - 1$}
+      \Else{}
+      \State{$front \gets ind + 1$}
+      \EndIf{}
+    \EndWhile{}
+    \State{\Return{$x[front]$}}
+  \end{algorithmic}
+\end{algorithm}
 
 \bibliography{fastcvar.bib}
 

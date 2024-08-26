@@ -354,7 +354,7 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
     \State{$sum \gets \sum_{i=ind + 1}^n \min\left(1, x_i + 0.5 \cdot \gamma\right)$}
       \If{$\sum > k$}
       \State{$front \gets ind$}
-      \Elseif{$\sum < k$}
+      \ElsIf{$\sum < k$}
       \State{$back \gets ind - 1$}
       \Else{}
       \State{$front \gets ind + 1$}

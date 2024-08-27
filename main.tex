@@ -334,36 +334,6 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
   \end{mprog}
 \end{equation}
 
-\begin{algorithm}
-  \floatname{algorithm}{k-capped simplex linear time}
-  \algrenewcommand\algorithmicrequire{\textbf{Input: Original vector $\tilde{X}$ as vector $x$, , sum constraint $k$}}
-  
-  \algrenewcommand\algorithmicensure{\textbf{Output: solution vector $\tilde{Y}$}}
-  \caption{algorithm}{Linear capped simplex}
-  \begin{algorithmic}[1]
-    \Require{}
-    \Ensure{}
-    \todo{Make absolutely sure that you tell the reader that we use 1based indexing}
-    \State{$a$ = NULL}
-    \State{$front \gets 1$}
-    \State{ $back \gets n$ }
-    \While{$back - front \geq 1$}
-    \State{$ind \gets partition(x, f, b) - 1$  \Comment{Lomuto partition scheme - works in the code but termination can not be proven}}
-    \State {$\gamma \gets -2x[ind]$}
-    
-    \State{$sum \gets \sum_{i=ind + 1}^n \min\left(1, x_i + 0.5 \cdot \gamma\right)$}
-      \If{$\sum > k$}
-      \State{$front \gets ind$}
-      \ElsIf{$\sum < k$}
-      \State{$back \gets ind - 1$}
-      \Else{}
-      \State{$front \gets ind + 1$}
-      \EndIf{}
-    \EndWhile{}
-    \State{\Return{$x[front]$}}
-  \end{algorithmic}
-\end{algorithm}
-
 \bibliography{fastcvar.bib}
 
 \end{document}

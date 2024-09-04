@@ -328,11 +328,98 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
   \end{mprog}
   =
   \begin{mprog}
-    \minimize{\xi \in \Real^n} \lvert \lvert \xi - x \rvert \rvert_2^2
-    \stc \xi\tr \mathbf{1} \leq k
-    \cs \xi \geq 0   
+    \minimize{\bm\xi \in \Real^n} \lvert \lvert \bm\xi - \bm{x} \rvert \rvert_2^2
+    \stc \bm\xi\tr \mathbf{1} \leq k
+    \cs \bm{0} \le \bm\xi \le \bm{1} 
   \end{mprog}
 \end{equation}
+
+\mm{define k-capped simplex}
+
+    \todo{Make absolutely sure that you tell the reader that we use 1based indexing. Make sure that we always use 1-based indices in all algorithms}
+
+\begin{algorithm}
+  \algrenewcommand\algorithmicrequire{\textbf{Input:   $\tilde{X}$ as vector $x$ to project and sum constraint k}}
+  \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
+  \caption{algorithm}{K-capped}\label{alg:quick_quantile}
+  \begin{algorithmic}[1]
+    \Require{}
+    \Ensure{}
+    \State{$frontA \gets 1$}
+    \State{ $backA \gets n$ }
+    \State{$frontB \gets 1$}
+    \State{ $backB \gets n$ }
+    \State{ $midSum \gets 0$ }
+    \State{ $minMid \gets inf$ }
+    \State{ $midSize \gets 0$ }
+    \State{ $maxMid \gets -inf$ }
+    \While{$backB - frontB \geq 1$ and $backA - frontA \geq 1$}
+      
+     \Comment{Lomuto partition scheme}
+    
+      \If{$backB - frontB >= 1$}
+      \State{$ind,leftsum,maxLeft,minLeft \gets modifiedPartition(x, l, f, b) - 1$}
+      \State{$\gamma \gets -2x[ind] + 2$}
+       \If{$maxMid + \gamma*2 >= 1$}
+         \State{$front \gets ind + 1$}
+       \ElsIf{$minMid + \gamma*2 <= 0$}
+         \State{$back \gets ind$} 
+       \Else{}
+       \State{$sum = \sum_{n=frontA}^{backA} (max(0, min(1, x[i])))  + midSum + \gamma*midSize + \sum_{i=frontB}^{backB} (max(0, min(1, x[i])))$}
+       \If{$sum > k$}
+           \State{$back \gets ind - 1$}
+       \ElsIf {$sum < k$}
+           \State{$front \gets ind$}
+           \If {$frontB - backA > mid_size$}
+           \State{$midSize \gets frontB - backA$}
+           \State{$midSum \gets leftSum + midSum$}
+            \EndIf{}
+            
+           
+       \Else{}
+         return solution with computed \gamma
+        
+      \EndIf{}
+      
+      \EndIf{}
+      \EndIf{}
+    \If{$backA - backB \ge 1$} 
+       \State{ $backA \gets backB$ }
+     \EndIf{}
+    \If{$backA - frontA >= 1$}
+      \State{$ind,rightsum,maxRight,minRight \gets modifiedPartition(x, r, f, b) - 1$}
+      \State{$\gamma \gets -2x[ind]$}
+       \If{$maxMid + \gamma*2 >= 1$}
+         \State{$front \gets ind + 1$}
+       \ElsIf{$minMid + \gamma*2 <= 0$}
+         \State{$back \gets ind$} 
+       \Else{}
+       \State{$sum = \sum_{n=frontA}^{backA} (max(0, min(1, x[i])))  + midSum + \gamma*midSize + \sum_{i=frontB}^{backB} (max(0, min(1, x[i])))$}
+       \If{$sum > k$}
+           \State{$back \gets ind - 1$}
+       \ElsIf {$sum < k$}
+           \State{$front \gets ind$}
+           \If {$frontB - backA > midSize$}
+           \State{$midSize \gets frontB - backA$}
+           \State{$midSum \gets rightSum + midSum$}
+            \EndIf{}
+            
+           
+       \Else{}
+         
+          \EndIf{}   
+     \EndIf{}
+      \EndIf{}  
+  \EndWhile{}
+    \State{\Return{$x[front]$}}
+
+
+  
+  
+  \end{algorithmic}
+\end{algorithm}
+
+
 
 \bibliography{fastcvar.bib}
 

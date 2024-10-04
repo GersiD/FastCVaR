@@ -64,36 +64,36 @@ This paper seems to describe an algorithm for projection onto the unit simplex, 
 Before describing CVaR and its solution we define the basic notation we use in the paper. 
 We use calligraphic letters to denote sets and a tilde to denote random variables. 
 We also adopt the standard convention that $\mathcal{A}^{\mathcal{B}}$ represents the set of all functions from a set $\mathcal{B}$ to a set $\mathcal{A}$ and 
-treat vectors as a function from indexes to real numbers. $\mathbf{1}$ denotes the vector of ones and $\mathds{1}(bool)$ denotes the indicator function. We use the convention that comparison operators are defined on vector spaces element-wise, that is for $x, y \in \Real^n$ then $x \leq y \iff x_i \leq y_i \quad \; \forall \; i \in 1\dots n$.
+treat vectors as a function from indexes to real numbers. $\mathbf{1}$ denotes the vector of ones and $\mathds{1}(bool)$ denotes the indicator function. We use the convention that comparison operators are defined on vector spaces element-wise, that is for $x, y \in \mathbb{R}^n$ then $x \leq y \iff x_i \leq y_i \quad \; \forall \; i \in 1\dots n$.
 Finally, $\Delta^n$ denotes the standard $n$-simplex while $\Delta_k^n$ denotes the k-capped simplex~\cite{kcapped_ang}.
 
 \paragraph{Value-at-Risk and Quantiles}
 
-Quantile of a random variable $\tilde{x} \in \mathbb{X}$ at level $\alpha \in [0,1]$ is any value $\tau\in \Real$ such that $\P{\tilde{x} \le \tau} \ge \alpha$ and $\P{\tilde{x} \ge \tau} \ge 1-\alpha$. The quantile of a random variable may not be unique and lies in the interval $[\quant^-_{\alpha}(\tilde{x}), \quant^+_{\alpha}(\tilde{x})]$ where
+Quantile of a random variable $\tilde{x} \in \mathbb{X}$ at level $\alpha \in [0,1]$ is any value $\tau\in \mathbb{R}$ such that $\mathbb{P}({\tilde{x}) \le \tau} \ge \alpha$ and $\mathbb{P}({\tilde{x}) \ge \tau} \ge 1-\alpha$. The quantile of a random variable may not be unique and lies in the interval $[\quant^-_{\alpha}(\tilde{x}), \quant^+_{\alpha}(\tilde{x})]$ where
 %\begin{subequations} 
 \begin{align} \label{eq:quantile-definition}
 %\label{eq:upper-quantile-definition}
   \quant_{\alpha}^+(\tilde{x})
   &\;:=\;
-    \max\; \left\{\tau \in \bar{\Real} \mid \P{ \tilde{x} < \tau } \le \alpha\right\}, 
+    \max\; \left\{\tau \in \bar{\mathbb{R}} \mid \mathbb{P}({ \tilde{x}) < \tau } \le \alpha\right\}, 
       %\label{eq:low-quantile-definition}
   &\quant_{\alpha}^-(\tilde{x})
   &\;:=\;
-    \min\; \left\{\tau \in \bar{\Real} \mid \P{ \tilde{x}  \le \tau } \ge \alpha\right\}.
+    \min\; \left\{\tau \in \bar{\mathbb{R}} \mid \mathbb{P}({ \tilde{x})  \le \tau } \ge \alpha\right\}.
 \end{align}
 %\end{subequations}
-The maximum in \eqref{eq:quantile-definition} exists because $\tau \mapsto \P{\tilde{x} < \tau}$ is lower semi-continuous and the minimum in \eqref{eq:quantile-definition} exists because $\tau \mapsto \P{\tilde{x} \le \tau}$ is upper semi-continuous. Note that $\quant^+_1(\tilde{x}) = \infty$, $\quant^-_0(\tilde{x}) = -\infty$ and the quantiles are bounded otherwise for all $\alpha \in [0,1]$.
-Monetary risk measures generalize the expectation operator to account for the uncertainty in the distribution. \emph{Value-at-Risk}~(VaR) is one of the oldest, simplest, and most common risk measures~\cite{Follmer2016, Shapiro2014}. Value-at-Risk $\varo \colon \mathbb{X} \to \bar{\Real}$ at a risk level $\alpha \in [0,1]$ of a random variable $\tilde{x}\in \mathbb{X}$ is defined as the largest $1-\alpha$ confidence lower bound on the value of the random variable:
+The maximum in \eqref{eq:quantile-definition} exists because $\tau \mapsto \mathbb{P}({\tilde{x} )< \tau}$ is lower semi-continuous and the minimum in \eqref{eq:quantile-definition} exists because $\tau \mapsto \mathbb{P}({\tilde{x}) \le \tau}$ is upper semi-continuous. Note that $\quant^+_1(\tilde{x}) = \infty$, $\quant^-_0(\tilde{x}) = -\infty$ and the quantiles are bounded otherwise for all $\alpha \in [0,1]$.
+Monetary risk measures generalize the expectation operator to account for the uncertainty in the distribution. \emph{Value-at-Risk}~(VaR) is one of the oldest, simplest, and most common risk measures~\cite{Follmer2016, Shapiro2014}. Value-at-Risk: $VaR \colon \mathbb{X} \to \bar{\mathbb{R}}$ at a risk level $\alpha \in [0,1]$ of a random variable $\tilde{x}\in \mathbb{X}$ is defined as the largest $1-\alpha$ confidence lower bound on the value of the random variable:
 \begin{equation}
   \label{eq:var-definition}
-\var{\alpha}{\tilde{x}} \;:=\;  \quant^+_{ \alpha }(\tilde{x}).  
+VaR_{\alpha}{\tilde{x}} \;:=\;  \quant^+_{ \alpha }(\tilde{x}).  
 \end{equation}
 
 \section{Formal Model}
 
 
 We can assume a probability space with outcomes $\Omega = \left\{ 1, \dots , N \right\}$, events $\mathcal{F}$, and
-probability function $\mathbb{P} \in \Delta^N$. We consider a random variable to be any mapping $\tilde{x}\colon \Omega \to \Real$. Or equivalently as vectors on $\Omega$. For example, the vector $\bm{x}\in \Real^N$ equivalent to $\tilde{x}$ is constructed as
+probability function $\mathbb{P} \in \Delta^N$. We consider a random variable to be any mapping $\tilde{x}\colon \Omega \to \mathbb{R}$. Or equivalently as vectors on $\Omega$. For example, the vector $\bm{x}\in \mathbb{R}^N$ equivalent to $\tilde{x}$ is constructed as
 \[
  x_w = \tilde{x}( \omega ), \quad\forall \omega \in \Omega .
 \]
@@ -104,12 +104,12 @@ We assume the same equivalence for probability distributions.
 
 \palash{TODO reference where the linear programming formulation for CVar is derived, lemma relating k-capped simple.}\begin{equation} \label{eq:primal_cvar}
   \begin{aligned}
-    \cvaro_\alpha(\tilde{x})
+    CVaR_\alpha(\tilde{x})
   &= \min \left\{  \Ex{\bm{\xi}}{ \tilde{x}  } \mid
   \bm{\xi} \leq \frac{1}{1-\alpha} p, \bm{\xi} \in \Delta^n \right\} \\
-  &= \min \left\{\bm{\xi}\tr \bm{x} \mid \bm{\xi} \leq \frac{1}{1-\alpha} \bm{p},
-     \xi\tr \mathbf{1} = 1, \bm{\xi} \geq 0\right\}\\
-  &= \max \left\{ z - \frac{1}{1-\alpha} \Ex{\bm{p}}{z-x}_+ \mid z \in \Real\right\}.
+  &= \min \left\{\bm{\xi}^T \bm{x} \mid \bm{\xi} \leq \frac{1}{1-\alpha} \bm{p},
+     \xi^T \mathbf{1} = 1, \bm{\xi} \geq 0\right\}\\
+  &= \max \left\{ z - \frac{1}{1-\alpha} \Ex{\bm{p}}{z-x}_+ \mid z \in \mathbb{R}\right\}.
   \end{aligned}
 \end{equation}
 
@@ -119,7 +119,7 @@ We assume the same equivalence for probability distributions.
 \end{thm}
 
 \begin{lem}
-Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite $\Omega$, and $\alpha\in [0,1)$. Then, there exist $\omega_1, \omega_2\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_1)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_2)$ for each $\alpha\in (0,1]$.
+Suppose that $\tilde{x}\colon \Omega \to \mathbb{R}$ is a random variable with finite $\Omega$, and $\alpha\in [0,1)$. Then, there exist $\omega_1, \omega_2\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_1)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_2)$ for each $\alpha\in (0,1]$.
 \end{lem}
 % \begin{proof}
 % Let
@@ -229,7 +229,6 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
 \section{Algorithm}
 
 \subsection{Piece-wise Linear Minimization}
-
 \maeve{Incorporate projection.jl }
 \begin{algorithm}
 \floatname{algorithm}{Piece-wise Linear Minimization}
@@ -293,8 +292,8 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
 
 \begin{algorithm}
 \floatname{algorithm}{Partition}
-\algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ with probability mass function p and $lo, hi \in \Real$}}
-\algrenewcommand\algorithmicensure{\textbf{Output: pivot index $i \in \Real$}}
+\algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ with probability mass function p and $lo, hi \in \mathbb{R}$}}
+\algrenewcommand\algorithmicensure{\textbf{Output: pivot index $i \in \mathbb{R}$}}
   \begin{algorithmic}[1]
     \Require{}
     \Ensure{} 
@@ -370,14 +369,14 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
            \State{$back \gets ind - 1$}
        \ElsIf {$sum < k$}
            \State{$front \gets ind$}
-           \If {$frontB - backA > mid_size$}
+           \If {$frontB - backA > midsize$}
            \State{$midSize \gets frontB - backA$}
            \State{$midSum \gets leftSum + midSum$}
             \EndIf{}
             
            
        \Else{}
-         return solution with computed \gamma
+         return solution with computed $\gamma$
         
       \EndIf{}
       
@@ -413,10 +412,23 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
   \EndWhile{}
     \State{\Return{$x[front]$}}
 
-
-  
-  
   \end{algorithmic}
+\end{algorithm}
+
+\section{Greedy Algorithm}
+
+\begin{algorithm}
+    \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite set $N$ = [$n$], non-decreasing submodular function $f$ : 2$^N$ $\rightarrow$ $\mathbb{R}$ satisfying $f$($\emptyset$) = 0 given by} 
+        \algrenewcommand\algorithmicensure{\textbf{Output: }max\{$c^Tx$ : $x \in$ $P_f$\}}
+  \caption{algorithm}{Greedy algorithm from Submodular Functions, Polymatroids, TDI \\Goal: min$\{f(S) : S\subseteq N\}$}
+ \begin{algorithmic}[1]
+    \Require{}
+    {the value function oracle.}
+    \Ensure{}
+    \State{Order the elements such that $c_1\geq c_2 \geq c_r \geq 0 \geq c_{r+1} \geq ... \geq c_n$.}
+    \State{Let $S^i := \{1, ..., i\}$ & $\forall i \in [n]$ and $S^0 := \emptyset$}
+    \State{Let $x_i :=  \begin{cases}f(S^i) - f(S^{i-1}) & \text{for } i = 1,..., r \\                          0 & \text{otherwise} \end{cases}$}
+\end{algorithmic}
 \end{algorithm}
 
 

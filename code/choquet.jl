@@ -16,8 +16,8 @@ end
 # Example
 x = [1, 2, 3, 4]
 p = [0.1, 0.2, 0.3, 0.4]
-c = function (x) # TODO: THIS IS WRONG
-  return sum(x)
+c = function (S) # TODO: THIS IS WRONG
+  return sum(S)
 end
 ξ = risk(x, p, c)
 @show ξ

@@ -1,4 +1,4 @@
-include("loop_cvar.jl")
+include("../loop_cvar.jl")
 using Test
 
 @testset "Loopy tests" begin

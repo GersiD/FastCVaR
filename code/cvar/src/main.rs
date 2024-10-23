@@ -21,7 +21,10 @@ fn run_experiment(n: usize) -> (usize, f64, f64) {
 }
 
 fn run_batch(n: usize, batch_size: usize) -> Vec<(usize, f64, f64)> {
-    (0..batch_size).map(|_| run_experiment(n)).collect()
+    (0..batch_size)
+        .into_par_iter()
+        .map(|_| run_experiment(n))
+        .collect()
 }
 
 fn main() -> Result<(), csv::Error> {

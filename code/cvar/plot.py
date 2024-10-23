@@ -2,12 +2,13 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from pandas.core.arrays.interval import ArrayLike
+from sklearn.linear_model import Lasso, LinearRegression
 
 csv_file = 'experiments.csv'
 df = pd.read_csv(csv_file)
 # 3 columns in the csv file: 'Size,Fast_CVaR,Slow_CVaR'
 # 'Size' is the x-axis, 'Fast_CVaR' and 'Slow_CVaR' are the y-axis
-unique_sizes : ArrayLike = df['Size'].unique()
+unique_sizes = df['Size'].unique()
 cis_slow_cvar = []
 cis_fast_cvar = []
 means_slow_cvar = []
@@ -21,10 +22,24 @@ for size in unique_sizes:
     means_slow_cvar.append(df_size['Slow_CVaR'].mean())
     means_fast_cvar.append(df_size['Fast_CVaR'].mean())
 
+unique_sizes = np.array(unique_sizes)
 plt.errorbar(unique_sizes, means_slow_cvar, yerr=cis_slow_cvar, label='Slow_CVaR', color='red')
 plt.errorbar(unique_sizes, means_fast_cvar, yerr=cis_fast_cvar, label='Fast_CVaR', color='green')
-# plt.scatter(unique_sizes, means_slow_cvar, label='Slow_CVaR')
-# plt.scatter(unique_sizes, means_fast_cvar, label='Fast_CVaR')
+# need to fit the plot with nlogn and n using linear regression
+# nlogn
+L = Lasso()
+X = np.array([unique_sizes, np.log(unique_sizes)]).T
+y = np.array(means_slow_cvar)
+reg = L.fit(X, y)
+y_pred = reg.predict(X)
+print('SlowCVaR Coef N Nlog(N)', reg.coef_)
+plt.plot(unique_sizes, y_pred, label=None, color='red', linestyle='dashed')
+y = np.array(means_fast_cvar)
+reg = L.fit(X, y)
+print('FastCVaR Coef N Nlog(N)', reg.coef_)
+y_pred = reg.predict(X)
+plt.plot(unique_sizes, y_pred, label=None, color='green', linestyle='dashed')
+
 plt.xlabel('Size')
 plt.ylabel('Time (s)')
 plt.legend()

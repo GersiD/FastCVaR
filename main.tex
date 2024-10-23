@@ -99,10 +99,8 @@ probability function $\mathbb{P} \in \Delta^N$. We consider a random variable to
 \]
 We assume the same equivalence for probability distributions. 
 
-\mm{Do we assume that $\bm{p} > 0$?}
-\gersi{@Marek $\bm{p} \in \Delta^n$}
-
-\palash{TODO reference where the linear programming formulation for CVar is derived, lemma relating k-capped simple.}\begin{equation} \label{eq:primal_cvar}
+As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk (CVaR) is a convex risk measure that generalizes the Value-at-Risk (VaR) and can be definied as
+\begin{equation} \label{eq:primal_cvar}
   \begin{aligned}
     CVaR_\alpha(\tilde{x})
   &= \min \left\{  \Ex{\bm{\xi}}{ \tilde{x}  } \mid

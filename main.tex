@@ -418,16 +418,15 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
 \section{Greedy Algorithm}
 
 \begin{algorithm}
-    \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite set $N$ = [$n$], non-decreasing submodular function $f$ : 2$^N$ $\rightarrow$ $\mathbb{R}$ satisfying $f$($\emptyset$) = 0 given by} 
-        \algrenewcommand\algorithmicensure{\textbf{Output: }max\{$c^Tx$ : $x \in$ $P_f$\}}
-  \caption{algorithm}{Greedy algorithm from Submodular Functions, Polymatroids, TDI \\Goal: min$\{f(S) : S\subseteq N\}$}
+    \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \mathbb{R}$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
+    \algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
+  \caption{algorithm}{Greedy algorithm from Submodular Functions, Polymatroids, TDI}
  \begin{algorithmic}[1]
     \Require{}
-    {the value function oracle.}
     \Ensure{}
-    \State{Order the elements such that $c_1\geq c_2 \geq c_r \geq 0 \geq c_{r+1} \geq ... \geq c_n$.}
-    \State{Let $S^i := \{1, ..., i\}$ & $\forall i \in [n]$ and $S^0 := \emptyset$}
-    \State{Let $x_i :=  \begin{cases}f(S^i) - f(S^{i-1}) & \text{for } i = 1,..., r \\                          0 & \text{otherwise} \end{cases}$}
+    \State{Order the elements such that $c_1 \geq c_2 \cdots \geq c_n$.}
+    \State{Let $S_i := \{1, \dots, i\}$ and $S_0 := \emptyset$}
+    \State{Let $x_i :=  \begin{cases}f(S_i) - f(S_{i-1}) & \text{for } i = 1,\dots, r \\ 0 & \text{otherwise} \end{cases}$}
 \end{algorithmic}
 \end{algorithm}
 

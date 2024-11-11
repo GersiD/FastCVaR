@@ -1,6 +1,22 @@
 # Compute the risk measure for any choquet capacity function ξ
+import Optim: optimize, Brent, BFGS
 using RiskMeasures
-using RobustMDPs
+
+function expectile(values, p, α)
+  if abs(α - 0.5) <= 1e-10
+    return values' * p
+  end
+
+  xmin, xmax = extrema(values)
+  # the function is minimized
+  f(x) = α * (max.(values .- x, 0) .^ 2)' * p + (1 - α) * (max.(values .- x, 0) .^ 2)' * p
+  sol = optimize(f, xmin, xmax, Brent())
+  sol.converged || error("Failed to find optimal x (unknown reason).")
+  isfinite(sol.minimum) || error("Overflow, computed an invalid solution. Check α.")
+  x = float(sol.minimizer)
+  return x
+end
+
 # Input:
 # x: vector of rewards
 # p: vector of probabilities
@@ -22,29 +38,24 @@ c = function (S, pmf, alpha)
   for i in S
     one_tilde[i] = 1
   end
-  return -worstcase_l1(-one_tilde, pmf, alpha)[2]
+  return -expectile(-one_tilde, pmf, alpha)
 end
-# c = function (S, pmf, alpha) # sorry palash
-#   if isempty(S)
-#     return 0
-#   end
-#   return min(1 / (1 - alpha) * sum(pmf[i] for i in S), 1)
-# end
 choq_risk = risk(x, p, c, 0.5)
-evar_risk = worstcase_l1(x, p, 0.5)[2]
-@show choq_risk
-@show evar_risk
-@show abs(choq_risk - evar_risk)
-@show c([], p, 0.5)
-@show c([1], p, 0.5)
-@show c([1, 2, 3, 4], p, 0.5)
+expectile_risk = expectile(x, p, 0.5)
+# @show choq_risk
+# @show expectile_risk
+# @show abs(choq_risk - expectile_risk)
+# @show c([], p, 0.5)
+# @show c([1], p, 0.5)
+# @show c([1, 2, 3, 4], p, 0.5)
 # plot difference across different values of α
 alphas = 0.0:0.1:1.0
 choq_risks = [risk(x, p, c, alpha) for alpha in alphas]
-evar_risks = [EVaR_e(x, p, alpha).value for alpha in alphas]
+expectile_risks = [EVaR_e(x, p, alpha).value for alpha in alphas]
 using Plots
 plot(alphas, choq_risks, label="Choquet", lw=2)
-plot!(alphas, evar_risks, label="worstcase_l1", lw=2)
-plot!(alphas, abs.(choq_risks .- evar_risks), label="Difference", lw=2)
+plot!(alphas, expectile_risks, label="expectile", lw=2)
+plot!(alphas, abs.(choq_risks .- expectile_risks), label="Difference", lw=2)
 xlabel!("α")
 savefig("choquet_vs_evar.pdf")
+

@@ -9,7 +9,7 @@ function expectile(values, p, α)
 
   xmin, xmax = extrema(values)
   # the function is minimized
-  f(x) = α * (max.(values .- x, 0) .^ 2)' * p + (1 - α) * (max.(values .- x, 0) .^ 2)' * p
+  f(x) = α * (max.(values .- x, 0) .^ 2)' * p + (1 - α) * (max.(x .- values, 0) .^ 2)' * p
   sol = optimize(f, xmin, xmax, Brent())
   sol.converged || error("Failed to find optimal x (unknown reason).")
   isfinite(sol.minimum) || error("Overflow, computed an invalid solution. Check α.")
@@ -51,7 +51,7 @@ expectile_risk = expectile(x, p, 0.5)
 # plot difference across different values of α
 alphas = 0.0:0.1:1.0
 choq_risks = [risk(x, p, c, alpha) for alpha in alphas]
-expectile_risks = [EVaR_e(x, p, alpha).value for alpha in alphas]
+expectile_risks = [expectile(x, p, alpha) for alpha in alphas]
 using Plots
 plot(alphas, choq_risks, label="Choquet", lw=2)
 plot!(alphas, expectile_risks, label="expectile", lw=2)

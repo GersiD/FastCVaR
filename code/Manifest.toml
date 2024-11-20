@@ -2,7 +2,7 @@
 
 julia_version = "1.11.1"
 manifest_format = "2.0"
-project_hash = "c720a4f0c2d38e5e9718bad1c093843b1eee7ed6"
+project_hash = "27332d3d0cd180817d769f632a9d69f9510102b3"
 
 [[deps.Adapt]]
 deps = ["LinearAlgebra", "Requires"]
@@ -911,6 +911,13 @@ deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "58cdd8fb2201a6267e1db87ff148dd6c1dbd8ad8"
 uuid = "f50d1b31-88e8-58de-be2c-1cc44531875f"
 version = "0.5.1+0"
+
+[[deps.RobustMDPs]]
+git-tree-sha1 = "07353fadd43501ff21c0a63d1a1006ca89c58f8c"
+repo-rev = "main"
+repo-url = "https://github.com/RiskAverseRL/RobustMDPs"
+uuid = "74c908e1-de81-459c-8fea-3c7fe559e5e4"
+version = "0.1.0"
 
 [[deps.SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"

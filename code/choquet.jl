@@ -31,14 +31,19 @@ fns = Dict("expectile" => expectile,
   end,
   "WorstCaseL1UnWeighted" => function (x, p, α)
     return worstcase_l1(x, p, α)[2]
-  end)
+  end,
+  "WorstCaseL1Weighted" => function (x, p, α)
+    w = ones(Float64, length(x))
+    return RobustMDPs.worstcase_l1_w(x, p, w, α)[2]
+  end
+)
 function closure_c(fn)
   return function (S, pmf, alpha)
     one_tilde = zeros(length(pmf))
     for i in S
-      one_tilde[i] = 1
+      one_tilde[i] = -1
     end
-    return -fn(-one_tilde, pmf, alpha)
+    return -fn(one_tilde, pmf, alpha)
   end
 end
 # Input:
@@ -53,14 +58,15 @@ return function choq_risk(x, pmf, c, alpha)
   end
   return sum(ξ .* x)
 end
+n = 100
 for (name, fn) in fns
   println("Risk for $name: ")
-  x = randn(100)
-  p = rand(100)
+  x = randn(n)
+  p = rand(n)
   p /= sum(p)
   c = closure_c(fn)
   # plot difference across different values of α
-  alphas = 0.0:0.1:1.0
+  alphas = 0.0:0.01:1.0
   choq_risks = [choq_risk(x, p, c, alpha) for alpha in alphas]
   expectile_risks = [fn(x, p, alpha) for alpha in alphas]
   plot(alphas, choq_risks, label="Choquet", lw=2)

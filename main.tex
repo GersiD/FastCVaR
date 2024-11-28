@@ -221,9 +221,19 @@ CVAR can be computing by solving an optimization problem $\max_{Q \in \mathcal{Q
 , such that all $Q$ in the set   satisfy $\max_{Q} Q(A) < \frac{1}{1-\alpha} P(A) \quad \forall A \in \mathcal{P}(\Omega)$.
 \end{lem}
 \begin{proof}
-  We start by noting that Q(A) can be written as $\sum_{j=1}^{n} \xi_j(A_j)$ where $A_1 , A_2, .. ,A_n$, are disjoint sets corresponding to a outcome where only one possible value of the random variable is realized and A is a subset of $\Omega$ if $j \neq n$. For all Q(A) such that $j \neq n$, we know from (3) that Q(A) \leq$\sum_{j=1}^{n} (1/1-a)*P(a)$ and that that $Q(A) < 1$ , thus Q(A) \leq $min($\sum_{j=1}^{n} (1/1-a)*P(a), 1)$$.
+  We start by noting that Q(A) can be written as $\sum_{j=1}^{n} \xi_j(A_j)$ where $A_1 , A_2, .. ,A_n$, are disjoint sets corresponding to a outcome where only one possible value of the random variable is realized and A is a subset of $\Omega$ if $j \neq n$. For all Q(A) such that $j \neq n$, we know from (3) that Q(A) \leq$\sum_{j=1}^{n} (1/1-a)*P(a)$ and that that $Q(A) < 1$ , thus Q(A) \leq $min($\sum_{j=1}^{n} (1/1-a)*P(a), 1)$$. 
 
 \end{proof}
+\begin{lem}
+We can prove that for any given $A$ we can construct a feasible $Q$ such that $Q(A) = min($\sum_{j=1}^{n} (1/1-a)*P(a), 1)$.
+
+\end{lem}
+\begin{proof}
+  Two possible scenarios exist. 
+  Case 1: $P(A) \geq 1 - \alpha$. In this case, Q(A) must equal 1 since $(1/(1 - \alpha)) $. Thus every element in $A$ should be scaled by $1/P(A)$ if in $A$ and set to 0 otherwise. Since  $P(A) \geq 1 - \alpha$, $1/P(A) \leq 1/(1-\alpha)$  
+  Case 2: $P(A) \geq 1/(1 - \alpha)$
+\end{proof}
+
 \begin{lem}
   If \cref{alg:quick_quantile} correctly computes $\quant^+$ then \cref{alg:quick_cvar} correctly computes CVaR. 
 \end{lem}

@@ -1,5 +1,7 @@
 include("../loop_cvar.jl")
 using Test
+using JuMP, Gurobi
+using RobustMDPs
 
 @testset "Loopy tests" begin
   x1::Vector{Float64} = Float64[1, 2, 3]
@@ -81,5 +83,52 @@ end
   @test qCVaR!(x2, p, 1 - 0.5) ≈ -0.2
   @test CVaR_e(x2, p, 0.4)[1] ≈ 0
   @test qCVaR!(x2, p, 1 - 0.4) ≈ 0
+end
+
+@testset "Sanity Check Robust MDPs" begin
+  x = randn(5)
+  probs = rand(5)
+  probs = probs / sum(probs)
+  α = randn(Float64)
+  (α < 0.0) && (α *= -1.0)
+  function worstcase_l1_gurobi(x, pbar, ξ)
+    m = Model(Gurobi.Optimizer)
+    set_optimizer_attribute(m, "OutputFlag", 0)
+    @variable(m, p[1:length(x)])
+    @variable(m, t[1:length(x)])
+    @constraint(m, p .- pbar <= t)
+    @constraint(m, pbar .- p <= t)
+    @constraint(m, sum(t) <= ξ)
+    @constraint(m, sum(p) == 1)
+    @constraint(m, p .>= 0)
+    @objective(m, Min, p' * x)
+    optimize!(m)
+    termination_status(m) != MOI.OPTIMAL && Error("Gurobi failed to find optimal solution")
+    return value.(p)' * x
+  end
+  function worstcase_l1_weighted_gurobi(x, pbar, ξ, w)
+    m = Model(Gurobi.Optimizer)
+    set_optimizer_attribute(m, "OutputFlag", 0)
+    @variable(m, p[1:length(x)])
+    @variable(m, t[1:length(x)])
+    @constraint(m, p .- pbar <= t)
+    @constraint(m, pbar .- p <= t)
+    @constraint(m, w' * t <= ξ)
+    @constraint(m, sum(p) == 1)
+    @constraint(m, p .>= 0)
+    @objective(m, Min, p' * x)
+    optimize!(m)
+    termination_status(m) != MOI.OPTIMAL && Error("Gurobi failed to find optimal solution")
+    return value.(p)' * x
+  end
+  @show x
+  @show probs
+  @show α
+  @test worstcase_l1_weighted_gurobi(x, probs, α, ones(5)) ≈ worstcase_l1_gurobi(x, probs, α)
+  @test worstcase_l1_gurobi(x, probs, α) ≈ worstcase_l1(x, probs, α)[2]
+  @test worstcase_l1_weighted_gurobi(x, probs, α, ones(5)) ≈ worstcase_l1_w(x, probs, ones(5), α)[2]
+  w = abs.(rand(5))
+  w = w / sum(w)
+  @test worstcase_l1_weighted_gurobi(x, probs, α, w) ≈ worstcase_l1_w(x, probs, w, α)[2]
 end
 

@@ -217,9 +217,22 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
   \mm{Maeve and prove it in Lean}
 \end{proof}
 \begin{lem}
-CVAR can be computing by solving an optimization problem $\max_{Q \in \mathcal{Q}} \mathbb{E}_Q[X]$
-, such that all $Q$ in the set must satisfy such that all  $Q \in \mathcal{Q}  satisfy \max_{Q} Q(A) < \frac{1}{1-\alpha} P(A) \quad \forall A \in \mathcal{P}(\Omega)$ . 
+CVAR can be computing by solving an optimization problem $\max_{Q \in \mathcal{Q}} \mathbb{E}_Q[X]$, such that all $Q$ in the set must satisfy such that all  $Q \in \mathcal{Q}  satisfy \max_{Q} Q(A) < \frac{1}{1-\alpha} P(A) \quad \forall A \in \mathcal{P}(\Omega)$ . 
 \end{lem}
+\begin{proof}
+  We start by noting that Q(A) can be written as $\sum_{j=1}^{n} \xi_j(A_j)$ where $A_1 , A_2, .. ,A_n$, are disjoint sets corresponding to a outcome where only one possible value of the random variable is realized and A is a subset of $\Omega$ if $j \neq n$. For all Q(A) such that $j \neq n$, we know from (3) that Q(A) \leq$\sum_{j=1}^{n} (1/1-a)*P(a)$ and that that $Q(A) < 1$ , thus Q(A) \leq $min($\sum_{j=1}^{n} (1/1-a)*P(a), 1)$. 
+
+\end{proof}
+\begin{lem}
+We can prove that for any given $A$ we can construct a feasible $Q$ such that $Q(A) = min($\sum_{j=1}^{n} (1/1-a)*P(a), 1)$.
+
+\end{lem}
+\begin{proof}
+  Two possible scenarios exist. 
+  Case 1: $P(A) \geq 1 - \alpha$. In this case, Q(A) must equal 1 since $(1/(1 - \alpha))* P(A) > 1 $. Thus every element in $A$ should be scaled by $1/P(A)$ if in $A$ and set to 0 otherwise. Since  $P(A) \geq 1 - \alpha$, $1/P(A) \leq 1/(1-\alpha)$  
+  Case 2: $P(A) < (1 - \alpha)$. In this scenario, $Q(A) \leq (1/(1 - \alpha)) * P(A) < 1$. For any given A, We can construct a Q(A) such that $Q(A) = (1/(1 - \alpha)) * P(A)$. This can be done by setting $Q(a) to $(1/(1 - \alpha))* P(a)$ for all a in A and $P(a)* d$ otherwise such that $(1/(1 - \alpha)) * P(A) + d*P(B) = 1$, where B contains all elements not in A. It is provable that $d \leq (1/(1 - \alpha))$, which is required for the constructed Q to be feasible. For all feasible $\alpha \geq 0$, $(1/(1 - \alpha)) \geq 1. Since $P(A) + P(B) = 1$,  $d must be \leq 1$ in order for $(1/(1 - \alpha)) * P(A) + d*P(B) = 1$ to hold. Since $1 \leq 1/(1-\alpha)$, d must then be \leq (1/(1 - \alpha)).
+\end{proof}
+
 \begin{lem}
   If \cref{alg:quick_quantile} correctly computes $\quant^+$ then \cref{alg:quick_cvar} correctly computes CVaR. 
 \end{lem}
@@ -431,7 +444,21 @@ CVAR can be computing by solving an optimization problem $\max_{Q \in \mathcal{Q
 \end{algorithmic}
 \end{algorithm}
 
+\section{Comonotonicity of Risk}
 
+Given two random variables $\tilde{x}$ and $\tilde{y}$ we say that they are comonotonic if \todo{what is the definition of comonotonicity?}.
+A risk measure is said to be comonotonic if $\rho(\tilde{x} + \tilde{y}) = \rho(\tilde{x}) + \rho(\tilde{y})$ for comonotonic random variables $\tilde{x}$ and $\tilde{y}$.
+
+\begin{table}[]
+\begin{tabular}{lll}
+  \textbf{Risk Measure} &  \textbf{Comonotone?} & \\
+  $\cvaro$ & Yes & \\
+  $\varo$ &  Yes & \\
+  Un weighted L1 &  Yes & \\
+  $\evaro$ & No & \\
+  Expectile & No &
+\end{tabular}
+\end{table}
 
 \bibliography{fastcvar.bib}
 

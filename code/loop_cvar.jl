@@ -52,9 +52,9 @@ function qCVaR!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, α::Rea
   q = qql!(vals, p, α)
 
   # From here on: α ∈ (0,1)
-  value = zero(T)                  # CVaR value
+  value = zero(T)           # CVaR value
   p_left = one(T)           # probabilities left for allocation
-  α̂ = α                      # probabilities to allocate
+  α̂ = α                    # probabilities to allocate
 
   @inbounds for i ∈ eachindex(vals)
     if vals[i] <= q

@@ -32,7 +32,12 @@
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,automata}
 
-\title{CVaR in Linear Time}
+\DeclareMathOperator{\varo}{VaR}
+\DeclareMathOperator{\cvaro}{CVaR}
+\DeclareMathOperator{\evaro}{EVaR}
+
+%\title{CVaR in Linear Time}
+\title{Fast Algorithms for VaR and $\varphi$-divergence Risk Measures, like CVaR and EVaR}
 \author{Palash Agrawal, Gersi Doko, Maeve Burwell, Marek Petrik}
 \date{}
 
@@ -58,7 +63,6 @@ Excellent paper covering the k-capped simplex problem in two forms (when the sum
 This paper seems to describe an algorithm for projection onto the unit simplex, NOT k-capped using a quickselect based approach, although this is not the primary contribution. 
 
 
-
 \section{Preliminaries}
 
 Before describing CVaR and its solution we define the basic notation we use in the paper. 
@@ -67,10 +71,11 @@ We also adopt the standard convention that $\mathcal{A}^{\mathcal{B}}$ represent
 treat vectors as a function from indexes to real numbers. $\mathbf{1}$ denotes the vector of ones and $\mathds{1}(bool)$ denotes the indicator function. We use the convention that comparison operators are defined on vector spaces element-wise, that is for $x, y \in \mathbb{R}^n$ then $x \leq y \iff x_i \leq y_i \quad \; \forall \; i \in 1\dots n$.
 Finally, $\Delta^n$ denotes the standard $n$-simplex while $\Delta_k^n$ denotes the k-capped simplex~\cite{kcapped_ang}.
 
-\paragraph{Value-at-Risk and Quantiles}
+\section{Formal Model}
 
+
+\paragraph{Value-at-Risk and quantiles}
 Quantile of a random variable $\tilde{x} \in \mathbb{X}$ at level $\alpha \in [0,1]$ is any value $\tau\in \mathbb{R}$ such that $\mathbb{P}({\tilde{x}) \le \tau} \ge \alpha$ and $\mathbb{P}({\tilde{x}) \ge \tau} \ge 1-\alpha$. The quantile of a random variable may not be unique and lies in the interval $[\quant^-_{\alpha}(\tilde{x}), \quant^+_{\alpha}(\tilde{x})]$ where
-%\begin{subequations} 
 \begin{align} \label{eq:quantile-definition}
 %\label{eq:upper-quantile-definition}
   \quant_{\alpha}^+(\tilde{x})
@@ -81,15 +86,32 @@ Quantile of a random variable $\tilde{x} \in \mathbb{X}$ at level $\alpha \in [0
   &\;:=\;
     \min\; \left\{\tau \in \bar{\mathbb{R}} \mid \mathbb{P}({ \tilde{x})  \le \tau } \ge \alpha\right\}.
 \end{align}
-%\end{subequations}
 The maximum in \eqref{eq:quantile-definition} exists because $\tau \mapsto \mathbb{P}({\tilde{x} )< \tau}$ is lower semi-continuous and the minimum in \eqref{eq:quantile-definition} exists because $\tau \mapsto \mathbb{P}({\tilde{x}) \le \tau}$ is upper semi-continuous. Note that $\quant^+_1(\tilde{x}) = \infty$, $\quant^-_0(\tilde{x}) = -\infty$ and the quantiles are bounded otherwise for all $\alpha \in [0,1]$.
-Monetary risk measures generalize the expectation operator to account for the uncertainty in the distribution. \emph{Value-at-Risk}~(VaR) is one of the oldest, simplest, and most common risk measures~\cite{Follmer2016, Shapiro2014}. Value-at-Risk: $VaR \colon \mathbb{X} \to \bar{\mathbb{R}}$ at a risk level $\alpha \in [0,1]$ of a random variable $\tilde{x}\in \mathbb{X}$ is defined as the largest $1-\alpha$ confidence lower bound on the value of the random variable:
+
+Monetary risk measures generalize the expectation operator to account for the uncertainty in the distribution. \emph{Value-at-Risk}~(VaR) is one of the oldest, simplest, and most common risk measures~\cite{Follmer2016, Shapiro2014}. Value-at-Risk: $\varo \colon \mathbb{X} \to \bar{\mathbb{R}}$ at a risk level $\alpha \in [0,1]$ of a random variable $\tilde{x}\in \mathbb{X}$ is defined as the largest $1-\alpha$ confidence lower bound on the value of the random variable:
 \begin{equation}
   \label{eq:var-definition}
-VaR_{\alpha}{\tilde{x}} \;:=\;  \quant^+_{ \alpha }(\tilde{x}).  
+\varo_{\alpha}{\tilde{x}} \;:=\;  \quant^+_{ \alpha }(\tilde{x}).  
 \end{equation}
+\paragraph{$\varphi$-divergence Risk Measures}
 
-\section{Formal Model}
+\mm{Palash?}
+
+\begin{enumerate}
+\item Define $\varphi$-divergence
+\item Define $\varphi$-divergence risk measures 
+\cite{Ahmadi-Javid2017,Ahmadi-Javid2012}
+\item Some more recent papers that use these risk measures \cite{Kruse2021}
+\item CVaR, EVaR, VVaR as $\varphi$-divergence risk measures have a table something like Table 1 in \cite{Bayraksan2015}
+\end{enumerate}
+
+\paragraph{Polymatroids}
+ This is something that we do want to mention, but maybe not.
+\begin{enumerate}
+\item Define the polymatroids
+\item Define the generic algorithm
+\end{enumerate}
+
 
 
 We can assume a probability space with outcomes $\Omega = \left\{ 1, \dots , N \right\}$, events $\mathcal{F}$, and
@@ -99,10 +121,19 @@ probability function $\mathbb{P} \in \Delta^N$. We consider a random variable to
 \]
 We assume the same equivalence for probability distributions. 
 
+\section{Fast Algorithm for VaR}
+
+
+
+\section{Fast $\varphi$-divergence Algorithms}
+
+\subsection{General Algorithm}
+
+\subsection{CVaR}
 As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk (CVaR) is a convex risk measure that generalizes the Value-at-Risk (VaR) and can be definied as
 \begin{equation} \label{eq:primal_cvar}
   \begin{aligned}
-    CVaR_\alpha(\tilde{x})
+    \cvaro_\alpha(\tilde{x})
   &= \min \left\{  \Ex{\bm{\xi}}{ \tilde{x}  } \mid
   \bm{\xi} \leq \frac{1}{1-\alpha} p, \bm{\xi} \in \Delta^n \right\} \\
   &= \min \left\{\bm{\xi}^T \bm{x} \mid \bm{\xi} \leq \frac{1}{1-\alpha} \bm{p},
@@ -111,27 +142,20 @@ As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk 
   \end{aligned}
 \end{equation}
 
+\subsection{EVaR}
+
+\subsection{VVaR}
+
+
+\section{To Be Sorted}
+
 \begin{thm}
 \Cref{alg:quick_cvar} is correct and runs in linear time.
-
 \end{thm}
 
 \begin{lem}
 Suppose that $\tilde{x}\colon \Omega \to \mathbb{R}$ is a random variable with finite $\Omega$, and $\alpha\in [0,1)$. Then, there exist $\omega_1, \omega_2\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_1)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_2)$ for each $\alpha\in (0,1]$.
 \end{lem}
-% \begin{proof}
-% Let
-%  \[
-%    f(\tau) = \P{\tilde{x} < \tau}
-%  \]
-
-%  Let $x \in \Real^n$, such that $x_1 < x_2 < \cdots < x_n$ \mm{TODO: relax this}. Then for any two elements $x_i$ and $x_{i+1}$, any value $y$ in the range $f(x_i, x_{i+1})$ will have a probability of zero. This means that $f(x_{i + 1}) equals f(y)$ for all $y$ in the specified range, as the probability of $x$ being less than any $y$ and $x_{i+1}$ means it only takes on the values of elements ranging from $x_1$ to $x_i$, which has a fixed probability of occurring. For $y$ in the range $(-\infty, x_1]$, the value of $f(y)$ must be 0 as there is no probability of any element occurring that is smaller than $x_1$, so the random variable  $x$ must always be $\geq x_1$. Likewise, for $y$ in the range $[x_n, \infty)$, the value of $f(y)$ must be 1 as there is no probability of any element occurring that is larger than $x_n$. 
-
-
-% There is thus $n + 1$ values that $f(\tau)$ can take on, including 0, 1, and $n - 1$ values between 0 and 1. Let us define these values as a set $S$. 
-
-% Now let's refer again to Definition 1. The term  $\P{\tilde{x} < \tau}$, which is equal to $f(\tau)$ must take on the maximum value in the set $S$ which is less than or equal to $\alpha$. $\P{\tilde{x} < \tau}$  can never take the value 1, however, because 1 is not an admissible value for $\alpha$. For every value $v$ in set $S$ other than 1, the domain for which $v$ holds on the function $f$ is either $(-\infty, x_1]$ if $v = 0$, and $(x_i, x_{i+1})$ otherwise. The max element in the domain for every $v$ is an outcome of random variable $x$, therefore for Definition 1 to be satisfied, $\tau$  would have to be one of these values.
-% \end{proof}
 \begin{proof}
 Recall the definition:
  \[
@@ -140,7 +164,6 @@ Recall the definition:
     \max\; \left\{\tau \in \bar{\Real} \mid \P{ \tilde{x} < \tau } \le \alpha\right\}, 
  \] 
 Assume the random variable $ x $ has $ n $ unique values, such that $ x_1 < x_2 < \cdots < x_n $.  We can assume this without loss of generality because VaR is law invariant~\cite{Follmer2016}.  
- 
 
 Suppose for the sake of contradiction, that there is no $\omega\in \Omega $ such that $\quant^+_{\alpha}(\tilde{x}) = \tilde{x}(\omega)$. That may mean:
 \begin{enumerate}
@@ -159,53 +182,27 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
   % New Proof 2: Recall that $\alpha$ is less than 1 and  $\quant^+_{\alpha}(\tilde{x})$ is bounded for all admissible $\alpha$ values. Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})  $. Then, let $\tau' = \tau\opt + 1$. Because $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition}, $\P{ \tilde{x} < \tau' } =  \P{ \tilde{x} < \tau\opt  }\le \alpha$, $\tau\opt $ cannot be optimal.
 
   % Old Proof: Then $ P[x < \quant_{\alpha}^+(\tilde{x})] $ is greater than or equal to $ P[x < x_{n}] $. Remember that $\alpha$ must be less than 1 and $\quant_{\alpha}^+(\tilde{x})$ is bounded for all $\alpha$ less than 1 and greater than or equal to 0, therefore $ P[x < \quant_{\alpha}^+(\tilde{x})] $ is less than 1. Then, there must exist $ y $ in the range $ [\quant_{\alpha}^+(\tilde{x}), \infty) $ such that $ P[x = y] > 0 $ . This is impossible by definition. 
- 
 \end{enumerate}
-   
-   
-
-
-
- 
-
- 
- 
 \end{proof}
 
 \begin{thm}
 \Cref{alg:quick_quantile} computes $\quant^+$.
 \end{thm}
 \begin{proof}
-
- 
- 
- 
  Loop Invariant: Before and after every iteration $\quant^+$ will remain in the array $x$ at an index $i$ such that $ front \leq i \leq back $.
 
-
- At the loop beginning: Every element in $x$ has an index $i$ such $ front \leq i \leq back $, since $front=1$ and $back=n$. By Lemma 1, there exists an element with index $i$ such that $ front \leq i \leq n $.
-
-
+At the loop beginning: Every element in $x$ has an index $i$ such $ front \leq i \leq back $, since $front=1$ and $back=n$. By Lemma 1, there exists an element with index $i$ such that $ front \leq i \leq n $.
  
+During the loop: There are three possible scenarios at each iteration:
  
- During the loop: There are three possible scenarios at each iteration:
-
-  
- 
- Case 1: Tail is selected such that $\alpha < tail$. In this case $back$ is set to $ind$. Assume there exists $\tau\opt $ such that $\tau\opt >= $x[ind]$ $, and $x[\tau\opt]=\quant^+$. Then $P[x < x[\tau\opt]] \geq tail > \alpha$, meaning that $x[\tau\opt]$ is not feasible by \eqref{eq:var-definition}. %However, if $\tau\opt $ such that $\tau\opt \leq ind$ , then $P[x < x[\tau\opt]]  < tail > \alpha$, meaning that $x[\tau\opt]$ is potentially feasible by \eqref{eq:var-definition}, so by Lemma 1 $\quant^+$ must remain in this range.% 
+Case 1: Tail is selected such that $\alpha < tail$. In this case $back$ is set to $ind$. Assume there exists $\tau\opt $ such that $\tau\opt >= $x[ind]$ $, and $x[\tau\opt]=\quant^+$. Then $P[x < x[\tau\opt]] \geq tail > \alpha$, meaning that $x[\tau\opt]$ is not feasible by \eqref{eq:var-definition}. %However, if $\tau\opt $ such that $\tau\opt \leq ind$ , then $P[x < x[\tau\opt]]  < tail > \alpha$, meaning that $x[\tau\opt]$ is potentially feasible by \eqref{eq:var-definition}, so by Lemma 1 $\quant^+$ must remain in this range.% 
  Since from Lemma 1 we know $\quant^+$ must be in $x$, the loop invariant must hold true.
 
- Case 2: Tail is selected such that $\alpha > tail$. In this case $front$ is set to $ind + 1$. Assume there exists $\tau\opt $ such that $\tau\opt \leq $x[ind]$ $, and $x[\tau\opt]=\quant^+$. Let $\tau' = ind$. $P[x < x[\tau']] \leq tail < \alpha$. If $x[\tau\opt] <  x[\tau']$ then $x[\tau\opt]$ can not be optimal by \eqref{eq:var-definition}. If $x[\tau\opt] =  x[\tau']$, then from the partitioning scheme we this is the optimal $\quant^+$ since 
+Case 2: Tail is selected such that $\alpha > tail$. In this case $front$ is set to $ind + 1$. Assume there exists $\tau\opt $ such that $\tau\opt \leq $x[ind]$ $, and $x[\tau\opt]=\quant^+$. Let $\tau' = ind$. $P[x < x[\tau']] \leq tail < \alpha$. If $x[\tau\opt] <  x[\tau']$ then $x[\tau\opt]$ can not be optimal by \eqref{eq:var-definition}. If $x[\tau\opt] =  x[\tau']$, then from the partitioning scheme we this is the optimal $\quant^+$ since 
  
  Case 3: $front - back = 0$.
  Two scenarios here. If $x$ contains more than one element, all the elements are no longer in the range $[front, back]$ could not have been $\quant_{\alpha}^+(\tilde{x})$ (see Case 1 and Case 2), and $\quant_{\alpha}^+(\tilde{x})$ must exist in x per lemma 1. Therefore this element that will be returned is $\quant_{\alpha}^+(\tilde{x})$.  If $x$ had one element to begin with, $\quant_{\alpha}^+(\tilde{x})$ equals this element for all admissible alpha. 
 
- 
- 
-
-
-  
- 
  Termination Step:  
  Proof: At every iteration, the algorithm will always hit case 1 or case 2 assuming $back - front >= 1$. If $alpha < tail$, $back$ will always get smaller assuming it is in the range $(front, back$. If $alpha \geq tail$ , then  $back - front$ will not get smaller if $ind = front$. However, in this case the elements at $front$ and $back$ will have been swapped in the partition scheme, such that at next iteration $ind$ will not be equal to $front$ (as the pivot selected will now no longer be the smallest element in the list). 
 \end{proof}
@@ -244,13 +241,8 @@ We can prove that for any given $A$ we can construct a feasible $Q$ such that $Q
 
 \subsection{Piece-wise Linear Minimization}
 \maeve{Incorporate projection.jl }
-\begin{algorithm}
-\floatname{algorithm}{Piece-wise Linear Minimization}
-\end{algorithm}
-
 
 \subsection{Quick Quantile}
-
 
 \begin{algorithm}
   \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ and probability mass function $p$ and $\alpha \in [0,1]$}}

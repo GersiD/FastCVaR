@@ -9,7 +9,8 @@
 \usepackage[capitalise,noabbrev]{cleveref}
 \usepackage{algorithm,algorithmicx,algpseudocode}
 \usepackage{bm}
-
+\usepackage{amsthm}
+\newtheorem{assumption}{Assumption}
 \newcommand{\gersi}[1]{\textcolor{red}{#1}}
 \newcommand{\palash}[1]{\textcolor{green}{#1}}
 \newcommand{\mm}[1]{\textcolor{magenta}{[#1]}}
@@ -50,17 +51,8 @@
 Approximate quantile algorithm but probability distribution is not known unlike our setting (really each element in the given dataset has an equal probability)
 
 
-% https://arxiv.org/pdf/2310.07224
-(Top-k projection - note this is DIFFERENT than k-capped simplex because it does not have constraint that elements should be between 0 and 1 and it may not necessarily be looking at the sum of all elements, just the top k elements). The paper claims that this can be trivially extended to the superquantile (CVaR), however this mainly seems to be the case other then if you are sampling from an unknown continuous distribuiton. That being said, they have a Rockefellar-Ursalyev formulation (well known in Cvar literature) formulation to the top-k operator in their prior work. They also have a quickselect formulation to solve this problem
 
-% https://arxiv.org/pdf/1503.01002
-A sorting and partitioning based approach to the k-capped simplex problem (with the constraint being the sum of the vector has to add up to k). Simple proof done with the KKT conditions.
 
-% https://hal.science/hal-01056171v2/document
-Excellent paper covering the k-capped simplex problem in two forms (when the sum can be less than dor equal to k or when it can be equal to k). Covers lots of prior algorithms used to solve the problem (I need to read this in more depth). This paper has a lemma that will come helpful in equating the inequality constraint in k-capped simplex problem to the equality of constraint of the sum of probability vector equal to 1 in Cvar case.
-
-% https://bayen.berkeley.edu/sites/default/files/efficient_bregman_projections.pdf
-This paper seems to describe an algorithm for projection onto the unit simplex, NOT k-capped using a quickselect based approach, although this is not the primary contribution. 
 
 
 \section{Preliminaries}
@@ -106,20 +98,67 @@ Monetary risk measures generalize the expectation operator to account for the un
 \end{enumerate}
 
 \paragraph{Polymatroids}
- This is something that we do want to mention, but maybe not.
-\begin{enumerate}
-\item Define the polymatroids
-\item Define the generic algorithm
-\end{enumerate}
+ 
+
+Let \( E \) be a finite set and \( f: 2^E \to \mathbb{R}_+ \) a non-decreasing submodular function, that is, for each \( A \subseteq B \subseteq E \) we have \( f(A) \leq f(B) \), and for each \( A, B \subseteq E \) we have 
+\[
+f(A) + f(B) \geq f(A \cup B) + f(A \cap B).
+\]
+We define the polymatroid associated to \( f \) to be the following polytope:
+\[
+P_f = \left\{ \mathbf{x} \in \mathbb{R}_+^E \ \middle|\ \sum_{e \in U} \mathbf{x}(e) \leq f(U), \ \forall U \subseteq E \right\}.
+\]
+ (taken from Wikipedia). This polytope is of special interest for computing risk measure as we will see later on as all coherent and comonotonic risk measures can be computed by solving the maximum weight independent set problem on a polymatroid. The maximum weight independant set problem on a polymatroid can be defined as \[\max\{\mathbf{c}^T \mathbf{x} : \mathbf{x} \in P_f\}\]
+Conventional algorithms such as Algorithm 4, solve this problem through a greedy approach which requires sorting the elements. We will show in the next section that for a special class of submodular functions $f$, we can compute the maximum weight independent set without sorting elements.
 
 
 
+\paragraph{General Notation}
 We can assume a probability space with outcomes $\Omega = \left\{ 1, \dots , N \right\}$, events $\mathcal{F}$, and
 probability function $\mathbb{P} \in \Delta^N$. We consider a random variable to be any mapping $\tilde{x}\colon \Omega \to \mathbb{R}$. Or equivalently as vectors on $\Omega$. For example, the vector $\bm{x}\in \mathbb{R}^N$ equivalent to $\tilde{x}$ is constructed as
 \[
  x_w = \tilde{x}( \omega ), \quad\forall \omega \in \Omega .
 \]
-We assume the same equivalence for probability distributions. 
+We assume the same equivalence for probability distributions.
+
+\section{No - sort algorithm Maximum Weight Independant Set on Polymatroid with PieceWiseLinear Submodular Function}
+
+Our first contribution new algorithm for solving the maximum weight Independant Set without sorting for polymatroids. We note that certain additional assumptions have to be satisified on the submodular function as follows.
+\begin{assumption}
+Assume for $P_f$ that $f(U)$ is such that for all $S_i, S_(i+1) \cup E$ where $S_i \cup $ (i + 1) $= S_(i+1) $ and $f(S_(i+1)) < f(E)$, $f(S_i) + f({i + 1}) = f(S_(i+1))$.
+\end{assumption}
+We note this assumption essentially state that the submodular function must be a piecewise linear function. 
+\begin{algorithm}
+    \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \mathbb{R}$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
+    \algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
+  \caption{algorithm}{New algorithm}
+ \begin{algorithmic}[1]
+     \Require{}
+     \Ensure{}
+  
+    \State{$left \gets 1$}
+    \State{$right \gets n$}
+    \While{$left  - right \geq 1$}
+    \State{$mid \gets partition(left, right, c)$}
+    \If{$f(S_mid) = f(N)$}
+       \State{Let $x_i :=  \begin{cases}0 & \text{for } i \geq mid,\dots \end{cases}$}
+    \Else
+          \State{Let $x_i :=  \begin{cases}f(i) & \text{for } i \leq mid,\dots \end{cases}$}
+    \EndIf{}      
+    
+    
+    
+    \EndWhile{}
+    \State{$x_right \gets f(N) - f(S_{right - 1})$}
+\end{algorithmic}
+\end{algorithm}
+The proof for this algorithm is simple and shows that output is equal to that of Algorithm 4 (the standard greedy algorithm), which has already proved to be both feasible and optimal.
+\begin{lem}
+Algorithm 1 returns a feasible and optimal solution to the maximum weight independent set for polymatroids.
+\end{lem}
+\begin{proof}
+The optimal solution will always be $f(S_i) - f(S_{i-1})$ assuming the weight $c_i \geq 0$. Our solution is $f(i)$ for $f(S_i) < f(N)$, and by assumption 1 this equals $f(S_i) - f(S_{i - 1})$. If $f(S_i) = f(N)$ and $f(S_{i - 1}) = f(N)$, then $x_i = 0$ by the algorithm.
+\end{proof}
 
 \section{Fast Algorithm for VaR}
 

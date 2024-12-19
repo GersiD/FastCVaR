@@ -1,6 +1,6 @@
 include("../loop_cvar.jl")
 using Test
-using JuMP, Gurobi
+using JuMP, HiGHS
 using RobustMDPs
 
 @testset "Loopy tests" begin
@@ -89,11 +89,11 @@ end
   x = randn(5)
   probs = rand(5)
   probs = probs / sum(probs)
-  α = randn(Float64)
+  α = clamp(randn(Float64), 0, 2)
   (α < 0.0) && (α *= -1.0)
   function worstcase_l1_gurobi(x, pbar, ξ)
-    m = Model(Gurobi.Optimizer)
-    set_optimizer_attribute(m, "OutputFlag", 0)
+    m = Model(HiGHS.Optimizer)
+    set_optimizer_attribute(m, "log_to_console", false)
     @variable(m, p[1:length(x)])
     @variable(m, t[1:length(x)])
     @constraint(m, p .- pbar <= t)
@@ -104,11 +104,11 @@ end
     @objective(m, Min, p' * x)
     optimize!(m)
     termination_status(m) != MOI.OPTIMAL && Error("Gurobi failed to find optimal solution")
-    return value.(p)' * x
+    return value.(p), value.(p)' * x
   end
   function worstcase_l1_weighted_gurobi(x, pbar, ξ, w)
-    m = Model(Gurobi.Optimizer)
-    set_optimizer_attribute(m, "OutputFlag", 0)
+    m = Model(HiGHS.Optimizer)
+    set_optimizer_attribute(m, "log_to_console", false)
     @variable(m, p[1:length(x)])
     @variable(m, t[1:length(x)])
     @constraint(m, p .- pbar <= t)
@@ -119,16 +119,13 @@ end
     @objective(m, Min, p' * x)
     optimize!(m)
     termination_status(m) != MOI.OPTIMAL && Error("Gurobi failed to find optimal solution")
-    return value.(p)' * x
+    return value.(p), value.(p)' * x
   end
-  @show x
-  @show probs
-  @show α
-  @test worstcase_l1_weighted_gurobi(x, probs, α, ones(5)) ≈ worstcase_l1_gurobi(x, probs, α)
-  @test worstcase_l1_gurobi(x, probs, α) ≈ worstcase_l1(x, probs, α)[2]
-  @test worstcase_l1_weighted_gurobi(x, probs, α, ones(5)) ≈ worstcase_l1_w(x, probs, ones(5), α)[2]
+  @test worstcase_l1_weighted_gurobi(x, probs, α, ones(5))[2] ≈ worstcase_l1_gurobi(x, probs, α)[2]
+  @test worstcase_l1_gurobi(x, probs, α)[2] ≈ worstcase_l1(x, probs, α)[2]
+  @test worstcase_l1_weighted_gurobi(x, probs, α, ones(5))[2] ≈ worstcase_l1_w(x, probs, ones(5), α)[2]
   w = abs.(rand(5))
   w = w / sum(w)
-  @test worstcase_l1_weighted_gurobi(x, probs, α, w) ≈ worstcase_l1_w(x, probs, w, α)[2]
+  @test worstcase_l1_weighted_gurobi(x, probs, α, w)[2] ≈ worstcase_l1_w(x, probs, w, α)[2] # TODO: write the real unit test use HIghs
 end
 

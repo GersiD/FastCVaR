@@ -143,52 +143,29 @@ We assume the same equivalence for probability distributions.
 
 \section{Fast Algorithm for VaR}
 
+In this section, we describe a linear time algorithm for VaR.
 
 \begin{algorithm}
-  \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ and probability mass function $p$ and $\alpha \in [0,1]$}}
+  \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and $\alpha \in [0,1]$}}
   \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
-  \caption{algorithm}{Quick Quantile}\label{alg:quick_quantile}
+  \caption{Quick Quantile algorithm for VaR}\label{alg:quick_quantile}
   \begin{algorithmic}[1]
-    \Require{}
-    \Ensure{}
-    \todo{Make absolutely sure that you tell the reader that we use 1based indexing}
-    \State{$front \gets 1$}
-    \State{ $back \gets n$ }
-    \While{$back - front \geq 1$}
-    \State{$ind \gets partition(x, p, f, b) - 1$  \Comment{Lomuto partition scheme - works in the code but termination can not be proven}}
-    \State{$tail \gets \sum_{i=1}^n \mathds{1}(x[i] \leq x[ind]) p[i]$}
-      \If{$\alpha < tail$}
-      \State{$back \gets ind$}
+    \Require{} \Ensure{}
+    \State{$f_0 \gets 1$}
+    \State{$b_0 \gets n$ }
+    \While{$b_k - f_k \geq 1$}
+      \State{$i_k \gets \operatorname{partition}(x, p, f_k, b_k) - 1$  \Comment{Lomuto partition}}
+    \State{$t_k \gets \sum_{j=1}^n \mathds{1}(x[j] \leq x[i_k]) p[j]$}
+      \If{$\alpha < t_k$}
+      \State{$b_k \gets i_k$}
       \Else{}
-      \State{$front \gets ind + 1$}
-      \EndIf{}
+      \State{$f_k \gets i_k + 1$}
+    \EndIf{}
+    \State $k \gets k + 1$
     \EndWhile{}
-    \State{\Return{$x[front]$}}
+    \State{\Return{$x[f_k]$}}
   \end{algorithmic}
 \end{algorithm}
-
-\section{Fast $\varphi$-divergence Algorithms}
-
-\subsection{General Algorithm}
-
-\subsection{CVaR}
-As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk (CVaR) is a convex risk measure that generalizes the Value-at-Risk (VaR) and can be defined as
-\begin{equation} \label{eq:primal_cvar}
-  \begin{aligned}
-    \cvaro_\alpha(\tilde{x})
-  &= \min \left\{  \Ex{\bm{\xi}}{ \tilde{x}  } \mid
-  \bm{\xi} \leq \frac{1}{1-\alpha} p, \bm{\xi} \in \Delta^n \right\} \\
-  &= \min \left\{\bm{\xi}\tr \bm{x} \mid \bm{\xi} \leq \frac{1}{1-\alpha} \bm{p},
-     \xi\tr \bm{1} = 1, \bm{\xi} \geq 0\right\}\\
-  &= \max \left\{ z - \frac{1}{1-\alpha} \Ex{\bm{p}}{z-x}_+ \mid z \in \mathbb{R}\right\}.
-  \end{aligned}
-\end{equation}
-
-\subsection{EVaR}
-
-\subsection{TVaR}
-
-\section{To Be Sorted}
 
 \begin{thm}
 \Cref{alg:quick_cvar} is correct and runs in linear time.
@@ -276,6 +253,30 @@ We can prove that for any given $A$ we can construct a feasible $Q$ such that $Q
 \begin{proof}
   \mm{TODO}
 \end{proof}
+
+\section{Fast $\varphi$-divergence Algorithms}
+
+\subsection{General Algorithm}
+
+\subsection{CVaR}
+As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk (CVaR) is a convex risk measure that generalizes the Value-at-Risk (VaR) and can be defined as
+\begin{equation} \label{eq:primal_cvar}
+  \begin{aligned}
+    \cvaro_\alpha(\tilde{x})
+  &= \min \left\{  \Ex{\bm{\xi}}{ \tilde{x}  } \mid
+  \bm{\xi} \leq \frac{1}{1-\alpha} p, \bm{\xi} \in \Delta^n \right\} \\
+  &= \min \left\{\bm{\xi}\tr \bm{x} \mid \bm{\xi} \leq \frac{1}{1-\alpha} \bm{p},
+     \xi\tr \bm{1} = 1, \bm{\xi} \geq 0\right\}\\
+  &= \max \left\{ z - \frac{1}{1-\alpha} \Ex{\bm{p}}{z-x}_+ \mid z \in \mathbb{R}\right\}.
+  \end{aligned}
+\end{equation}
+
+\subsection{EVaR}
+
+\subsection{TVaR}
+
+\section{To Be Sorted}
+
 
 \section{Algorithm}
 

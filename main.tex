@@ -91,8 +91,12 @@ Monetary risk measures generalize the expectation operator to account for the un
 
 \begin{enumerate}
 \item Define $\varphi$-divergence
+Phi divergences can be defined as \[
+I_\phi(p, q) = \sum_{n=1}^X \phi\left(\frac{p_\omega}{q_\omega}\right)
+\] for two discrete probability distribuitions $p$ and $q$.
+
 \item Define $\varphi$-divergence risk measures 
-\cite{Ahmadi-Javid2017,Ahmadi-Javid2012}
+\cite{Ahmadi-Javid2017,Ahmadi-Javid2012, }
 \item Some more recent papers that use these risk measures \cite{Kruse2021}
 \item CVaR, EVaR, VVaR as $\varphi$-divergence risk measures have a table something like Table 1 in \cite{Bayraksan2015}
 \end{enumerate}
@@ -169,7 +173,7 @@ The optimal solution will always be $f(S_i) - f(S_{i-1})$ assuming the weight $c
 \subsection{General Algorithm}
 
 \subsection{CVaR}
-As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk (CVaR) is a convex risk measure that generalizes the Value-at-Risk (VaR) and can be definied as
+As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk (CVaR) is a convex risk measure that generalizes the Value-at-Risk (VaR) and can be defined as
 \begin{equation} \label{eq:primal_cvar}
   \begin{aligned}
     \cvaro_\alpha(\tilde{x})

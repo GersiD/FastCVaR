@@ -56,7 +56,7 @@ Approximate quantile algorithm but probability distribution is not known unlike 
 Before describing CVaR and its solution we define the basic notation we use in the paper. 
 We use calligraphic letters to denote sets and a tilde to denote random variables. 
 We also adopt the standard convention that $\mathcal{A}^{\mathcal{B}}$ represents the set of all functions from a set $\mathcal{B}$ to a set $\mathcal{A}$ and 
-treat vectors as a function from indexes to real numbers. $\mathbf{1}$ denotes the vector of ones and $\mathds{1}(bool)$ denotes the indicator function. We use the convention that comparison operators are defined on vector spaces element-wise, that is for $x, y \in \mathbb{R}^n$ then $x \leq y \iff x_i \leq y_i \quad \; \forall \; i \in 1\dots n$.
+treat vectors as a function from indexes to real numbers. $\bm{1}$ denotes the vector of ones and $\mathds{1}(bool)$ denotes the indicator function. We use the convention that comparison operators are defined on vector spaces element-wise, that is for $x, y \in \mathbb{R}^n$ then $x \leq y \iff x_i \leq y_i \quad \; \forall \; i \in 1\dots n$.
 Finally, $\Delta^n$ denotes the standard $n$-simplex while $\Delta_k^n$ denotes the k-capped simplex~\cite{kcapped_ang}.
 
 \section{Formal Model}
@@ -87,9 +87,11 @@ Monetary risk measures generalize the expectation operator to account for the un
 
 \begin{enumerate}
 \item Define $\varphi$-divergence
-Phi divergences can be defined as $\[
+  Phi divergences can be defined as 
+  \[
 I_\phi(p, q) = \sum_{n=1}^X \phi\left(\frac{p_\omega}{q_\omega}\right)
-\]$ for two discrete probability distribuitions $p$ and $q$.
+\]
+for two discrete probability distribuitions $p$ and $q$.
 
 \item Define $\varphi$-divergence risk measures 
 \cite{Ahmadi-Javid2017,Ahmadi-Javid2012, }
@@ -100,15 +102,18 @@ I_\phi(p, q) = \sum_{n=1}^X \phi\left(\frac{p_\omega}{q_\omega}\right)
 \paragraph{Polymatroids}
  
 
-Let \( E \) be a finite set and \( f: 2^E \to \mathbb{R}_+ \) a non-decreasing submodular function, that is, for each \( A \subseteq B \subseteq E \) we have \( f(A) \leq f(B) \), and for each \( A, B \subseteq E \) we have 
+Let \( E \) be a finite set and \( f\colon  2^E \to \mathbb{R}_+ \) a non-decreasing submodular function, that is, for each \( A \subseteq B \subseteq E \) we have \( f(A) \leq f(B) \), and for each \( A, B \subseteq E \) we have 
 \[
 f(A) + f(B) \geq f(A \cup B) + f(A \cap B).
 \]
 We define the polymatroid associated to \( f \) to be the following polytope:
 \[
-P_f = \left\{ \mathbf{x} \in \mathbb{R}_+^E \ \middle|\ \sum_{e \in U} \mathbf{x}(e) \leq f(U), \ \forall U \subseteq E \right\}.
+P_f = \left\{ \bm{x} \in \mathbb{R}_+^E \ \middle|\ \sum_{e \in U} \bm{x}(e) \leq f(U), \ \forall U \subseteq E \right\}.
 \]
- (taken from Wikipedia). This polytope is of special interest for computing risk measure as we will see later on as all coherent and comonotonic risk measures can be computed by solving the maximum weight independent set problem on a polymatroid. The maximum weight independant set problem on a polymatroid can be defined as \[\max\{\mathbf{c}^T \mathbf{x} : \mathbf{x} \in P_f\}\]
+(taken from Wikipedia). This polytope is of special interest for computing risk measure as we will see later on as all coherent and comonotonic risk measures can be computed by solving the maximum weight independent set problem on a polymatroid. The maximum weight independant set problem on a polymatroid can be defined as
+\[
+  \max\{\bm{c}^T \bm{x} : \bm{x} \in P_f\}
+\]
 Conventional algorithms such as Algorithm 4, solve this problem through a greedy approach which requires sorting the elements. We will show in the next section that for a special class of submodular functions $f$, we can compute the maximum weight independent set without sorting elements.
 
 
@@ -176,7 +181,7 @@ As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk 
   &= \min \left\{  \Ex{\bm{\xi}}{ \tilde{x}  } \mid
   \bm{\xi} \leq \frac{1}{1-\alpha} p, \bm{\xi} \in \Delta^n \right\} \\
   &= \min \left\{\bm{\xi}^T \bm{x} \mid \bm{\xi} \leq \frac{1}{1-\alpha} \bm{p},
-     \xi^T \mathbf{1} = 1, \bm{\xi} \geq 0\right\}\\
+     \xi^T \bm{1} = 1, \bm{\xi} \geq 0\right\}\\
   &= \max \left\{ z - \frac{1}{1-\alpha} \Ex{\bm{p}}{z-x}_+ \mid z \in \mathbb{R}\right\}.
   \end{aligned}
 \end{equation}
@@ -372,7 +377,7 @@ We can prove that for any given $A$ we can construct a feasible $Q$ such that $Q
   =
   \begin{mprog}
     \minimize{\bm\xi \in \Real^n} \lvert \lvert \bm\xi - \bm{x} \rvert \rvert_2^2
-    \stc \bm\xi\tr \mathbf{1} \leq k
+    \stc \bm\xi\tr \bm{1} \leq k
     \cs \bm{0} \le \bm\xi \le \bm{1} 
   \end{mprog}
 \end{equation}

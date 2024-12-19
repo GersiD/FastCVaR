@@ -24,21 +24,23 @@ for size in unique_sizes:
 
 unique_sizes = np.array(unique_sizes)
 plt.errorbar(unique_sizes, means_slow_cvar, yerr=cis_slow_cvar, label='Slow_CVaR', color='red')
+plt.fill_between(unique_sizes, np.array(means_slow_cvar) - np.array(cis_slow_cvar), np.array(means_slow_cvar) + np.array(cis_slow_cvar), color='red', alpha=0.2)
 plt.errorbar(unique_sizes, means_fast_cvar, yerr=cis_fast_cvar, label='Fast_CVaR', color='green')
+plt.fill_between(unique_sizes, np.array(means_fast_cvar) - np.array(cis_fast_cvar), np.array(means_fast_cvar) + np.array(cis_fast_cvar), color='green', alpha=0.2)
 # need to fit the plot with nlogn and n using linear regression
 # nlogn
-L = Lasso()
-X = np.array([unique_sizes, np.log(unique_sizes)]).T
-y = np.array(means_slow_cvar)
-reg = L.fit(X, y)
-y_pred = reg.predict(X)
-print('SlowCVaR Coef N Nlog(N)', reg.coef_)
-plt.plot(unique_sizes, y_pred, label=None, color='red', linestyle='dashed')
-y = np.array(means_fast_cvar)
-reg = L.fit(X, y)
-print('FastCVaR Coef N Nlog(N)', reg.coef_)
-y_pred = reg.predict(X)
-plt.plot(unique_sizes, y_pred, label=None, color='green', linestyle='dashed')
+# L = Lasso()
+# X = np.array([unique_sizes, np.log(unique_sizes)]).T
+# y = np.array(means_slow_cvar)
+# reg = L.fit(X, y)
+# y_pred = reg.predict(X)
+# print('SlowCVaR Coef N Nlog(N)', reg.coef_)
+# plt.plot(unique_sizes, y_pred, label=None, color='red', linestyle='dashed')
+# y = np.array(means_fast_cvar)
+# reg = L.fit(X, y)
+# print('FastCVaR Coef N Nlog(N)', reg.coef_)
+# y_pred = reg.predict(X)
+# plt.plot(unique_sizes, y_pred, label=None, color='green', linestyle='dashed')
 
 plt.xlabel('Size')
 plt.ylabel('Time (s)')

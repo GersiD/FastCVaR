@@ -29,9 +29,9 @@ fn run_batch(n: usize, batch_size: usize) -> Vec<(usize, f64, f64)> {
 
 fn main() -> Result<(), csv::Error> {
     let mut writer = Writer::from_path("experiments.csv").unwrap();
-    let step_size = 100000;
+    let step_size = 1000000;
     let start = 5;
-    let end = 10000000;
+    let end = 100000000;
     let total = (end - start) / step_size;
     let batch_size = 10; // Number of experiments to run for each n
                          // Header row

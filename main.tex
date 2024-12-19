@@ -1,8 +1,9 @@
 \documentclass{article}
+
+
 \usepackage{graphicx} % Required for inserting images
-\usepackage{fullpage}
 \usepackage{mpemath}
-\usepackage{hyperref} % For hyperlinks in the PDF like citations
+\usepackage[colorlinks=true]{hyperref} % For hyperlinks in the PDF like citations
 \usepackage{dsfont}
 \usepackage{amsmath}
 \usepackage{mathtools}
@@ -10,12 +11,18 @@
 \usepackage{algorithm,algorithmicx,algpseudocode}
 \usepackage{bm}
 \usepackage{amsthm}
-\newtheorem{assumption}{Assumption}
+\usepackage{natbib}
+
+
 \newcommand{\gersi}[1]{\textcolor{red}{#1}}
 \newcommand{\palash}[1]{\textcolor{green}{#1}}
 \newcommand{\mm}[1]{\textcolor{magenta}{[#1]}}
 \newcommand{\maeve}[1]{\textcolor{blue}{[#1]}}
+
 \bibliographystyle{abbrvnat}
+
+
+\usepackage{fullpage}
 
 \DeclareMathOperator{\kl}{KL}
 \DeclareMathOperator{\ess}{ess}
@@ -24,20 +31,27 @@
 \DeclareMathOperator{\conv}{conv}
 \newcommand{\quant}{{\mathfrak{q}}}
 
-%\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
-%\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
 \DeclarePairedDelimiter{\spannorm}{\lVert}{\rVert_s}
-% \newtheoremstyle{case}{}{}{}{}{}{:}{ }{}
-% \theoremstyle{case}
-% \newtheorem{case}{\textbf{Case}}
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta,automata}
 
-% \DeclareMathOperator{\varo}{VaR}
-% \DeclareMathOperator{\cvaro}{CVaR}
-% \DeclareMathOperator{\evaro}{EVaR}
+\renewcommand{\cite}{\citep}
 
-%\title{CVaR in Linear Time}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% THEOREMS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+\newtheorem{example}{Example}
+
+
+% \title{CVaR in Linear Time}
 \title{Fast Algorithms for VaR and $\varphi$-divergence Risk Measures, like CVaR and EVaR}
 \author{Palash Agrawal, Gersi Doko, Maeve Burwell, Marek Petrik}
 \date{}
@@ -167,8 +181,6 @@ The optimal solution will always be $f(S_i) - f(S_{i-1})$ assuming the weight $c
 
 \section{Fast Algorithm for VaR}
 
-
-
 \section{Fast $\varphi$-divergence Algorithms}
 
 \subsection{General Algorithm}
@@ -189,7 +201,6 @@ As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk 
 \subsection{EVaR}
 
 \subsection{VVaR}
-
 
 \section{To Be Sorted}
 

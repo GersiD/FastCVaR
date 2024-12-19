@@ -110,7 +110,7 @@ for two discrete probability distribuitions $p$ and $q$.
 \item Define $\varphi$-divergence risk measures 
 \cite{Ahmadi-Javid2017,Ahmadi-Javid2012, }
 \item Some more recent papers that use these risk measures \cite{Kruse2021}
-\item CVaR, EVaR, VVaR as $\varphi$-divergence risk measures have a table something like Table 1 in \cite{Bayraksan2015}
+\item CVaR, EVaR, TVaR as $\varphi$-divergence risk measures have a table something like Table 1 in \cite{Bayraksan2015}
 \end{enumerate}
 
 \paragraph{Polymatroids}
@@ -126,7 +126,7 @@ P_f = \left\{ \bm{x} \in \mathbb{R}_+^E  \mid  \sum_{e \in U} \bm{x}(e) \leq f(U
 \]
 (taken from Wikipedia). This polytope is of special interest for computing risk measure as we will see later on as all coherent and comonotonic risk measures can be computed by solving the maximum weight independent set problem on a polymatroid. The maximum weight independant set problem on a polymatroid can be defined as
 \[
-  \max\{\bm{c}^T \bm{x} : \bm{x} \in P_f\}
+  \max\left\{\bm{c}\tr \bm{x} \mid  \bm{x} \in P_f\right\}
 \]
 Conventional algorithms such as Algorithm 4, solve this problem through a greedy approach which requires sorting the elements. We will show in the next section that for a special class of submodular functions $f$, we can compute the maximum weight independent set without sorting elements.
 
@@ -140,46 +140,32 @@ probability function $\mathbb{P} \in \Delta^N$. We consider a random variable to
 \]
 We assume the same equivalence for probability distributions.
 
-\section{No - sort algorithm Maximum Weight Independant Set on Polymatroid with PieceWiseLinear Submodular Function}
-
-Our first contribution new algorithm for solving the maximum weight Independant Set without sorting for polymatroids. We note that certain additional assumptions have to be satisified on the submodular function as follows.
-\begin{assumption}
-Assume for $P_f$ that $f(U)$ is such that for all $S_i, S_{ i+1 } \cup E$ where $S_i \cup (i + 1) = S_{ i+1 } $ and $f(S_{ i+1 }) < f(E)$, $f(S_i) + f({i + 1}) = f(S_{ i+1 })$.
-\end{assumption}
-We note this assumption essentially state that the submodular function must be a piecewise linear function. 
-\begin{algorithm}
-    \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \mathbb{R}$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
-    \algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
-  \caption{algorithm}{New algorithm}
- \begin{algorithmic}[1]
-     \Require{}
-     \Ensure{}
-  
-    \State{$left \gets 1$}
-    \State{$right \gets n$}
-    \While{$left  - right \geq 1$}
-    \State{$mid \gets partition(left, right, c)$}
-    \If{$f(S_mid) = f(N)$}
-       \State{Let $x_i :=  \begin{cases}0 & \text{for } i \geq mid,\dots \end{cases}$}
-    \Else
-          \State{Let $x_i :=  \begin{cases}f(i) & \text{for } i \leq mid,\dots \end{cases}$}
-    \EndIf{}      
-    
-    
-    
-    \EndWhile{}
-    \State{$x_right \gets f(N) - f(S_{right - 1})$}
-\end{algorithmic}
-\end{algorithm}
-The proof for this algorithm is simple and shows that output is equal to that of Algorithm 4 (the standard greedy algorithm), which has already proved to be both feasible and optimal.
-\begin{lem}
-Algorithm 1 returns a feasible and optimal solution to the maximum weight independent set for polymatroids.
-\end{lem}
-\begin{proof}
-The optimal solution will always be $f(S_i) - f(S_{i-1})$ assuming the weight $c_i \geq 0$. Our solution is $f(i)$ for $f(S_i) < f(N)$, and by assumption 1 this equals $f(S_i) - f(S_{i - 1})$. If $f(S_i) = f(N)$ and $f(S_{i - 1}) = f(N)$, then $x_i = 0$ by the algorithm.
-\end{proof}
 
 \section{Fast Algorithm for VaR}
+
+
+\begin{algorithm}
+  \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ and probability mass function $p$ and $\alpha \in [0,1]$}}
+  \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
+  \caption{algorithm}{Quick Quantile}\label{alg:quick_quantile}
+  \begin{algorithmic}[1]
+    \Require{}
+    \Ensure{}
+    \todo{Make absolutely sure that you tell the reader that we use 1based indexing}
+    \State{$front \gets 1$}
+    \State{ $back \gets n$ }
+    \While{$back - front \geq 1$}
+    \State{$ind \gets partition(x, p, f, b) - 1$  \Comment{Lomuto partition scheme - works in the code but termination can not be proven}}
+    \State{$tail \gets \sum_{i=1}^n \mathds{1}(x[i] \leq x[ind]) p[i]$}
+      \If{$\alpha < tail$}
+      \State{$back \gets ind$}
+      \Else{}
+      \State{$front \gets ind + 1$}
+      \EndIf{}
+    \EndWhile{}
+    \State{\Return{$x[front]$}}
+  \end{algorithmic}
+\end{algorithm}
 
 \section{Fast $\varphi$-divergence Algorithms}
 
@@ -192,15 +178,15 @@ As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk 
     \cvaro_\alpha(\tilde{x})
   &= \min \left\{  \Ex{\bm{\xi}}{ \tilde{x}  } \mid
   \bm{\xi} \leq \frac{1}{1-\alpha} p, \bm{\xi} \in \Delta^n \right\} \\
-  &= \min \left\{\bm{\xi}^T \bm{x} \mid \bm{\xi} \leq \frac{1}{1-\alpha} \bm{p},
-     \xi^T \bm{1} = 1, \bm{\xi} \geq 0\right\}\\
+  &= \min \left\{\bm{\xi}\tr \bm{x} \mid \bm{\xi} \leq \frac{1}{1-\alpha} \bm{p},
+     \xi\tr \bm{1} = 1, \bm{\xi} \geq 0\right\}\\
   &= \max \left\{ z - \frac{1}{1-\alpha} \Ex{\bm{p}}{z-x}_+ \mid z \in \mathbb{R}\right\}.
   \end{aligned}
 \end{equation}
 
 \subsection{EVaR}
 
-\subsection{VVaR}
+\subsection{TVaR}
 
 \section{To Be Sorted}
 
@@ -296,32 +282,6 @@ We can prove that for any given $A$ we can construct a feasible $Q$ such that $Q
 \subsection{Piece-wise Linear Minimization}
 \maeve{Incorporate projection.jl }
 
-\subsection{Quick Quantile}
-
-\begin{algorithm}
-  \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ and probability mass function $p$ and $\alpha \in [0,1]$}}
-  \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
-  \caption{algorithm}{Quick Quantile}\label{alg:quick_quantile}
-  \begin{algorithmic}[1]
-    \Require{}
-    \Ensure{}
-    \todo{Make absolutely sure that you tell the reader that we use 1based indexing}
-    \State{$front \gets 1$}
-    \State{ $back \gets n$ }
-    \While{$back - front \geq 1$}
-    \State{$ind \gets partition(x, p, f, b) - 1$  \Comment{Lomuto partition scheme - works in the code but termination can not be proven}}
-    \State{$tail \gets \sum_{i=1}^n \mathds{1}(x[i] \leq x[ind]) p[i]$}
-      \If{$\alpha < tail$}
-      \State{$back \gets ind$}
-      \Else{}
-      \State{$front \gets ind + 1$}
-      \EndIf{}
-    \EndWhile{}
-    \State{\Return{$x[front]$}}
-  \end{algorithmic}
-\end{algorithm}
-
-
 \subsection{Quick CVaR}
 
 \begin{algorithm}
@@ -376,119 +336,119 @@ We can prove that for any given $A$ we can construct a feasible $Q$ such that $Q
 \end{algorithm}
 
 
-\section{k-capped simplex}
+% \section{k-capped simplex}
 
-\begin{equation}
-  \label{eq:k_capped_simplex}
-  \psi(x, k) = 
-  \begin{mprog}
-    \minimize{\xi \in \Real^n} \lvert \lvert \xi - x \rvert \rvert_2^2
-    \stc \xi \in \Delta_k^n
-  \end{mprog}
-  =
-  \begin{mprog}
-    \minimize{\bm\xi \in \Real^n} \lvert \lvert \bm\xi - \bm{x} \rvert \rvert_2^2
-    \stc \bm\xi\tr \bm{1} \leq k
-    \cs \bm{0} \le \bm\xi \le \bm{1} 
-  \end{mprog}
-\end{equation}
+% \begin{equation}
+%   \label{eq:k_capped_simplex}
+%   \psi(x, k) = 
+%   \begin{mprog}
+%     \minimize{\xi \in \Real^n} \lvert \lvert \xi - x \rvert \rvert_2^2
+%     \stc \xi \in \Delta_k^n
+%   \end{mprog}
+%   =
+%   \begin{mprog}
+%     \minimize{\bm\xi \in \Real^n} \lvert \lvert \bm\xi - \bm{x} \rvert \rvert_2^2
+%     \stc \bm\xi\tr \bm{1} \leq k
+%     \cs \bm{0} \le \bm\xi \le \bm{1} 
+%   \end{mprog}
+% \end{equation}
 
-\mm{define k-capped simplex}
+% \mm{define k-capped simplex}
 
-    \todo{Make absolutely sure that you tell the reader that we use 1based indexing. Make sure that we always use 1-based indices in all algorithms}
+%     \todo{Make absolutely sure that you tell the reader that we use 1based indexing. Make sure that we always use 1-based indices in all algorithms}
 
-\begin{algorithm}
-  \algrenewcommand\algorithmicrequire{\textbf{Input:   $\tilde{X}$ as vector $x$ to project and sum constraint k}}
-  \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
-  \caption{algorithm}{K-capped}\label{alg:quick_quantile}
-  \begin{algorithmic}[1]
-    \Require{}
-    \Ensure{}
-    \State{$frontA \gets 1$}
-    \State{ $backA \gets n$ }
-    \State{$frontB \gets 1$}
-    \State{ $backB \gets n$ }
-    \State{ $midSum \gets 0$ }
-    \State{ $minMid \gets inf$ }
-    \State{ $midSize \gets 0$ }
-    \State{ $maxMid \gets -inf$ }
-    \While{$backB - frontB \geq 1$ and $backA - frontA \geq 1$}
+% \begin{algorithm}
+%   \algrenewcommand\algorithmicrequire{\textbf{Input:   $\tilde{X}$ as vector $x$ to project and sum constraint k}}
+%   \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
+%   \caption{algorithm}{K-capped}\label{alg:quick_quantile}
+%   \begin{algorithmic}[1]
+%     \Require{}
+%     \Ensure{}
+%     \State{$frontA \gets 1$}
+%     \State{ $backA \gets n$ }
+%     \State{$frontB \gets 1$}
+%     \State{ $backB \gets n$ }
+%     \State{ $midSum \gets 0$ }
+%     \State{ $minMid \gets inf$ }
+%     \State{ $midSize \gets 0$ }
+%     \State{ $maxMid \gets -inf$ }
+%     \While{$backB - frontB \geq 1$ and $backA - frontA \geq 1$}
       
-     \Comment{Lomuto partition scheme}
+%      \Comment{Lomuto partition scheme}
     
-      \If{$backB - frontB >= 1$}
-      \State{$ind,leftsum,maxLeft,minLeft \gets modifiedPartition(x, l, f, b) - 1$}
-      \State{$\gamma \gets -2x[ind] + 2$}
-       \If{$maxMid + \gamma*2 >= 1$}
-         \State{$front \gets ind + 1$}
-       \ElsIf{$minMid + \gamma*2 <= 0$}
-         \State{$back \gets ind$} 
-       \Else{}
-       \State{$sum = \sum_{n=frontA}^{backA} (max(0, min(1, x[i])))  + midSum + \gamma*midSize + \sum_{i=frontB}^{backB} (max(0, min(1, x[i])))$}
-       \If{$sum > k$}
-           \State{$back \gets ind - 1$}
-       \ElsIf {$sum < k$}
-           \State{$front \gets ind$}
-           \If {$frontB - backA > midsize$}
-           \State{$midSize \gets frontB - backA$}
-           \State{$midSum \gets leftSum + midSum$}
-            \EndIf{}
+%       \If{$backB - frontB >= 1$}
+%       \State{$ind,leftsum,maxLeft,minLeft \gets modifiedPartition(x, l, f, b) - 1$}
+%       \State{$\gamma \gets -2x[ind] + 2$}
+%        \If{$maxMid + \gamma*2 >= 1$}
+%          \State{$front \gets ind + 1$}
+%        \ElsIf{$minMid + \gamma*2 <= 0$}
+%          \State{$back \gets ind$} 
+%        \Else{}
+%        \State{$sum = \sum_{n=frontA}^{backA} (max(0, min(1, x[i])))  + midSum + \gamma*midSize + \sum_{i=frontB}^{backB} (max(0, min(1, x[i])))$}
+%        \If{$sum > k$}
+%            \State{$back \gets ind - 1$}
+%        \ElsIf {$sum < k$}
+%            \State{$front \gets ind$}
+%            \If {$frontB - backA > midsize$}
+%            \State{$midSize \gets frontB - backA$}
+%            \State{$midSum \gets leftSum + midSum$}
+%             \EndIf{}
             
            
-       \Else{}
-         return solution with computed $\gamma$
+%        \Else{}
+%          return solution with computed $\gamma$
         
-      \EndIf{}
+%       \EndIf{}
       
-      \EndIf{}
-      \EndIf{}
-    \If{$backA - backB \ge 1$} 
-       \State{ $backA \gets backB$ }
-     \EndIf{}
-    \If{$backA - frontA >= 1$}
-      \State{$ind,rightsum,maxRight,minRight \gets modifiedPartition(x, r, f, b) - 1$}
-      \State{$\gamma \gets -2x[ind]$}
-       \If{$maxMid + \gamma*2 >= 1$}
-         \State{$front \gets ind + 1$}
-       \ElsIf{$minMid + \gamma*2 <= 0$}
-         \State{$back \gets ind$} 
-       \Else{}
-       \State{$sum = \sum_{n=frontA}^{backA} (max(0, min(1, x[i])))  + midSum + \gamma*midSize + \sum_{i=frontB}^{backB} (max(0, min(1, x[i])))$}
-       \If{$sum > k$}
-           \State{$back \gets ind - 1$}
-       \ElsIf {$sum < k$}
-           \State{$front \gets ind$}
-           \If {$frontB - backA > midSize$}
-           \State{$midSize \gets frontB - backA$}
-           \State{$midSum \gets rightSum + midSum$}
-            \EndIf{}
+%       \EndIf{}
+%       \EndIf{}
+%     \If{$backA - backB \ge 1$} 
+%        \State{ $backA \gets backB$ }
+%      \EndIf{}
+%     \If{$backA - frontA >= 1$}
+%       \State{$ind,rightsum,maxRight,minRight \gets modifiedPartition(x, r, f, b) - 1$}
+%       \State{$\gamma \gets -2x[ind]$}
+%        \If{$maxMid + \gamma*2 >= 1$}
+%          \State{$front \gets ind + 1$}
+%        \ElsIf{$minMid + \gamma*2 <= 0$}
+%          \State{$back \gets ind$} 
+%        \Else{}
+%        \State{$sum = \sum_{n=frontA}^{backA} (max(0, min(1, x[i])))  + midSum + \gamma*midSize + \sum_{i=frontB}^{backB} (max(0, min(1, x[i])))$}
+%        \If{$sum > k$}
+%            \State{$back \gets ind - 1$}
+%        \ElsIf {$sum < k$}
+%            \State{$front \gets ind$}
+%            \If {$frontB - backA > midSize$}
+%            \State{$midSize \gets frontB - backA$}
+%            \State{$midSum \gets rightSum + midSum$}
+%             \EndIf{}
             
            
-       \Else{}
+%        \Else{}
          
-          \EndIf{}   
-     \EndIf{}
-      \EndIf{}  
-  \EndWhile{}
-    \State{\Return{$x[front]$}}
+%           \EndIf{}   
+%      \EndIf{}
+%       \EndIf{}  
+%   \EndWhile{}
+%     \State{\Return{$x[front]$}}
 
-  \end{algorithmic}
-\end{algorithm}
+%   \end{algorithmic}
+% \end{algorithm}
 
-\section{Greedy Algorithm}
+% \section{Greedy Algorithm}
 
-\begin{algorithm}
-    \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \mathbb{R}$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
-    \algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
-  \caption{algorithm}{Greedy algorithm from Submodular Functions, Polymatroids, TDI}
- \begin{algorithmic}[1]
-    \Require{}
-    \Ensure{}
-    \State{Order the elements such that $c_1 \geq c_2 \cdots \geq c_n$.}
-    \State{Let $S_i := \{1, \dots, i\}$ and $S_0 := \emptyset$}
-    \State{Let $x_i :=  \begin{cases}f(S_i) - f(S_{i-1}) & \text{for } i = 1,\dots, r \\ 0 & \text{otherwise} \end{cases}$}
-\end{algorithmic}
-\end{algorithm}
+% \begin{algorithm}
+%     \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \mathbb{R}$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
+%     \algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
+%   \caption{algorithm}{Greedy algorithm from Submodular Functions, Polymatroids, TDI}
+%  \begin{algorithmic}[1]
+%     \Require{}
+%     \Ensure{}
+%     \State{Order the elements such that $c_1 \geq c_2 \cdots \geq c_n$.}
+%     \State{Let $S_i := \{1, \dots, i\}$ and $S_0 := \emptyset$}
+%     \State{Let $x_i :=  \begin{cases}f(S_i) - f(S_{i-1}) & \text{for } i = 1,\dots, r \\ 0 & \text{otherwise} \end{cases}$}
+% \end{algorithmic}
+% \end{algorithm}
 
 \section{Comonotonicity of Risk}
 
@@ -498,15 +458,56 @@ A risk measure is said to be comonotonic if $\rho(\tilde{x} + \tilde{y}) = \rho(
 \begin{table}[]
 \begin{tabular}{lll}
   \textbf{Risk Measure} &  \textbf{Comonotone?} & \\
-  $\cvaro$ & Yes & \\
-  $\varo$ &  Yes & \\
-  Un weighted L1 &  Yes & \\
-  $\evaro$ & No & \\
+  CVaR &  Yes & \\
+  VaR &   Yes & \\
+  TVaR &  Yes & \\
+  EVaR &  No & \\
   Expectile & No &
 \end{tabular}
 \end{table}
 
 \bibliography{fastcvar.bib}
+
+\appendix
+
+\section{No-sort Polymatroid}
+
+Our first contribution new algorithm for solving the maximum weight Independant Set without sorting for polymatroids. We note that certain additional assumptions have to be satisified on the submodular function as follows.
+\begin{assumption}
+Assume for $P_f$ that $f(U)$ is such that for all $S_i, S_{ i+1 } \cup E$ where $S_i \cup (i + 1) = S_{ i+1 } $ and $f(S_{ i+1 }) < f(E)$, $f(S_i) + f({i + 1}) = f(S_{ i+1 })$.
+\end{assumption}
+We note this assumption essentially state that the submodular function must be a piecewise linear function. 
+\begin{algorithm}
+    \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \mathbb{R}$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
+    \algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
+  \caption{algorithm}{New algorithm}
+ \begin{algorithmic}[1]
+     \Require{}
+     \Ensure{}
+  
+    \State{$left \gets 1$}
+    \State{$right \gets n$}
+    \While{$left  - right \geq 1$}
+    \State{$mid \gets partition(left, right, c)$}
+    \If{$f(S_mid) = f(N)$}
+       \State{Let $x_i :=  \begin{cases}0 & \text{for } i \geq mid,\dots \end{cases}$}
+    \Else
+          \State{Let $x_i :=  \begin{cases}f(i) & \text{for } i \leq mid,\dots \end{cases}$}
+    \EndIf{}      
+    
+    
+    
+    \EndWhile{}
+    \State{$x_right \gets f(N) - f(S_{right - 1})$}
+\end{algorithmic}
+\end{algorithm}
+The proof for this algorithm is simple and shows that output is equal to that of Algorithm 4 (the standard greedy algorithm), which has already proved to be both feasible and optimal.
+\begin{lem}
+Algorithm 1 returns a feasible and optimal solution to the maximum weight independent set for polymatroids.
+\end{lem}
+\begin{proof}
+The optimal solution will always be $f(S_i) - f(S_{i-1})$ assuming the weight $c_i \geq 0$. Our solution is $f(i)$ for $f(S_i) < f(N)$, and by assumption 1 this equals $f(S_i) - f(S_{i - 1})$. If $f(S_i) = f(N)$ and $f(S_{i - 1}) = f(N)$, then $x_i = 0$ by the algorithm.
+\end{proof}
 
 \end{document}
 

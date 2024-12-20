@@ -119,7 +119,7 @@ We define the polymatroid associated to $f$ to be the following polytope:
 \[
 P_f = \left\{ \bm{x} \in \mathbb{R}_+^E  \mid  \sum_{e \in U} \bm{x}(e) \leq f(U), \ \forall U \subseteq E \right\}.
 \]
-This polytope is of special interest for computing risk measure as we will see later on as all coherent and comonotonic risk measures can be computed by solving the maximum weight independent set problem on a polymatroid. The maximum weight independant set problem on a polymatroid can be defined as
+This polytope is of special interest for computing risk measures as we will see later on as all coherent and comonotonic risk measures can be computed by solving the maximum weight independent set problem on a polymatroid. The maximum weight independant set problem on a polymatroid can be defined as
 \[
   \max\left\{\bm{c}\tr \bm{x} \mid  \bm{x} \in P_f\right\}
 \]
@@ -167,7 +167,7 @@ In this section, we describe a linear time algorithm for VaR.
 \end{thm}
 
 \begin{lem}
-Suppose that $\tilde{x}\colon \Omega \to \mathbb{R}$ is a random variable with finite $\Omega$, and $\alpha\in [0,1$. Then, there exist $\omega_1, \omega_2\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_1)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_2)$ for each $\alpha\in (0,1]$.
+Suppose that $\tilde{x}\colon \Omega \to \mathbb{R}$ is a random variable with finite $\Omega$, and $\alpha\in [0,1)$. Then, there exist $\omega_1, \omega_2\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_1)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_2)$ for each $\alpha\in (0,1]$.
 \end{lem}
 \begin{proof}
 Recall the definition:
@@ -221,20 +221,18 @@ Case 2: Tail is selected such that $\alpha > tail$. In this case $front$ is set 
 \end{proof}
 
 \begin{lem}
-\Cref{alg:quick_quantile}in \eqref{eq:var-definition} runs in linear time.
+  \Cref{alg:quick_quantile} achieves a time complexity of $\mathcal{O}(N)$
+  where $N$ is the number of elements in $\tilde{x}$.
 \end{lem}
 \begin{proof}
-  \mm{Maeve and prove it in Lean}
+  \todo{need proof}
 \end{proof}
 \begin{lem}
-CVAR can be computing by solving an optimization problem $\max_{Q \in \mathcal{Q}} \mathbb{E}_Q[X]$, such that all $Q$ in the set must satisfy such that all  $Q \in \mathcal{Q}  satisfy \max_{Q} Q(A) < \frac{1}{1-\alpha} P(A) \quad \forall A \in \mathcal{P}(\Omega)$ . 
+  CVAR can be computed by solving the following optimization problem $\min_{Q \in \mathcal{Q}} \mathbb{E}_Q[X]$, where $\mathcal{Q} = \left\{Q \in \Delta^\Omega \mid Q(\omega) < \frac{1}{1-\alpha} P(\omega) \quad \forall \omega \in \Omega\right\}$.
 \end{lem}
-\begin{proof}
-  We start by noting that $Q(A)$ can be written as $\sum_{j=1}^{n} \xi_j(A_j)$ where $A_1 , A_2, \dots  ,A_n$, are disjoint sets corresponding to a outcome where only one possible value of the random variable is realized and $A$ is a subset of $\Omega$ if $j \neq n$. For all Q(A) such that $j \neq n$, we know from (3) that $Q(A) \leq \sum_{j=1}^{n} (1/1-a)*P(a)$ and that that $Q(A) < 1$ , thus $Q(A) \le \min\left\{ \sum_{j=1}^{n} (1/1-a)*P(a), 1\right\}$. 
-
-\end{proof}
+\proof{Theorem 4.52 in~\cite{Follmer2016}, note we consider rewards.}
 \begin{lem}
-We can prove that for any given $A$ we can construct a feasible $Q$ such that $Q(A) = \min\left\{\sum_{j=1}^n \frac{1}{1-a} \cdot P(a), 1\right\}$.
+  For $\omega \in \Omega$ we can construct a feasible $Q \in \mathcal{Q}$ such that $Q(\omega) = \min\left\{\frac{P(\omega)}{1-a}, 1\right\}$.
 \end{lem}
 \begin{proof}
   Two possible scenarios exist. 

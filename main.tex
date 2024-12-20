@@ -69,8 +69,7 @@ Approximate quantile algorithm but probability distribution is not known unlike 
 
 Before describing CVaR and its solution we define the basic notation we use in the paper. 
 We use calligraphic letters to denote sets and a tilde to denote random variables. 
-We also adopt the standard convention that $\mathcal{A}^{\mathcal{B}}$ represents the set of all functions from a set $\mathcal{B}$ to a set $\mathcal{A}$ and 
-treat vectors as a function from indexes to real numbers. $\bm{1}$ denotes the vector of ones and $\mathds{1}(bool)$ denotes the indicator function. We use the convention that comparison operators are defined on vector spaces element-wise, that is for $x, y \in \mathbb{R}^n$ then $x \leq y \iff x_i \leq y_i \quad \; \forall \; i \in 1\dots n$.
+We also adopt the standard convention that $\mathcal{A}^{\mathcal{B}}$ represents the set of all functions from a set $\mathcal{B}$ to a set $\mathcal{A}$ and treat vectors as a function from indexes to real numbers. $\bm{1}$ denotes the vector of ones and $\mathds{1}(bool)$ denotes the indicator function. We use the convention that comparison operators are defined on vector spaces element-wise, that is for $x, y \in \mathbb{R}^n$ then $x \leq y \iff x_i \leq y_i \quad \; \forall \; i \in 1\dots n$.
 Finally, $\Delta^n$ denotes the standard $n$-simplex while $\Delta_k^n$ denotes the k-capped simplex~\cite{kcapped_ang}.
 
 \section{Formal Model}
@@ -97,9 +96,9 @@ Monetary risk measures generalize the expectation operator to account for the un
 \end{equation}
 \paragraph{$\varphi$-divergence Risk Measures}
 
-\mm{Palash?}
+
 Phi divergences can be defined as \[I_\phi(p, q) = \sum_{n=1}^X \phi\left(\frac{p_\omega}{q_\omega}\right)
-\] for two discrete probability distributions $p$ and $q$.
+\] for two discrete probability distributions $p$ and $q$, where $\phi$ is a convex function such that $\phi(1)=0$. A $\phi$ divergence risk measure can be defined 
 
 
 \cite{Ahmadi-Javid2017,Ahmadi-Javid2012, }

@@ -81,15 +81,15 @@ Quantile of a random variable $\tilde{x} \in \mathbb{X}$ at level $\alpha \in [0
 %\label{eq:upper-quantile-definition}
   \quant_{\alpha}^+(\tilde{x})
   &\;:=\;
-    \max\; \left\{\tau \in \bar{\mathbb{R}} \mid \mathbb{P}({ \tilde{x}) < \tau } \le \alpha\right\}, 
+    \max\; \left\{\tau \in \bar{\mathbb{R}} \mid \mathbb{P}[\tilde{x} < \tau]  \le \alpha\right\}, 
       %\label{eq:low-quantile-definition}
   &\quant_{\alpha}^-(\tilde{x})
   &\;:=\;
-    \min\; \left\{\tau \in \bar{\mathbb{R}} \mid \mathbb{P}({ \tilde{x})  \le \tau } \ge \alpha\right\}.
+    \min\; \left\{\tau \in \bar{\mathbb{R}} \mid \mathbb{P}[\tilde{x} \le \tau]   \ge \alpha\right\}.
 \end{align}
-The maximum in \eqref{eq:quantile-definition} exists because $\tau \mapsto \mathbb{P}({\tilde{x} )< \tau}$ is lower semi-continuous and the minimum in \eqref{eq:quantile-definition} exists because $\tau \mapsto \mathbb{P}({\tilde{x}) \le \tau}$ is upper semi-continuous. Note that $\quant^+_1(\tilde{x}) = \infty$, $\quant^-_0(\tilde{x}) = -\infty$ and the quantiles are bounded otherwise for all $\alpha \in [0,1]$.
+The maximum in~\eqref{eq:quantile-definition} exists because $\mathbb{P}[\tilde{x} < \tau]$ is lower semi-continuous and the minimum in~\eqref{eq:quantile-definition} exists because $\mathbb{P}[\tilde{x} \le \tau]$ is upper semi-continuous with respect to $\tau$. Note that $\quant^+_1(\tilde{x}) = \infty$, $\quant^-_0(\tilde{x}) = -\infty$ and the quantiles are bounded otherwise for all $\alpha \in [0,1]$.
 
-Monetary risk measures generalize the expectation operator to account for the uncertainty in the distribution. \emph{Value-at-Risk}~(VaR) is one of the oldest, simplest, and most common risk measures~\cite{Follmer2016, Shapiro2014}. Value-at-Risk: $\varo \colon \mathbb{X} \to \bar{\mathbb{R}}$ at a risk level $\alpha \in [0,1]$ of a random variable $\tilde{x}\in \mathbb{X}$ is defined as the largest $1-\alpha$ confidence lower bound on the value of the random variable:
+Monetary risk measures generalize the expectation operator to account for the uncertainty in the distribution.~\emph{Value-at-Risk}~(VaR) is one of the oldest, simplest, and most common risk measures\todo{fixme}~\cite{Follmer2016,Shapiro2014}. Value-at-Risk: $\varo \colon \mathbb{X} \to \bar{\mathbb{R}}$ at a risk level $\alpha \in [0,1]$ of a random variable $\tilde{x}\in \mathbb{X}$ is defined as the largest $1-\alpha$ confidence lower bound on the value of the random variable:
 \begin{equation}
   \label{eq:var-definition}
 \varo_{\alpha}{\tilde{x}} \;:=\;  \quant^+_{ \alpha }(\tilde{x}).  
@@ -103,23 +103,23 @@ Phi divergences can be defined as \[I_\phi(p, q) = \sum_{n=1}^X \phi\left(\frac{
 
 \cite{Ahmadi-Javid2017}
 \begin{itemize}
-  \item Some more recent papers that use these risk measures \cite{Kruse2021}
-  \item CVaR, EVaR, TVaR as $\varphi$-divergence risk measures have a table something like Table 1 in \cite{Bayraksan2015}
+  \item Some more recent papers that use these risk measures~\cite{Kruse2021}
+  \item CVaR, EVaR, TVaR as $\varphi$-divergence risk measures have a table something like Table 1 in~\cite{Bayraksan2015}
 \end{itemize}i
 
 
 \paragraph{Polymatroids}
  
 
-Let \( E \) be a finite set and \( f\colon  2^E \to \mathbb{R}_+ \) a non-decreasing submodular function, that is, for each \( A \subseteq B \subseteq E \) we have \( f(A) \leq f(B) \), and for each \( A, B \subseteq E \) we have 
+Let $E$ be a finite set and $f\colon  2^E \to \mathbb{R}_+$ a non-decreasing submodular function, that is, for each $A \subseteq B \subseteq E$ we have $f(A) \leq f(B)$, and for each $A, B \subseteq E$ we have 
 \[
 f(A) + f(B) \geq f(A \cup B) + f(A \cap B).
 \]
-We define the polymatroid associated to \( f \) to be the following polytope:
+We define the polymatroid associated to $f$ to be the following polytope:
 \[
 P_f = \left\{ \bm{x} \in \mathbb{R}_+^E  \mid  \sum_{e \in U} \bm{x}(e) \leq f(U), \ \forall U \subseteq E \right\}.
 \]
-(taken from Wikipedia). This polytope is of special interest for computing risk measure as we will see later on as all coherent and comonotonic risk measures can be computed by solving the maximum weight independent set problem on a polymatroid. The maximum weight independant set problem on a polymatroid can be defined as
+This polytope is of special interest for computing risk measure as we will see later on as all coherent and comonotonic risk measures can be computed by solving the maximum weight independent set problem on a polymatroid. The maximum weight independant set problem on a polymatroid can be defined as
 \[
   \max\left\{\bm{c}\tr \bm{x} \mid  \bm{x} \in P_f\right\}
 \]
@@ -167,7 +167,7 @@ In this section, we describe a linear time algorithm for VaR.
 \end{thm}
 
 \begin{lem}
-Suppose that $\tilde{x}\colon \Omega \to \mathbb{R}$ is a random variable with finite $\Omega$, and $\alpha\in [0,1)$. Then, there exist $\omega_1, \omega_2\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_1)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_2)$ for each $\alpha\in (0,1]$.
+Suppose that $\tilde{x}\colon \Omega \to \mathbb{R}$ is a random variable with finite $\Omega$, and $\alpha\in [0,1$. Then, there exist $\omega_1, \omega_2\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_1)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_2)$ for each $\alpha\in (0,1]$.
 \end{lem}
 \begin{proof}
 Recall the definition:

@@ -98,20 +98,20 @@ Monetary risk measures generalize the expectation operator to account for the un
 
 
 Phi divergences can be defined as \[I_\phi(p, q) = \sum_{n=1}^X \phi\left(\frac{p_\omega}{q_\omega}\right)
-\] for two discrete probability distributions $p$ and $q$, where $\phi$ is a convex function such that $\phi(1)=0$. A $\phi$ divergence risk measure can be defined as a coherent risk measure 
+\] for two discrete probability distributions $p$ and $q$, where $\phi$ is a convex function such that $\phi(1)=0$. 
+
+Recall that any coherent risk measure can be defined as $\rho(X)=\displaystyle\mathop{\sup}_{Q\in \mathfrak{J}}{\rm E}_{Q}$ where $\mathfrak{J}$ is a constrained set of probability measures. Phi-divergence risk measures can be defined as a coherent risk measure for which $\mathfrak{J}$ contains all $Q$ such that $I_\phi(P, Q) \le \beta$, where $\beta$ is some constant typically dependent on the risk level. Phi-divergence risk measures are equivalent to g-entropic risk measures, which can be seen as primal representation of these risk measures. All g-entropic risk measures take on the following form: ${\rm ER}_{g,\beta}(X) = \displaystyle\mathop{\inf}_{t > 0, v \in \mathfrak{R}} \left\{ t \left[v + {\rm E}_{P}\left(g^{\ast}\left(\frac{X}{t} - v + \beta \right)\right)\right] \right\}$, where $g^*$ the convex function of the phi-divergence $g$ that is in the dual representation. EVaR, for example, is a well known example of phi-divergence risk measure where the phi-Divergence is relative entropy, better known as the KL-divergence. 
+
+
 
 
 \cite{Ahmadi-Javid2017}
-\begin{itemize}
-  \item Some more recent papers that use these risk measures~\cite{Kruse2021}
-  \item CVaR, EVaR, TVaR as $\varphi$-divergence risk measures have a table something like Table 1 in~\cite{Bayraksan2015}
-\end{itemize}i
 
 
 \paragraph{Polymatroids}
  
 
-Let $E$ be a finite set and $f\colon  2^E \to \mathbb{R}_+$ a non-decreasing submodular function, that is, for each $A \subseteq B \subseteq E$ we have $f(A) \leq f(B)$, and for each $A, B \subseteq E$ we have 
+Let $E$ be a finite set, and $f\colon  2^E \to \mathbb{R}_+$ a nondecreasing submodular function. That is, for each $A \subseteq B \subseteq E$ we have $f(A) \leq f(B)$, and for each $A, B \subseteq E$ we have 
 \[
 f(A) + f(B) \geq f(A \cup B) + f(A \cap B).
 \]
@@ -119,7 +119,7 @@ We define the polymatroid associated to $f$ to be the following polytope:
 \[
 P_f = \left\{ \bm{x} \in \mathbb{R}_+^E  \mid  \sum_{e \in U} \bm{x}(e) \leq f(U), \ \forall U \subseteq E \right\}.
 \]
-This polytope is of special interest for computing risk measures as we will see later on as all coherent and comonotonic risk measures can be computed by solving the maximum weight independent set problem on a polymatroid. The maximum weight independant set problem on a polymatroid can be defined as
+This polytope is of special interest for computing risk measures, as we will see later on that all coherent and comonotonic risk measures can be computed by solving the maximum weight independent set problem on a polymatroid. The maximum weight independent set problem on a polymatroid can be defined as
 \[
   \max\left\{\bm{c}\tr \bm{x} \mid  \bm{x} \in P_f\right\}
 \]
@@ -178,7 +178,7 @@ Recall the definition:
  \] 
 Assume the random variable $ x $ has $ n $ unique values, such that $ x_1 < x_2 < \cdots < x_n $.  We can assume this without loss of generality because VaR is law invariant~\cite{Follmer2016}.  
 
-Suppose for the sake of contradiction, that there is no $\omega\in \Omega $ such that $\quant^+_{\alpha}(\tilde{x}) = \tilde{x}(\omega)$. That may mean:
+Suppose for the sake of contradiction that there is no $\omega\in \Omega $ such that $\quant^+_{\alpha}(\tilde{x}) = \tilde{x}(\omega)$. That may mean:
 \begin{enumerate}
 \item[Case 1] $\exists x_{i}, x_{i + 1} \in \tilde{x}(\Omega)$ such that $\quant^+_{\alpha}(\tilde{x}) \in (x_{i}, x_{i + 1})$.
 Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})  $. Then, let $\tau' = \tau\opt  + \frac{1}{2}(x_{i+1} - \tau\opt)$. Because $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition}, $\P{ \tilde{x} < \tau' } =  \P{ \tilde{x} < \tau\opt  }\le \alpha$, $\tau\opt $ cannot be optimal.
@@ -198,27 +198,26 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
 \end{enumerate}
 \end{proof}
 
-\begin{thm}
+\begin{lem}
 \Cref{alg:quick_quantile} computes $\quant^+$.
-\end{thm}
-\begin{proof}
  Loop Invariant: Before and after every iteration $\quant^+$ will remain in the array $x$ at an index $i$ such that $ front \leq i \leq back $.
-
-At the loop beginning: Every element in $x$ has an index $i$ such $ front \leq i \leq back $, since $front=1$ and $back=n$. By Lemma 1, there exists an element with index $i$ such that $ front \leq i \leq n $.
+\begin{proof}
+At the loop beginning: Every element in $x$ has an index $i$ such that $ front \leq i \leq back $, where $front=1$ and $back=n$. By Lemma 1, there exists an element with index $i$ such that $ front \leq i \leq n $.
  
 During the loop: There are three possible scenarios at each iteration:
  
-Case 1: Tail is selected such that $\alpha < tail$. In this case $back$ is set to $ind$. Assume there exists $\tau\opt $ such that $\tau\opt >= $x[ind]$ $, and $x[\tau\opt]=\quant^+$. Then $P[x < x[\tau\opt]] \geq tail > \alpha$, meaning that $x[\tau\opt]$ is not feasible by \eqref{eq:var-definition}. %However, if $\tau\opt $ such that $\tau\opt \leq ind$ , then $P[x < x[\tau\opt]]  < tail > \alpha$, meaning that $x[\tau\opt]$ is potentially feasible by \eqref{eq:var-definition}, so by Lemma 1 $\quant^+$ must remain in this range.% 
- Since from Lemma 1 we know $\quant^+$ must be in $x$, the loop invariant must hold true.
+\item[Case 1]: The tail is selected such that $\alpha < tail$. In this case $back$ is set to $ind$. Assume there exists $\tau\opt $ such that $\tau\opt >= $x[ind]$ $, and $x[\tau\opt]=\quant^+$. Then $P[x < x[\tau\opt]] \geq tail > \alpha$, which means that $x[\tau\opt]$ is not feasible with \eqref{eq:var-definition}. %However, if $\tau\opt $ such that $\tau\opt \leq ind$ , then $P[x < x[\tau\opt]]  < tail > \alpha$, meaning that $x[\tau\opt]$ is potentially feasible by \eqref{eq:var-definition}, so by Lemma 1 $\quant^+$ must remain in this range.% 
+ Since from Lemma 1 we know that $\quant^+$ must be in $x$, the loop invariant must hold.
 
-Case 2: Tail is selected such that $\alpha > tail$. In this case $front$ is set to $ind + 1$. Assume there exists $\tau\opt $ such that $\tau\opt \leq $x[ind]$ $, and $x[\tau\opt]=\quant^+$. Let $\tau' = ind$. $P[x < x[\tau']] \leq tail < \alpha$. If $x[\tau\opt] <  x[\tau']$ then $x[\tau\opt]$ can not be optimal by \eqref{eq:var-definition}. If $x[\tau\opt] =  x[\tau']$, then from the partitioning scheme we this is the optimal $\quant^+$ since 
+\item[Case 2]: Tail is selected such that $\alpha > tail$. In this case $front$ is set to $ind + 1$. Assume there exists $\tau\opt $ such that $\tau\opt \leq $x[ind]$ $, and $x[\tau\opt]=\quant^+$. Let $\tau' = ind$. $P[x < x[\tau']] \leq tail < \alpha$. If $x[\tau\opt] <  x[\tau']$ then $x[\tau\opt]$ can not be optimal by \eqref{eq:var-definition}. If $x[\tau\opt] =  x[\tau']$, then from the partitioning scheme we this is the optimal $\quant^+$ since 
  
- Case 3: $front - back = 0$.
+ \item[Case 3]: $front - back = 0$.
  Two scenarios here. If $x$ contains more than one element, all the elements are no longer in the range $[front, back]$ could not have been $\quant_{\alpha}^+(\tilde{x})$ (see Case 1 and Case 2), and $\quant_{\alpha}^+(\tilde{x})$ must exist in x per lemma 1. Therefore this element that will be returned is $\quant_{\alpha}^+(\tilde{x})$.  If $x$ had one element to begin with, $\quant_{\alpha}^+(\tilde{x})$ equals this element for all admissible alpha. 
-
- Termination Step:  
- Proof: At every iteration, the algorithm will always hit case 1 or case 2 assuming $back - front >= 1$. If $alpha < tail$, $back$ will always get smaller assuming it is in the range $(front, back$. If $alpha \geq tail$ , then  $back - front$ will not get smaller if $ind = front$. However, in this case the elements at $front$ and $back$ will have been swapped in the partition scheme, such that at next iteration $ind$ will not be equal to $front$ (as the pivot selected will now no longer be the smallest element in the list). 
-\end{proof}
+ \end{proof}
+ \end{lem}
+\begin{thm}
+At every iteration, the algorithm will always hit case 1 or case 2 assuming $back - front >= 1$. If $alpha < tail$, $back$ will always get smaller assuming it is in the range $(front, back$. If $alpha \geq tail$ , then  $back - front$ will not get smaller if $ind = front$. However, in this case the elements at $front$ and $back$ will have been swapped in the partition scheme, such that at next iteration $ind$ will not be equal to $front$ (as the pivot selected will now no longer be the smallest element in the list). 
+\end{thm}
 
 \begin{lem}
   \Cref{alg:quick_quantile} achieves a time complexity of $\mathcal{O}(N)$
@@ -267,6 +266,32 @@ As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk 
 \subsection{EVaR}
 
 \subsection{TVaR}
+\begin{algorithm}
+  \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and maximum divergence \beta}}
+  \algrenewcommand\algorithmicensure{\textbf{Output: $q$ : new distribution }}
+  \caption{Linear Time Algorithm for TVaR}\label{alg:quick_quantile}
+  \begin{algorithmic}[1]
+    \State{find max element in $x$}
+    \State{$offset \gets \min{p[max ind] + \beta/2, 1} - p[max ind] $}
+    
+    \State{$VAR \gets QuickQuantile(x, q, offset)$ }
+    \State{$sum \gets 0$}
+    \For{$i = 1 \dots n$}
+    \If{$q[i] \leq VAR$}
+    \State{$sum += q[i]$}
+    \State{$q[i] \gets 0$}
+    \EndIf{}
+   \EndFor{}
+     \If{$sum < offset$}
+    \State{set $z$ to min $i$  such that $x[i] > VAR$}
+    \State{$q[z] \gets q[z] - offset - sum$}
+    \EndIf{}
+    
+
+      
+  \end{algorithmic}
+\end{algorithm}
+
 
 \section{To Be Sorted}
 

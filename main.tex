@@ -19,12 +19,15 @@
 \newcommand{\mm}[1]{\textcolor{magenta}{[#1]}}
 \newcommand{\maeve}[1]{\textcolor{blue}{[#1]}}
 
+
+
 \bibliographystyle{abbrvnat}
 
 
 \usepackage{fullpage}
 
 \DeclareMathOperator{\kl}{KL}
+\DeclareMathOperator{\ER}{ER}
 \DeclareMathOperator{\ess}{ess}
 \DeclareMathOperator{\KL}{KL}
 \DeclareMathOperator{\ext}{ext}
@@ -97,10 +100,20 @@ Monetary risk measures generalize the expectation operator to account for the un
 \paragraph{$\varphi$-divergence Risk Measures}
 
 
-Phi divergences can be defined as \[I_\phi(p, q) = \sum_{n=1}^X \phi\left(\frac{p_\omega}{q_\omega}\right)
-\] for two discrete probability distributions $p$ and $q$, where $\phi$ is a convex function such that $\phi(1)=0$. 
+$\varphi$-divergences can be defined as 
+\[I_\phi(p, q) = \sum_{n=1}^X \phi\left(\frac{p_\omega}{q_\omega}\right)
+\] 
+for two discrete probability distributions $p$ and $q$, where $\phi$ is a convex function such that $\phi(1)=0$. 
 
-Recall that any coherent risk measure can be defined as $\rho(X)=\displaystyle\mathop{\sup}_{Q\in \mathfrak{J}}{\rm E}_{Q}$ where $\mathfrak{J}$ is a constrained set of probability measures. Phi-divergence risk measures can be defined as a coherent risk measure for which $\mathfrak{J}$ contains all $Q$ such that $I_\phi(P, Q) \le \beta$, where $\beta$ is some constant typically dependent on the risk level. Phi-divergence risk measures are equivalent to g-entropic risk measures, which can be seen as primal representation of these risk measures. All g-entropic risk measures take on the following form: ${\rm ER}_{g,\beta}(X) = \displaystyle\mathop{\inf}_{t > 0, v \in \mathfrak{R}} \left\{ t \left[v + {\rm E}_{P}\left(g^{\ast}\left(\frac{X}{t} - v + \beta \right)\right)\right] \right\}$, where $g^*$ the convex function of the phi-divergence $g$ that is in the dual representation. EVaR, for example, is a well known example of phi-divergence risk measure where the phi-Divergence is relative entropy, better known as the KL-divergence. 
+Recall that any coherent risk measure can be defined as 
+\[
+\rho(X)=\sup_{Q\in \mathfrak{J}}{\rm E}_{Q},
+\]
+where $\mathfrak{J}$ is a constrained set of probability measures. Phi-divergence risk measures can be defined as a coherent risk measure for which $\mathfrak{J}$ contains all $Q$ such that $I_\phi(P, Q) \le \beta$, where $\beta$ is some constant typically dependent on the risk level. Phi-divergence risk measures are equivalent to g-entropic risk measures, which can be seen as primal representation of these risk measures. All g-entropic risk measures take on the following form: 
+\[
+{\ER_{g,\beta}(X) = \displaystyle\mathop{\inf}_{t > 0, v \in \mathfrak{R}} \left\{ t \left[v + {\rm E}_{P}\left(g^{\ast}\left(\frac{X}{t} - v + \beta \right)\right)\right] \right\},
+\] 
+where $g^*$ the convex function of the phi-divergence $g$ that is in the dual representation. EVaR, for example, is a well known example of phi-divergence risk measure where the phi-Divergence is relative entropy, better known as the KL-divergence. 
 
 
 

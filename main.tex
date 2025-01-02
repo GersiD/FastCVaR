@@ -12,7 +12,7 @@
 \usepackage{bm}
 \usepackage{amsthm}
 \usepackage{natbib}
-\usepackage{}
+\usepackage{booktabs}
 
 
 \newcommand{\gersi}[1]{\textcolor{red}{#1}}
@@ -108,7 +108,7 @@ for two discrete probability distributions $p$ and $q$, where $\phi$ is a convex
 
 Recall that any coherent risk measure can be defined as 
 \[
-\rho(X)=\sup_{Q\in \mathfrak{J}}{\rm E}_{Q},
+\rho(X)=\sup_{Q\in \mathfrak{J}}\mathbb{E}_Q [???],
 \]
 where $\mathfrak{J}$ is a constrained set of probability measures. Phi-divergence risk measures can be defined as a coherent risk measure for which $\mathfrak{J}$ contains all $Q$ such that $I_\phi(P, Q) \le \beta$, where $\beta$ is some constant typically dependent on the risk level. Phi-divergence risk measures are equivalent to g-entropic risk measures, which can be seen as primal representation of these risk measures. All g-entropic risk measures take on the following form for $\beta \in \mathbb{R}$ and any convex (closed?) function $g\colon: \mathbb{R} \to \mathbb{R}$: 
 \[
@@ -122,6 +122,7 @@ where $g^{\star}$ the convex conjugate of the phi-divergence $g$ that is in the 
     \begin{tabular}{c|ccc}
          \textbf{Risk measure} & $g$  & $g\opt$ & $\beta$ \\
          Expectation           &  \\
+         \DeclareMathOperator{\kl}{KL}
     \end{tabular}
     \caption{Example divergences}
     \label{tab:my_label}

@@ -38,6 +38,10 @@ end
 plot(experiments[5:length(qcvar_results)], qcvar_results[5:end], label="qCVaR", xaxis=:log, yaxis=:log, legend=:topleft)
 plot!(experiments[5:length(cvar_results)], cvar_results[5:end], label="CVaR", xaxis=:log, yaxis=:log, legend=:topleft)
 plot!(title="qCVaR vs CVaR", xlabel="n", ylabel="Time (s)")
-savefig("results/res.png")
+savefig("results/res_log.png")
+plot(experiments[5:length(qcvar_results)], qcvar_results[5:end], label="qCVaR", legend=:topleft)
+plot!(experiments[5:length(cvar_results)], cvar_results[5:end], label="CVaR", legend=:topleft)
+plot!(title="qCVaR vs CVaR", xlabel="n", ylabel="Time (s)")
+savefig("results/res_linear.png")
 println("Done!")
 

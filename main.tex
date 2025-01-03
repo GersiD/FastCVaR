@@ -264,7 +264,7 @@ At every iteration, the algorithm will always hit case 1 or case 2 assuming $bac
   If \cref{alg:quick_quantile} correctly computes $\quant^+$ then \cref{alg:quick_cvar} correctly computes CVaR. 
 \end{lem}
 \begin{proof}
-  \mm{TODO}
+  \todo{need proof}
 \end{proof}
 
 \section{Fast $\varphi$-divergence Algorithms}
@@ -280,7 +280,8 @@ As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk 
   \bm{\xi} \leq \frac{1}{1-\alpha} p, \bm{\xi} \in \Delta^n \right\} \\
   &= \min \left\{\bm{\xi}\tr \bm{x} \mid \bm{\xi} \leq \frac{1}{1-\alpha} \bm{p},
      \xi\tr \bm{1} = 1, \bm{\xi} \geq 0\right\}\\
-  &= \max \left\{ z - \frac{1}{1-\alpha} \Ex{\bm{p}}{z-x}_+ \mid z \in \mathbb{R}\right\}.
+  &= \max \left\{ z - \frac{1}{1-\alpha} \Ex{\bm{p}}{z-\bm{x}}_+ \mid z \in \mathbb{R}\right\} \\
+  &= \max \left\{ z - \frac{1}{1-\alpha} \bm{p}\tr(z-\bm{x})_+ \mid z \in \mathbb{R}\right\}.
   \end{aligned}
 \end{equation}
 
@@ -492,8 +493,19 @@ As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk 
 
 \section{Comonotonicity of Risk}
 
-Given two random variables $\tilde{x}$ and $\tilde{y}$ we say that they are comonotonic if \todo{what is the definition of comonotonicity?}.
-A risk measure is said to be comonotonic if $\rho(\tilde{x} + \tilde{y}) = \rho(\tilde{x}) + \rho(\tilde{y})$ for comonotonic random variables $\tilde{x}$ and $\tilde{y}$.
+\begin{definition}
+  Two random variables $\tilde{x}$ and $\tilde{y}$ are said to be comonotonic if
+  \begin{align*}
+    (\tilde{x}(\omega) - \tilde{x}(\omega'))(\tilde{y}(\omega) - \tilde{y}(\omega')) \geq 0 \quad \forall \; \omega, \omega' \in \Omega.
+  \end{align*}
+\end{definition}
+\begin{definition}
+  A risk measure is said to be comonotonic if given comonotonic random variables $\tilde{x}$ and $\tilde{y}$
+  \begin{align*}
+    \rho(\tilde{x} + \tilde{y}) = \rho(\tilde{x}) + \rho(\tilde{y}).
+  \end{align*}
+\end{definition}
+
 
 \begin{table}[]
 \begin{tabular}{lll}

@@ -56,7 +56,7 @@
 
 
 % \title{CVaR in Linear Time}
-\title{Fast Algorithms for VaR and $\varphi$-divergence Risk Measures, like CVaR and EVaR}
+\title{Fast Algorithms for VaR and $\varphi$-divergence Risk Measures}
 \author{Palash Agrawal, Gersi Doko, Maeve Burwell, Marek Petrik}
 \date{}
 
@@ -66,21 +66,23 @@
 
 \section{Introduction}
 % https://www.researchgate.net/publication/2611689_A_One-Pass_Space-Efficient_Algorithm_for_Finding_Quantiles
-Approximate quantile algorithm but probability distribution is not known unlike our setting (really each element in the given dataset has an equal probability)
-
+\todo{
+  Before the intro can be written need the following 
+\begin{itemize}
+  \item Need to tell a \textquotedblleft story \textquotedblright with existing sections
+\end{itemize}
+}
 
 \section{Preliminaries}
 
-Before describing CVaR and its solution we define the basic notation we use in the paper. 
-We use calligraphic letters to denote sets and a tilde to denote random variables. 
-We also adopt the standard convention that $\mathcal{A}^{\mathcal{B}}$ represents the set of all functions from a set $\mathcal{B}$ to a set $\mathcal{A}$ and treat vectors as a function from indexes to real numbers. $\bm{1}$ denotes the vector of ones and $\mathds{1}(bool)$ denotes the indicator function. We use the convention that comparison operators are defined on vector spaces element-wise, that is for $x, y \in \mathbb{R}^n$ then $x \leq y \iff x_i \leq y_i \quad \; \forall \; i \in 1\dots n$.
-Finally, $\Delta^n$ denotes the standard $n$-simplex while $\Delta_k^n$ denotes the k-capped simplex~\cite{kcapped_ang}.
+We use calligraphic letters to denote sets, $\mathcal{A} = \{a \in \Real \}$ and a tilde to denote random variables, $\tilde{x} : \Omega \to \Real$. 
+We also adopt the standard convention that $\mathcal{A}^{\mathcal{B}}$ represents the set of all functions from a set $\mathcal{B}$ to a set $\mathcal{A}$ and treat vectors as a function from indexes to real numbers. $\bm{1}$ denotes the vector of ones and $\mathds{1}(bool)$ denotes the indicator function. We use the convention that comparison operators are defined on vector spaces element-wise, that is for $x, y \in \mathbb{R}^n$ then $x \leq y \iff x_i \leq y_i \quad \; \forall \; i \in 1\dots n$. Finally, $\Delta^n$ denotes the standard $n$-simplex while $\Delta_k^n$ denotes the k-capped simplex~\cite{kcapped_ang}.
 
 \section{Formal Model}
 
 
 \paragraph{Value-at-Risk and quantiles}
-Quantile of a random variable $\tilde{x} \in \mathbb{X}$ at level $\alpha \in [0,1]$ is any value $\tau\in \mathbb{R}$ such that $\mathbb{P}({\tilde{x}) \le \tau} \ge \alpha$ and $\mathbb{P}({\tilde{x}) \ge \tau} \ge 1-\alpha$. The quantile of a random variable may not be unique and lies in the interval $[\quant^-_{\alpha}(\tilde{x}), \quant^+_{\alpha}(\tilde{x})]$ where
+Quantile of a random variable $\tilde{x} \in \mathbb{X}$ at level $\alpha \in [0,1]$ is any value $\tau\in \mathbb{R}$ such that $\mathbb{P}({\tilde{x}) \le \tau} \ge \alpha$ and $\mathbb{P}({\tilde{x}) \ge \tau} \ge 1-\alpha$. The quantile may not be unique however always lies in the interval $[\quant^-_{\alpha}(\tilde{x}), \quant^+_{\alpha}(\tilde{x})]$ where
 \begin{align} \label{eq:quantile-definition}
 %\label{eq:upper-quantile-definition}
   \quant_{\alpha}^+(\tilde{x})
@@ -91,7 +93,7 @@ Quantile of a random variable $\tilde{x} \in \mathbb{X}$ at level $\alpha \in [0
   &\;:=\;
     \min\; \left\{\tau \in \bar{\mathbb{R}} \mid \mathbb{P}[\tilde{x} \le \tau]   \ge \alpha\right\}.
 \end{align}
-The maximum in~\eqref{eq:quantile-definition} exists because $\mathbb{P}[\tilde{x} < \tau]$ is lower semi-continuous and the minimum in~\eqref{eq:quantile-definition} exists because $\mathbb{P}[\tilde{x} \le \tau]$ is upper semi-continuous with respect to $\tau$. Note that $\quant^+_1(\tilde{x}) = \infty$, $\quant^-_0(\tilde{x}) = -\infty$ and the quantiles are bounded otherwise for all $\alpha \in [0,1]$.
+The maximum in~\eqref{eq:quantile-definition} exists because $\mathbb{P}[\tilde{x} < \tau]$ is lower semi-continuous and the minimum in~\eqref{eq:quantile-definition} exists because $\mathbb{P}[\tilde{x} \le \tau]$ is upper semi-continuous with respect to $\tau$. Note that $\quant^+_1(\tilde{x}) = \infty$, $\quant^-_0(\tilde{x}) = -\infty$, otherwise $\quant^+_\alpha, \quant^-_\alpha$ are bounded for all $\alpha \in (0,1)$ and $\tilde{x} \in \mathcal{L}^\infty$.
 
 Monetary risk measures generalize the expectation operator to account for the uncertainty in the distribution.~\emph{Value-at-Risk}~(VaR) is one of the oldest, simplest, and most common risk measures\todo{fixme}~\cite{Follmer2016,Shapiro2014}. Value-at-Risk: $\varo \colon \mathbb{X} \to \bar{\mathbb{R}}$ at a risk level $\alpha \in [0,1]$ of a random variable $\tilde{x}\in \mathbb{X}$ is defined as the largest $1-\alpha$ confidence lower bound on the value of the random variable:
 \begin{equation}
@@ -299,7 +301,7 @@ As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk 
 \begin{algorithm}
   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and maximum divergence \beta}}
   \algrenewcommand\algorithmicensure{\textbf{Output: $q$ : new distribution }}
-  \caption{Linear Time Algorithm for TVaR}\label{alg:quick_quantile}
+  \caption{Linear Time Algorithm for TVaR}\label{alg:quick_tvar}
   \begin{algorithmic}[1]
     \State{find max element in $x$}
     \State{$offset \gets \min{p[max ind] + \beta/2, 1} - p[max ind] $}

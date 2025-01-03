@@ -67,7 +67,7 @@
 \section{Introduction}
 % https://www.researchgate.net/publication/2611689_A_One-Pass_Space-Efficient_Algorithm_for_Finding_Quantiles
 \todo{
-  Before the intro can be written need the following 
+  Before the intro can be written
 \begin{itemize}
   \item Need to tell a \textquotedblleft story \textquotedblright with existing sections
 \end{itemize}
@@ -75,13 +75,18 @@
 
 \section{Preliminaries}
 
-We use calligraphic letters to denote sets, $\mathcal{A} = \{a \in \Real \}$ and a tilde to denote random variables, $\tilde{x} : \Omega \to \Real$. 
+\paragraph{General Notation}
+We use caligraphic letters to denote sets, a tilde to denote random variables, and bold lowercase letters to denote
+vectors. 
 We also adopt the standard convention that $\mathcal{A}^{\mathcal{B}}$ represents the set of all functions from a set $\mathcal{B}$ to a set $\mathcal{A}$ and treat vectors as a function from indexes to real numbers. $\bm{1}$ denotes the vector of ones and $\mathds{1}(bool)$ denotes the indicator function. We use the convention that comparison operators are defined on vector spaces element-wise, that is for $x, y \in \mathbb{R}^n$ then $x \leq y \iff x_i \leq y_i \quad \; \forall \; i \in 1\dots n$. Finally, $\Delta^n$ denotes the standard $n$-simplex while $\Delta_k^n$ denotes the k-capped simplex~\cite{kcapped_ang}.
+We assume a probability space with finite outcomes $\Omega = \left\{ 1, \dots , N \right\}$, events $\mathcal{F}$, and
+probability measure $\mathbb{P} \in \Delta^N$. We consider a random variable to be any mapping $\tilde{x}\colon \Omega \to \mathbb{R}$. Or equivalently as vectors on $\Omega$. For example, the vector $\bm{x}\in \mathbb{R}^N$ equivalent to $\tilde{x}$ is constructed as
+\[
+ x_w = \tilde{x}( \omega ), \quad\forall \omega \in \Omega .
+\]
+We assume the same equivalence for probability distributions.
 
-\section{Formal Model}
-
-
-\paragraph{Value-at-Risk and quantiles}
+\paragraph{Value-at-Risk and Quantiles}
 Quantile of a random variable $\tilde{x} \in \mathbb{X}$ at level $\alpha \in [0,1]$ is any value $\tau\in \mathbb{R}$ such that $\mathbb{P}({\tilde{x}) \le \tau} \ge \alpha$ and $\mathbb{P}({\tilde{x}) \ge \tau} \ge 1-\alpha$. The quantile may not be unique however always lies in the interval $[\quant^-_{\alpha}(\tilde{x}), \quant^+_{\alpha}(\tilde{x})]$ where
 \begin{align} \label{eq:quantile-definition}
 %\label{eq:upper-quantile-definition}
@@ -95,31 +100,28 @@ Quantile of a random variable $\tilde{x} \in \mathbb{X}$ at level $\alpha \in [0
 \end{align}
 The maximum in~\eqref{eq:quantile-definition} exists because $\mathbb{P}[\tilde{x} < \tau]$ is lower semi-continuous and the minimum in~\eqref{eq:quantile-definition} exists because $\mathbb{P}[\tilde{x} \le \tau]$ is upper semi-continuous with respect to $\tau$. Note that $\quant^+_1(\tilde{x}) = \infty$, $\quant^-_0(\tilde{x}) = -\infty$, otherwise $\quant^+_\alpha, \quant^-_\alpha$ are bounded for all $\alpha \in (0,1)$ and $\tilde{x} \in \mathcal{L}^\infty$.
 
-Monetary risk measures generalize the expectation operator to account for the uncertainty in the distribution.~\emph{Value-at-Risk}~(VaR) is one of the oldest, simplest, and most common risk measures\todo{fixme}~\cite{Follmer2016,Shapiro2014}. Value-at-Risk: $\varo \colon \mathbb{X} \to \bar{\mathbb{R}}$ at a risk level $\alpha \in [0,1]$ of a random variable $\tilde{x}\in \mathbb{X}$ is defined as the largest $1-\alpha$ confidence lower bound on the value of the random variable:
+Monetary risk measures generalize the expectation operator to allow for risk sensitive distinctions in otherwise equivalent distributions~\cite{Follmer2016}.~\emph{Value-at-Risk}~(VaR) is one of the oldest, simplest, and most common risk measures~\cite{Follmer2016,Shapiro2014}. $\varo : \mathbb{X} \to \bar{\mathbb{R}}$ at a risk level $\alpha \in [0,1]$ of a random variable $\tilde{x}\in \mathbb{X}$ is defined as:
 \begin{equation}
   \label{eq:var-definition}
-\varo_{\alpha}{\tilde{x}} \;:=\;  \quant^+_{ \alpha }(\tilde{x}).  
+\varo_{\alpha}(\tilde{x}) \;:=\;  \quant^+_{ \alpha }(\tilde{x}).  
 \end{equation}
-\paragraph{$\varphi$-divergence Risk Measures}
 
+\paragraph{$\varphi$-divergence Risk Measures}
 
 $\varphi$-divergences can be defined as 
 \[I_\phi(p, q) = \sum_{n=1}^X \phi\left(\frac{p_\omega}{q_\omega}\right)
 \] 
-for two discrete probability distributions $p$ and $q$, where $\phi$ is a convex function such that $\phi(1)=0$. 
+for two discrete, absolutely continuous probability distributions $p$ and $q$, and convex $\phi$ such that $\phi(1)=0$. 
 
 Recall that any coherent risk measure can be defined as 
-\[
-\rho(X)=\sup_{Q\in \mathfrak{J}}\mathbb{E}_Q [???],
-\]
-where $\mathfrak{J}$ is a constrained set of probability measures. Phi-divergence risk measures can be defined as a coherent risk measure for which $\mathfrak{J}$ contains all $Q$ such that $I_\phi(P, Q) \le \beta$, where $\beta$ is some constant typically dependent on the risk level. Phi-divergence risk measures are equivalent to g-entropic risk measures, which can be seen as primal representation of these risk measures. All g-entropic risk measures take on the following form for $\beta \in \mathbb{R}$ and any convex (closed?) function $g\colon \mathbb{R} \to \mathbb{R}$~\cite{Ahmadi-Javid2011,Ahmadi-Javid2017}: 
+\begin{align}\label{eq:correspondence_coherent_risk}
+  \rho(X)=\sup_{Q\in \mathcal{Q}}\mathbb{E}_Q [-X],
+\end{align}
+where $\mathcal{Q}$ is a subset of all probability measures on $\Omega$~\cite{Follmer2016}(Prop. 2.84). Phi-divergence risk measures can be defined as a coherent risk measure for which $\mathcal{Q}$ contains all $Q$ such that $I_\phi(P, Q) \le \beta$, where $\beta$ is some constant typically dependent on the risk level. Phi-divergence risk measures are equivalent to g-entropic risk measures, which can be seen as the primal representation of these risk measures. All g-entropic risk measures take on the following form for $\beta \in \mathbb{R}$ and any convex \todo{(closed?)} function $g\colon \mathbb{R} \to \mathbb{R}$~\cite{Ahmadi-Javid2011,Ahmadi-Javid2017}: 
 \[
 \ER_{g,\beta}(\tilde{x}) = \sup_{t > 0, v \in \mathbb{R}} t \left(v + \E {-g^{\star}\left(-\frac{\tilde{x}}{t} + v + \beta \right)}\right),
 \] 
-where $g^{\star}$ the convex conjugate of the phi-divergence $g$ that is in the dual representation. EVaR, for example, is a well known example of phi-divergence risk measure where the phi-Divergence is relative entropy, better known as the KL-divergence. 
-
-\mm{The dual representation of the g-risk measure?}
-
+where $g^{\star}$ the convex conjugate of the phi-divergence $g$. EVaR, for example, is a well known example of phi-divergence risk measure where the phi-Divergence is the KL-divergence~\cite{Ahmadi-Javid2017}.
 
 \begin{table}
     \centering
@@ -134,38 +136,25 @@ where $g^{\star}$ the convex conjugate of the phi-divergence $g$ that is in the 
          \bottomrule
     \end{tabular}
     \caption{Example divergences}
-    \label{tab:my_label}
+    \label{tab:divergences}
 \end{table}
-
-\cite{Ahmadi-Javid2017}
 
 
 \paragraph{Polymatroids}
- 
 
-Let $E$ be a finite set, and $f\colon  2^E \to \mathbb{R}_+$ a nondecreasing submodular function. That is, for each $A \subseteq B \subseteq E$ we have $f(A) \leq f(B)$, and for each $A, B \subseteq E$ we have 
+Let $\mathcal{E}$ be a finite set, and $f : \{\mathcal{X} \mid \mathcal{X} \subseteq \mathcal{E} \} \to \mathbb{R}_+$ a nondecreasing submodular function. That is, for each $\mathcal{A} \subseteq \mathcal{B} \subseteq \mathcal{E}$ we have $f(\mathcal{A}) \leq f(\mathcal{B})$, and for each $\mathcal{A}, \mathcal{B} \subseteq \mathcal{E}$ we have 
 \[
-f(A) + f(B) \geq f(A \cup B) + f(A \cap B).
+f(\mathcal{A}) + f(\mathcal{B}) \geq f(\mathcal{A} \cup \mathcal{B}) + f(\mathcal{A} \cap \mathcal{B}).
 \]
 We define the polymatroid associated to $f$ to be the following polytope:
 \[
-P_f = \left\{ \bm{x} \in \mathbb{R}_+^E  \mid  \sum_{e \in U} \bm{x}(e) \leq f(U), \ \forall U \subseteq E \right\}.
+  P_f = \left\{ \bm{x} \in \mathbb{R}_+^E  \mid  \sum_{e \in \mathcal{U}} \bm{x}(e) \leq f(\mathcal{U}), \;\; \forall \; \mathcal{U} \subseteq \mathcal{E} \right\}.
 \]
-This polytope is of special interest for computing risk measures, as we will see later on that all coherent and comonotonic risk measures can be computed by solving the maximum weight independent set problem on a polymatroid. The maximum weight independent set problem on a polymatroid can be defined as
-\[
-  \max\left\{\bm{c}\tr \bm{x} \mid  \bm{x} \in P_f\right\}
-\]
-Conventional algorithms such as Algorithm 4, solve this problem through a greedy approach which requires sorting the elements. We will show in the next section that for a special class of submodular functions $f$, we can compute the maximum weight independent set without sorting elements.
-
-
-
-\paragraph{General Notation}
-We can assume a probability space with outcomes $\Omega = \left\{ 1, \dots , N \right\}$, events $\mathcal{F}$, and
-probability function $\mathbb{P} \in \Delta^N$. We consider a random variable to be any mapping $\tilde{x}\colon \Omega \to \mathbb{R}$. Or equivalently as vectors on $\Omega$. For example, the vector $\bm{x}\in \mathbb{R}^N$ equivalent to $\tilde{x}$ is constructed as
-\[
- x_w = \tilde{x}( \omega ), \quad\forall \omega \in \Omega .
-\]
-We assume the same equivalence for probability distributions.
+This polytope is of special interest for computing risk measures, as we will see later on that all coherent and comonotonic risk measures can be computed by solving
+\begin{align}\label{eq:polytope}
+  \max_{x}\left\{\bm{x}\tr \bm{p} \mid  \bm{p} \in P_f\right\}
+\end{align}
+Conventional algorithms such as Algorithm 4, solve \eqref{eq:polytope} through a greedy approach which requires sorting. We will show in \todo{reference section} that for a special class of submodular functions $f$, sorting is not neccecary.
 
 
 \section{Fast Algorithm for VaR}
@@ -195,11 +184,11 @@ In this section, we describe a linear time algorithm for VaR.
 \end{algorithm}
 
 \begin{thm}
-\Cref{alg:quick_cvar} is correct and runs in linear time.
+\cref{alg:quick_cvar} is correct and runs in linear time.
 \end{thm}
 
 \begin{lem}
-Suppose that $\tilde{x}\colon \Omega \to \mathbb{R}$ is a random variable with finite $\Omega$, and $\alpha\in [0,1)$. Then, there exist $\omega_1, \omega_2\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_1)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_2)$ for each $\alpha\in (0,1]$.
+Suppose that $\tilde{x}\colon \Omega \to \mathbb{R}$ is a random variable with finite $\Omega$. Then, there exist $\omega_1, \omega_2\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_1)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_2)$ for each $\alpha\in (0,1)$.
 \end{lem}
 \begin{proof}
 Recall the definition:
@@ -259,16 +248,16 @@ At every iteration, the algorithm will always hit case 1 or case 2 assuming $bac
   \todo{need proof}
 \end{proof}
 \begin{lem}
-  CVAR can be computed by solving the following optimization problem $\min_{Q \in \mathcal{Q}} \mathbb{E}_Q[X]$, where $\mathcal{Q} = \left\{Q \in \Delta^\Omega \mid Q(\omega) < \frac{1}{1-\alpha} P(\omega) \quad \forall \omega \in \Omega\right\}$.
+  CVAR can be computed by solving the following optimization problem $\min_{Q \in \mathcal{Q}} \mathbb{E}_Q[X]$, where $\mathcal{Q} = \left\{Q \in \Delta^\Omega \mid Q(\omega) < \frac{1}{1-\alpha} P(\omega)\right\}$.
 \end{lem}
-\proof{Theorem 4.52 in~\cite{Follmer2016}, note we consider rewards.}
+\proof{Theorem 4.52 in~\cite{Follmer2016}, note we consider rewards \todo{make sure this is correct \eqref{eq:correspondence_coherent_risk}}.}
 \begin{lem}
   For $\omega \in \Omega$ we can construct a feasible $Q \in \mathcal{Q}$ such that $Q(\omega) = \min\left\{\frac{P(\omega)}{1-a}, 1\right\}$.
 \end{lem}
 \begin{proof}
   Two possible scenarios exist. 
-  Case 1: $P(A) \geq 1 - \alpha$. In this case, Q(A) must equal 1 since $(1/(1 - \alpha))* P(A) > 1 $. Thus every element in $A$ should be scaled by $1/P(A)$ if in $A$ and set to 0 otherwise. Since  $P(A) \geq 1 - \alpha$, $1/P(A) \leq 1/(1-\alpha)$  
-  Case 2: $P(A) < (1 - \alpha)$. In this scenario, $Q(A) \leq (1/(1 - \alpha)) \cdot  P(A) < 1$. For any given A, We can construct a Q(A) such that $Q(A) = (1/(1 - \alpha)) \cdot  P(A)$. This can be done by setting $Q(a)$ to $(1/(1 - \alpha)) \cdot P(a)$ for all a in A and $P(a) \cdot  d$ otherwise such that $(1/(1 - \alpha)) * P(A) + d*P(B) = 1$, where B contains all elements not in $A$. It is provable that $d \leq (1/(1 - \alpha))$, which is required for the constructed \(Q\) to be feasible. For all feasible $\alpha \geq 0$, $(1/(1 - \alpha)) \ge 1$. Since $P(A) + P(B) = 1$,  $d \le 1$ in order for $(1/(1 - \alpha)) \cdot  P(A) + d\cdot P(B) = 1$ to hold. Since $1 \leq 1/(1-\alpha)$, $d\le \leq (1/(1 - \alpha))$.
+\item[Case 1]: $P(A) \geq 1 - \alpha$. In this case, Q(A) must equal 1 since $(1/(1 - \alpha))* P(A) > 1 $. Thus every element in $A$ should be scaled by $1/P(A)$ if in $A$ and set to 0 otherwise. Since  $P(A) \geq 1 - \alpha$, $1/P(A) \leq 1/(1-\alpha)$  
+\item[Case 2]: $P(A) < (1 - \alpha)$. In this scenario, $Q(A) \leq (1/(1 - \alpha)) \cdot  P(A) < 1$. For any given A, We can construct a Q(A) such that $Q(A) = (1/(1 - \alpha)) \cdot  P(A)$. This can be done by setting $Q(a)$ to $(1/(1 - \alpha)) \cdot P(a)$ for all a in A and $P(a) \cdot  d$ otherwise such that $(1/(1 - \alpha)) * P(A) + d*P(B) = 1$, where B contains all elements not in $A$. It is provable that $d \leq (1/(1 - \alpha))$, which is required for the constructed \(Q\) to be feasible. For all feasible $\alpha \geq 0$, $(1/(1 - \alpha)) \ge 1$. Since $P(A) + P(B) = 1$,  $d \le 1$ in order for $(1/(1 - \alpha)) \cdot  P(A) + d\cdot P(B) = 1$ to hold. Since $1 \leq 1/(1-\alpha)$, $d\le \leq (1/(1 - \alpha))$.
 \end{proof}
 
 \begin{lem}

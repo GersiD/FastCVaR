@@ -42,4 +42,4 @@ using DataFrames
 df = DataFrame(n=experiments, cvar=cvar_results, qcvar=qcvar_results)
 # Save the DataFrame
 using CSV
-CSV.write("./results/cvar_vs_qcvar.csv", df)
+CSV.write("./plots/cvar_vs_qcvar.csv", df)

@@ -5,3 +5,5 @@ code/cvar/target
 code/cvar/my_env
 code/cvar/venv
 code/Manifest.toml
+code/venv
+code/plots/venv

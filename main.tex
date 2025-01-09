@@ -542,7 +542,7 @@ We note this assumption essentially state that the submodular function must be a
     \State{$right \gets n$}
     \While{$left  - right \geq 1$}
     \State{$mid \gets partition(left, right, c)$}
-    \If{$f(S_mid) = f(N)$}
+    \If{$f(S_{mid}) = f(N)$}
        \State{Let $x_i :=  \begin{cases}0 & \text{for } i \geq mid,\dots \end{cases}$}
     \Else
           \State{Let $x_i :=  \begin{cases}f(i) & \text{for } i \leq mid,\dots \end{cases}$}
@@ -551,7 +551,7 @@ We note this assumption essentially state that the submodular function must be a
     
     
     \EndWhile{}
-    \State{$x_right \gets f(N) - f(S_{right - 1})$}
+    \State{$x_{right} \gets f(N) - f(S_{right - 1})$}
 \end{algorithmic}
 \end{algorithm}
 The proof for this algorithm is simple and shows that output is equal to that of Algorithm 4 (the standard greedy algorithm), which has already proved to be both feasible and optimal.

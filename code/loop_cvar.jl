@@ -1,23 +1,39 @@
 using RiskMeasures
 
 function swap!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, i::Int, j::Int)
+  i == j && return # TODO: Test speedup I am curious
   vals[i], vals[j] = vals[j], vals[i]
   p[i], p[j] = p[j], p[i]
 end
 
+"""
+Function to partition the values in `vals` according to the pivot value `pivot_val`.
+Returns:
+  A tuple (lt::Int, gt::Int) where `lt` is the index of the start of the eq partition
+  and `gt` is the index of the start of the right partition, the difference between the two 
+  contain values equal to the pivot.
+"""
 function partition!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, f::Int, b::Int)
-  pivot = f + Int(ceil((b - f) / 2))
-  pivot_val = vals[pivot]
-  @inbounds swap!(vals, p, pivot, b) # move pivot to back
-  store_index = f
-  @inbounds for i ∈ range(f, b - 1)
-    if vals[i] < pivot_val
-      swap!(vals, p, store_index, i)
-      store_index += 1
+  pivot_ind = f + Int(ceil((b - f) / 2))
+  pivot_val = vals[pivot_ind]
+  lt = f
+  eq = f
+  gt = b
+  # @show lt, eq, gt
+  while eq <= gt
+    if vals[eq] < pivot_val
+      swap!(vals, p, eq, lt)
+      lt += 1
+      eq += 1
+    elseif vals[eq] > pivot_val
+      swap!(vals, p, eq, gt)
+      gt -= 1
+    else # vals[eq] == pivot_val
+      eq += 1
     end
+    # @show lt, eq, gt
   end
-  @inbounds swap!(vals, p, b, store_index)
-  return store_index
+  return (lt=lt - 1, gt=gt)
 end
 
 
@@ -30,10 +46,18 @@ function qql!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, α::Real)
   end
   i = 1
   j = length(vals)
+  # @show i, j
   @inbounds while j - i >= 1
-    ind = partition!(vals, p, i, j) - 1
+    lt, gt = partition!(vals, p, i, j)
+    # @show lt, gt
+    ind = lt
     tail::Float64 = sum(view(p, 1:ind))
-    α < tail ? j = ind : i = ind + 1 # Cut off half of the random variable
+    # @show ind
+    # @show tail
+    # @show vals[ind]
+    # @show α < tail
+    α < tail ? j = ind : i = ind + (gt - lt) # Cut off half of the random variable
+    # @show i, j
   end
   return vals[i]
 end

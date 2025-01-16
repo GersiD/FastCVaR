@@ -155,8 +155,11 @@ This polytope is of special interest for computing risk measures, as we will see
 \begin{align}\label{eq:polytope}
   \max_{x}\left\{\bm{x}\tr \bm{p} \mid  \bm{p} \in P_f\right\}
 \end{align}
-Conventional algorithms such as Algorithm 4, solve \eqref{eq:polytope} through a greedy approach which requires sorting. We will show in \todo{reference section} that for a special class of submodular functions $f$, sorting is not neccecary.
+Conventional algorithms such as Algorithm 4, solve \eqref{eq:polytope} through a greedy approach which requires sorting. We will show in \todo{reference section} that for a special class of submodular functions $f$, sorting is not necessary.
 
+\paragraph{Other work}
+
+\cite{adam2019projectionscanonicalsimplexadditional}
 
 \section{Fast Algorithm for VaR}
 
@@ -255,7 +258,6 @@ At every iteration, this algorithm will always hit case 1 or case 2, where $back
 \end{lem}
 \begin{proof}
   Two possible scenarios exist.
-\baselineskip=1.5\baselineskip
 \item[Case 1]: $P(A) \geq 1 - \alpha$. In this scenario, $Q(A)$ must equal 1 since $\frac{1}{1 - \alpha} P(A) > 1 $. Thus every element in $A$ should be scaled by $\frac{1}{P(A)}$ if in $A$ and set to 0 otherwise. Since  $P(A) \geq 1 - \alpha$, we can imply the reciprocal $\frac{1}{P(A)} \leq \frac{1}{1-\alpha}$ is also true.  
 \item[Case 2]: $P(A) < (1 - \alpha)$. In this scenario, $Q(A) \leq \frac{1}{1 - \alpha} \cdot  P(A) < 1$. For any given $A$, we can construct a Q(A) such that $Q(A) = \frac{1}{1 - \alpha} \cdot  P(A)$. This can be done by setting $Q(a)$ to $\frac{1}{1 - \alpha} \cdot P(a)$ for all $a$ in $A$ and $P(a) \cdot  d$ otherwise such that $\frac{1}{1 - \alpha} * P(A) + d*P(B) = 1$, where $B$ contains all elements not in $A$. It is provable that $d \leq \frac{1}{1 - \alpha}$, which is required for the constructed \(Q\) to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{1 - \alpha} \ge 1$. Since $P(A) + P(B) = 1$,  $d \le 1$ in order for $\frac{1}{1 - \alpha} \cdot  P(A) + d\cdot P(B) = 1$ to hold. Since $1 \leq \frac{1}{1-\alpha}$, this implies $d\le \leq \frac{1}{1 - \alpha}$.
 

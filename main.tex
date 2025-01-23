@@ -88,7 +88,7 @@ probability measure $\mathbb{P} \in \Delta^N$. We consider a random variable to 
 We assume the same equivalence for probability distributions.
 
 \paragraph{Value-at-Risk and Quantiles}
-\todo{something is very wrong here, consider a bernouli random variable [0, 1] with probability 0.5, and $\alpha = 0.5$, then $\quant^+_\alpha(\tilde{x}) = 1$ but it should be $0$ according to the \href{https://github.com/RiskAverseRL/RiskMeasures.jl/blob/e7ccc8a8d8a5126ea9bf63988b9f9a485fe8e876/test/runtests.jl\#L67}{code}.}
+\todo{something is very wrong here, consider a bernouli random variable [0, 1] with probability 0.5, and $\alpha = 0.5$, then $\quant^+_\alpha(\tilde{x}) = 1$ following the definition in \cref{eq:quantile-definition} but it should be $0$ according to the \href{https://github.com/RiskAverseRL/RiskMeasures.jl/blob/e7ccc8a8d8a5126ea9bf63988b9f9a485fe8e876/test/runtests.jl\#L67}{code}.}
 Quantile of a random variable $\tilde{x} \in \mathbb{X}$ at level $\alpha \in [0,1]$ is any value $\tau\in \mathbb{R}$ such that $\mathbb{P}({\tilde{x} \le \tau}) \ge \alpha$ and $\mathbb{P}({\tilde{x} \ge \tau}) \ge 1-\alpha$. The quantile may not be unique however always lies in the interval $[\quant^-_{\alpha}(\tilde{x}), \quant^+_{\alpha}(\tilde{x})]$ where
 \begin{align} \label{eq:quantile-definition}
 %\label{eq:upper-quantile-definition}

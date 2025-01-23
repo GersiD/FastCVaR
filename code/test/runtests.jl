@@ -66,33 +66,33 @@ using JuMP, HiGHS
   @test VaR(x5, p5, 0.9).value ≈ 2.0
 end
 
-# @testset "Fast CVaR Tests" begin
-#   x1 = [4, 5, 1, 2, -1, -2]
-#   p = [0.1, 0.2, 0.3, 0.1, 0.3, 0.0]
-#
-#   @test CVaR_e(x1, p, 1)[1] ≈ -1.0
-#   @test qCVaR!(x1, p, 1 - 1) ≈ -1.0
-#   @test CVaR_e(x1, p, 0.99)[1] ≈ -1.0
-#   @test qCVaR!(x1, p, 1 - 0.99) ≈ -1.0
-#   @test CVaR_e(x1, p, 0.0)[1] ≈ 1.6
-#   @test qCVaR!(x1, p, 1 - 0.0) ≈ 1.6
-#   @test CVaR_e(x1, p, 0.5)[1] ≈ -0.2
-#   @test qCVaR!(x1, p, 1 - 0.5) ≈ -0.2
-#   @test CVaR_e(x1, p, 0.4)[1] ≈ 0.0
-#   @test qCVaR!(x1, p, 1 - 0.4) ≈ 0.0
-#
-#   p = [0.1, 0.2, 0.3, 0.1, 0.3]
-#   x2 = [4.0, 5.0, 1.0, 2.0, -1.0]
-#
-#   @test CVaR_e(x2, p, 1)[1] ≈ -1.0
-#   @test qCVaR!(x2, p, 1 - 1) ≈ -1.0
-#   @test CVaR_e(x2, p, 0)[1] ≈ 1.6
-#   @test qCVaR!(x2, p, 1 - 0) ≈ 1.6
-#   @test CVaR_e(x2, p, 0.5)[1] ≈ -0.2
-#   @test qCVaR!(x2, p, 1 - 0.5) ≈ -0.2
-#   @test CVaR_e(x2, p, 0.4)[1] ≈ 0
-#   @test qCVaR!(x2, p, 1 - 0.4) ≈ 0
-# end
+@testset "Fast CVaR Tests" begin
+  x1 = [4, 5, 1, 2, -1, -2]
+  p = [0.1, 0.2, 0.3, 0.1, 0.3, 0.0]
+
+  @test CVaR(x1, p, 0).value ≈ -1.0
+  @test qCVaR!(x1, p, 0).value ≈ -1.0
+  @test CVaR(x1, p, 0.01).value ≈ -1.0
+  @test qCVaR!(x1, p, 0.01).value ≈ -1.0
+  @test CVaR(x1, p, 1.0).value ≈ 1.6
+  @test qCVaR!(x1, p, 1.0).value ≈ 1.6
+  @test CVaR(x1, p, 0.5).value ≈ -0.2
+  @test qCVaR!(x1, p, 0.5).value ≈ -0.2
+  @test CVaR(x1, p, 0.6).value ≈ 0.0
+  @test qCVaR!(x1, p, 0.6).value ≈ 0.0
+
+  p = [0.1, 0.2, 0.3, 0.1, 0.3]
+  x2 = [4.0, 5.0, 1.0, 2.0, -1.0]
+
+  @test CVaR(x2, p, 0).value ≈ -1.0
+  @test qCVaR!(x2, p, 0).value ≈ -1.0
+  @test CVaR(x2, p, 1).value ≈ 1.6
+  @test qCVaR!(x2, p, 1).value ≈ 1.6
+  @test CVaR(x2, p, 0.5).value ≈ -0.2
+  @test qCVaR!(x2, p, 0.5).value ≈ -0.2
+  @test CVaR(x2, p, 0.6).value ≈ 0
+  @test qCVaR!(x2, p, 0.6).value ≈ 0
+end
 
 @testset "Duplicates" begin
   x1 = [1, 2, 2, 3]
@@ -116,19 +116,19 @@ end
   @test qql!(x1, p, 0.5).value ≈ 1
   @test VaR(x1, p, 0.5).value ≈ 1
 
-  # x1 = [4, 5, 1, 1, 2, -1, -2]
-  # p = [0.1, 0.2, 0.2, 0.1, 0.1, 0.3, 0.0]
-  #
-  # @test CVaR_e(x1, p, 1)[1] ≈ -1.0
-  # @test qCVaR!(x1, p, 1 - 1) ≈ -1.0
-  # @test CVaR_e(x1, p, 0.99)[1] ≈ -1.0
-  # @test qCVaR!(x1, p, 1 - 0.99) ≈ -1.0
-  # @test CVaR_e(x1, p, 0.0)[1] ≈ 1.6
-  # @test qCVaR!(x1, p, 1 - 0.0) ≈ 1.6
-  # @test CVaR_e(x1, p, 0.5)[1] ≈ -0.2
-  # @test qCVaR!(x1, p, 1 - 0.5) ≈ -0.2
-  # @test CVaR_e(x1, p, 0.4)[1] ≈ 0.0
-  # @test qCVaR!(x1, p, 1 - 0.4) ≈ 0.0
+  x1 = [4, 5, 1, 1, 2, -1, -2]
+  p = [0.1, 0.2, 0.2, 0.1, 0.1, 0.3, 0.0]
+
+  @test CVaR(x1, p, 0.0).value ≈ -1.0
+  @test qCVaR!(x1, p, 0.0).value ≈ -1.0
+  @test CVaR(x1, p, 0.01).value ≈ -1.0
+  @test qCVaR!(x1, p, 0.01).value ≈ -1.0
+  @test CVaR(x1, p, 1).value ≈ 1.6
+  @test qCVaR!(x1, p, 1).value ≈ 1.6
+  @test CVaR(x1, p, 0.5).value ≈ -0.2
+  @test qCVaR!(x1, p, 0.5).value ≈ -0.2
+  @test CVaR(x1, p, 0.6).value ≈ 0.0
+  @test qCVaR!(x1, p, 0.6).value ≈ 0.0
 end
 
 @testset "qql behaves reasonably when mutating" begin

@@ -22,13 +22,13 @@ function partition!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, f::
   eq = f
   gt = b
   # @show lt, eq, gt
-  while eq <= gt
+  @inbounds while eq <= gt
     if vals[eq] < pivot_val
-      swap!(vals, p, eq, lt)
+      @inbounds swap!(vals, p, eq, lt)
       lt += 1
       eq += 1
     elseif vals[eq] > pivot_val
-      swap!(vals, p, eq, gt)
+      @inbounds swap!(vals, p, eq, gt)
       gt -= 1
     else # vals[eq] == pivot_val
       eq += 1
@@ -66,25 +66,27 @@ function qCVaR!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, α::Rea
     minval = essinf(vals, p; check_inputs=false)
     minpmf = zeros(T, length(p))
     minpmf[minval.index] = one(T)
-    return minval.value
+    return (value=minval.value, pmf=minpmf)
   elseif isone(α)
-    return vals' * p
+    return (value=vals' * p, pmf=Vector(p))
   end
   q, qind = qql!(vals, p, α)
 
   # From here on: α ∈ (0,1)
   value = zero(T)           # CVaR value
+  pc = zeros(T, length(p))  # this is the new distribution
   p_left = one(T)           # probabilities left for allocation
   α̂ = α                    # probabilities to allocate
 
-  @inbounds for i ∈ eachindex(vals)
-    if vals[i] <= q
-      # update index's probability and probability left to sum to 1.0
-      increment = min(p[i] / α̂, p_left)
-      value += increment * vals[i]
-      p_left -= increment
-      p_left ≤ zero(p_left) && break
-    end
+  @inbounds for i ∈ 1:qind
+    # if vals[i] <= q # all elements up to qind are less than or equal to q by def of partition
+    # update index's probability and probability left to sum to 1.0
+    increment = min(p[i] / α̂, p_left)
+    pc[i] = increment
+    value += increment * vals[i]
+    p_left -= increment
+    p_left ≤ zero(p_left) && break
+    # end
   end
-  return value
+  return (value=value, pmf=pc)
 end

@@ -88,7 +88,8 @@ probability measure $\mathbb{P} \in \Delta^N$. We consider a random variable to 
 We assume the same equivalence for probability distributions.
 
 \paragraph{Value-at-Risk and Quantiles}
-Quantile of a random variable $\tilde{x} \in \mathbb{X}$ at level $\alpha \in [0,1]$ is any value $\tau\in \mathbb{R}$ such that $\mathbb{P}({\tilde{x}) \le \tau} \ge \alpha$ and $\mathbb{P}({\tilde{x}) \ge \tau} \ge 1-\alpha$. The quantile may not be unique however always lies in the interval $[\quant^-_{\alpha}(\tilde{x}), \quant^+_{\alpha}(\tilde{x})]$ where
+\todo{something is very wrong here, consider a bernouli random variable [0, 1] with probability 0.5, and $\alpha = 0.5$, then $\quant^+_\alpha(\tilde{x}) = 1$ but it should be $0$ according to the \href{https://github.com/RiskAverseRL/RiskMeasures.jl/blob/e7ccc8a8d8a5126ea9bf63988b9f9a485fe8e876/test/runtests.jl\#L67}{code}.}
+Quantile of a random variable $\tilde{x} \in \mathbb{X}$ at level $\alpha \in [0,1]$ is any value $\tau\in \mathbb{R}$ such that $\mathbb{P}({\tilde{x} \le \tau}) \ge \alpha$ and $\mathbb{P}({\tilde{x} \ge \tau}) \ge 1-\alpha$. The quantile may not be unique however always lies in the interval $[\quant^-_{\alpha}(\tilde{x}), \quant^+_{\alpha}(\tilde{x})]$ where
 \begin{align} \label{eq:quantile-definition}
 %\label{eq:upper-quantile-definition}
   \quant_{\alpha}^+(\tilde{x})
@@ -215,7 +216,7 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
 
   
 
-  Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})$. Recall $\alpha \in [0,1)$, $\P{\tilde{x} < \tau\opt} = 1 \leq \alpha < 1$.
+  Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})$. Recall $\alpha \in [0,1$, $\P{\tilde{x} < \tau\opt} = 1 \leq \alpha < 1$.
   
   % New Proof 2: Recall that $\alpha$ is less than 1 and  $\quant^+_{\alpha}(\tilde{x})$ is bounded for all admissible $\alpha$ values. Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})  $. Then, let $\tau' = \tau\opt + 1$. Because $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition}, $\P{ \tilde{x} < \tau' } =  \P{ \tilde{x} < \tau\opt  }\le \alpha$, $\tau\opt $ cannot be optimal.
 

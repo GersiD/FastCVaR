@@ -12,6 +12,8 @@ Returns:
   A tuple (lt::Int, gt::Int) where `lt` is the index of the start of the eq partition
   and `gt` is the index of the start of the right partition, the difference between the two 
   contain values equal to the pivot.
+  x = [1,2,2,3]
+  prtition!(x, 2, 1, 4) # (2, 4)
 """
 function partition!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, f::Int, b::Int)
   pivot_ind = f + Int(ceil((b - f) / 2))
@@ -40,40 +42,35 @@ end
 ## Quick Quantile (loopy version)
 function qql!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, α::Real)
   if iszero(α) # minimum
-    return essinf_e(vals, p; check_inputs=true)[1]
+    return essinf(vals, p; check_inputs=true)
   elseif isone(α) # maximum (it is unbounded)
-    return typemax(eltype(p))
+    return (value=typemax(eltype(p)), index=length(vals))
   end
   i = 1
   j = length(vals)
+  gt = 1
   # @show i, j
   @inbounds while j - i >= 1
     lt, gt = partition!(vals, p, i, j)
-    # @show lt, gt
     ind = lt
     tail::Float64 = sum(view(p, 1:ind))
-    # @show ind
-    # @show tail
-    # @show vals[ind]
-    # @show α < tail
-    α < tail ? j = ind : i = ind + (gt - lt) # Cut off half of the random variable
-    # @show i, j
+    α <= tail ? j = ind : i = ind + (gt - lt) # Cut off half of the random variable
   end
-  return vals[i]
+  return (value=vals[i], index=gt)
 end
 
 function qCVaR!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, α::Real)
   T = eltype(p)
   # handle special cases
   if iszero(α)
-    minval = essinf_e(vals, p; check_inputs=false)
+    minval = essinf(vals, p; check_inputs=false)
     minpmf = zeros(T, length(p))
     minpmf[minval.index] = one(T)
     return minval.value
   elseif isone(α)
     return vals' * p
   end
-  q = qql!(vals, p, α)
+  q, qind = qql!(vals, p, α)
 
   # From here on: α ∈ (0,1)
   value = zero(T)           # CVaR value

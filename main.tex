@@ -290,6 +290,21 @@ As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk 
 \end{equation}
 
 \subsection{EVaR}
+\begin{lem}
+  $TVaR(x) \leq EVaR(x) \leq CVaR(x)$ for any given x.
+\end{lem}
+Two methods exist for computing EVaR, both being bisection methods. We can initialize these bisections with lower and upper bounds using TVaR and CVaR.
+Method 2, the solution can be computed by the bisection method in \cite{adam2019projectionscanonicalsimplexadditional}. We can initialize with a lower upper bound on $\mu$ by the following algorithm.
+\begin{algorithm}
+
+\algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ solution for CVar and maximum divergence \beta}}
+\State{Compute $\gamma_i$ using $x_i - (x_max - x_min)/2 * log(p_i/q_i)$}
+\State{Select max $\gamma_i$}
+\State{Find max $\mu$ computed by $(x_i - \gamma_i)/log(p_i/q_i) $}
+\State{max $\mu_i$ is new lower bound}
+
+\end{algorithm}
+
 
 \subsection{TVaR}
 \begin{algorithm}

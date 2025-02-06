@@ -312,10 +312,10 @@ Method 2, the solution can be computed by the bisection method in \cite{adam2019
   \algrenewcommand\algorithmicensure{\textbf{Output: $q$ : new distribution }}
   \caption{Linear Time Algorithm for TVaR}\label{alg:quick_tvar}
   \begin{algorithmic}[1]
-    \State{find max element in $x$}
-    \State{$offset \gets \min{p[max ind] + \beta/2, 1} - p[max ind] $}
+    \State{$m \gets \min \left\{ x_i \mid  i = 1, \dots, n \right\} }
+    \State{$o \gets \min\left\{p_{m} + \frac{\beta}{2}, 1 - p_m\right\} $}
     
-    \State{$VAR \gets QuickQuantile(x, q, offset)$ }
+    \State{$VAR \gets \operatorname{QuickQuantile}(x, q, o)$ }
     \State{$sum \gets 0$}
     \For{$i = 1 \dots n$}
     \If{$q[i] \leq VAR$}

@@ -1,7 +1,7 @@
 include("../loop_cvar.jl")
 include("../tvar.jl")
 using Test
-using JuMP, HiGHS
+using JuMP, HiGHS, Gurobi
 # using RobustMDPs
 
 # @testset "Loopy tests" begin
@@ -151,24 +151,25 @@ using JuMP, HiGHS
 
 @testset "TVaR" begin
   function worstcase_l1_gurobi(x, pbar, ξ)
-    m = Model(HiGHS.Optimizer)
+    m = Model(Gurobi.Optimizer)
     set_optimizer_attribute(m, "log_to_console", false)
-    @variable(m, p[1:length(x)])
+    @variable(m, p[1:length(x)] .>= 0)
     @variable(m, t[1:length(x)])
     @constraint(m, p .- pbar <= t)
     @constraint(m, pbar .- p <= t)
     @constraint(m, sum(t) <= ξ)
     @constraint(m, sum(p) == 1)
-    @constraint(m, p .>= 0)
     @objective(m, Min, p' * x)
     optimize!(m)
-    termination_status(m) != MOI.OPTIMAL && throw(error("worstcase_l1_gurobi failed to find optimal solution"))
+    termination_status(m) != MOI.OPTIMAL && throw(error("worstcase_l1_gurobi expected optimal got $(termination_status(m))"))
     return value.(p), value.(p)' * x
   end
   x1 = [1, 2, 3]
   p1 = [1 / 3, 1 / 3, 1 / 3]
-  # TODO: need gurobi to test this
-  @test TVaR(x1, p1, 0.5) ≈ worstcase_l1_gurobi(x1, p1, 1.0)[2]
+  TVaR(x1, p1, 0.5)
+  @test x1 == [1, 2, 3]
+  @test p1 == [1 / 3, 1 / 3, 1 / 3]
+  @test worstcase_l1_gurobi(x1, p1, 0.8)[2] ≈ TVaR(x1, p1, 0.8)
 end
 
 

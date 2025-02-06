@@ -10,8 +10,8 @@ stop = 100000000
 step = 1000000
 experiments = range(start=start, stop=stop, step=step)
 len = length(experiments)
-qcvar_results = Float64[]
-cvar_results = Float64[]
+qcvar_results = Float64[len]
+cvar_results = Float64[len]
 # @threads :dynamic for i ∈ 1:len
 for i ∈ 1:len
   n = Int(ceil(experiments[i]))
@@ -23,10 +23,10 @@ for i ∈ 1:len
   GC.enable(false)
   local start = now()
   slow_cvar_result = CVaR(deepcopy(x), p, α).value
-  push!(cvar_results, (now() - start).value)
+  cvar_results[i] = (now() - start).value
   start = now()
-  fast_cvar_result = qCVaR!(deepcopy(x), p, α)
-  push!(qcvar_results, (now() - start).value)
+  fast_cvar_result = qCVaR!(deepcopy(x), p, α).value
+  qcvar_results[i] = (now() - start).value
   local δ = abs(slow_cvar_result - fast_cvar_result)
   if δ >= 1e-6
     println("CVaR: $slow_cvar_result, qCVaR: $fast_cvar_result, diff: $δ")

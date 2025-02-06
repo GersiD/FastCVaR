@@ -51,10 +51,9 @@ function qql!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, α::Real)
   gt = 1
   # @show i, j
   @inbounds while j - i >= 1
-    lt, gt = partition!(vals, p, i, j)
-    ind = lt
+    ind, gt = partition!(vals, p, i, j)
     tail::Float64 = sum(view(p, 1:ind))
-    α <= tail ? j = ind : i = ind + (gt - lt) # Cut off half of the random variable
+    α <= tail ? j = ind : i = gt # Cut off half of the random variable
   end
   return (value=vals[i], index=gt)
 end

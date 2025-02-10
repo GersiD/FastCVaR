@@ -7,6 +7,7 @@ function TVaR(x, p, β)
   min_ind = findmin(x)[2]
   offset = min((β / 2), 1 - pbar[min_ind]) # allocate to the minimum
   _, var_ind = qql!(x, pbar, offset)
+  min_ind = findmin(x)[2] # qql mutates x and pbar
   pbar[min_ind] += offset
   sum = offset
   for i in range(n, var_ind + 1, step=-1) # every element bigger than the quantilej

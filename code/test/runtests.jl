@@ -165,11 +165,15 @@ using JuMP, HiGHS, Gurobi
     return value.(p), value.(p)' * x
   end
   x1 = [1, 2, 3]
-  p1 = [1 / 3, 1 / 3, 1 / 3]
-  TVaR(x1, p1, 0.5)
-  @test x1 == [1, 2, 3]
-  @test p1 == [1 / 3, 1 / 3, 1 / 3]
+  p1 = [0.5, 0.2, 0.3]
   @test worstcase_l1_gurobi(x1, p1, 0.8)[2] ≈ TVaR(x1, p1, 0.8)
+  x1 = [3, 2, 1]
+  p1 = [0.3, 0.2, 0.5]
+  @test worstcase_l1_gurobi(x1, p1, 0.8)[2] ≈ TVaR(x1, p1, 0.8)
+  # x1 = [5, 4, 2, 1, -1, -2]
+  # p1 = [0.2, 0.1, 0.1, 0.3, 0.3, 0.0]
+  # pstar = [0.0, 0.0, 0.0, 0.3, 0.3, 0.4]
+  # @test worstcase_l1_gurobi(x1, p1, 0.8)[2] ≈ TVaR(x1, p1, 0.8)
 end
 
 

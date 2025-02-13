@@ -86,7 +86,8 @@ probability measure $\mathbb{P} \in \Delta^N$. We consider a random variable to 
 We assume the same equivalence for probability distributions.
 
 \paragraph{Value-at-Risk and Quantiles}
-\todo{something is very wrong here, consider a bernouli random variable [0, 1] with probability 0.5, and $\alpha = 0.5$, then $\quant^+_\alpha(\tilde{x}) = 1$ following the definition in \cref{eq:quantile-definition} but it should be $0$ according to the \href{https://github.com/RiskAverseRL/RiskMeasures.jl/blob/e7ccc8a8d8a5126ea9bf63988b9f9a485fe8e876/test/runtests.jl\#L67}{code}.}
+%\todo{something is very wrong here, consider a bernouli random variable [0, 1] with probability 0.5, and $\alpha = 0.5$, then $\quant^+_\alpha(\tilde{x}) = 1$ following the definition in \cref{eq:quantile-definition} but it should be $0$ according to the \href{https://github.com/RiskAverseRL/RiskMeasures.jl/blob/e7ccc8a8d8a5126ea9bf63988b9f9a485fe8e876/test/runtests.jl\#L67}{code}.}
+
 Quantile of a random variable $\tilde{x} \in \mathbb{X}$ at level $\alpha \in [0,1]$ is any value $\tau\in \mathbb{R}$ such that $\mathbb{P}({\tilde{x} \le \tau}) \ge \alpha$ and $\mathbb{P}({\tilde{x} \ge \tau}) \ge 1-\alpha$. The quantile may not be unique however always lies in the interval $[\quant^-_{\alpha}(\tilde{x}), \quant^+_{\alpha}(\tilde{x})]$ where
 \begin{align} \label{eq:quantile-definition}
 %\label{eq:upper-quantile-definition}
@@ -125,14 +126,14 @@ where $g^{\star}$ the convex conjugate of the phi-divergence $g$. EVaR, for exam
 
 \begin{table}
     \centering
-    \begin{tabular}{c|ccc}
+    \begin{tabular}{l|ccc}
          \toprule
-         \textbf{Risk measure} & $g$  & $g\opt$ & $\beta$ \\
+         \textbf{Risk measure} & $g(y)$  & $g\opt(x)$ & $\beta$ \\
          \midrule        
-         Expectation           & & & \\
-         $\cvaro_{\alpha}$     & & & \\
-         $\evaro_{\alpha}$     & & & \\
-         $\tvaro_{\alpha}$     & & & \\
+         $\mathbb{E}$           & $\begin{cases} 0 &\text{if } y = 1 \\ \infty & \text{otherwise}  \end{cases}$ & $x$ & $0$  \\
+         $\cvaro_{\alpha}$     & $\begin{cases} 0 &\text{if } y \in [0, \frac{1}{\alpha}] \\ \infty & \text{otherwise}  \end{cases}$ & $\max \left\{ 0, \frac{1}{\alpha} x \right\} $& $0$ \\
+         $\evaro_{\alpha}$     & ?? & ?? & ?? \\
+         $\tvaro_{\alpha}$     & ?? & $|x-1|$  & $\sqrt{2 \cdot \log 2 \cdot \alpha }$ \\
          \bottomrule
     \end{tabular}
     \caption{Example divergences}
@@ -154,7 +155,7 @@ This polytope is of special interest for computing risk measures, as we will see
 \begin{align}\label{eq:polytope}
   \max_{x}\left\{\bm{x}\tr \bm{p} \mid  \bm{p} \in P_f\right\}
 \end{align}
-Conventional algorithms such as Algorithm 4, solve \eqref{eq:polytope} through a greedy approach which requires sorting. We will show in \todo{reference section} that for a special class of submodular functions $f$, sorting is not necessary.
+Conventional algorithms such as \cref{alg:greedy-polymatroid} solve \eqref{eq:polytope} through a greedy approach which requires sorting. We will show in \todo{reference section} that for a special class of submodular functions $f$, sorting is not necessary.
 
 \paragraph{Other work}
 
@@ -269,7 +270,7 @@ At every iteration, this algorithm will always hit case 1 or case 2, where $back
   \todo{need proof}
 \end{proof}
 
-\section{Fast $\varphi$-divergence Algorithms}
+\section{Fast Algorithms for $\varphi$-divergence Risk}
 
 \subsection{General Algorithm}
 
@@ -294,7 +295,7 @@ As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk 
 %{Input: vector $x$, pmf $p$ solution for CVar and maximum divergence \beta}
 \State{Define vector $p'$ such that every element $p'_i = \frac{1}{\sum_{j} p_j} * p_i$ }
 \State{If $\sum_{i=1}p'_i\phi(p'_i/q_i) \leq \epsilon$, this is the solution}
-\State{Else, bisect on $h_1(\mu) := \sum_{i=1}^n q_i \exp \left( \frac{c_i}{\mu} \right) \left( \frac{c_i}{\mu}\right) - \log\left( \sum_{j=1}^n q_j \exp\left( \frac{c_j}{\mu}\right)\right)$}
+\State{ }
 \end{algorithmic}
 \end{algorithm}
 
@@ -485,20 +486,20 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1
 %   \end{algorithmic}
 % \end{algorithm}
 
-% \section{Greedy Algorithm}
+\section{Greedy Algorithm}
 
-% \begin{algorithm}
-%     \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \mathbb{R}$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
-%     \algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
-%   \caption{algorithm}{Greedy algorithm from Submodular Functions, Polymatroids, TDI}
-%  \begin{algorithmic}[1]
-%     \Require{}
-%     \Ensure{}
-%     \State{Order the elements such that $c_1 \geq c_2 \cdots \geq c_n$.}
-%     \State{Let $S_i := \{1, \dots, i\}$ and $S_0 := \emptyset$}
-%     \State{Let $x_i :=  \begin{cases}f(S_i) - f(S_{i-1}) & \text{for } i = 1,\dots, r \\ 0 & \text{otherwise} \end{cases}$}
-% \end{algorithmic}
-% \end{algorithm}
+\begin{algorithm} \label{alg:greedy-polymatroid}
+    \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \mathbb{R}$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
+    \algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
+  \caption{algorithm}{Greedy algorithm from Submodular Functions, Polymatroids, TDI}
+ \begin{algorithmic}[1]
+    \Require{}
+    \Ensure{}
+    \State{Order the elements such that $c_1 \geq c_2 \cdots \geq c_n$.}
+    \State{Let $S_i := \{1, \dots, i\}$ and $S_0 := \emptyset$}
+    \State{Let $x_i :=  \begin{cases}f(S_i) - f(S_{i-1}) & \text{for } i = 1,\dots, r \\ 0 & \text{otherwise} \end{cases}$}
+\end{algorithmic}
+\end{algorithm}
 
 \section{Comonotonicity of Risk}
 

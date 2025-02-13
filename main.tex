@@ -294,7 +294,7 @@ As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk 
 %{Input: vector $x$, pmf $p$ solution for CVar and maximum divergence \beta}
 \State{Define vector $p'$ such that every element $p'_i = \frac{1}{\sum_{j} p_j} * p_i$ }
 \State{If $\sum_{i=1}p'_i\phi(p'_i/q_i) \leq \epsilon$, this is the solution}
-\State{Else, bisect on h_1(\mu) := \sum_{i=1}^{n} q_i \exp\left( \frac{c_i}{\mu} \right) \left( \frac{c_i}{\mu}) - \log\left( \sum_{j=1}^{n} q_j \exp\left( \frac{c_j}{\mu})}
+
 \end{algorithmic}
 \end{algorithm}
 

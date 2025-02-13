@@ -26,6 +26,7 @@ fi
 
 # run the plotter to generate the plot
 echo "Generating the plot"
+source ./plots/venv/bin/activate
 python ./plots/plot.py
 if [ $? -ne 0 ]; then
   echo "Plotting failed"

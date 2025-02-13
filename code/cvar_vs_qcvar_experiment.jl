@@ -10,8 +10,8 @@ stop = 100000000
 step = 1000000
 experiments = range(start=start, stop=stop, step=step)
 len = length(experiments)
-qcvar_results = Float64[len]
-cvar_results = Float64[len]
+qcvar_results = zeros(Float64, len)
+cvar_results = zeros(Float64, len)
 # @threads :dynamic for i ∈ 1:len
 for i ∈ 1:len
   n = Int(ceil(experiments[i]))

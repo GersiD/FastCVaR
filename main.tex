@@ -305,6 +305,8 @@ Method 2, the solution can be computed by the bisection method in \cite{adam2019
 
 
 \subsection{TVaR}
+From previous work, we know that $D(p||q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1^2$. Thus the coherent risk measure TVaR with the divergence constraint $\|p - q\|_1 \leq \sqrt{2*ln(2)*\alpha}$ must be $\leq EVaR_\alpha(p)$. 
+
 \begin{algorithm}
   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and maximum divergence \beta}}
   \algrenewcommand\algorithmicensure{\textbf{Output: $q$ : new distribution }}

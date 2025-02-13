@@ -312,24 +312,18 @@ Method 2, the solution can be computed by the bisection method in \cite{adam2019
   \algrenewcommand\algorithmicensure{\textbf{Output: $q$ : new distribution }}
   \caption{Linear Time Algorithm for TVaR}\label{alg:quick_tvar}
   \begin{algorithmic}[1]
-    \State{$m \gets \min \left\{ x_i \mid  i = 1, \dots, n \right\}$}
-    \State{$o \gets \min\left\{p_{m} + \frac{\beta}{2}, 1 - p_m\right\} $}
-    
-    \State{$VAR \gets \operatorname{QuickQuantile}(x, q, o)$ }
-    \State{$sum \gets 0$}
-    \For{$i = 1 \dots n$}
-    \If{$q[i] \leq VAR$}
-    \State{$sum += q[i]$}
-    \State{$q[i] \gets 0$}
-    \EndIf{}
-   \EndFor{}
-     \If{$sum < offset$}
-    \State{set $z$ to min $i$  such that $x[i] > VAR$}
-    \State{$q[z] \gets q[z] - offset - sum$}
-    \EndIf{}
-    
-
-      
+    \State{$m \gets \arg\min \left\{ x_i \mid  i = 1, \dots, n \right\}$}
+    \State{$\delta \gets \min\left\{\frac{\beta}{2}, 1 - p_m\right\} $}
+    \State{$\quant^+ \gets \operatorname{QuickQuantile}(x, q, \delta)$ }
+    \State{$q_m \gets q_m + \delta$}
+    \State{$\lambda \gets \delta$}
+    \For{$i \in 1 \dots n$}
+      \If{$q[i] > \quant^+$}
+        \State{$\lambda \gets \lambda - q[i]$}
+        \State{$q[i] \gets 0$}
+      \EndIf{}
+    \EndFor{}
+    \State{\Return{$\lambda$}}
   \end{algorithmic}
 \end{algorithm}
 

@@ -69,14 +69,14 @@
   Before the intro can be written
 \begin{itemize}
   \item Need to tell a \textquotedblleft story \textquotedblright with existing sections
+  \subitem What probelm do we solve, why is it important, what was our insight
 \end{itemize}
 }
 
 \section{Preliminaries}
 
-\paragraph{General Notation}
-We use caligraphic letters to denote sets, a tilde to denote random variables, and bold lowercase letters to denote
-vectors. 
+\paragraph{Notation}
+We use caligraphic letters to denote sets, a tilde to denote random variables, and bold lowercase letters to denote vectors.
 We also adopt the standard convention that $\mathcal{A}^{\mathcal{B}}$ represents the set of all functions from a set $\mathcal{B}$ to a set $\mathcal{A}$ and treat vectors as a function from indexes to real numbers. $\bm{1}$ denotes the vector of ones and $\mathds{1}(bool)$ denotes the indicator function. We use the convention that comparison operators are defined on vector spaces element-wise, that is for $x, y \in \mathbb{R}^n$ then $x \leq y \iff x_i \leq y_i \quad \; \forall \; i \in 1\dots n$. Finally, $\Delta^n$ denotes the standard $n$-simplex while $\Delta_k^n$ denotes the k-capped simplex~\cite{kcapped_ang}.
 We assume a probability space with finite outcomes $\Omega = \left\{ 1, \dots , N \right\}$, events $\mathcal{F}$, and
 probability measure $\mathbb{P} \in \Delta^N$. We consider a random variable to be any mapping $\tilde{x}\colon \Omega \to \mathbb{R}$. Or equivalently as vectors on $\Omega$. For example, the vector $\bm{x}\in \mathbb{R}^N$ equivalent to $\tilde{x}$ is constructed as
@@ -295,7 +295,7 @@ Two methods exist for computing EVaR, both being bisection methods. We can initi
 Method 2, the solution can be computed by the bisection method in \cite{adam2019projectionscanonicalsimplexadditional}. We can initialize with a lower upper bound on $\mu$ by the following algorithm.
 \begin{algorithm}
   \begin{algorithmic}
-%{Input: vector $x$, pmf $p$ solution for CVar and maximum divergence \beta}}
+%{Input: vector $x$, pmf $p$ solution for CVar and maximum divergence \beta}
 \State{Compute $\gamma_i$ using $x_i - (x_{\max} - x_{\min})/2 \cdot  \log(p_i/q_i)$}
 \State{Select max $\gamma_i$}
 \State{Find max $\mu$ computed by $(x_i - \gamma_i)/log(p_i/q_i) $}

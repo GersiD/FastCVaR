@@ -288,18 +288,13 @@ As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk 
 \end{equation}
 
 \subsection{EVaR}
-\begin{lem}
-  $TVaR(x) \leq EVaR(x) \leq CVaR(x)$ for any given x.
-\end{lem}
-Two methods exist for computing EVaR, both being bisection methods. We can initialize these bisections with lower and upper bounds using TVaR and CVaR.
-Method 2, the solution can be computed by the bisection method in \cite{adam2019projectionscanonicalsimplexadditional}. We can initialize with a lower upper bound on $\mu$ by the following algorithm.
+
 \begin{algorithm}
   \begin{algorithmic}
 %{Input: vector $x$, pmf $p$ solution for CVar and maximum divergence \beta}
-\State{Compute $\gamma_i$ using $x_i - (x_{\max} - x_{\min})/2 \cdot  \log(p_i/q_i)$}
-\State{Select max $\gamma_i$}
-\State{Find max $\mu$ computed by $(x_i - \gamma_i)/log(p_i/q_i) $}
-\State{max $\mu_i$ is new lower bound}
+\State{Define vector $p'$ such that every element $p'_i = \frac{1}{\sum_{j} p_j} * p_i$ }
+\State{If $\sum_{i=1}p'_i\phi(p'_i/q_i) \leq \epsilon$, this is the solution}
+\State{Else, bisect on h_1(\mu) := \sum_{i=1}^{n} q_i \exp\left( \frac{c_i}{\mu} \right) \left( \frac{c_i}{\mu}) - \log\left( \sum_{j=1}^{n} q_j \exp\left( \frac{c_j}{\mu})}
 \end{algorithmic}
 \end{algorithm}
 

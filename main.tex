@@ -77,31 +77,32 @@
 
 \paragraph{Notation}
 We use caligraphic letters to denote sets, a tilde to denote random variables, and bold lowercase letters to denote vectors.
-We also adopt the standard convention that $\mathcal{A}^{\mathcal{B}}$ represents the set of all functions from a set $\mathcal{B}$ to a set $\mathcal{A}$ and treat vectors as a function from indexes to real numbers. $\bm{1}$ denotes the vector of ones and $\mathds{1}(bool)$ denotes the indicator function. We use the convention that comparison operators are defined on vector spaces element-wise, that is for $x, y \in \mathbb{R}^n$ then $x \leq y \iff x_i \leq y_i \quad \; \forall \; i \in 1\dots n$. Finally, $\Delta^n$ denotes the standard $n$-simplex while $\Delta_k^n$ denotes the k-capped simplex~\cite{kcapped_ang}.
+We also adopt the standard convention that $\mathcal{A}^{\mathcal{B}}$ represents the set of all functions from a set $\mathcal{B}$ to a set $\mathcal{A}$ and treat vectors as a function from indexes to real numbers. $\bm{1}$ denotes the vector of ones and $\mathds{1}(bool)$ denotes the indicator function. We use the convention that comparison operators are defined on vector spaces element-wise, that is for $x, y \in \Real^n$ then $x \leq y \iff x_i \leq y_i \quad \; \forall \; i \in 1\dots n$. Finally, $\Delta^n$ denotes the standard $n$-simplex while $\Delta_k^n$ denotes the k-capped simplex~\cite{kcapped_ang}.
 We assume a probability space with finite outcomes $\Omega = \left\{ 1, \dots , N \right\}$, events $\mathcal{F}$, and
-probability measure $\mathbb{P} \in \Delta^N$. We consider a random variable to be any mapping $\tilde{x}\colon \Omega \to \mathbb{R}$. Or equivalently as vectors on $\Omega$. For example, the vector $\bm{x}\in \mathbb{R}^N$ equivalent to $\tilde{x}$ is constructed as
+probability measure $\mathbb{P} \in \Delta^N$. We consider a random variable to be any mapping $\tilde{x}\colon \Omega \to \Real$. Or equivalently as vectors on $\Omega$. For example, the vector $\bm{x}\in \Real^N$ equivalent to $\tilde{x}$ is constructed as
 \[
  x_w = \tilde{x}( \omega ), \quad\forall \omega \in \Omega .
 \]
 We assume the same equivalence for probability distributions.
+We use $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ to denote the extended real line.
 
 \paragraph{Value-at-Risk and Quantiles}
 %\todo{something is very wrong here, consider a bernouli random variable [0, 1] with probability 0.5, and $\alpha = 0.5$, then $\quant^+_\alpha(\tilde{x}) = 1$ following the definition in \cref{eq:quantile-definition} but it should be $0$ according to the \href{https://github.com/RiskAverseRL/RiskMeasures.jl/blob/e7ccc8a8d8a5126ea9bf63988b9f9a485fe8e876/test/runtests.jl\#L67}{code}.}
 
-Quantile of a random variable $\tilde{x} \in \mathbb{X}$ at level $\alpha \in [0,1]$ is any value $\tau\in \mathbb{R}$ such that $\mathbb{P}({\tilde{x} \le \tau}) \ge \alpha$ and $\mathbb{P}({\tilde{x} \ge \tau}) \ge 1-\alpha$. The quantile may not be unique however always lies in the interval $[\quant^-_{\alpha}(\tilde{x}), \quant^+_{\alpha}(\tilde{x})]$ where
+Quantile of a random variable $\tilde{x} \in \mathbb{X}$ at level $\alpha \in [0,1]$ is any value $\tau\in \Real$ such that $\mathbb{P}({\tilde{x} \le \tau}) \ge \alpha$ and $\mathbb{P}({\tilde{x} \ge \tau}) \ge 1-\alpha$. The quantile may not be unique however always lies in the interval $[\quant^-_{\alpha}(\tilde{x}), \quant^+_{\alpha}(\tilde{x})]$ where
 \begin{align} \label{eq:quantile-definition}
 %\label{eq:upper-quantile-definition}
   \quant_{\alpha}^+(\tilde{x})
   &\;:=\;
-    \max\; \left\{\tau \in \bar{\mathbb{R}} \mid \mathbb{P}[\tilde{x} < \tau]  \le \alpha\right\}, 
+    \max\; \left\{\tau \in \bar{\Real} \mid \mathbb{P}[\tilde{x} < \tau]  \le \alpha\right\}, 
       %\label{eq:low-quantile-definition}
   &\quant_{\alpha}^-(\tilde{x})
   &\;:=\;
-    \min\; \left\{\tau \in \bar{\mathbb{R}} \mid \mathbb{P}[\tilde{x} \le \tau]   \ge \alpha\right\}.
+    \min\; \left\{\tau \in \bar{\Real} \mid \mathbb{P}[\tilde{x} \le \tau]   \ge \alpha\right\}.
 \end{align}
 The maximum in~\eqref{eq:quantile-definition} exists because $\mathbb{P}[\tilde{x} < \tau]$ is lower semi-continuous and the minimum in~\eqref{eq:quantile-definition} exists because $\mathbb{P}[\tilde{x} \le \tau]$ is upper semi-continuous with respect to $\tau$. Note that $\quant^+_1(\tilde{x}) = \infty$, $\quant^-_0(\tilde{x}) = -\infty$, otherwise $\quant^+_\alpha, \quant^-_\alpha$ are bounded for all $\alpha \in (0,1)$ and $\tilde{x} \in \mathcal{L}^\infty$.
 
-Monetary risk measures generalize the expectation operator to allow for risk sensitive distinctions in otherwise equivalent distributions~\cite{Follmer2016}.~\emph{Value-at-Risk}~(VaR) is one of the oldest, simplest, and most common risk measures~\cite{Follmer2016,Shapiro2014}. $\varo : \mathbb{X} \to \bar{\mathbb{R}}$ at a risk level $\alpha \in [0,1]$ of a random variable $\tilde{x}\in \mathbb{X}$ is defined as:
+Monetary risk measures generalize the expectation operator to allow for risk sensitive distinctions in otherwise equivalent distributions~\cite{Follmer2016}.~\emph{Value-at-Risk}~(VaR) is one of the oldest, simplest, and most common risk measures~\cite{Follmer2016,Shapiro2014}. $\varo : \mathbb{X} \to \bar{\Real}$ at a risk level $\alpha \in [0,1]$ of a random variable $\tilde{x}\in \mathbb{X}$ is defined as:
 \begin{equation}
   \label{eq:var-definition}
 \varo_{\alpha}(\tilde{x}) \;:=\;  \quant^+_{ \alpha }(\tilde{x}).  
@@ -110,7 +111,7 @@ Monetary risk measures generalize the expectation operator to allow for risk sen
 \paragraph{$\varphi$-divergence Risk Measures}
 
 $\varphi$-divergences can be defined as 
-\[I_\phi(p, q) = \sum_{n=1}^X \phi\left(\frac{p_\omega}{q_\omega}\right)
+\[I_\varphi(p \| q) = \sum_{\omega \in \Omega } p_{\omega } \cdot \varphi\left(\frac{p_\omega}{q_\omega}\right)
 \] 
 for two discrete, absolutely continuous probability distributions $p$ and $q$, and convex $\phi$ such that $\phi(1)=0$. 
 
@@ -118,22 +119,28 @@ Recall that any coherent risk measure can be defined as
 \begin{align}\label{eq:correspondence_coherent_risk}
   \rho(X)=\sup_{Q\in \mathcal{Q}}\mathbb{E}_Q [-X],
 \end{align}
-where $\mathcal{Q}$ is a subset of all probability measures on $\Omega$~\cite{Follmer2016}(Prop. 2.84). Phi-divergence risk measures can be defined as a coherent risk measure for which $\mathcal{Q}$ contains all $Q$ such that $I_\phi(P, Q) \le \beta$, where $\beta$ is some constant typically dependent on the risk level. Phi-divergence risk measures are equivalent to g-entropic risk measures, which can be seen as the primal representation of these risk measures. All g-entropic risk measures take on the following form for $\beta \in \mathbb{R}$ and any convex \todo{(closed?)} function $g\colon \mathbb{R} \to \mathbb{R}$~\cite{Ahmadi-Javid2011,Ahmadi-Javid2017}: 
+where $\mathcal{Q}$ is a subset of all probability measures on $\Omega$~\cite{Follmer2016}(Prop. 2.84). Phi-divergence risk measures can be defined as a coherent risk measure for which $\mathcal{Q}$ contains all $Q$ such that $I_\phi(P, Q) \le \beta$, where $\beta$ is some constant typically dependent on the risk level. $\varphi$-entropic (also known as $g$-entropic risk measures) can be seen as the primal representation of these risk measures. All $\varphi$-entropic risk measures take on the following form for $\beta \in \Real$ and any proper, lower semi-continuous, and convex function $\varphi\colon \Real \to \bar{\Real}$~\cite{Ahmadi-Javid2011,Ahmadi-Javid2017}: 
 \[
-\ER_{g,\beta}(\tilde{x}) = \sup_{t > 0, v \in \mathbb{R}} t \left(v + \E {-g^{\star}\left(-\frac{\tilde{x}}{t} + v + \beta \right)}\right),
+\ER_{g,\beta}(\tilde{x}) = \sup_{t > 0, v \in \Real} t \left(v + \E { - \varphi\opt \left(-\frac{\tilde{x}}{t} + v + \beta \right)}\right),
 \] 
-where $g^{\star}$ the convex conjugate of the phi-divergence $g$. EVaR, for example, is a well known example of phi-divergence risk measure where the phi-Divergence is the KL-divergence~\cite{Ahmadi-Javid2017}.
+where $\varphi^{\star}$ the convex conjugate of the $\varphi$-divergence $\varphi$. EVaR, for example, is a well known example of phi-divergence risk measure where the phi-Divergence is the KL-divergence~\cite{Ahmadi-Javid2017}.
+
+The primal formulation is
+\[
+\ER_{g,\beta}(\tilde{x}) = \inf \left\{p\tr x \mid I_{\varphi}(p \| q) \le \beta,   p\in \Real^N \right\}   
+\] 
+
 
 \begin{table}
     \centering
     \begin{tabular}{l|ccc}
          \toprule
-         \textbf{Risk measure} & $g(y)$  & $g\opt(x)$ & $\beta$ \\
+         \textbf{Risk measure} & $\varphi(y)$  & $\varphi\opt(x)$ & $\beta$ \\
          \midrule        
          $\mathbb{E}$           & $\begin{cases} 0 &\text{if } y = 1 \\ \infty & \text{otherwise}  \end{cases}$ & $x$ & $0$  \\
          $\cvaro_{\alpha}$     & $\begin{cases} 0 &\text{if } y \in [0, \frac{1}{\alpha}] \\ \infty & \text{otherwise}  \end{cases}$ & $\max \left\{ 0, \frac{1}{\alpha} x \right\} $& $0$ \\
-         $\evaro_{\alpha}$     & $\begin{cases} 0 &\text{if } y > 0 \\ 0 &\text{if } y = 0 \\ \infty & x < 0  \end{cases}$ & $e^(x - 1)$ & $-ln(\alpha)$ \\
-         $\tvaro_{\alpha}$     & $|y - 1|$ & $x$& $\sqrt{2 \cdot \log 2 \cdot (-ln(\alpha)) }$ \\
+         $\evaro_{\alpha}$     & $\begin{cases} y \log y &\text{if } y > 0 \\ 0 &\text{if } y \ge  0 \\  \infty &\text{if } y < 0 \end{cases}$ & $\exp{ x - 1 }$ & $-\log(\alpha)$ \\
+         $\tvaro_{\alpha}$     & $|y - 1|$ & $x$& $\sqrt{2 \cdot \log 2 \cdot (-\log(\alpha)) }$ \\
          \bottomrule
     \end{tabular}
     \caption{Example divergences}
@@ -143,13 +150,13 @@ where $g^{\star}$ the convex conjugate of the phi-divergence $g$. EVaR, for exam
 
 \paragraph{Polymatroids}
 
-Let $\mathcal{E}$ be a finite set, and $f : \{\mathcal{X} \mid \mathcal{X} \subseteq \mathcal{E} \} \to \mathbb{R}_+$ a nondecreasing submodular function. That is, for each $\mathcal{A} \subseteq \mathcal{B} \subseteq \mathcal{E}$ we have $f(\mathcal{A}) \leq f(\mathcal{B})$, and for each $\mathcal{A}, \mathcal{B} \subseteq \mathcal{E}$ we have 
+Let $\mathcal{E}$ be a finite set, and $f : \{\mathcal{X} \mid \mathcal{X} \subseteq \mathcal{E} \} \to \Real_+$ a nondecreasing submodular function. That is, for each $\mathcal{A} \subseteq \mathcal{B} \subseteq \mathcal{E}$ we have $f(\mathcal{A}) \leq f(\mathcal{B})$, and for each $\mathcal{A}, \mathcal{B} \subseteq \mathcal{E}$ we have 
 \[
 f(\mathcal{A}) + f(\mathcal{B}) \geq f(\mathcal{A} \cup \mathcal{B}) + f(\mathcal{A} \cap \mathcal{B}).
 \]
 We define the polymatroid associated to $f$ to be the following polytope:
 \[
-  P_f = \left\{ \bm{x} \in \mathbb{R}_+^E  \mid  \sum_{e \in \mathcal{U}} \bm{x}(e) \leq f(\mathcal{U}), \;\; \forall \; \mathcal{U} \subseteq \mathcal{E} \right\}.
+  P_f = \left\{ \bm{x} \in \Real_+^E  \mid  \sum_{e \in \mathcal{U}} \bm{x}(e) \leq f(\mathcal{U}), \;\; \forall \; \mathcal{U} \subseteq \mathcal{E} \right\}.
 \]
 This polytope is of special interest for computing risk measures, as we will see later on that all coherent and comonotonic risk measures can be computed by solving
 \begin{align}\label{eq:polytope}
@@ -192,7 +199,7 @@ In this section, we describe a linear time algorithm for VaR.
 \end{thm}
 
 \begin{lem}
-Suppose that $\tilde{x}\colon \Omega \to \mathbb{R}$ is a random variable with finite $\Omega$. Then, there exist $\omega_1, \omega_2\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_1)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_2)$ for each $\alpha\in (0,1)$.
+Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite $\Omega$. Then, there exist $\omega_1, \omega_2\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_1)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_2)$ for each $\alpha\in (0,1)$.
 \end{lem}
 \begin{proof}
 Recall the definition:
@@ -281,8 +288,8 @@ As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk 
   \bm{\xi} \leq \frac{1}{1-\alpha} p, \bm{\xi} \in \Delta^n \right\} \\
   &= \min \left\{\bm{\xi}\tr \bm{x} \mid \bm{\xi} \leq \frac{1}{1-\alpha} \bm{p},
      \xi\tr \bm{1} = 1, \bm{\xi} \geq 0\right\}\\
-  &= \max \left\{ z - \frac{1}{1-\alpha} \Ex{\bm{p}}{z-\bm{x}}_+ \mid z \in \mathbb{R}\right\} \\
-  &= \max \left\{ z - \frac{1}{1-\alpha} \bm{p}\tr(z-\bm{x})_+ \mid z \in \mathbb{R}\right\}.
+  &= \max \left\{ z - \frac{1}{1-\alpha} \Ex{\bm{p}}{z-\bm{x}}_+ \mid z \in \Real\right\} \\
+  &= \max \left\{ z - \frac{1}{1-\alpha} \bm{p}\tr(z-\bm{x})_+ \mid z \in \Real\right\}.
   \end{aligned}
 \end{equation}
 
@@ -358,8 +365,8 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1
 
 \begin{algorithm}
 \floatname{algorithm}{Partition}
-\algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ with probability mass function p and $f, b \in \mathbb{R}$}}
-\algrenewcommand\algorithmicensure{\textbf{Output: pivot index $i \in \mathbb{R}$}}
+\algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ with probability mass function p and $f, b \in \Real$}}
+\algrenewcommand\algorithmicensure{\textbf{Output: pivot index $i \in \Real$}}
 \caption{}\label{alg:partition}
   \begin{algorithmic}[1]
     \Require{}
@@ -487,7 +494,7 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1
 \section{Greedy Algorithm}
 
 \begin{algorithm} \label{alg:greedy-polymatroid}
-    \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \mathbb{R}$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
+    \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
     \algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
   \caption{algorithm}{Greedy algorithm from Submodular Functions, Polymatroids, TDI}
  \begin{algorithmic}[1]
@@ -538,7 +545,7 @@ Assume for $P_f$ that $f(U)$ is such that for all $S_i, S_{ i+1 } \cup E$ where 
 \end{assumption}
 We note this assumption essentially state that the submodular function must be a piecewise linear function. 
 \begin{algorithm}
-    \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \mathbb{R}$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
+    \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
     \algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
   \caption{algorithm}{New algorithm}
  \begin{algorithmic}[1]

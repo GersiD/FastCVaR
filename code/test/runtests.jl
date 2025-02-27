@@ -2,6 +2,7 @@ include("../loop_cvar.jl")
 include("../tvar.jl")
 using Test
 using JuMP, HiGHS, Gurobi
+using RobustMDPs
 # using RobustMDPs
 
 # @testset "Loopy tests" begin
@@ -166,14 +167,26 @@ using JuMP, HiGHS, Gurobi
   end
   x1 = [1, 2, 3]
   p1 = [0.5, 0.2, 0.3]
-  @test worstcase_l1_gurobi(x1, p1, 0.8)[2] ≈ TVaR(x1, p1, 0.8)
+  @test worstcase_l1_gurobi(x1, p1, 0.8)[2] ≈ TVaR!(x1, p1, 0.8)
+  @test worstcase_l1(x1, p1, 0.8)[2] ≈ TVaR!(x1, p1, 0.8)
   x1 = [3, 2, 1]
   p1 = [0.3, 0.2, 0.5]
-  @test worstcase_l1_gurobi(x1, p1, 0.8)[2] ≈ TVaR(x1, p1, 0.8)
-  x1 = [5, 4, 2, 1, -1, -2]
+  @test worstcase_l1_gurobi(x1, p1, 0.8)[2] ≈ TVaR!(x1, p1, 0.8)
+  @test worstcase_l1(x1, p1, 0.8)[2] ≈ TVaR!(x1, p1, 0.8)
+  x1 = [-2.0, -1.0, 1.0, 2.0, 4.0, 5.0]
+  p1 = [0.0, 0.3, 0.3, 0.1, 0.1, 0.2]
+  pstar = [0.4, 0.3, 0.3, 0.0, 0.0, 0.0] # solution for β = 0.8
+  @test worstcase_l1(copy(x1), copy(p1), 0.8)[2] ≈ TVaR!(copy(x1), copy(p1), 0.8)
+  @test worstcase_l1_gurobi(copy(x1), copy(p1), 0.8)[2] ≈ TVaR!(copy(x1), copy(p1), 0.8)
+  @test worstcase_l1(copy(x1), copy(p1), 0.5)[2] ≈ TVaR!(copy(x1), copy(p1), 0.5)
+  @test worstcase_l1_gurobi(copy(x1), copy(p1), 0.5)[2] ≈ TVaR!(copy(x1), copy(p1), 0.5)
+  x1 = [5.0, 4.0, 2.0, 1.0, -1.0, -2.0]
   p1 = [0.2, 0.1, 0.1, 0.3, 0.3, 0.0]
   pstar = [0.0, 0.0, 0.0, 0.3, 0.3, 0.4]
-  @test worstcase_l1_gurobi(x1, p1, 0.8)[2] ≈ TVaR(x1, p1, 0.8)
+  @test worstcase_l1(copy(x1), copy(p1), 0.8)[2] ≈ TVaR!(copy(x1), copy(p1), 0.8)
+  @test worstcase_l1_gurobi(copy(x1), copy(p1), 0.8)[2] ≈ TVaR!(copy(x1), copy(p1), 0.8)
+  # @test worstcase_l1(copy(x1), copy(p1), 0.5)[2] ≈ TVaR!(copy(x1), copy(p1), 0.5)
+  # @test worstcase_l1_gurobi(copy(x1), copy(p1), 0.5)[2] ≈ TVaR(copy(x1), copy(p1), 0.5)
 end
 
 

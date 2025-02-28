@@ -55,7 +55,7 @@ function qql!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, α::Real)
     tail::Float64 = sum(view(p, 1:ind))
     α <= tail ? j = ind : i = gt # Cut off half of the random variable
   end
-  return (value=vals[i], index=gt)
+  return (value=vals[i], index=i)
 end
 
 function qCVaR!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, α::Real)

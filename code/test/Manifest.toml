@@ -307,7 +307,7 @@ uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 version = "1.11.0"
 
 [[deps.RobustMDPs]]
-git-tree-sha1 = "7e9c1ec93397cfb41618ac17757442f705b1db46"
+git-tree-sha1 = "3ea6a8977c77bb73552ff008e3cd640143e58f15"
 repo-rev = "add_tests"
 repo-url = "../../../RobustMDPs"
 uuid = "74c908e1-de81-459c-8fea-3c7fe559e5e4"

@@ -4,6 +4,7 @@ using RiskMeasures
 using RobustMDPs
 using Plots
 include("./tvar.jl")
+include("./gurobi.jl")
 
 function expectile(values, p, α)
   if abs(α - 0.5) <= 1e-10
@@ -20,16 +21,20 @@ function expectile(values, p, α)
   return -x
 end
 
-fns = Dict("expectile" => expectile,
-  "CVaR" => function (x, p, α)
-    return CVaR(x, p, α).value
-  end,
-  "EVaR" => function (x, p, α)
-    return EVaR(x, p, α).value
-  end,
-  "VaR" => function (x, p, α)
-    return VaR(x, p, α).value
-  end,
+fns = Dict(
+  # "expectile" => expectile,
+  # "Expectation" => function (x, p, α)
+  #   return x' * p
+  # end,
+  # "CVaR" => function (x, p, α)
+  #   return CVaR(x, p, α).value
+  # end,
+  # "EVaR" => function (x, p, α)
+  #   return EVaR(x, p, α).value
+  # end,
+  # "VaR" => function (x, p, α)
+  #   return VaR(x, p, α).value
+  # end,
   "WorstCaseL1UnWeighted" => function (x, p, α)
     return worstcase_l1(x, p, α)[2]
   end,
@@ -38,8 +43,11 @@ fns = Dict("expectile" => expectile,
   #   return RobustMDPs.worstcase_l1_w(x, p, w, α)[2]
   # end,
   "TVaR" => function (x, p, α)
-    return TVaR(x, p, α)
+    return TVaR!(x, p, α)
   end,
+  # "TVaR Gurobi" => function (x, p, α)
+  #   return worstcase_l1_gurobi(x, p, α)[2]
+  # end,
 )
 # Choquet capacity functions - for testing purposes
 alt_cs = Dict(
@@ -47,39 +55,43 @@ alt_cs = Dict(
   #   length(S) == 0 && return 0
   #   return min((β / 2) + sum(view(pmf, S)), 1)
   # end,
-  # "CVaR" => function (S, pmf, α) # this is the submodular function for CVaR
-  #   return min((1 / (α)) * sum(view(pmf, S)), 1)
+  # "TVaR" => function (S, pmf, β)
+  #   length(S) == 0 && return 0
+  #   return min((β / 2) + sum(view(pmf, S)), 1)
   # end,
+  "CVaR" => function (S, pmf, α) # this is the submodular function for CVaR
+    return min((1 / (α)) * sum(view(pmf, S)), 1)
+  end,
 )
-function closure_c(fn)
-  return function (S, pmf, alpha) # this is the submodular function
-    one_tilde = zeros(length(pmf))
-    for i in S
-      one_tilde[i] = -1
-    end
-    return -fn(one_tilde, pmf, alpha)
+function closure_c(ρ::Function)
+  return function (S::AbstractVector{<:Integer}, pmf::AbstractVector{<:Real}, alpha::Float64) # this is the submodular function
+    length(S) == 0 && return 0 # By definition c(∅) = 0
+    one_tilde = zeros(Float64, length(pmf))
+    one_tilde[S] .= 1 # wow, julia thanks for this neat notation
+    @show one_tilde
+    @show pmf
+    @show alpha
+    return -ρ(-one_tilde, pmf, alpha)
   end
 end
 # Input:
 # x: vector of rewards
 # p: vector of probabilities
 # c: choquet capacity function takes a vector of rewards ⊂ powerset({1…n}) and returns a scalar
-return function choq_risk(x, pmf, c, alpha)
+function choq_risk(x::AbstractVector{<:Real}, pmf::AbstractVector{<:Real}, c::Function, alpha::Float64)
   indices = sortperm(x)
-  ξ = zeros(length(x))
+  ξ = zeros(Float64, length(x))
   for i in 1:length(x)
-    ξ[indices[i]] = c(indices[1:i], pmf, alpha) - c(indices[1:i-1], pmf, alpha)
+    ci = clamp(c(indices[1:i], pmf, alpha), 0, 1) # HACK: This is due to the duplicate failures in tvar
+    c1m1 = clamp(c(indices[1:i-1], pmf, alpha), 0, 1)
+    ξ[indices[i]] = ci - c1m1
   end
-  return sum(ξ .* x)
+  return ξ' * x
 end
 n = 100
-# x = randn(n)
-# p = rand(n)
-# p /= sum(p)
-x = [-2.0, -1.0, 1.0, 2.0, 4.0, 5.0]
-p = [0.0, 0.3, 0.3, 0.1, 0.1, 0.2]
-@show worstcase_l1(copy(x), copy(p), 0.5)[2]
-@show TVaR(copy(x), copy(p), 0.5)
+x = randn(n)
+p = rand(n)
+p /= sum(p)
 for (name, fn) in fns
   println("Risk for $name: ")
   c = closure_c(fn)

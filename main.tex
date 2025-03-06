@@ -111,7 +111,8 @@ Monetary risk measures generalize the expectation operator to allow for risk sen
 \paragraph{$\varphi$-divergence Risk Measures}
 
 $\varphi$-divergences can be defined as 
-\[I_\varphi(p \| q) = \sum_{\omega \in \Omega } p_{\omega } \cdot \varphi\left(\frac{p_\omega}{q_\omega}\right)
+\[
+  I_\varphi(p \| q) = \sum_{\omega \in \Omega } p_{\omega } \cdot \varphi\left(\frac{p_\omega}{q_\omega}\right)
 \] 
 for two discrete, absolutely continuous probability distributions $p$ and $q$, and convex $\phi$ such that $\phi(1)=0$. 
 
@@ -551,7 +552,7 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1
 
 \section{No-sort Polymatroid}
 
-Our first contribution new algorithm for solving the maximum weight Independent Set without sorting for polymatroids. We note that certain additional assumptions have to be satisified on the submodular function as follows.
+Our first contribution new algorithm for solving the maximum weight Independent Set without sorting for polymatroids. We note that certain additional assumptions have to be satisfied on the submodular function as follows.
 \begin{assumption}
 Assume for $P_f$ that $f(U)$ is such that for all $S_i, S_{ i+1 } \cup E$ where $S_i \cup (i + 1) = S_{ i+1 } $ and $f(S_{ i+1 }) < f(E)$, $f(S_i) + f({i + 1}) = f(S_{ i+1 })$.
 \end{assumption}

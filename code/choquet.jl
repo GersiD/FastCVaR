@@ -68,9 +68,6 @@ function closure_c(ρ::Function)
     length(S) == 0 && return 0 # By definition c(∅) = 0
     one_tilde = zeros(Float64, length(pmf))
     one_tilde[S] .= 1 # wow, julia thanks for this neat notation
-    @show one_tilde
-    @show pmf
-    @show alpha
     return -ρ(-one_tilde, pmf, alpha)
   end
 end
@@ -82,16 +79,20 @@ function choq_risk(x::AbstractVector{<:Real}, pmf::AbstractVector{<:Real}, c::Fu
   indices = sortperm(x)
   ξ = zeros(Float64, length(x))
   for i in 1:length(x)
-    ci = clamp(c(indices[1:i], pmf, alpha), 0, 1) # HACK: This is due to the duplicate failures in tvar
-    c1m1 = clamp(c(indices[1:i-1], pmf, alpha), 0, 1)
+    # ci = clamp(c(indices[1:i], pmf, alpha), 0, 1) # HACK: This is due to the duplicate failures in tvar
+    # c1m1 = clamp(c(indices[1:i-1], pmf, alpha), 0, 1)
+    ci = c(indices[1:i], pmf, alpha)
+    c1m1 = c(indices[1:i-1], pmf, alpha)
     ξ[indices[i]] = ci - c1m1
   end
   return ξ' * x
 end
 n = 100
-x = randn(n)
-p = rand(n)
-p /= sum(p)
+# x = randn(n)
+# p = rand(n)
+# p /= sum(p)
+x = [1, 2, 3]
+p = [0.0, 1.0, 0.0]
 for (name, fn) in fns
   println("Risk for $name: ")
   c = closure_c(fn)

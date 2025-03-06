@@ -22,7 +22,14 @@ function TVaR!(x, p, β)
     offset -= pbar[i]
     pbar[i] = 0
   end
-  # deal with quantile
-  pbar[var_ind] = max(pbar[var_ind] - offset, 0)
+  for i in range(var_ind, 1, step=-1)
+    @assert xbar[i] ≈ xbar[var_ind] # for debugging
+    if offset <= pbar[i]
+      @inbounds pbar[i] -= offset
+      break
+    end
+    @inbounds offset -= pbar[i]
+    @inbounds pbar[i] = 0
+  end
   return pbar' * xbar
 end

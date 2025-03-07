@@ -6,6 +6,11 @@ using Plots
 include("./tvar.jl")
 include("./gurobi.jl")
 
+"""
+    expectile(values, p, α)
+
+Compute the expectile of a random variable `values` with probabilities `p` at level `α`.
+"""
 function expectile(values, p, α)
   if abs(α - 0.5) <= 1e-10
     return values' * p
@@ -63,6 +68,12 @@ alt_cs = Dict(
     return min((1 / (α)) * sum(view(pmf, S)), 1)
   end,
 )
+"""
+    closure_c(ρ)
+
+Given a submodular function *ρ*, 
+  return a *closure* that computes the submodular function c(S) = -ρ(-1_S) where 1_S is the indicator vector of S.
+"""
 function closure_c(ρ::Function)
   return function (S::AbstractVector{<:Integer}, pmf::AbstractVector{<:Real}, alpha::Float64) # this is the submodular function
     length(S) == 0 && return 0 # By definition c(∅) = 0
@@ -71,28 +82,28 @@ function closure_c(ρ::Function)
     return -ρ(-one_tilde, pmf, alpha)
   end
 end
-# Input:
-# x: vector of rewards
-# p: vector of probabilities
-# c: choquet capacity function takes a vector of rewards ⊂ powerset({1…n}) and returns a scalar
+
+"""
+    choq_risk(x, pmf, c, α)
+
+Compute the risk measure for a given choquet capacity function `c` and random variable `x` with probabilities `pmf` at level `α`.
+"""
 function choq_risk(x::AbstractVector{<:Real}, pmf::AbstractVector{<:Real}, c::Function, alpha::Float64)
   indices = sortperm(x)
   ξ = zeros(Float64, length(x))
   for i in 1:length(x)
-    # ci = clamp(c(indices[1:i], pmf, alpha), 0, 1) # HACK: This is due to the duplicate failures in tvar
-    # c1m1 = clamp(c(indices[1:i-1], pmf, alpha), 0, 1)
     ci = c(indices[1:i], pmf, alpha)
     c1m1 = c(indices[1:i-1], pmf, alpha)
+    @assert 0.0 <= ci <= 1.0
+    @assert 0.0 <= c1m1 <= 1.0
     ξ[indices[i]] = ci - c1m1
   end
   return ξ' * x
 end
 n = 100
-# x = randn(n)
-# p = rand(n)
-# p /= sum(p)
-x = [1, 2, 3]
-p = [0.0, 1.0, 0.0]
+x = randn(n)
+p = rand(n)
+p /= sum(p)
 for (name, fn) in fns
   println("Risk for $name: ")
   c = closure_c(fn)

@@ -18,7 +18,7 @@ function TVaR!(x, p, β)
   _, var_ind = qql!(xbar, pbar, 1 - offset) # complement of offset to target higher numbers
   min_ind = findmin(xbar)[2] # qql mutates xbar and pbar
   pbar[min_ind] += offset
-  for i in range(n, var_ind + 1, step=-1) # every element bigger than the quantile
+  @inbounds for i in range(n, var_ind + 1, step=-1) # every element bigger than the quantile
     offset -= pbar[i]
     pbar[i] = 0
   end

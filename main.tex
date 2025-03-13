@@ -132,7 +132,7 @@ where $\varphi^{\star}$ the convex conjugate of the $\varphi$-divergence $\varph
 
 The primal formulation is
 \[
-\ER_{g,\beta}(\tilde{x}) = \inf \left\{p\tr x \mid I_{\varphi}(p \| q) \le \beta,   p\in \Real^N \right\}   
+\ER_{g,\beta}(\tilde{x}) = \inf \left\{q\tr x \mid I_{\varphi}(p \| q) \le \beta,   q\in \Real^N \right\}   
 \] 
 
 
@@ -144,7 +144,7 @@ The primal formulation is
          \midrule        
          $\mathbb{E}$           & $\begin{cases} 0 &\text{if } y = 1 \\ \infty & \text{otherwise}  \end{cases}$ & $x$ & $0$  \\
          $\cvaro_{\alpha}$     & $\begin{cases} 0 &\text{if } y \in [0, \frac{1}{\alpha}] \\ \infty & \text{otherwise}  \end{cases}$ & $\max \left\{ 0, \frac{1}{\alpha} x \right\} $& $0$ \\
-         $\evaro_{\alpha}$     & $\begin{cases} y \log y &\text{if } y > 0 \\ 0 &\text{if } y \ge  0 \\  \infty &\text{if } y < 0 \end{cases}$ & $\exp{ x - 1 }$ & $-\log(\alpha)$ \\
+         $\evaro_{\alpha}$     & $\begin{cases} y \log y &\text{if } y > 0 \\ 0 &\text{if } y =  0 \\  \infty &\text{if } y < 0 \end{cases}$ & $\exp{ x - 1 }$ & $-\log(\alpha)$ \\
          $\tvaro_{\alpha}$     & $|y - 1|$ & $ \begin{cases} x &\text{if } |x| \le 1\\ \infty &\text{otherwise} \end{cases} $& $\sqrt{2 \cdot \log 2 \cdot (-\log(\alpha)) }$ \\
          \bottomrule
     \end{tabular}
@@ -161,17 +161,17 @@ f(\mathcal{A}) + f(\mathcal{B}) \geq f(\mathcal{A} \cup \mathcal{B}) + f(\mathca
 \]
 We define the polymatroid associated to $f$ to be the following polytope:
 \[
-  P_f = \left\{ \bm{x} \in \Real_+^E  \mid  \sum_{e \in \mathcal{U}} \bm{x}(e) \leq f(\mathcal{U}), \;\; \forall \; \mathcal{U} \subseteq \mathcal{E} \right\}.
+  Q_f = \left\{ \bm{q} \in \Real_+^E  \mid  \sum_{e \in \mathcal{U}} \bm{q}(e) \leq f(\mathcal{U}), \;\; \forall \; \mathcal{U} \subseteq \mathcal{E} \right\}.
 \]
 This polytope is of special interest for computing risk measures, as we will see later on that all coherent and comonotonic risk measures can be computed by solving
 \begin{align}\label{eq:polytope}
-  \max_{x}\left\{\bm{x}\tr \bm{p} \mid  \bm{p} \in P_f\right\}
+  \max_{q}\left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in Q_f\right\}
 \end{align}
 
 \begin{theorem}[Corollary 4.95 in~\cite{Follmer2016}]
   For any coherent and comonotonic risk measure $\rho\colon \mathbb{X}\to \Real$, let $c:= \rho(\one_{\mathcal{A}})$ for each $\mathcal{A} \subseteq \Omega$. Then
   \[
-   \rho(\tilde{x}) = \sup_{q\in P_c} q\tr  x.
+   \rho(\tilde{x}) = \sup_{q\in _c} q\tr  x.
   \]
 \end{theorem}
 

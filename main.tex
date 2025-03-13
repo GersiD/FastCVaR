@@ -547,6 +547,7 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1
 \end{table}
 
 \section{Experiments}
+\gersi{Find better plots to explain the story above, maybe also include the comonotonic plots?}
 \begin{figure}
   \includegraphics[]{./code/plots/cvar_vs_qcvar_linear.png}
   \caption{Time comparison between the standard implementation of CVaR (sorting) and \cref{alg:quick_cvar}. On the x
@@ -561,7 +562,7 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1
   \label{fig:cvar_vs_qcvar_log}
 \end{figure}
 
-\begin{figure}
+\begin{figure} 
   \includegraphics[]{./code/plots/cvar_div_qcvar.png}
   \caption{The ratio of the time taken by the sorting-based CVaR implementation and \cref{alg:quick_cvar}. On the x axis we have the size of the random variable, and on the y axis we have the ratio of the time taken by the sorting-based CVaR implementation and \cref{alg:quick_cvar}.}
   \label{fig:cvar_vs_qcvar_div}

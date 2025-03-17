@@ -19,7 +19,7 @@ def plot_cvar_vs_qcvar_log_linear(csv_file: pd.DataFrame):
     plt.ylabel('Time (ms)')
     plt.legend()
     plt.title('CVaR vs QCVaR')
-    plt.savefig('./plots/cvar_vs_qcvar_log.png')
+    plt.savefig('./plots/cvar_vs_qcvar_log.pdf')
     plt.show()
     plt.clf()
     plt.plot(csv_file['n'], csv_file['cvar'], label='CVaR')
@@ -28,7 +28,7 @@ def plot_cvar_vs_qcvar_log_linear(csv_file: pd.DataFrame):
     plt.ylabel('Time (ms)')
     plt.legend()
     plt.title('CVaR vs QCVaR')
-    plt.savefig('./plots/cvar_vs_qcvar_linear.png')
+    plt.savefig('./plots/cvar_vs_qcvar_linear.pdf')
     plt.show()
     plt.clf()
 
@@ -47,7 +47,7 @@ def plot_cvar_div_qcvar(csv_file: pd.DataFrame):
     plt.ylabel('CVaR/QCVaR')
     plt.legend()
     plt.title('CVaR/QCVaR')
-    plt.savefig('./plots/cvar_div_qcvar.png')
+    plt.savefig('./plots/cvar_div_qcvar.pdf')
     plt.show()
     plt.clf()
 

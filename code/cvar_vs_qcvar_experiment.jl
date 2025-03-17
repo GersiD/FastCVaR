@@ -5,9 +5,9 @@ using Random
 using Dates
 Random.seed!(1234)
 
-start = 5
 stop = 100000000
 step = 1000000
+start = step
 experiments = range(start=start, stop=stop, step=step)
 len = length(experiments)
 qcvar_results = zeros(Float64, len)

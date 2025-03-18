@@ -37,24 +37,24 @@ start = step
 # Number of trials per experiment
 # One experiment is running the CVaR and qCVaR algorithms and collecting the time taken.
 trials = 10
-experiments = range(start=start, stop=stop, step=step)
+experiments = Int.(ceil.(range(start=start, stop=stop, step=step)))
+# need to "multiply" experiments vector by trials
+experiments = hcat(repeat(experiments, 1, trials)'...)[:]
 len = length(experiments)
-qcvar_results = zeros(Float64, len * trials)
-cvar_results = zeros(Float64, len * trials)
+qcvar_results = zeros(Float64, len)
+cvar_results = zeros(Float64, len)
 # @threads :dynamic for i ∈ 1:len
 for i ∈ 1:len
   GC.enable(false)
-  n = Int(ceil(experiments[i]))
+  n = experiments[i]
   println("Experiment $i / $len --- n = $n")
   x = rand(Float64, n) .* 100
   p = rand(Float64, n)
   p ./= sum(p)
   α = 0.6
-  for j ∈ 0:trials-1
-    s, f = run_one_experiment(x, p, α)
-    qcvar_results[i+j] = f
-    cvar_results[i+j] = s
-  end
+  s, f = run_one_experiment(x, p, α)
+  qcvar_results[i] = f
+  cvar_results[i] = s
   GC.enable(true)
   x = nothing
   p = nothing

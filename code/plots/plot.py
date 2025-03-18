@@ -11,8 +11,25 @@ def plot_cvar_vs_qcvar_log_linear(csv_file: pd.DataFrame):
     and a linear scale.
     and save the plot in the plots folder.
     """
-    plt.plot(csv_file['n'], csv_file['cvar'], label='CVaR')
-    plt.plot(csv_file['n'], csv_file['qcvar'], label='QCVaR')
+    # There may be multiple trials for the same n
+    # We need to compute the mean and confidence interval
+    unique_sizes = csv_file['n'].unique()
+    cis_slow_cvar = []
+    cis_fast_cvar = []
+    means_slow_cvar = []
+    means_fast_cvar = []
+    for size in unique_sizes:
+        df_size = df[df['n'] == size]
+        ci_slow_cvar = 1.96 * (df_size['cvar'].std() / np.sqrt(len(df_size['cvar'])))
+        ci_fast_cvar = 1.96 * (df_size['qcvar'].std() / np.sqrt(len(df_size['qcvar'])))
+        cis_slow_cvar.append(ci_slow_cvar)
+        cis_fast_cvar.append(ci_fast_cvar)
+        means_slow_cvar.append(df_size['cvar'].mean())
+        means_fast_cvar.append(df_size['qcvar'].mean())
+    plt.plot(unique_sizes, means_slow_cvar, label='CVaR') # pyright: ignore[reportArgumentType]
+    plt.fill_between(unique_sizes, np.array(means_slow_cvar) - np.array(cis_slow_cvar), np.array(means_slow_cvar) + np.array(cis_slow_cvar), alpha=0.2)# pyright: ignore[reportArgumentType]
+    plt.plot(unique_sizes, means_fast_cvar, label='QCVaR')# pyright: ignore[reportArgumentType]
+    plt.fill_between(unique_sizes, np.array(means_fast_cvar) - np.array(cis_fast_cvar), np.array(means_fast_cvar) + np.array(cis_fast_cvar), alpha=0.2)# pyright: ignore[reportArgumentType]
     plt.yscale('log')
     plt.xscale('log')
     plt.xlabel('n')
@@ -22,8 +39,10 @@ def plot_cvar_vs_qcvar_log_linear(csv_file: pd.DataFrame):
     plt.savefig('./plots/cvar_vs_qcvar_log.pdf')
     plt.show()
     plt.clf()
-    plt.plot(csv_file['n'], csv_file['cvar'], label='CVaR')
-    plt.plot(csv_file['n'], csv_file['qcvar'], label='QCVaR')
+    plt.plot(unique_sizes, means_slow_cvar, label='CVaR') # pyright: ignore[reportArgumentType]
+    plt.fill_between(unique_sizes, np.array(means_slow_cvar) - np.array(cis_slow_cvar), np.array(means_slow_cvar) + np.array(cis_slow_cvar), alpha=0.2)# pyright: ignore[reportArgumentType]
+    plt.plot(unique_sizes, means_fast_cvar, label='QCVaR')# pyright: ignore[reportArgumentType]
+    plt.fill_between(unique_sizes, np.array(means_fast_cvar) - np.array(cis_fast_cvar), np.array(means_fast_cvar) + np.array(cis_fast_cvar), alpha=0.2)# pyright: ignore[reportArgumentType]
     plt.xlabel('n')
     plt.ylabel('Time (ms)')
     plt.legend()
@@ -38,11 +57,25 @@ def plot_cvar_div_qcvar(csv_file: pd.DataFrame):
     Then fit a logaritmic function to the data
     and save the plot in the plots folder.
     """
-    X = np.array(np.log(csv_file['n'])).reshape(-1, 1)
-    Y = np.log(csv_file['cvar']/csv_file['qcvar'])
+    unique_sizes = csv_file['n'].unique()
+    cvar_cis = []
+    qcvar_cis = []
+    cvar_means = []
+    qcvar_means = []
+    for size in unique_sizes:
+        df_size = df[df['n'] == size]
+        ci_cvar = 1.96 * (df_size['cvar'].std() / np.sqrt(len(df_size['cvar'])))
+        ci_qcvar = 1.96 * (df_size['qcvar'].std() / np.sqrt(len(df_size['qcvar'])))
+        cvar_cis.append(ci_cvar)
+        qcvar_cis.append(ci_qcvar)
+        cvar_means.append(df_size['cvar'].mean())
+        qcvar_means.append(df_size['qcvar'].mean())
+    X = np.array(np.log(unique_sizes)).reshape(-1, 1)
+    Y = np.log(np.array(cvar_means)/np.array(qcvar_means))
     model = LinearRegression(fit_intercept=False).fit(X, Y)
-    plt.plot(csv_file['n'], csv_file['cvar']/csv_file['qcvar'],  label='CVaR/QCVaR')
-    plt.plot(csv_file['n'], np.exp(model.predict(X)), label='y = {:.2f} * log(n)'.format(model.coef_[0]))
+    plt.plot(unique_sizes, np.array(cvar_means)/np.array(qcvar_means), label='CVaR/QCVaR') # pyright: ignore[reportArgumentType]
+    plt.fill_between(unique_sizes, np.array(cvar_means)/np.array(qcvar_means) - np.array(cvar_cis)/np.array(qcvar_means), np.array(cvar_means)/np.array(qcvar_means) + np.array(cvar_cis)/np.array(qcvar_means), alpha=0.2)# pyright: ignore[reportArgumentType]
+    plt.plot(unique_sizes, np.exp(model.predict(X)), label='y = {:.2f} * log(n)'.format(model.coef_[0]))
     plt.xlabel('n')
     plt.ylabel('CVaR/QCVaR')
     plt.legend()

@@ -20,8 +20,8 @@ def plot_cvar_vs_qcvar_log_linear(csv_file: pd.DataFrame):
     means_fast_cvar = []
     for size in unique_sizes:
         df_size = df[df['n'] == size]
-        ci_slow_cvar = 1.96 * (df_size['cvar'].std() / np.sqrt(len(df_size['cvar'])))
-        ci_fast_cvar = 1.96 * (df_size['qcvar'].std() / np.sqrt(len(df_size['qcvar'])))
+        ci_slow_cvar = 1.96 * (df_size['cvar'].std() / np.sqrt(len(df_size['cvar'])) - 1)
+        ci_fast_cvar = 1.96 * (df_size['qcvar'].std() / np.sqrt(len(df_size['qcvar'])) - 1)
         cis_slow_cvar.append(ci_slow_cvar)
         cis_fast_cvar.append(ci_fast_cvar)
         means_slow_cvar.append(df_size['cvar'].mean())
@@ -64,8 +64,8 @@ def plot_cvar_div_qcvar(csv_file: pd.DataFrame):
     qcvar_means = []
     for size in unique_sizes:
         df_size = df[df['n'] == size]
-        ci_cvar = 1.96 * (df_size['cvar'].std() / np.sqrt(len(df_size['cvar'])))
-        ci_qcvar = 1.96 * (df_size['qcvar'].std() / np.sqrt(len(df_size['qcvar'])))
+        ci_cvar = 1.96 * (df_size['cvar'].std() / np.sqrt(len(df_size['cvar'])) - 1)
+        ci_qcvar = 1.96 * (df_size['qcvar'].std() / np.sqrt(len(df_size['qcvar'])) - 1)
         cvar_cis.append(ci_cvar)
         qcvar_cis.append(ci_qcvar)
         cvar_means.append(df_size['cvar'].mean())

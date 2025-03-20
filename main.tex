@@ -112,9 +112,11 @@ Monetary risk measures generalize the expectation operator to allow for risk sen
 
 $\varphi$-divergences can be defined as 
 \[
-  I_\varphi(p \| q) = \sum_{\omega \in \Omega } p_{\omega } \cdot \varphi\left(\frac{p_\omega}{q_\omega}\right)
+  I_\varphi(p \| q) = \sum_{\omega \in \Omega } q_{\omega } \cdot \varphi\left(\frac{p_\omega}{q_\omega}\right)
 \] 
 for two discrete, absolutely continuous probability distributions $p$ and $q$, and convex $\phi$ such that $\phi(1)=0$. 
+
+
 
 Recall that any coherent risk measure can be defined as 
 \begin{align}\label{eq:correspondence_coherent_risk}
@@ -143,7 +145,7 @@ The primal formulation is
          \textbf{Risk measure} & $\varphi(y)$  & $\varphi\opt(x)$ & $\beta$ \\
          \midrule        
          $\mathbb{E}$           & $\begin{cases} 0 &\text{if } y = 1 \\ \infty & \text{otherwise}  \end{cases}$ & $x$ & $0$  \\
-         $\cvaro_{\alpha}$     & $\begin{cases} 0 &\text{if } y \in [0, \frac{1}{\alpha}] \\ \infty & \text{otherwise}  \end{cases}$ & $\max \left\{ 0, \frac{1}{\alpha} x \right\} $& $0$ \\
+         $\cvaro_{\alpha}$     & $\begin{cases} 0 &\text{if } y \in [0, \frac{1}{1 -\alpha}] \\ \infty & \text{otherwise}  \end{cases}$ & $\max \left\{ 0, \frac{1}{1 - \alpha} x \right\} $& $0$ \\
          $\evaro_{\alpha}$     & $\begin{cases} y \log y &\text{if } y > 0 \\ 0 &\text{if } y =  0 \\  \infty &\text{if } y < 0 \end{cases}$ & $\exp{ x - 1 }$ & $-\log(\alpha)$ \\
          $\tvaro_{\alpha}$     & $|y - 1|$ & $ \begin{cases} x &\text{if } |x| \le 1\\ \infty &\text{otherwise} \end{cases} $& $\sqrt{2 \cdot \log 2 \cdot (-\log(\alpha)) }$ \\
          \bottomrule

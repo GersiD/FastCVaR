@@ -23,7 +23,7 @@ function TVaR!(x, p, β)
     pbar[i] = 0
   end
   for i in range(var_ind, 1, step=-1)
-    @assert xbar[i] ≈ xbar[var_ind] # for debugging
+    # @assert xbar[i] ≈ xbar[var_ind] # for debugging
     if offset <= pbar[i]
       @inbounds pbar[i] -= offset
       break

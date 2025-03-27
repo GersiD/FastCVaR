@@ -65,26 +65,46 @@
 \maketitle
 
 \section{Introduction}
-\textcolor{Aquamarine}{ Main points of our paper
-  \begin{itemize}
-      \item We present a linear time algorithm for many popular risk measures.
-      \item we popularize $\varphi$ divergence risk measures and their applications to polymatroids.
-  \end{itemize}
-}
 
-
+% 1-2 paragraphs for general motivation ... what are risk measures and why they matter
 In standard paradigms of reinforcement learning and decision making, it is common to maximize the expectation of a given objective function which depends on a random variable. However, in many applications such as robotics, finance, and autonomous systems, solutions must account for performance with respect to worst case scenarios rather than simply maximizing the mean. Therefore, it has become a common practice to optimize policies with respect to a risk measure, which focuses on the tails of the reward distribution rather than the expectation. 
 
-In applications like finance and robotics, certain properties of risk measures have been established as desirable. These include positive homogeneity, subadditivity, translation invariance, and monotonicity \todo{cite}\citep{Follmer2016}. Risk measures that satisfy these properties are known as coherent risk measures. 
-\gersi{Are we doing RARL? If not, lets avoid this discussion completely as it gets very technical very fast and detracts from our main point.}
-Many applications of risk-averse reinforcement learning, such as nested Risk MDPs and Monte Carlo methods, require the efficient computation of the risk measure of a discrete random variable or the estimate of the risk measure from samples of a distribution. For coherent risk measures, it has been shown that computing these risk measures is equivalent to solving a robust optimization problem where a probability distribution must be selected to minimize the expectation of a random variable subject to a divergence constraint from a normal distribution. For certain risk measures that satistfy an additional property known as comonotinicity, it is known that this optimization problem can be casted as the maximum weighted independent set problem (MWIS) on a polymathic.
+% what are we doing; our contributions 
+In this work, we make  risk measures fast. Not just fast, very fast. We can solve several common risk measures in linear time, including VaR and CVaR. Our approach also makes it possible to define new cool amazing useful risk $\varphi$-divergence measures that can be solved in linear time. We call one of these TVaR and this matters because ????. 
 
-In this work, we show that for certain classes of polymatroids, we can solve the MWIS problem in expected linear time. We use this to then show multiple example coherent and comonotonic risk measures. Finally for phi-divergence risk measures, which are a subset of coherent risk measures such that the divergence constraint is a phi-divergence, we establish the necessary conditions on the divergence in order for the resulting optimization problem to compute the risk measure be a MWIS.
+% how we are doing this? connect phi-divergence risk measures and polymatroids
+We show that for certain classes of polymatroids, we can solve the MWIS problem in expected linear time. We use this to then show multiple example coherent and comonotonic risk measures. Finally for phi-divergence risk measures, which are a subset of coherent risk measures such that the divergence constraint is a phi-divergence, we establish the necessary conditions on the divergence in order for the resulting optimization problem to compute the risk measure be a MWIS.
+
+% justify why this is important
+
+% justify why this is novel
+
+% position with respect to fast algorithms for robust MDPs, risk-averse RL,
+
+In applications like finance and robotics, certain properties of risk measures have been established as desirable. These include positive homogeneity, subadditivity, translation invariance, and monotonicity \todo{cite}\citep{Follmer2016}. Risk measures that satisfy these properties are known as coherent risk measures. 
+
+Many applications of risk-averse reinforcement learning, such as nested Risk MDPs and Monte Carlo methods, require the efficient computation of the risk measure of a discrete random variable or the estimate of the risk measure from samples of a distribution.
+
+For coherent risk measures, it has been shown that computing these risk measures is equivalent to solving a robust optimization problem where a probability distribution must be selected to minimize the expectation of a random variable subject to a divergence constraint from a normal distribution. For certain risk measures that satistfy an additional property known as comonotinicity, it is known that this optimization problem can be casted as the maximum weighted independent set problem (MWIS) on a polymathic.
+
+% the remainder of the paper is organized as follows.
+
 \section{Preliminaries}
 
 \paragraph{Notation}
+
 We use calligraphic letters to denote sets, a tilde to denote random variables, and bold lowercase letters to denote vectors.
-We also adopt the standard convention that $\mathcal{A}^{\mathcal{B}}$ represents the set of all functions from a set $\mathcal{B}$ to a set $\mathcal{A}$ and treat vectors as a function from indexes to real numbers. $\bm{1}$ denotes the vector of ones and $\mathds{1}(bool)$ denotes the indicator function. We use the convention that comparison operators are defined on vector spaces element-wise, that is for $x, y \in \Real^n$ then $x \leq y \iff x_i \leq y_i \quad \; \forall \; i \in 1\dots n$. Finally, $\Delta^n$ denotes the standard $n$-simplex while $\Delta_k^n$ denotes the k-capped simplex~\cite{kcapped_ang}.
+
+% We also adopt the standard convention that $\mathcal{A}^{\mathcal{B}}$ represents the set of all functions from a set $\mathcal{B}$ to a set $\mathcal{A}$ and treat vectors as a function from indexes to real numbers.
+
+% $\bm{1}$ denotes the vector of ones and $\mathds{1}(bool)$ denotes the indicator function.
+
+% We use the convention that comparison operators are defined on vector spaces element-wise, that is for $x, y \in \Real^n$ then $x \leq y \iff x_i \leq y_i \quad \; \forall \; i \in 1\dots n$.
+
+% Finally, $\Delta^n$ denotes the standard $n$-simplex while $\Delta_k^n$ denotes the k-capped simplex~\cite{kcapped_ang}.
+
+
+
 We assume a probability space with finite outcomes $\Omega = \left\{ 1, \dots , N \right\}$, events $\mathcal{F}$, and
 probability measure $\mathbb{P} \in \Delta^N$. We consider a random variable to be any mapping $\tilde{x}\colon \Omega \to \Real$. Or equivalently as vectors on $\Omega$. For example, the vector $\bm{x}\in \Real^N$ equivalent to $\tilde{x}$ is constructed as
 \[
@@ -157,9 +177,10 @@ The primal formulation is
          $\tvaro_{\alpha}$     & $|y - 1|$ & $ \begin{cases} x &\text{if } |x| \le 1\\ \infty &\text{otherwise} \end{cases} $& $\sqrt{2 \cdot \log 2 \cdot (-\log(\alpha)) }$ \\
          \bottomrule
     \end{tabular}
-    \caption{Example divergences}
+    \caption{Example $\varphi$-divergence risk measures.}
     \label{tab:divergences}
 \end{table}
+
 \todo{check this is correct : Gersi}
 
 \paragraph{Polymatroids}
@@ -197,7 +218,8 @@ In this section, we describe a linear time algorithm for VaR.
 \begin{algorithm}
   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and $\alpha \in [0,1]$}}
   \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
-  \caption{Quick Quantile algorithm for VaR}\label{alg:quick_quantile}
+  \caption{Quick Quantile algorithm for VaR. $\mathds{1}(bool)$ denotes the indicator function.}\label{alg:quick_quantile}
+
   \begin{algorithmic}[1]
     \Require{} \Ensure{}
     \State{$f_0 \gets 1$}
@@ -297,7 +319,7 @@ At every iteration, this algorithm will always hit case 1 or case 2, where $back
   \todo{need proof}
 \end{proof}
 
-\section{Fast Algorithms for $\varphi$-divergence Risk}
+\section{Fast Algorithms for $\varphi$-divergence Risk Measures}
 
 \subsection{General Algorithm}
 
@@ -314,7 +336,7 @@ As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk 
   &= \max \left\{ z - \frac{1}{1-\alpha} \bm{p}\tr(z-\bm{x})_+ \mid z \in \Real\right\}.
   \end{aligned}
 \end{equation}
-
+Here, $\bm{1}$ is a vector of ones of an appropriate dimension. 
 \subsection{EVaR}
 
 \begin{algorithm}

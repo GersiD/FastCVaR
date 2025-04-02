@@ -584,23 +584,23 @@ To evaluate the algorithms developed in \cref{alg:quick_cvar} and \cref{alg:quic
 and compare their speedup against their standard sorting-based counterparts. 
 
 \begin{figure}
-  \includegraphics[width=0.5\textwidth]{./code/plots/cvar_vs_qcvar_sparse_linear.pdf}
-  \includegraphics[width=0.5\textwidth]{./code/plots/cvar_vs_qcvar_uniform_linear.pdf}
-  \caption{Time comparison between the standard implementation of CVaR (sorting) and \cref{alg:quick_cvar}. On the x-axis we have the size of the random variable, and on the y-axis we have the time in milliseconds. Left side represents when a sparse random variable is used and the right side represents when a uniform random variable is used. Both axes are in linear scale.}
-  \label{fig:cvar_vs_qcvar_linear}
+  \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_linear.pdf}
+  \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_log.pdf}
+  \caption{Time comparison between the standard implementation of sorting based algorithms and quickselect based ones such as \cref{alg:quick_cvar}. On the x-axis we have the size of the random variable, and on the y-axis we have the time in milliseconds. Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{sparse} random variable.}
+  \label{fig:all_sparse}
 \end{figure}
 \begin{figure}
-  \includegraphics[width=0.5\textwidth]{./code/plots/var_vs_qvar_sparse_linear.pdf}
-  \includegraphics[width=0.5\textwidth]{./code/plots/var_vs_qvar_uniform_linear.pdf}
-  \caption{Time comparison between the standard implementation of VaR (sorting) and \cref{alg:quick_quantile}. On the x-axis we have the size of the random variable, and on the y-axis we have the time in milliseconds. Left side represents when a sparse random variable is used and the right side represents when a uniform random variable is used. Both axes are in linear scale.}
-  \label{fig:var_vs_qvar_linear}
+  \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_uniform_linear.pdf}
+  \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_uniform_log.pdf}
+  \caption{Time comparison between the standard implementation of sorting based algorithms and quickselect based ones such as \cref{alg:quick_cvar}. On the x-axis we have the size of the random variable, and on the y-axis we have the time in milliseconds. Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{uniform} random variable.}
+  \label{fig:all_uniform}
 \end{figure}
-\begin{figure}
-  \includegraphics[width=0.5\textwidth]{./code/plots/tvar_vs_qtvar_sparse_linear.pdf}
-  \includegraphics[width=0.5\textwidth]{./code/plots/tvar_vs_qtvar_uniform_linear.pdf}
-  \caption{Time comparison between the standard implementation of TVaR (sorting) and \todo{ref}. On the x-axis we have the size of the random variable, and on the y-axis we have the time in milliseconds. Left side represents when a sparse random variable is used and the right side represents when a uniform random variable is used. Both axes are in linear scale.}
-  \label{fig:tvar_vs_qtvar_linear}
-\end{figure}
+% \begin{figure}
+%   \includegraphics[width=0.5\textwidth]{./code/plots/tvar_vs_qtvar_sparse_linear.pdf}
+%   \includegraphics[width=0.5\textwidth]{./code/plots/tvar_vs_qtvar_uniform_linear.pdf}
+%   \caption{Time comparison between the standard implementation of TVaR (sorting) and \todo{ref}. On the x-axis we have the size of the random variable, and on the y-axis we have the time in milliseconds. Left side represents when a sparse random variable is used and the right side represents when a uniform random variable is used. Both axes are in linear scale.}
+%   \label{fig:tvar_vs_qtvar_linear}
+% \end{figure}
 
 \bibliography{fastcvar.bib}
 

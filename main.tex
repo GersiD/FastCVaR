@@ -595,13 +595,13 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1
 To evaluate the algorithms developed in \cref{alg:quick_cvar} and \cref{alg:quick_quantile} we numerically validate that they are correct, 
 and compare their speedup against their standard sorting-based counterparts. 
 
-\begin{figure}[h]
+\begin{figure}[htbp]
   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_linear.pdf}
   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_log.pdf}
   \caption{Time 1500 comparison between the standard implementation of sorting based algorithms and quickselect based ones such as \cref{alg:quick_cvar}. On the x-axis we have the size of the random variable, and on the y-axis we have the time in milliseconds. Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{sparse} random variable.}
   \label{fig:all_sparse}
 \end{figure}
-\begin{figure}[h]
+\begin{figure}[htbp]
   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_uniform_linear.pdf}
   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_uniform_log.pdf}
   \caption{Time comparison between the standard implementation of sorting based algorithms and quickselect based ones such as \cref{alg:quick_cvar}. On the x-axis we have the size of the random variable, and on the y-axis we have the time in milliseconds. Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{uniform} random variable.}

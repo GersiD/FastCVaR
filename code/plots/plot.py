@@ -27,9 +27,9 @@ class Plotter(object):
         plt.rcParams['axes.formatter.use_mathtext'] = True
         plt.rcParams["font.family"] = "cmr10"
         # set font size
-        plt.rcParams["font.size"] = 20
+        plt.rcParams["font.size"] = 18
         # set the figure size
-        plt.rcParams["figure.figsize"] = (8, 5)
+        plt.rcParams["figure.figsize"] = (8, 5.1)
 
     def compute_cis_means(self) -> dict[str, Tuple[float, float]]:
         """
@@ -82,7 +82,7 @@ def plot_one_slow_vs_fast(plotter: Plotter, slow: str, fast: str):
     plt.legend()
     plt.grid()
     plt.savefig(f'./plots/( plotter.slow_name )_vs_(plotter.fast_name)_{plotter.special}_log.pdf')
-    plt.show()
+    # plt.show()
     plt.clf()
     plot_slow_vs_fast_data(plotter, slow, fast)
     plt.xlabel('n')
@@ -90,7 +90,7 @@ def plot_one_slow_vs_fast(plotter: Plotter, slow: str, fast: str):
     plt.legend()
     plt.grid()
     plt.savefig(f'./plots/{plotter.col2Name[slow]}_vs_{plotter.col2Name[fast]}_{plotter.special}_linear.pdf')
-    plt.show()
+    # plt.show()
     plt.clf()
 
 def plot_all_slow_vs_fast(plotter: Plotter):
@@ -108,7 +108,7 @@ def plot_all_slow_vs_fast(plotter: Plotter):
     plt.legend()
     plt.grid()
     plt.savefig(f'./plots/all_slow_vs_fast_{plotter.special}_log.pdf')
-    plt.show()
+    # plt.show()
     plt.clf()
     for slow, fast in zip(plotter.slow_cols, plotter.fast_cols):
         plot_slow_vs_fast_data(plotter, slow, fast)
@@ -117,7 +117,7 @@ def plot_all_slow_vs_fast(plotter: Plotter):
     plt.legend()
     plt.grid()
     plt.savefig(f'./plots/all_slow_vs_fast_{plotter.special}_linear.pdf')
-    plt.show()
+    # plt.show()
     plt.clf()
 
 def plot_cvar_div_qcvar(plotter: Plotter):
@@ -149,7 +149,7 @@ def plot_cvar_div_qcvar(plotter: Plotter):
     plt.ylabel('CVaR/QCVaR')
     plt.legend()
     plt.savefig('./plots/cvar_div_qcvar.pdf')
-    plt.show()
+    # plt.show()
     plt.clf()
 
 if __name__ == "__main__":

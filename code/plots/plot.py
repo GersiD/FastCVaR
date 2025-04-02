@@ -27,7 +27,7 @@ class Plotter(object):
         plt.rcParams['axes.formatter.use_mathtext'] = True
         plt.rcParams["font.family"] = "cmr10"
         # set font size
-        plt.rcParams["font.size"] = 16
+        plt.rcParams["font.size"] = 20
         # set the figure size
         plt.rcParams["figure.figsize"] = (8, 5)
 

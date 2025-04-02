@@ -1,4 +1,16 @@
 \documentclass{article}
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2025
+% ready for submission
+\usepackage{neurips_2025}
+% to compile a preprint version, e.g., for submission to arXiv, add add the
+% [preprint] option:
+%     \usepackage[preprint]{neurips_2025}
+% to compile a camera-ready version, add the [final] option, e.g.:
+%     \usepackage[final]{neurips_2025}
+% to avoid loading the natbib package, add option nonatbib:
+%    \usepackage[nonatbib]{neurips_2025}
 
 
 \usepackage{graphicx} % Required for inserting images
@@ -14,7 +26,7 @@
 \usepackage{natbib}
 \usepackage{booktabs}
 \usepackage{setspace}
-\usepackage{fullpage}
+% \usepackage{fullpage} % neurips complained
 \usepackage[dvipsnames]{xcolor} % Saved my life during a conference once
 
 
@@ -586,7 +598,7 @@ and compare their speedup against their standard sorting-based counterparts.
 \begin{figure}
   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_linear.pdf}
   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_log.pdf}
-  \caption{Time comparison between the standard implementation of sorting based algorithms and quickselect based ones such as \cref{alg:quick_cvar}. On the x-axis we have the size of the random variable, and on the y-axis we have the time in milliseconds. Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{sparse} random variable.}
+  \caption{Time 1500 comparison between the standard implementation of sorting based algorithms and quickselect based ones such as \cref{alg:quick_cvar}. On the x-axis we have the size of the random variable, and on the y-axis we have the time in milliseconds. Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{sparse} random variable.}
   \label{fig:all_sparse}
 \end{figure}
 \begin{figure}
@@ -605,6 +617,11 @@ and compare their speedup against their standard sorting-based counterparts.
 \bibliography{fastcvar.bib}
 
 \appendix
+\todo{
+  \begin{itemize}
+    \item check formatting for neurips, no more than 9 pages
+  \end{itemize}
+}
 
 \section{No-sort Polymatroid}
 

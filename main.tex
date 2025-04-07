@@ -314,26 +314,57 @@ At every iteration, this algorithm will always hit case 1 or case 2, where $back
   CVaR can be computed by solving the following optimization problem $\min_{Q \in \mathcal{Q}} \mathbb{E}_Q[X]$, where $\mathcal{Q} = \left\{Q \in \Delta^\Omega \mid Q(\omega) < \frac{1}{1-\alpha} P(\omega)\right\}$.
 \end{lem}
 \proof{Theorem 4.52 in~\cite{Follmer2016}, note we consider rewards \todo{make sure this is correct \eqref{eq:correspondence_coherent_risk}}.}
-\begin{lem}
-  For $\omega \in \Omega$ we can construct a feasible $Q \in \mathcal{Q}$ such that $Q(\omega) = \min\left\{\frac{P(\omega)}{1-a}, 1\right\}$.
-\end{lem}
-\begin{proof}
-  Two possible scenarios exist.
-\item[Case 1]: $P(A) \geq 1 - \alpha$. In this scenario, $Q(A)$ must equal 1 since $\frac{1}{1 - \alpha} P(A) > 1 $. Thus, every element in $A$ should be scaled by $\frac{1}{P(A)}$ if in $A$ and set to 0 otherwise. Since  $P(A) \geq 1 - \alpha$, we can imply the reciprocal $\frac{1}{P(A)} \leq \frac{1}{1-\alpha}$ is also true.  
-\item[Case 2]: $P(A) < (1 - \alpha)$. In this scenario, $Q(A) \leq \frac{1}{1 - \alpha} \cdot  P(A) < 1$. For any given $A$, we can construct a Q(A) such that $Q(A) = \frac{1}{1 - \alpha} \cdot  P(A)$. This can be done by setting $Q(a)$ to $\frac{1}{1 - \alpha} \cdot P(a)$ for all $a$ in $A$ and $P(a) \cdot  d$ otherwise such that $\frac{1}{1 - \alpha} * P(A) + d*P(B) = 1$, where $B$ contains all elements not in $A$. It is provable that $d \leq \frac{1}{1 - \alpha}$, which is required for the constructed \(Q\) to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{1 - \alpha} \ge 1$. Since $P(A) + P(B) = 1$,  $d \le 1$ in order for $\frac{1}{1 - \alpha} \cdot  P(A) + d\cdot P(B) = 1$ to hold. Since $1 \leq \frac{1}{1-\alpha}$, this implies $d\le \leq \frac{1}{1 - \alpha}$.
 
-\end{proof}
 
-\begin{lem}
-  If \cref{alg:quick_quantile} correctly computes $\quant^+$ then \cref{alg:quick_cvar} correctly computes CVaR. 
-\end{lem}
-\begin{proof}
-  \todo{need proof}
-\end{proof}
+
 
 \section{Fast Algorithms for \texorpdfstring{$\varphi$}{phi}-divergence Risk Measures}
 
 \subsection{General Algorithm}
+Our first contribution is an algorithm for solving the maximum weight Independent Set without sorting for polymatroids. We note that certain additional assumptions have to be satisfied on the submodular function as follows.
+\begin{assumption}
+Assume for $P_f$ that $f(U)$ is such that for all $S_i, S_{ i+1 } \cup E$ where $S_i \cup (i + 1) = S_{ i+1 } $ and $f(S_{ i+1 }) < f(E)$, $f(S_i) + f({i + 1}) = f(S_{ i+1 })$.
+\end{assumption}
+We note this assumption essentially state that the submodular function must be a piecewise linear function. 
+\begin{algorithm}
+    \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
+    \algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
+  \caption{No sort Maximum Weighted Independent Set}
+ \begin{algorithmic}[1]
+     \Require{}
+     \Ensure{}
+  
+    \State{$left \gets 1$}
+    \State{$right \gets n$}
+    \While{$left  - right \geq 1$}
+    \State{$mid \gets partition(left, right, c)$}
+    \If{$f(S_{mid}) = f(N)$}
+       \State{Let $x_i :=  \begin{cases}0 & \text{for } i > mid,\dots 
+       \end{cases}$}
+       \State{$right \gets mid$}
+    \Else
+          \State{Let $x_i :=  \begin{cases}f(i) & \text{for } i \leq mid,\dots \end{cases}$}
+          \State{$left \gets mid + 1$}
+          
+    \EndIf{}      
+    
+    
+    
+    \EndWhile{}
+    \State{$x_{right} \gets f(N) - f(S_{right - 1})$}
+\end{algorithmic}
+\end{algorithm}
+The proof for this algorithm is simple and shows that the output is equal to that of Algorithm 4 (the standard greedy algorithm), which has already been shown to be both feasible and optimal.
+\begin{lem}
+Algorithm 2 returns a feasible and optimal solution to the maximum-weight-independent set for polymatroids.
+\end{lem}
+\begin{proof}
+The optimal solution will always be $f(S_i) - f(S_{i-1})$ assuming the weight $c_i \geq 0$. Our solution is $f(i)$ for $f(S_i) < f(N)$, and by Assumption 1 this equals $f(S_i) - f(S_{i - 1})$. If $f(S_i) = f(N)$ and $f(S_{i - 1}) = f(N)$, then $x_i = 0$ by the algorithm.
+\end{proof}
+
+\begin{lem}
+Algorithm 2 run with expected complexity $\mathcal{O}(N * f(i))$ for all $i$ in set $S$.
+\end{lem}
 
 \subsection{CVaR}
 As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk (CVaR) is a convex risk measure that generalizes the Value-at-Risk (VaR) and can be defined as
@@ -349,6 +380,20 @@ As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk 
   \end{aligned}
 \end{equation}
 Here, $\bm{1}$ is a vector of ones of an appropriate dimension. 
+
+\begin{lem}
+  For $\omega \in \Omega$ we can construct a feasible $Q \in \mathcal{Q}$ such that $Q(\omega) = \min\left\{\frac{P(\omega)}{1-a}, 1\right\}$.
+\end{lem}
+\begin{proof}
+  Two possible scenarios exist.
+\item[Case 1]: $P(A) \geq 1 - \alpha$. In this scenario, $Q(A)$ must equal 1 since $\frac{1}{1 - \alpha} P(A) > 1 $. Thus, every element in $A$ should be scaled by $\frac{1}{P(A)}$ if in $A$ and set to 0 otherwise. Since  $P(A) \geq 1 - \alpha$, we can imply the reciprocal $\frac{1}{P(A)} \leq \frac{1}{1-\alpha}$ is also true.  
+\item[Case 2]: $P(A) < (1 - \alpha)$. In this scenario, $Q(A) \leq \frac{1}{1 - \alpha} \cdot  P(A) < 1$. For any given $A$, we can construct a Q(A) such that $Q(A) = \frac{1}{1 - \alpha} \cdot  P(A)$. This can be done by setting $Q(a)$ to $\frac{1}{1 - \alpha} \cdot P(a)$ for all $a$ in $A$ and $P(a) \cdot  d$ otherwise such that $\frac{1}{1 - \alpha} * P(A) + d*P(B) = 1$, where $B$ contains all elements not in $A$. It is provable that $d \leq \frac{1}{1 - \alpha}$, which is required for the constructed \(Q\) to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{1 - \alpha} \ge 1$. Since $P(A) + P(B) = 1$,  $d \le 1$ in order for $\frac{1}{1 - \alpha} \cdot  P(A) + d\cdot P(B) = 1$ to hold. Since $1 \leq \frac{1}{1-\alpha}$, this implies $d\le \leq \frac{1}{1 - \alpha}$.
+
+\end{proof}
+\begin{lem}
+
+\end{proof}
+
 \subsection{EVaR}
 
 \begin{algorithm}

@@ -310,10 +310,6 @@ At every iteration, this algorithm will always hit case 1 or case 2, where $back
 \begin{proof}
   \todo{need proof}
 \end{proof}
-\begin{lem}
-  CVaR can be computed by solving the following optimization problem $\min_{Q \in \mathcal{Q}} \mathbb{E}_Q[X]$, where $\mathcal{Q} = \left\{Q \in \Delta^\Omega \mid Q(\omega) < \frac{1}{1-\alpha} P(\omega)\right\}$.
-\end{lem}
-\proof{Theorem 4.52 in~\cite{Follmer2016}, note we consider rewards \todo{make sure this is correct \eqref{eq:correspondence_coherent_risk}}.}
 
 
 
@@ -390,17 +386,28 @@ Here, $\bm{1}$ is a vector of ones of an appropriate dimension.
 \item[Case 2]: $P(A) < (1 - \alpha)$. In this scenario, $Q(A) \leq \frac{1}{1 - \alpha} \cdot  P(A) < 1$. For any given $A$, we can construct a Q(A) such that $Q(A) = \frac{1}{1 - \alpha} \cdot  P(A)$. This can be done by setting $Q(a)$ to $\frac{1}{1 - \alpha} \cdot P(a)$ for all $a$ in $A$ and $P(a) \cdot  d$ otherwise such that $\frac{1}{1 - \alpha} * P(A) + d*P(B) = 1$, where $B$ contains all elements not in $A$. It is provable that $d \leq \frac{1}{1 - \alpha}$, which is required for the constructed \(Q\) to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{1 - \alpha} \ge 1$. Since $P(A) + P(B) = 1$,  $d \le 1$ in order for $\frac{1}{1 - \alpha} \cdot  P(A) + d\cdot P(B) = 1$ to hold. Since $1 \leq \frac{1}{1-\alpha}$, this implies $d\le \leq \frac{1}{1 - \alpha}$.
 
 \end{proof}
+\begin{lem}
+  $Q(\omega) = \min\left\{\frac{P(\omega)}{1-a}, 1\right\}$ is a submodular function that satisfies Assumption 1.
+\end{lem}
+\begin{proof}
+The left hand side of the minimum function will be a summation that has all positive values for admissible $\alpha$. Thus this is equivalent to the budget additive function, which has proven to be a submodular function in the literature (must find citation that aren't lecture notes).
 
-\subsection{EVaR}
+Unless adding a new element $S_i$ will make the value of the submodular function 1, $f(S_i) + f({i + 1}) = f(S_{ i+1 })$ by definition. Since $f(S_i)$
 
-\begin{algorithm}
-  \begin{algorithmic}
-%{Input: vector $x$, pmf $p$ solution for CVar and maximum divergence \beta}
-\State{Define vector $p'$ such that every element $p'_i = \frac{1}{\sum_{j} p_j} * p_i$ }
-\State{If $\sum_{i=1}p'_i\phi(p'_i/q_i) \leq \epsilon$, this is the solution}
-\State{ }
-\end{algorithmic}
-\end{algorithm}
+\end{proof}
+
+
+
+%\subsection{EVaR}
+
+%\begin{algorithm}
+ % \begin{algorithmic}
+%{Input: vector $x$, pmf $p$ solution for %CVar and maximum divergence \beta}
+%\State{Define vector $p'$ such that every element $p'_i = \frac{1}{\sum_{j} p_j} * p_i$ }
+%\State{If $\sum_{i=1}p'_i\phi(p'_i/q_i) \leq \epsilon$, this is the solution}
+%\State{ }
+%\end{algorithmic}
+%\end{algorithm}
 
 
 \subsection{TVaR}

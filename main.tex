@@ -392,7 +392,7 @@ Here, $\bm{1}$ is a vector of ones of an appropriate dimension.
 \end{proof}
 \begin{lem}
 
-\end{proof}
+  \end{lem}
 
 \subsection{EVaR}
 
@@ -594,10 +594,12 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1
 
 \section{Greedy Algorithm}
 
+\mm{Why would we need the weights to be non-negative?}
+
 \begin{algorithm} \label{alg:greedy-polymatroid}
     \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
     \algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
-  \caption{algorithm}{Greedy algorithm from Submodular Functions, Polymatroids, TDI}
+  \caption{Greedy algorithm from Submodular Functions, Polymatroids, TDI}
  \begin{algorithmic}[1]
     \Require{}
     \Ensure{}

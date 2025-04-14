@@ -227,8 +227,18 @@ Conventional algorithms such as \cref{alg:greedy-polymatroid} solve \eqref{eq:po
 
 \section{Fast Algorithm for VaR}
 
-In this section, we describe a linear time algorithm for VaR.
+\begin{assumption}
+  The dutch partition scheme $i_k, x^k, p^k \gets \operatorname{partition}(x^{k-1}, p^{k-1}, f_{k-1}, b_{k-1})$ does the following:
+  \begin{enumerate}
+  \item $j \le i_k \Rightarrow x^k_j \le x^k_{i_k}$
+  \item $j > i_k \Rightarrow x^k_j > x^k_{i_k}$
+  \item $\exists l \ge i_k$ such that $ l \le j \le i_k \Rightarrow x^k_{i_k} = x^k_j $ and $ j < l \Rightarrow x^k_{i_k} > x^k_j $
+  \item the algorithm runs in time linear (if mean of means pivot scheme) in $b_k - f_k$
+  \end{enumerate}
+  Note that only the elements  $x^k_j$ for $j = f_k, \dots, b_k$ which makes it possible to achieve the desired time complexity.
+\end{assumption}
 
+In this section, we describe a linear time algorithm for VaR.
 \begin{algorithm}
   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and $\alpha \in [0,1]$}}
   \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
@@ -236,19 +246,18 @@ In this section, we describe a linear time algorithm for VaR.
 
   \begin{algorithmic}[1]
     \Require{} \Ensure{}
-    \State{$f_0 \gets 1$}
-    \State{$b_0 \gets n$ }
+    \State{$f_0 \gets 1$, $b_0 \gets n$, $x^0 = x$, $p^0 = p$, $k=1$, $\alpha_0 = \alpha$ } \Comment{Init front $f_0$ and back $b_0$}
     \While{$b_k - f_k \geq 1$}
-      \State{$i_k \gets \operatorname{partition}(x, p, f_k, b_k) - 1$  \Comment{Hoare partition scheme}}
-    \State{$t_k \gets \sum_{j=1}^n \mathds{1}(x[j] \leq x[i_k]) p[j]$}
-      \If{$\alpha < t_k$}
-      \State{$b_k \gets i_k$}
+      \State{$i_k, x^k, p^k \gets \operatorname{partition}(x^{k-1}, p^{k-1}, f_{k-1}, b_{k-1})$  \Comment{Dutch partition scheme}}
+    \State{$t_k \gets \sum_{j=f_{k-1}}^{i_k} p^k_j$}
+      \If{$\alpha_k < t_k$}
+      \State{$b_k \gets i_k$, $\alpha_k \gets \alpha_{k-1}$}
       \Else{}
-      \State{$f_k \gets i_k + 1$}
+      \State{$f_k \gets i_k + 1$, $\alpha_k \gets \alpha_{k-1} - t_k$}
     \EndIf{}
     \State $k \gets k + 1$
     \EndWhile{}
-    \State{\Return{$x[f_k]$}}
+    \State{\Return{$x^k_{f_k}$}}
   \end{algorithmic}
 \end{algorithm}
 
@@ -398,9 +407,8 @@ For $\omega \in \Omega$ we can construct a feasible\todo{what does feasible mean
 The left hand side of the minimum function will be a summation that has all positive values for admissible $\alpha$. Thus this is equivalent to the budget additive function, which has proven to be a submodular function in the literature (must find citation that aren't lecture notes).
 
 Unless adding a new element $S_i$ will make the value of the submodular function 1, $f(S_i) + f({i + 1}) = f(S_{ i+1 })$ by definition. Since $f(S_i)$
-
-  \end{lem}
-
+%\end{lem}
+\end{proof}
 
 
 %\subsection{EVaR}

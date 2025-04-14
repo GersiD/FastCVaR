@@ -25,7 +25,7 @@ class Plotter(object):
         plt.rcParams['ps.fonttype'] = 42
         # set the font to be Computer Modern (cmr10 doesnt work so we use serif)
         plt.rcParams['axes.formatter.use_mathtext'] = True
-        plt.rcParams["font.family"] = "cmr10"
+        plt.rcParams["font.family"] = "serif"
         # set font size
         plt.rcParams["font.size"] = 18
         # set the figure size

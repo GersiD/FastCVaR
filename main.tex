@@ -75,31 +75,33 @@
 \begin{document}
 
 \maketitle
+\todo{
+  \begin{itemize}
+    \item check formatting for neurips, no more than 9 pages
+  \end{itemize}
+}
 
-\section{Introduction}
+\section{Introduction}\label{sec:intro}
 
 % 1-2 paragraphs for general motivation ... what are risk measures and why they matter
-In standard paradigms of reinforcement learning and decision making, it is common to maximize the expectation of a given objective function which depends on a random variable. However, in many applications such as robotics, finance, and autonomous systems, solutions must account for performance with respect to worst case scenarios rather than simply maximizing the mean. Therefore, it has become a common practice to optimize policies with respect to a risk measure, which focuses on the tails of the reward distribution rather than the expectation. 
+In standard paradigms of reinforcement learning and decision making, it is common to maximize the expectation of the cumulative discounted future reward which depends on future states, policy actions, and translation dynamics~\cite{Sutton1998}. However, in many applications such as robotics, finance, and autonomous systems, solutions must account for performance with respect to worst case scenarios rather than simply maximizing the mean. Therefore, it has become a common practice to optimize policies with respect to a risk measure~\cite{Follmer2016}, which focuses on the tails of the reward distribution rather than the expectation. 
 
 % what are we doing; our contributions 
-In this work, we make  risk measures fast. Not just fast, very fast. We can solve several common risk measures in linear time, including VaR and CVaR. Our approach also makes it possible to define new cool amazing useful risk $\varphi$-divergence measures that can be solved in linear time. We call one of these TVaR and this matters because ????. 
+In this work, we make  risk measures fast. Not just fast, very fast. We can solve several common risk measures in linear time, including VaR and CVaR. Our approach is general and encapsulates new cool amazing useful risk $\varphi$-divergence measures that can be solved in linear time. We call one of these TVaR and this matters because \todo{motivate} 
 
 % how we are doing this? connect phi-divergence risk measures and polymatroids
-We show that for certain classes of polymatroids, we can solve the MWIS problem in expected linear time. We use this to then show multiple example coherent and comonotonic risk measures. Finally for phi-divergence risk measures, which are a subset of coherent risk measures such that the divergence constraint is a phi-divergence, we establish the necessary conditions on the divergence in order for the resulting optimization problem to compute the risk measure be a MWIS.
+For certain classes of polymatroids, we solve the Maximum-Weight-Independent-Sum (MWIS) problem in $O(N)$ time. In turn we demonstrate multiple examples of coherent and comonotonic risk measures which benifit from this observation. Finally for phi-divergence risk measures, which are a subset of coherent risk measures such that the divergence constraint is a phi-divergence, we establish the necessary conditions on the divergence in order for the resulting optimization problem to compute the risk measure be a MWIS.
 
 % justify why this is important
+In applications like finance, healthcare, and robotics, certain properties of risk measures have been established as desirable. These include positive homogeneity, subadditivity, translation invariance, and monotonicity~\citep{Follmer2016}. Risk measures that satisfy these properties are known as coherent risk measures. Coherent risk measures, when optimized, allow for policies which are risk-sensitive. In the applications of finance, healthcare, and robotics risk-sensitive policies often best match human preferences in their respective domains\todo{cite}. These human preferences, when summed, equate to ensuring good performance even in situations of uncertainty.
 
 % justify why this is novel
-
-% position with respect to fast algorithms for robust MDPs, risk-averse RL,
-
-In applications like finance and robotics, certain properties of risk measures have been established as desirable. These include positive homogeneity, subadditivity, translation invariance, and monotonicity \todo{cite}\citep{Follmer2016}. Risk measures that satisfy these properties are known as coherent risk measures. 
-
-Many applications of risk-averse reinforcement learning, such as nested Risk MDPs and Monte Carlo methods, require the efficient computation of the risk measure of a discrete random variable or the estimate of the risk measure from samples of a distribution.
+Many applications of risk measures in the aformentioned fields require that they are efficiently computed. Compute time and resources are a major concern in real-world applications. For example, in finance, the computation of risk measures is often a bottleneck in portfolio optimization and risk management where trades are often made on intervals of milliseconds. Likewise in robotics, the computation of risk measures is often a bottleneck in real-time decision making. In healthcare, the computation of risk measures is often a bottleneck in clinical decision support systems which may care for a large quanity of patients.
 
 For coherent risk measures, it has been shown that computing these risk measures is equivalent to solving a robust optimization problem where a probability distribution must be selected to minimize the expectation of a random variable subject to a divergence constraint from a normal distribution. For certain risk measures that satistfy an additional property known as comonotinicity, it is known that this optimization problem can be casted as the maximum weighted independent set problem (MWIS) on a polymathic.
 
 % the remainder of the paper is organized as follows.
+\todo{The remainder of this work is organized as follows.}
 
 \section{Preliminaries}
 
@@ -310,10 +312,6 @@ At every iteration, this algorithm will always hit case 1 or case 2, where $back
 \begin{proof}
   \todo{need proof}
 \end{proof}
-\begin{lem}
-  CVaR can be computed by solving the following optimization problem $\min_{Q \in \mathcal{Q}} \mathbb{E}_Q[X]$, where $\mathcal{Q} = \left\{Q \in \Delta^\Omega \mid Q(\omega) < \frac{1}{1-\alpha} P(\omega)\right\}$.
-\end{lem}
-\proof{Theorem 4.52 in~\cite{Follmer2016}, note we consider rewards \todo{make sure this is correct \eqref{eq:correspondence_coherent_risk}}.}
 
 
 
@@ -326,10 +324,10 @@ Our first contribution is an algorithm for solving the maximum weight Independen
 Assume for $P_f$ that $f(U)$ is such that for all $S_i, S_{ i+1 } \cup E$ where $S_i \cup (i + 1) = S_{ i+1 } $ and $f(S_{ i+1 }) < f(E)$, $f(S_i) + f({i + 1}) = f(S_{ i+1 })$.
 \end{assumption}
 We note this assumption essentially state that the submodular function must be a piecewise linear function. 
-\begin{algorithm}
+\begin{algorithm} 
     \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
     \algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
-  \caption{No sort Maximum Weighted Independent Set}
+  \caption{No sort Maximum Weighted Independent Set}\label{alg:maximum-weight-independent}
  \begin{algorithmic}[1]
      \Require{}
      \Ensure{}
@@ -356,18 +354,19 @@ We note this assumption essentially state that the submodular function must be a
 \end{algorithm}
 The proof for this algorithm is simple and shows that the output is equal to that of Algorithm 4 (the standard greedy algorithm), which has already been shown to be both feasible and optimal.
 \begin{lem}
-Algorithm 2 returns a feasible and optimal solution to the maximum-weight-independent set for polymatroids.
+  \cref{alg:maximum-weight-independent} returns a optimal solution \todo{optimal for what optimization?} to the maximum-weight-independent set for polymatroids.
 \end{lem}
 \begin{proof}
-The optimal solution will always be $f(S_i) - f(S_{i-1})$ assuming the weight $c_i \geq 0$. Our solution is $f(i)$ for $f(S_i) < f(N)$, and by Assumption 1 this equals $f(S_i) - f(S_{i - 1})$. If $f(S_i) = f(N)$ and $f(S_{i - 1}) = f(N)$, then $x_i = 0$ by the algorithm.
+  \todo{This doesnt follow from Algorithm \ref{alg:maximum-weight-independent}}
+  \textcolor{blue}{The optimal solution will always be $f(S_i) - f(S_{i-1})$ assuming the weight $c_i \geq 0$}. Therefore choose $f(i)$ for $f(S_i) < f(N)$, and by \todo{what is Assumption 1? link?}\textcolor{blue}{Assumption 1} this equals $f(S_i) - f(S_{i - 1})$. If $f(S_i) = f(N)$ and $f(S_{i - 1}) = f(N)$, then $x_i = 0$ by the algorithm.
 \end{proof}
 
 \begin{lem}
-Algorithm 2 run with expected complexity $\mathcal{O}(N * f(i))$ for all $i$ in set $S$.
+  \cref{alg:maximum-weight-independent} run with expected complexity $\mathcal{O}(N * f(i))$ for all $i$ in set $S$.
 \end{lem}
 
 \subsection{CVaR}
-As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk (CVaR) is a convex risk measure that generalizes the Value-at-Risk (VaR) and can be defined as
+As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk (CVaR) is a convex risk measure that generalizes Value-at-Risk (VaR) and can be defined as
 \begin{equation} \label{eq:primal_cvar}
   \begin{aligned}
     \cvaro_\alpha(\tilde{x})
@@ -382,8 +381,9 @@ As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk 
 Here, $\bm{1}$ is a vector of ones of an appropriate dimension. 
 
 \begin{lem}
-  For $\omega \in \Omega$ we can construct a feasible $Q \in \mathcal{Q}$ such that $Q(\omega) = \min\left\{\frac{P(\omega)}{1-a}, 1\right\}$.
+For $\omega \in \Omega$ we can construct a feasible\todo{what does feasible mean?} $Q \in \mathcal{Q}$ such that $Q(\omega) = \min\left\{\frac{P(\omega)}{1-a}, 1\right\}$.
 \end{lem}
+\todo{why does $\alpha$ show up in the proof but not the statement?}
 \begin{proof}
   Two possible scenarios exist.
 \item[Case 1]: $P(A) \geq 1 - \alpha$. In this scenario, $Q(A)$ must equal 1 since $\frac{1}{1 - \alpha} P(A) > 1 $. Thus, every element in $A$ should be scaled by $\frac{1}{P(A)}$ if in $A$ and set to 0 otherwise. Since  $P(A) \geq 1 - \alpha$, we can imply the reciprocal $\frac{1}{P(A)} \leq \frac{1}{1-\alpha}$ is also true.  
@@ -391,19 +391,28 @@ Here, $\bm{1}$ is a vector of ones of an appropriate dimension.
 
 \end{proof}
 \begin{lem}
+  $Q(\omega) = \min\left\{\frac{P(\omega)}{1-a}, 1\right\}$ is a submodular function that satisfies Assumption
+  1\todo{what is assumption 1?}.
+\end{lem}
+\begin{proof}
+The left hand side of the minimum function will be a summation that has all positive values for admissible $\alpha$. Thus this is equivalent to the budget additive function, which has proven to be a submodular function in the literature (must find citation that aren't lecture notes).
+
+Unless adding a new element $S_i$ will make the value of the submodular function 1, $f(S_i) + f({i + 1}) = f(S_{ i+1 })$ by definition. Since $f(S_i)$
 
   \end{lem}
 
-\subsection{EVaR}
 
-\begin{algorithm}
-  \begin{algorithmic}
-%{Input: vector $x$, pmf $p$ solution for CVar and maximum divergence \beta}
-\State{Define vector $p'$ such that every element $p'_i = \frac{1}{\sum_{j} p_j} * p_i$ }
-\State{If $\sum_{i=1}p'_i\phi(p'_i/q_i) \leq \epsilon$, this is the solution}
-\State{ }
-\end{algorithmic}
-\end{algorithm}
+
+%\subsection{EVaR}
+
+%\begin{algorithm}
+ % \begin{algorithmic}
+%{Input: vector $x$, pmf $p$ solution for %CVar and maximum divergence \beta}
+%\State{Define vector $p'$ such that every element $p'_i = \frac{1}{\sum_{j} p_j} * p_i$ }
+%\State{If $\sum_{i=1}p'_i\phi(p'_i/q_i) \leq \epsilon$, this is the solution}
+%\State{ }
+%\end{algorithmic}
+%\end{algorithm}
 
 
 \subsection{TVaR}
@@ -429,11 +438,7 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1
   \end{algorithmic}
 \end{algorithm}
 
-
-\section{To Be Sorted}
-
-
-\section{Algorithm}
+\section{Algorithms}
 
 \subsection{Piece-wise Linear Minimization}
 \maeve{Incorporate projection.jl }
@@ -609,38 +614,28 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1
 \end{algorithmic}
 \end{algorithm}
 
-\section{Comonotonicity of Risk}
-
-\begin{definition}
-  Two random variables $\tilde{x}$ and $\tilde{y}$ are said to be comonotonic if
-  \begin{align*}
-    (\tilde{x}(\omega) - \tilde{x}(\omega'))(\tilde{y}(\omega) - \tilde{y}(\omega')) \geq 0 \quad \forall \; \omega, \omega' \in \Omega.
-  \end{align*}
-\end{definition}
-\begin{definition}
-  A risk measure is said to be comonotonic if given comonotonic random variables $\tilde{x}$ and $\tilde{y}$
-  \begin{align*}
-    \rho(\tilde{x} + \tilde{y}) = \rho(\tilde{x}) + \rho(\tilde{y}).
-  \end{align*}
-\end{definition}
 
 
-\begin{table}[htbp]
-\begin{tabular}{lll}
-  \textbf{Risk Measure} &  \textbf{Comonotone?} & \\
-  CVaR &  Yes & \\
-  VaR &   Yes & \\
-  TVaR &  Yes & \\
-  EVaR &  No & \\
-  Expectile & No &
-\end{tabular}
-\end{table}
 
 \section{Experiments}
-\gersi{Find better plots to explain the story above, maybe also include the comonotonic plots?}
 
 To evaluate the algorithms developed in \cref{alg:quick_cvar} and \cref{alg:quick_quantile} we numerically validate that they are correct, 
-and compare their speedup against their standard sorting-based counterparts. 
+and compare their speedup against their cannonical sorting-based counterparts. For the numerical results we refer to the
+cannonical implementations as their un-altered risk measure name, and for the "quick" no-sort implementations we append
+the "Q" prefix.
+
+Numerical experiments are conducted using 10 random seed values and are rendered on plots with 95\% confidence interval
+band. Note these bands are tight due to the little variance in the measured runtimes. Code and results for these experiments as well
+as the implementations of all contained risk measures can be found at \todo{REDACTED}.
+
+We observe an approximately log speedup in the runtime of the quick algorithms which is consistent with the theoretical complexity of the algorithms.
+This log speedup coincides with a noticeable speedup in the runtime of the algorithms as the size of the random variable increases. 
+We present our results in \cref{fig:all_sparse} and \cref{fig:all_uniform} for the sparse and uniform random variables respectively. 
+For the ease of the reader to note multiplicative decreases in runtime, we present the results in both linear and log scale.
+
+Demonstrating the speedup of the quick algorithms over their sorting based counterparts, we observe that the quick algorithms are significantly faster than their sorting based counterparts. 
+Especially in the case of CVaR and VaR which are extensively used in the industries aformentioned in \cref{sec:intro}.
+
 
 \begin{figure}[htbp]
   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_linear.pdf}
@@ -661,14 +656,17 @@ and compare their speedup against their standard sorting-based counterparts.
 %   \label{fig:tvar_vs_qtvar_linear}
 % \end{figure}
 
+\section{Conclusion}
+
+We have formulated and demonstrated the correctness of a new algorithm for computing the maximum weight independent set for polymatroids without sorting.
+Which allowed us to solve many common risk measures such as CVaR, VaR, and TVaR in $O(N)$ time.
+This speedup is significant in the context of risk measures as they are often used in large scale applications such as finance, healthcare and robotics.
+
+This work was partly supported by \todo{who supported us? Thank you Marek ;)}
+
 \bibliography{fastcvar.bib}
 
 \appendix
-\todo{
-  \begin{itemize}
-    \item check formatting for neurips, no more than 9 pages
-  \end{itemize}
-}
 
 \section{No-sort Polymatroid}
 
@@ -708,6 +706,32 @@ Algorithm 1 returns a feasible and optimal solution to the maximum weight indepe
 \begin{proof}
 The optimal solution will always be $f(S_i) - f(S_{i-1})$ assuming the weight $c_i \geq 0$. Our solution is $f(i)$ for $f(S_i) < f(N)$, and by assumption 1 this equals $f(S_i) - f(S_{i - 1})$. If $f(S_i) = f(N)$ and $f(S_{i - 1}) = f(N)$, then $x_i = 0$ by the algorithm.
 \end{proof}
+
+\section{Comonotonicity of Risk}
+
+\begin{definition}
+  Two random variables $\tilde{x}$ and $\tilde{y}$ are said to be comonotonic if
+  \begin{align*}
+    (\tilde{x}(\omega) - \tilde{x}(\omega'))(\tilde{y}(\omega) - \tilde{y}(\omega')) \geq 0 \quad \forall \; \omega, \omega' \in \Omega.
+  \end{align*}
+\end{definition}
+\begin{definition}
+  A risk measure is said to be comonotonic if given comonotonic random variables $\tilde{x}$ and $\tilde{y}$
+  \begin{align*}
+    \rho(\tilde{x} + \tilde{y}) = \rho(\tilde{x}) + \rho(\tilde{y}).
+  \end{align*}
+\end{definition}
+
+\begin{table}[htbp]
+\begin{tabular}{lll}
+  \textbf{Risk Measure} &  \textbf{Comonotone?} & \\
+  CVaR &  Yes & \\
+  VaR &   Yes & \\
+  TVaR &  Yes & \\
+  EVaR &  No & \\
+  Expectile & No &
+\end{tabular}
+\end{table}
 
 \end{document}
 

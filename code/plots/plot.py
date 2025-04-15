@@ -29,7 +29,7 @@ class Plotter(object):
         # set font size
         plt.rcParams["font.size"] = 18
         # set the figure size
-        plt.rcParams["figure.figsize"] = (8, 5.2)
+        plt.rcParams["figure.figsize"] = (8.2, 5.2)
 
     def compute_cis_means(self) -> dict[str, Tuple[float, float]]:
         """

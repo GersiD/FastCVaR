@@ -257,7 +257,7 @@ In this section, we describe a linear time algorithm for VaR.
     \EndIf{}
     \State $k \gets k + 1$
     \EndWhile{}
-    \State{\Return{$x^k_{f_k}$}}
+    \State{\Return{$x^k_{b_k})$}}
   \end{algorithmic}
 \end{algorithm}
 
@@ -297,21 +297,29 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
 
 \begin{lem}
 \Cref{alg:quick_quantile} computes $\quant^+$.
- Loop Invariant: Before and after every iteration $\quant^+$ will remain in the array $x$ at an index $i$ such that $ front \leq i \leq back $.
+ Loop Invariant: Before and after every iteration $\quant^+$ will remain in the array $x$ at an index $i$ such that $ f_k \leq i \leq b_k $ or if $f_k > b_k$ , then $\quant^+ = b_k$.
 \begin{proof}
-During the first loop: Every element in $x$ has an index $i$ such that $ front \leq i \leq back $, where $front=1$ and $back=n$. By Lemma 1, there exists an element with index $i$ such that $ front \leq i \leq n $.
+During the first loop: Every element in $x$ has an index $i$ such that $ front \leq i \leq back $, where $front=1$ and $back=n$. By Lemma 1, there exists an element with index $i$ such that $\quant^+ = x[i] $.
  
-During the loop: There are three possible scenarios at each iteration:
+During the loop: There are five possible scenarios at each iteration:
  
-\item[Case 1]: The tail is selected such that $\alpha < tail$. In this case $back$ is set to $ind$. Assume there exists $\tau\opt $ such that $\tau\opt \geq x[ind]$, and $x[\tau\opt]=\quant^+$. Then $P[x < x[\tau\opt]] \geq tail > \alpha$, which means that $x[\tau\opt]$ is not feasible with \eqref{eq:var-definition}. %However, if $\tau\opt $ such that $\tau\opt \leq ind$ , then $P[x < x[\tau\opt]]  < tail > \alpha$, meaning that $x[\tau\opt]$ is potentially feasible by \eqref{eq:var-definition}, so by Lemma 1 $\quant^+$ must remain in this range.% 
- Since from Lemma 1 we know that $\quant^+$ must be in $x$, the loop invariant must hold.
+\item[Case 1]: The tail is selected such that $\alpha < t_k$. In this case $b_k$ is set to $i_k$ such that $b_k > f_k$. Assume there exists $\tau\opt $ such that $\tau\opt > x[i_k]$, and $x[\tau\opt]=\quant^+$. Then $P[x < x[\tau\opt]] \geq t_k > \alpha$, which means that $x[\tau\opt]$ is not feasible with \eqref{eq:var-definition}.
 
-\item[Case 2]: Tail is selected such that $\alpha > tail$. In this case $front$ is set to $ind + 1$. Assume there exists $\tau\opt $ such that $\tau\opt \leq x[ind] $, and $x[\tau\opt]=\quant^+$. Let $\tau' = ind$. $P[x < x[\tau']] \leq tail < \alpha$. If $x[\tau\opt] <  x[\tau']$ then $x[\tau\opt]$ can not be optimal by \eqref{eq:var-definition}. If $x[\tau\opt] =  x[\tau']$, then from the partitioning scheme we this is the optimal $\quant^+$ since 
- 
- \item[Case 3]: $front - back = 0$,
- implying two scenarios: if $x$ contains more than one element, all the elements are no longer in the range $[front, back]$ could not have been $\quant_{\alpha}^+(\tilde{x})$ (see Case 1 and Case 2), and $\quant_{\alpha}^+(\tilde{x})$ must exist in x per lemma 1. Therefore, this element that will be returned is $\quant_{\alpha}^+(\tilde{x})$.  If $x$ had one element to begin with, $\quant_{\alpha}^+(\tilde{x})$ equals this element for all admissible alpha. 
 
-At every iteration, this algorithm will always hit case 1 or case 2, where $back - front \geq 1$. If $\alpha < tail$, $back$ will always decrease, assuming that it is within range $(front, back$. If $\alpha \geq tail$, then  $back - front$ will not decrease if $ind = front$. However, in this case the elements at $front$ and $back$ will have been swapped in the partition scheme, such that at the next iteration, $ind$ will not be equal to $front$ (as the pivot selected will now no longer be the smallest element in the list). 
+ \item[Case 2]: The tail is selected such that $\alpha < t_k$. In this case $b_k$ is set to $i_k$ such that $b_k = f_k$. Assume there exists $\tau\opt $ such that $\tau\opt > x[i_k]$, and $x[\tau\opt]=\quant^+$. Then $P[x < x[\tau\opt]] \geq t_k > \alpha$, which means that $x[\tau\opt]$ is not feasible with \eqref{eq:var-definition}. The algorithm terminates after this iteration.
+
+
+\item[Case 3]: Tail is selected such that $\alpha \geq t_k$. In this case $f_k$ is set to $i_k + 1$ such that $f_k < b_k$ . Assume there exists $\tau\opt $ such that $\tau\opt \leq x[i_k] $, and $x[\tau\opt]=\quant^+$. Let $\tau' = i_k$. $P[x < x[\tau']] \leq tail < \alpha$. If $x[\tau\opt] <  x[\tau']$ then $x[\tau\opt]$ can not be optimal by \eqref{eq:var-definition}.Thus, $\quant_{\alpha}^+(\tilde{x}) \geq x^f_{i_k} $ and $\quant_{\alpha}^+(\tilde{x}) \leq x^b_{i_k}$ and loop invariant is satisfied. 
+ 
+ \item[Case 4]: Tail is selected such that $\alpha \geq t_k$. In this case assume $f_k$ is set to $ind + 1$ such that $f_k = b_k$ . 
+ All the elements are no longer in the range $[front, back]$ could not have been $\quant_{\alpha}^+(\tilde{x})$ (see Case 1 and Case 2), and $\quant_{\alpha}^+(\tilde{x})$ must exist in x per lemma 1. Thus, $\quant_{\alpha}^+(\tilde{x}) = b_k$ and loop invariant is satisfied. The algorithm terminates at this condition. 
+
+  \item[Case 5]: Tail is selected such that $\alpha \geq t_k$. In this case assume that $f_k$ is set to $i_k + 1$ such that $f_k > b_k$ . 
+ Thus $b_k = i_k$. From case 1, we know any $\tau\opt $ larger than $b_k$ is not feasible and since $b_k = i_k$, $P[x < x[b_k]] \leq \alpha$. Since all feasible elements are $\leq b_k$, $b_k$ is optimal by \eqref{eq:var-definition}. 
+
+
+
+
  \end{proof}
  \end{lem}
 \begin{lem}
@@ -319,7 +327,7 @@ At every iteration, this algorithm will always hit case 1 or case 2, where $back
   where $N$ is the number of elements in $\tilde{x}$.
 \end{lem}
 \begin{proof}
-  \todo{need proof}
+  From \todo{insert citation here}, the time complexity for the while loop with the Dutch partition scheme is $O(n)$ in the expected case. Since line 4 will at most take as many steps as a single call to the partition function, and the remaining lines in each iteration of the while loop take constant time, the overall complexity remains unchanged. 
 \end{proof}
 
 

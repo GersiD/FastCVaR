@@ -227,8 +227,8 @@ Conventional algorithms such as \cref{alg:greedy-polymatroid} solve \eqref{eq:po
 
 \section{Fast Algorithm for VaR}
 
-\begin{assumption}
-  The dutch partition scheme $i_k, x^k, p^k \gets \operatorname{partition}(x^{k-1}, p^{k-1}, f_{k-1}, b_{k-1})$ does the following:
+\begin{lemma}
+The Hoare's partition scheme $i_k, x^k, p^k \gets \operatorname{partition}(x^{k-1}, p^{k-1}, f_{k-1}, b_{k-1})$ does the following:
   \begin{enumerate}
   \item $j \le i_k \Rightarrow x^k_j \le x^k_{i_k}$
   \item $j > i_k \Rightarrow x^k_j > x^k_{i_k}$
@@ -236,7 +236,7 @@ Conventional algorithms such as \cref{alg:greedy-polymatroid} solve \eqref{eq:po
   \item the algorithm runs in time linear (if mean of means pivot scheme) in $b_k - f_k$
   \end{enumerate}
   Note that only the elements  $x^k_j$ for $j = f_k, \dots, b_k$ which makes it possible to achieve the desired time complexity.
-\end{assumption}
+\end{lemma}
 
 In this section, we describe a linear time algorithm for VaR.
 \begin{algorithm}
@@ -248,7 +248,7 @@ In this section, we describe a linear time algorithm for VaR.
     \Require{} \Ensure{}
     \State{$f_0 \gets 1$, $b_0 \gets n$, $x^0 = x$, $p^0 = p$, $k=1$, $\alpha_0 = \alpha$ } \Comment{Init front $f_0$ and back $b_0$}
     \While{$b_k - f_k \geq 1$}
-      \State{$i_k, x^k, p^k \gets \operatorname{partition}(x^{k-1}, p^{k-1}, f_{k-1}, b_{k-1})$  \Comment{Dutch partition scheme}}
+      \State{$i_k, x^k, p^k \gets \operatorname{hoare\_partition}(x^{k-1}, p^{k-1}, f_{k-1}, b_{k-1})$} %\Comment{Hoares partition scheme}}
     \State{$t_k \gets \sum_{j=f_{k-1}}^{i_k} p^k_j$}
       \If{$\alpha_k < t_k$}
       \State{$b_k \gets i_k$, $\alpha_k \gets \alpha_{k-1}$}
@@ -257,7 +257,7 @@ In this section, we describe a linear time algorithm for VaR.
     \EndIf{}
     \State $k \gets k + 1$
     \EndWhile{}
-    \State{\Return{$x^k_{b_k})$}}
+    \State{\Return{$x^k_{b_k}$}}
   \end{algorithmic}
 \end{algorithm}
 
@@ -269,6 +269,8 @@ In this section, we describe a linear time algorithm for VaR.
 Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite $\Omega$. Then, there exist $\omega_1, \omega_2\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_1)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_2)$ for each $\alpha\in (0,1)$.
 \end{lem}
 \begin{proof}
+
+  \mm{define feasible}
 Recall the definition:
  \[
   \quant_{\alpha}^+(\tilde{x})
@@ -462,7 +464,7 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1
 \subsection{Quick CVaR}
 
 \begin{algorithm}
-  \floatname{algorithm}{Quick CVaR}
+  %\floatname{algorithm}{Quick CVaR}
   \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ with probability mass function p and $\alpha \in [0,1]$}}
   \algrenewcommand\algorithmicensure{\textbf{Output: $CVaR_\alpha(\tilde{X})$}}
   \caption{}\label{alg:quick_cvar}
@@ -486,10 +488,9 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1
 \end{algorithm}
 
 \begin{algorithm}
-\floatname{algorithm}{Partition}
 \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ with probability mass function p and $f, b \in \Real$}}
 \algrenewcommand\algorithmicensure{\textbf{Output: pivot index $i \in \Real$}}
-\caption{}\label{alg:partition}
+\caption{Hoare's partition scheme}label{alg:partition}
   \begin{algorithmic}[1]
     \Require{}
     \Ensure{} 

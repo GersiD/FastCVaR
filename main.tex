@@ -215,7 +215,7 @@ This polytope is of special interest for computing risk measures, as we will see
 \begin{theorem}[Corollary 4.95 in~\cite{Follmer2016}]
   For any coherent and comonotonic risk measure $\rho\colon \mathbb{X}\to \Real$, let $c:= \rho(\one_{\mathcal{A}})$ for each $\mathcal{A} \subseteq \Omega$. Then
   \[
-   \rho(\tilde{x}) = \sup_{q\in _c} q\tr  x.
+   \rho(\tilde{x}) = \sup_{q\in \mm{??}} q\tr  x.
   \]
 \end{theorem}
 
@@ -537,34 +537,30 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1
 
 \section{Experiments}
 
-To evaluate the algorithms developed in \cref{alg:quick_cvar} and \cref{alg:quick_quantile} we numerically validate that they are correct, 
-and compare their speedup against their cannonical sorting-based counterparts. For the numerical results we refer to the
-cannonical implementations as their un-altered risk measure name, and for the "quick" no-sort implementations we append
-the "Q" prefix.
+To evaluate the algorithms developed in \cref{alg:quick_cvar} and \cref{alg:quick_quantile} we numerically compare their speedup against their cannonical sorting-based counterparts. \mm{this sentence should be in a separate para along with algo descriptions} For the numerical results we refer to the cannonical implementations as their un-altered risk measure name, and for the no-sort implementations we append the ``Q'' prefix.
 
-Numerical experiments are conducted using 10 random seed values and are rendered on plots with 95\% confidence interval
-band. Note these bands are tight due to the little variance in the measured runtimes. Code and results for these experiments as well
-as the implementations of all contained risk measures can be found at \todo{REDACTED}.
+\mm{What are we testing this on? What is the random variable?}
 
-We observe an approximately log speedup in the runtime of the quick algorithms which is consistent with the theoretical complexity of the algorithms.
-This log speedup coincides with a noticeable speedup in the runtime of the algorithms as the size of the random variable increases. 
-We present our results in \cref{fig:all_sparse} and \cref{fig:all_uniform} for the sparse and uniform random variables respectively. 
-For the ease of the reader to note multiplicative decreases in runtime, we present the results in both linear and log scale.
+\mm{Can we justify why these results would be representative of something meaningful.}
 
-Demonstrating the speedup of the quick algorithms over their sorting based counterparts, we observe that the quick algorithms are significantly faster than their sorting based counterparts. 
-Especially in the case of CVaR and VaR which are extensively used in the industries aformentioned in \cref{sec:intro}.
+\mm{should be a part of the description of the figures} Numerical experiments are conducted using values and are rendered on plots with 95\% confidence interval band. Note these bands are tight due to the little variance in the measured runtimes. Code and results for these experiments as well as the implementations of all contained risk measures can be found at \todo{REDACTED}.
 
+We present our results in \cref{fig:all_sparse} and \cref{fig:all_uniform} for the sparse and uniform random variables respectively. The results show approximately log speedup in the runtime of the quick algorithms which is consistent with the theoretical complexity of the algorithms. This log speedup coincides with a noticeable speedup in the runtime of the algorithms as the size of the random variable increases. For the ease of the reader to note multiplicative decreases in runtime, we present the results in both linear and log scale.
+
+\mm{have a separate paragraph interpreting the results.}
+
+Demonstrating the speedup of the quick algorithms over their sorting based counterparts, we observe that the quick algorithms are significantly faster than their sorting based counterparts. Especially in the case of CVaR and VaR which are extensively used in the industries aformentioned in \cref{sec:intro}.
 
 \begin{figure}[htbp]
   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_linear.pdf}
   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_log.pdf}
-  \caption{Time comparison between the standard implementation of sorting based algorithms and quickselect based ones such as \cref{alg:quick_cvar}. On the x-axis we have the size of the random variable, and on the y-axis we have the time in milliseconds. Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{sparse} random variable.}
+  \caption{\mm{make this shorter} Time comparison between the standard implementation of sorting based algorithms and quickselect based ones such as \cref{alg:quick_cvar}. On the x-axis we have the size of the random variable, and on the y-axis we have the time in milliseconds. Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{sparse} random variable.}
   \label{fig:all_sparse}
 \end{figure}
 \begin{figure}[htbp]
   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_uniform_linear.pdf}
   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_uniform_log.pdf}
-  \caption{Time comparison between the standard implementation of sorting based algorithms and quickselect based ones such as \cref{alg:quick_cvar}. On the x-axis we have the size of the random variable, and on the y-axis we have the time in milliseconds. Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{uniform} random variable.}
+  \caption{\mm{Make this shorter. } Time comparison between the standard implementation of sorting based algorithms and quickselect based ones such as \cref{alg:quick_cvar}. On the x-axis we have the size of the random variable, and on the y-axis we have the time in milliseconds. Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{uniform} random variable.}
   \label{fig:all_uniform}
 \end{figure}
 % \begin{figure}

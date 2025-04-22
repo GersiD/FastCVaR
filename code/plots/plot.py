@@ -77,7 +77,7 @@ def plot_one_slow_vs_fast(plotter: Plotter, slow: str, fast: str):
     plot_slow_vs_fast_data(plotter, slow, fast)
     plt.yscale('log')
     plt.xscale('log')
-    plt.xlabel('n')
+    plt.xlabel('Length of Random Variable')
     plt.ylabel('Time (ms)')
     plt.legend()
     plt.grid()
@@ -85,7 +85,7 @@ def plot_one_slow_vs_fast(plotter: Plotter, slow: str, fast: str):
     # plt.show()
     plt.clf()
     plot_slow_vs_fast_data(plotter, slow, fast)
-    plt.xlabel('n')
+    plt.xlabel('Length of Random Variable')
     plt.ylabel('Time (ms)')
     plt.legend()
     plt.grid()
@@ -103,7 +103,7 @@ def plot_all_slow_vs_fast(plotter: Plotter):
         plot_slow_vs_fast_data(plotter, slow, fast)
     plt.yscale('log')
     plt.xscale('log')
-    plt.xlabel('n')
+    plt.xlabel('Length of Random Variable')
     plt.ylabel('Time (ms)')
     plt.legend()
     plt.grid()
@@ -112,7 +112,7 @@ def plot_all_slow_vs_fast(plotter: Plotter):
     plt.clf()
     for slow, fast in zip(plotter.slow_cols, plotter.fast_cols):
         plot_slow_vs_fast_data(plotter, slow, fast)
-    plt.xlabel('n')
+    plt.xlabel('Length of Random Variable')
     plt.ylabel('Time (ms)')
     plt.legend()
     plt.grid()
@@ -145,7 +145,7 @@ def plot_cvar_div_qcvar(plotter: Plotter):
     plt.plot(unique_sizes, np.array(cvar_means)/np.array(qcvar_means), label='CVaR/QCVaR', marker="*") # pyright: ignore[reportArgumentType]
     plt.fill_between(unique_sizes, np.array(cvar_means)/np.array(qcvar_means) - np.array(cvar_cis)/np.array(qcvar_means), np.array(cvar_means)/np.array(qcvar_means) + np.array(cvar_cis)/np.array(qcvar_means), alpha=0.2)# pyright: ignore[reportArgumentType]
     plt.plot(unique_sizes, np.exp(model.predict(X)), label='y = {:.2f} * log(n)'.format(model.coef_[0]), marker="o")# pyright: ignore[reportArgumentType]
-    plt.xlabel('n')
+    plt.xlabel('Length of Random Variable')
     plt.ylabel('CVaR/QCVaR')
     plt.legend()
     plt.savefig('./plots/cvar_div_qcvar.pdf')

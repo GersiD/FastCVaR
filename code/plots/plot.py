@@ -77,7 +77,7 @@ def plot_one_slow_vs_fast(plotter: Plotter, slow: str, fast: str):
     plot_slow_vs_fast_data(plotter, slow, fast)
     plt.yscale('log')
     plt.xscale('log')
-    plt.xlabel('Length of Random Variable')
+    plt.xlabel('Length of Random Variable (n)')
     plt.ylabel('Time (ms)')
     plt.legend()
     plt.grid()
@@ -85,7 +85,7 @@ def plot_one_slow_vs_fast(plotter: Plotter, slow: str, fast: str):
     # plt.show()
     plt.clf()
     plot_slow_vs_fast_data(plotter, slow, fast)
-    plt.xlabel('Length of Random Variable')
+    plt.xlabel('Length of Random Variable (n)')
     plt.ylabel('Time (ms)')
     plt.legend()
     plt.grid()
@@ -103,7 +103,7 @@ def plot_all_slow_vs_fast(plotter: Plotter):
         plot_slow_vs_fast_data(plotter, slow, fast)
     plt.yscale('log')
     plt.xscale('log')
-    plt.xlabel('Length of Random Variable')
+    plt.xlabel('Length of Random Variable (n)')
     plt.ylabel('Time (ms)')
     plt.legend()
     plt.grid()
@@ -112,7 +112,7 @@ def plot_all_slow_vs_fast(plotter: Plotter):
     plt.clf()
     for slow, fast in zip(plotter.slow_cols, plotter.fast_cols):
         plot_slow_vs_fast_data(plotter, slow, fast)
-    plt.xlabel('Length of Random Variable')
+    plt.xlabel('Length of Random Variable (n)')
     plt.ylabel('Time (ms)')
     plt.legend()
     plt.grid()
@@ -127,26 +127,23 @@ def plot_cvar_div_qcvar(plotter: Plotter):
     and save the plot in the plots folder.
     """
     unique_sizes = plotter.df['n'].unique()
-    cvar_cis = []
-    qcvar_cis = []
-    cvar_means = []
-    qcvar_means = []
+    plotter.df['cvar/qcvar'] = plotter.df['cvar'] / plotter.df['qcvar']
+    cvar_div_qcvar_cis = []
+    cvar_div_qcvar_means = []
     for size in unique_sizes:
-        df_size = df[df['n'] == size]
-        ci_cvar = 1.96 * (df_size['cvar'].std() / (np.sqrt(len(df_size['cvar'])) - 1))
-        ci_qcvar = 1.96 * (df_size['qcvar'].std() / (np.sqrt(len(df_size['qcvar'])) - 1))
-        cvar_cis.append(ci_cvar)
-        qcvar_cis.append(ci_qcvar)
-        cvar_means.append(df_size['cvar'].mean())
-        qcvar_means.append(df_size['qcvar'].mean())
+        df_size = plotter.df[plotter.df['n'] == size]
+        cvar_div_qcvar_ci = 1.96 * (df_size['cvar/qcvar'].std() / (np.sqrt(len(df_size['cvar/qcvar']))-1))
+        cvar_div_qcvar_cis.append(cvar_div_qcvar_ci)
+        cvar_div_qcvar_mean = df_size['cvar/qcvar'].mean()
+        cvar_div_qcvar_means.append(cvar_div_qcvar_mean)
     X = np.array(np.log(unique_sizes)).reshape(-1, 1)
-    Y = np.log(np.array(cvar_means)/np.array(qcvar_means))
+    Y = np.log(np.array(cvar_div_qcvar_means))
     model = LinearRegression(fit_intercept=False).fit(X, Y)
-    plt.plot(unique_sizes, np.array(cvar_means)/np.array(qcvar_means), label='CVaR/QCVaR', marker="*") # pyright: ignore[reportArgumentType]
-    plt.fill_between(unique_sizes, np.array(cvar_means)/np.array(qcvar_means) - np.array(cvar_cis)/np.array(qcvar_means), np.array(cvar_means)/np.array(qcvar_means) + np.array(cvar_cis)/np.array(qcvar_means), alpha=0.2)# pyright: ignore[reportArgumentType]
-    plt.plot(unique_sizes, np.exp(model.predict(X)), label='y = {:.2f} * log(n)'.format(model.coef_[0]), marker="o")# pyright: ignore[reportArgumentType]
-    plt.xlabel('Length of Random Variable')
-    plt.ylabel('CVaR/QCVaR')
+    plt.plot(unique_sizes, np.array(cvar_div_qcvar_means), label='Time CVaR / Time QCVaR') # pyright: ignore[reportArgumentType]
+    plt.fill_between(unique_sizes, np.array(cvar_div_qcvar_means) - np.array(cvar_div_qcvar_cis), np.array(cvar_div_qcvar_means) + np.array(cvar_div_qcvar_cis), alpha=0.2)# pyright: ignore[reportArgumentType]
+    plt.plot(unique_sizes, np.exp(model.predict(X)), label='y = {:.2f} * log(n)'.format(model.coef_[0]))# pyright: ignore[reportArgumentType]
+    plt.xlabel('Length of Random Variable (n)')
+    plt.ylabel('Time (ms)')
     plt.legend()
     plt.savefig('./plots/cvar_div_qcvar.pdf')
     # plt.show()
@@ -172,3 +169,7 @@ if __name__ == "__main__":
         df = pd.read_csv(csv_file)
         plotter = Plotter(csv_file, df, slow, fast, col2Name, col2Marker, dist)
         plot_all_slow_vs_fast(plotter)
+    csv_file = "./plots/cvar_vs_qcvar_for_log_fit.csv"
+    df = pd.read_csv(csv_file)
+    plotter = Plotter(csv_file, df, ["cvar"], ["qcvar"], col2Name, col2Marker, "")
+    plot_cvar_div_qcvar(plotter)

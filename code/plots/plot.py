@@ -29,7 +29,7 @@ class Plotter(object):
         # set font size
         plt.rcParams["font.size"] = 18
         # set the figure size
-        plt.rcParams["figure.figsize"] = (8.3, 5.2)
+        plt.rcParams["figure.figsize"] = (8.3, 6.0)
 
     def compute_cis_means(self) -> dict[str, Tuple[float, float]]:
         """
@@ -149,7 +149,7 @@ def plot_cvar_div_qcvar(plotter: Plotter):
     plt.ylabel('CVaR/QCVaR')
     plt.legend()
     plt.savefig('./plots/cvar_div_qcvar.pdf')
-    plt.show()
+    # plt.show()
     plt.clf()
 
 if __name__ == "__main__":
@@ -172,4 +172,3 @@ if __name__ == "__main__":
         df = pd.read_csv(csv_file)
         plotter = Plotter(csv_file, df, slow, fast, col2Name, col2Marker, dist)
         plot_all_slow_vs_fast(plotter)
-        plot_cvar_div_qcvar(plotter)

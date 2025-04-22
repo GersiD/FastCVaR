@@ -199,7 +199,7 @@ The primal formulation is
 
 \paragraph{Polymatroids}
 
-Let $\mathcal{E}$ be a finite set, and $f : \{\mathcal{X} \mid \mathcal{X} \subseteq \mathcal{E} \} \to \Real_+$ a nondecreasing submodular function. That is, for each $\mathcal{A} \subseteq \mathcal{B} \subseteq \mathcal{E}$ we have $f(\mathcal{A}) \leq f(\mathcal{B})$, and for each $\mathcal{A}, \mathcal{B} \subseteq \mathcal{E}$ we have 
+Let $\mathcal{E}$ be a finite set, and $f : \{\mathcal{X} \mid \mathcal{X} \subseteq \mathcal{E} \} \to \Real_+$ be a non-decreasing submodular function. That is, for each $\mathcal{A} \subseteq \mathcal{B} \subseteq \mathcal{E}$ we have $f(\mathcal{A}) \leq f(\mathcal{B})$, and for each $\mathcal{A}, \mathcal{B} \subseteq \mathcal{E}$ we have 
 \[
 f(\mathcal{A}) + f(\mathcal{B}) \geq f(\mathcal{A} \cup \mathcal{B}) + f(\mathcal{A} \cap \mathcal{B}).
 \]
@@ -219,14 +219,14 @@ This polytope is of special interest for computing risk measures, as we will see
   \]
 \end{theorem}
 
-Conventional algorithms such as \cref{alg:greedy-polymatroid} solve \eqref{eq:polytope} through a greedy approach which requires sorting. We will show in \todo{reference section} that for a special class of submodular functions $f$, sorting is not necessary.
+Conventional algorithms such as \cref{alg:greedy-polymatroid} solve \eqref{eq:polytope} using a greedy approach that requires sorting. We will show in \todo{reference section} that for a special class of submodular functions $f$, sorting is not necessary.
 
 \paragraph{Other work}
 
 \cite{adam2019projectionscanonicalsimplexadditional}
 
 \section{Fast Algorithm for VaR}
-
+In this section, we develop a quick algorithm to compute the VaR of a random variable according to definition 1. The algorithm is based on the well-known quickselect algorithm, and uses the Hoare partition scheme. We first restate some well-known properties of the Hoare Partition scheme.
 \begin{lemma}
 The Hoare's partition scheme $i_k, x^k, p^k \gets \operatorname{partition}(x^{k-1}, p^{k-1}, f_{k-1}, b_{k-1})$ does the following:
   \begin{enumerate}
@@ -237,8 +237,8 @@ The Hoare's partition scheme $i_k, x^k, p^k \gets \operatorname{partition}(x^{k-
   \end{enumerate}
   Note that only the elements  $x^k_j$ for $j = f_k, \dots, b_k$ which makes it possible to achieve the desired time complexity.
 \end{lemma}
-
-In this section, we describe a linear time algorithm for VaR.
+The above conditions primarily state that each partition performs partial sorting such that all elements less than the pivot
+Below is the full algorithm, 
 \begin{algorithm}
   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and $\alpha \in [0,1]$}}
   \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
@@ -261,9 +261,7 @@ In this section, we describe a linear time algorithm for VaR.
   \end{algorithmic}
 \end{algorithm}
 
-\begin{thm}
-\cref{alg:quick_cvar} is correct and runs in linear time.
-\end{thm}
+In order to prove that the algorithm is optimal, we first show that $\quant_{\alpha}^-(\tilde{x})$ exists inside 
 
 \begin{lem}
 Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite $\Omega$. Then, there exist $\omega_1, \omega_2\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_1)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_2)$ for each $\alpha\in (0,1)$.
@@ -400,9 +398,9 @@ As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk 
 Here, $\bm{1}$ is a vector of ones of an appropriate dimension. 
 
 \begin{lem}
-For $\omega \in \Omega$ we can construct a feasible\todo{what does feasible mean?} $Q \in \mathcal{Q}$ such that $Q(\omega) = \min\left\{\frac{P(\omega)}{1-a}, 1\right\}$.
+For $\omega \in \Omega$ we can construct a feasible\todo{what does feasible mean?} $Q \in \mathcal{Q}$ such that $Q(\omega) = \min\left\{\frac{P(\omega)}{1-\alpha}, 1\right\}$.
 \end{lem}
-\todo{why does $\alpha$ show up in the proof but not the statement?}
+
 \begin{proof}
   Two possible scenarios exist.
 \item[Case 1]: $P(A) \geq 1 - \alpha$. In this scenario, $Q(A)$ must equal 1 since $\frac{1}{1 - \alpha} P(A) > 1 $. Thus, every element in $A$ should be scaled by $\frac{1}{P(A)}$ if in $A$ and set to 0 otherwise. Since  $P(A) \geq 1 - \alpha$, we can imply the reciprocal $\frac{1}{P(A)} \leq \frac{1}{1-\alpha}$ is also true.  
@@ -411,7 +409,7 @@ For $\omega \in \Omega$ we can construct a feasible\todo{what does feasible mean
 \end{proof}
 \begin{lem}
   $Q(\omega) = \min\left\{\frac{P(\omega)}{1-a}, 1\right\}$ is a submodular function that satisfies Assumption
-  1\todo{what is assumption 1?}.
+  4.1
 \end{lem}
 \begin{proof}
 The left hand side of the minimum function will be a summation that has all positive values for admissible $\alpha$. Thus this is equivalent to the budget additive function, which has proven to be a submodular function in the literature (must find citation that aren't lecture notes).

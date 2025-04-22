@@ -44,8 +44,8 @@ class Plotter(object):
             means_fast = []
             for size in unique_sizes:
                 df_size = df[df['n'] == size]
-                ci_slow = 1.96 * (df_size[slow_col].std() / np.sqrt(len(df_size[slow_col])))
-                ci_fast = 1.96 * (df_size[fast_col].std() / np.sqrt(len(df_size[fast_col])))
+                ci_slow = 1.96 * (df_size[slow_col].std() / (np.sqrt(len(df_size[slow_col]))-1))
+                ci_fast = 1.96 * (df_size[fast_col].std() / (np.sqrt(len(df_size[fast_col]))-1))
                 cis_slow.append(ci_slow)
                 cis_fast.append(ci_fast)
                 means_slow.append(df_size[slow_col].mean())
@@ -133,8 +133,8 @@ def plot_cvar_div_qcvar(plotter: Plotter):
     qcvar_means = []
     for size in unique_sizes:
         df_size = df[df['n'] == size]
-        ci_cvar = 1.96 * (df_size['cvar'].std() / np.sqrt(len(df_size['cvar'])) - 1)
-        ci_qcvar = 1.96 * (df_size['qcvar'].std() / np.sqrt(len(df_size['qcvar'])) - 1)
+        ci_cvar = 1.96 * (df_size['cvar'].std() / (np.sqrt(len(df_size['cvar'])) - 1))
+        ci_qcvar = 1.96 * (df_size['qcvar'].std() / (np.sqrt(len(df_size['qcvar'])) - 1))
         cvar_cis.append(ci_cvar)
         qcvar_cis.append(ci_qcvar)
         cvar_means.append(df_size['cvar'].mean())
@@ -142,14 +142,14 @@ def plot_cvar_div_qcvar(plotter: Plotter):
     X = np.array(np.log(unique_sizes)).reshape(-1, 1)
     Y = np.log(np.array(cvar_means)/np.array(qcvar_means))
     model = LinearRegression(fit_intercept=False).fit(X, Y)
-    plt.plot(unique_sizes, np.array(cvar_means)/np.array(qcvar_means), label='CVaR/QCVaR') # pyright: ignore[reportArgumentType]
+    plt.plot(unique_sizes, np.array(cvar_means)/np.array(qcvar_means), label='CVaR/QCVaR', marker="*") # pyright: ignore[reportArgumentType]
     plt.fill_between(unique_sizes, np.array(cvar_means)/np.array(qcvar_means) - np.array(cvar_cis)/np.array(qcvar_means), np.array(cvar_means)/np.array(qcvar_means) + np.array(cvar_cis)/np.array(qcvar_means), alpha=0.2)# pyright: ignore[reportArgumentType]
-    plt.plot(unique_sizes, np.exp(model.predict(X)), label='y = {:.2f} * log(n)'.format(model.coef_[0]))# pyright: ignore[reportArgumentType]
+    plt.plot(unique_sizes, np.exp(model.predict(X)), label='y = {:.2f} * log(n)'.format(model.coef_[0]), marker="o")# pyright: ignore[reportArgumentType]
     plt.xlabel('n')
     plt.ylabel('CVaR/QCVaR')
     plt.legend()
     plt.savefig('./plots/cvar_div_qcvar.pdf')
-    # plt.show()
+    plt.show()
     plt.clf()
 
 if __name__ == "__main__":
@@ -172,3 +172,4 @@ if __name__ == "__main__":
         df = pd.read_csv(csv_file)
         plotter = Plotter(csv_file, df, slow, fast, col2Name, col2Marker, dist)
         plot_all_slow_vs_fast(plotter)
+        plot_cvar_div_qcvar(plotter)

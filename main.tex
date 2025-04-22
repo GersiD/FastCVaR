@@ -751,9 +751,10 @@ The optimal solution will always be $f(S_i) - f(S_{i-1})$ assuming the weight $c
 \section{Experiments}
 
 \begin{figure}[htbp]
-  % \includegraphics[width=0.5\textwidth]{./code/plots/}
-  \caption{\mm{Make this shorter. } Time comparison between the standard implementation of sorting based algorithms and quickselect based ones such as \cref{alg:quick_cvar}. On the x-axis we have the size of the random variable, and on the y-axis we have the time in milliseconds. Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{uniform} random variable.}
-  \label{fig:all_uniform}
+  \centering
+  \includegraphics[width=0.70\textwidth]{./code/plots/cvar_div_qcvar.pdf}
+  \caption{Linear regression fit of a logaritmic function to the ratio of the time taken to compute $\cvar{0.5}{\tilde{x}}$ by sorting (CVaR) and quickselect (QCVaR).}
+  \label{fig:cvar_div_qcvar}
 \end{figure}
 \end{document}
 

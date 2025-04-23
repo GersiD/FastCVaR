@@ -235,10 +235,10 @@ The Hoare's partition scheme $i_k, x^k, p^k \gets \operatorname{partition}(x^{k-
   \item $\exists l \ge i_k$ such that $ l \le j \le i_k \Rightarrow x^k_{i_k} = x^k_j $ and $ j < l \Rightarrow x^k_{i_k} > x^k_j $
   \item the algorithm runs in time linear (if mean of means pivot scheme) in $b_k - f_k$
   \end{enumerate}
-  Note that only the elements  $x^k_j$ for $j = f_k, \dots, b_k$ which makes it possible to achieve the desired time complexity.
+  Note that only the elements $x^k_j$ for $j = f_k, \dots, b_k$ makes it possible to achieve the desired time complexity.
 \end{lemma}
-The above conditions primarily state that each partition performs partial sorting such that all elements less than the pivot
-Below is the full algorithm, 
+The above conditions primarily state that each call to the partition scheme performs partial sorting such that all elements less than or equal to the pivot will be at a lower index, and elements greater than the pivot will be at a higher index. 
+The following is the full algorithm. Intuitively, the algorithm picks a pivot and applies the partition in order to easily compute the probability of all outcomes smaller than or equal to that of the pivot. Then it determines whether the quantile can exist on the left side of the pivot or on the right side and shrinks the search space, parameterized by the variables $front$ and $back$, accordingly.
 \begin{algorithm}
   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and $\alpha \in [0,1]$}}
   \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
@@ -261,7 +261,7 @@ Below is the full algorithm,
   \end{algorithmic}
 \end{algorithm}
 
-In order to prove that the algorithm is optimal, we first show that $\quant_{\alpha}^-(\tilde{x})$ exists inside 
+In order to prove that the algorithm is optimal, we first show that $\quant_{\alpha}^-(\tilde{x})$ is an element in the array. 
 
 \begin{lem}
 Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite $\Omega$. Then, there exist $\omega_1, \omega_2\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_1)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_2)$ for each $\alpha\in (0,1)$.
@@ -322,6 +322,7 @@ During the loop: There are five possible scenarios at each iteration:
 
  \end{proof}
  \end{lem}
+ Finally we prove that the time complexity of our proposed algorithm is linear in the expected case. 
 \begin{lem}
   \Cref{alg:quick_quantile} achieves a time complexity of $\mathcal{O}(N)$
   where $N$ is the number of elements in $\tilde{x}$.

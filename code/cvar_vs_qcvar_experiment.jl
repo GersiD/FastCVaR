@@ -67,7 +67,7 @@ function p_gen_func(dist)
   elseif dist == "sparse"
     return n -> begin
       p = zeros(Float64, n)
-      inds = rand(1:n, Int(ceil(log(n))))
+      inds = unique(rand(1:n, Int(ceil(log(n)))))
       p[inds] .= 1 / length(inds)
       p
     end

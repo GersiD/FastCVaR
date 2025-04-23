@@ -436,10 +436,12 @@ Unless adding a new element $S_i$ will make the value of the submodular function
 From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1^2$. Thus, the coherent risk measure TVaR with the divergence constraint $\|p - q\|_1 \leq \sqrt{2*ln(2)*\alpha}$ must be $\leq EVaR_\alpha(p)$. Submodular function is $Q(\omega) = \min\left\{\beta/2 + P(\omega), 1\right\}$
 
 \begin{algorithm}
-  \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and maximum divergence \beta}}
-  \algrenewcommand\algorithmicensure{\textbf{Output: $q$ : new distribution }}
+  \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and maximum divergence $\beta$}}
+  \algrenewcommand\algorithmicensure{\textbf{Output: new distribution $q$}}
   \caption{Linear Time Algorithm for TVaR}\label{alg:quick_tvar}
   \begin{algorithmic}[1]
+    \Require{}
+    \Ensure{}
     \State{$m \gets \arg\min \left\{ x_i \mid  i = 1, \dots, n \right\}$}
     \State{$\delta \gets \min\left\{\frac{\beta}{2}, 1 - p_m\right\} $}
     \State{$\quant^+ \gets \operatorname{QuickQuantile}(x, q, \delta)$ }
@@ -451,7 +453,7 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1
         \State{$q[i] \gets 0$}
       \EndIf{}
     \EndFor{}
-    \State{\Return{$\lambda$}}
+    \State{\Return{$\lambda$}} \todo{I dont think this is right}
   \end{algorithmic}
 \end{algorithm}
 
@@ -466,7 +468,7 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1
   %\floatname{algorithm}{Quick CVaR}
   \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ with probability mass function p and $\alpha \in [0,1]$}}
   \algrenewcommand\algorithmicensure{\textbf{Output: $CVaR_\alpha(\tilde{X})$}}
-  \caption{}\label{alg:quick_cvar}
+  \caption{QCVaR}\label{alg:quick_cvar}
   \begin{algorithmic}[1]
     \Require{}
     \Ensure{} 
@@ -487,9 +489,9 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1
 \end{algorithm}
 
 \begin{algorithm}
-\algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ with probability mass function p and $f, b \in \Real$}}
-\algrenewcommand\algorithmicensure{\textbf{Output: pivot index $i \in \Real$}}
-\caption{Hoare's partition scheme}label{alg:partition}
+\algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $x \in \Real^n$ with probability mass function $p \in \Delta^n$ and $f, b \in \Real$}}
+\algrenewcommand\algorithmicensure{\textbf{Output: indices of partion $i, j \in \Real$}}
+\caption{Hoare's partition scheme}\label{alg:partition}
   \begin{algorithmic}[1]
     \Require{}
     \Ensure{} 
@@ -537,42 +539,31 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1
 
 \section{Experiments}
 
-To evaluate the algorithms developed in \cref{alg:quick_cvar} and \cref{alg:quick_quantile} we numerically compare their speedup against their cannonical sorting-based counterparts. 
+To evaluate the algorithms developed in \cref{alg:quick_cvar} and \cref{alg:quick_quantile} we numerically compare their speedup against their cannonical sorting-based counterparts. To ensure that the random variable causes as little difference in the runtime comparison we run our experiments both with uniform and sparse random variables. More detail on the experimental setup can be found in \cref{sec:appendix_experiments}.
 
-\mm{this sentence should be in a separate para along with algo descriptions} 
 For the numerical results we refer to the cannonical implementations as their un-altered risk measure name, and for the no-sort implementations we append the ``Q'' prefix.
 
-\mm{What are we testing this on? What is the random variable?}
-
-\gersi{describe the results}
-Our results represented by figures \ref{fig:all_sparse}, and \ref{fig:all_uniform} are rendered on plots with 95\% confidence interval band computed over 10 random seeds. Note these bands are tight due to the little variance in the measured runtimes. Code and results for these experiments as well as the implementations of all contained risk measures can be found at \todo{REDACTED}.
-
-\gersi{interpret the results}
-The results show approximately log speedup in the runtime of the quick algorithms which is consistent with the theoretical complexity of the algorithms. This log speedup coincides with a noticeable speedup in the runtime of the algorithms as the size of the random variable increases. For the ease of the reader to note multiplicative decreases in runtime, we present the results in both linear and log scale.
-
-\mm{have a separate paragraph interpreting the results.}
-\mm{Can we justify why these results would be representative of something meaningful.}
+Our results represented by Figures \ref{fig:all_sparse}, and \ref{fig:all_uniform} are rendered on plots with a 95\% confidence interval band computed over 10 random seeds. These bands are tight due to the little variance in the measured runtimes between seeds.
 
 Demonstrating the speedup of the quick algorithms over their sorting based counterparts, we observe that the quick algorithms are significantly faster than their sorting based counterparts. Especially in the case of CVaR and VaR which are extensively used in the industries aformentioned in \cref{sec:intro}.
+The results demonstrate approximately log speedup in the runtime of the quick algorithms which is consistent with the theoretical complexity of the algorithms, see \cref{sec:appendix_experiments}. This log speedup coincides with a noticeable speedup in runtime across the tested random variable sizes. For the ease of the reader to note multiplicative decreases in runtime, we present the results in both linear and log scale.
+
+In the fields of interest for this work, finance, healthcare, robotics, ect. . The computation of risk measures is
+often done over large random variables where the runtime and sensitivity of the algorithms to the size of the random variable is a concern. 
+The results presented in this section are chiefly concerned with demonstrating our ability to compute risk measures quickly, fulfilling the practical need.
 
 \begin{figure}[htbp]
   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_linear.pdf}
   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_log.pdf}
-  \caption{\mm{make this shorter} Time comparison between the standard implementation of sorting based algorithms and quickselect based ones such as \cref{alg:quick_cvar}. On the x-axis we have the size of the random variable, and on the y-axis we have the time in milliseconds. Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{sparse} random variable.}
+  \caption{Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{sparse} random variable.}
   \label{fig:all_sparse}
 \end{figure}
 \begin{figure}[htbp]
   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_uniform_linear.pdf}
   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_uniform_log.pdf}
-  \caption{\mm{Make this shorter. } Time comparison between the standard implementation of sorting based algorithms and quickselect based ones such as \cref{alg:quick_cvar}. On the x-axis we have the size of the random variable, and on the y-axis we have the time in milliseconds. Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{uniform} random variable.}
+  \caption{Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{uniform} random variable.}
   \label{fig:all_uniform}
 \end{figure}
-% \begin{figure}
-%   \includegraphics[width=0.5\textwidth]{./code/plots/tvar_vs_qtvar_sparse_linear.pdf}
-%   \includegraphics[width=0.5\textwidth]{./code/plots/tvar_vs_qtvar_uniform_linear.pdf}
-%   \caption{Time comparison between the standard implementation of TVaR (sorting) and \todo{ref}. On the x-axis we have the size of the random variable, and on the y-axis we have the time in milliseconds. Left side represents when a sparse random variable is used and the right side represents when a uniform random variable is used. Both axes are in linear scale.}
-%   \label{fig:tvar_vs_qtvar_linear}
-% \end{figure}
 
 \section{Conclusion}
 
@@ -594,6 +585,7 @@ Assume for $P_f$ that $f(U)$ is such that for all $S_i, S_{ i+1 } \cup E$ where 
 \end{assumption}
 We note this assumption essentially state that the submodular function must be a piecewise linear function. 
 \begin{algorithm}
+  \todo{fix typos}
     \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
     \algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
   \caption{algorithm}{New algorithm}
@@ -749,8 +741,8 @@ The optimal solution will always be $f(S_i) - f(S_{i-1})$ assuming the weight $c
 
 %   \end{algorithmic}
 % \end{algorithm}
-\section{Experiments}
-
+\section{Experiments}\label{sec:appendix_experiments}
+Code and results for these experiments as well as the implementations of all contained risk measures can be found at \todo{REDACTED}.
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.70\textwidth]{./code/plots/cvar_div_qcvar.pdf}

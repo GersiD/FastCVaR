@@ -238,7 +238,7 @@ Our QVaR algorithm is described in \cref{alg:quick_quantile}. The algorithm work
 \begin{algorithm}
   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and $\alpha \in [0,1]$}}
   \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
-  \caption{Quick Quantile algorithm for VaR. $\mathds{1}(bool)$ denotes the indicator function.}\label{alg:quick_quantile}
+  \caption{QVaR: Linear-time algorithm for VaR. $\mathds{1}(bool)$ denotes the indicator function.}\label{alg:quick_quantile}
 
   \begin{algorithmic}[1]
     \Require{} \Ensure{}
@@ -345,6 +345,9 @@ During the loop: There are five possible scenarios at each iteration:
 
 \section{Computing \texorpdfstring{$\varphi$}{phi}-divergence Risk Measures in Linear Time} \label{sec:phi-divergence}
 
+
+\mm{TODO: Use VaR in the algorithm intead of doing the work. }
+
 % \subsection{General Algorithm}
 Our first contribution is an algorithm for solving the maximum weight Independent Set without sorting for polymatroids. We note that certain additional assumptions have to be satisfied on the submodular function as follows.
 \begin{assumption}
@@ -352,13 +355,12 @@ Assume for $P_f$ that $f(U)$ is such that for all $S_i, S_{ i+1 } \cup E$ where 
 \end{assumption}
 We note this assumption essentially state that the submodular function must be a piecewise linear function. 
 \begin{algorithm} 
-    \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f\colon 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
-    \algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
-  \caption{No sort Maximum Weighted Independent Set}\label{alg:maximum-weight-independent}
+\algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f\colon 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
+\algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
+\caption{Linear-time Algorithm CVaR/TVaR}\label{alg:maximum-weight-independent}
  \begin{algorithmic}[1]
      \Require{}
      \Ensure{}
-  
     \State{$left \gets 1$}
     \State{$right \gets n$}
     \While{$right  - left \geq 1$} 
@@ -371,11 +373,7 @@ We note this assumption essentially state that the submodular function must be a
     \Else
           \State{Let $x_i :=  \begin{cases}f(i) & \text{for } i \leq mid,\dots \end{cases}$}
           \State{$left \gets mid + 1$}
-          
     \EndIf{}      
-    
-    
-    
     \EndWhile{}
     \State{$x_{right} \gets f(N) - f(S_{right - 1})$}
 \end{algorithmic}
@@ -394,6 +392,7 @@ The proof for this algorithm is simple and shows that the output is equal to tha
 \end{lem}
 
 \subsection{CVaR}
+
 As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk (CVaR) is a convex risk measure that generalizes Value-at-Risk (VaR) and can be defined as
 \begin{equation} \label{eq:primal_cvar}
   \begin{aligned}
@@ -411,38 +410,23 @@ Here, $\bm{1}$ is a vector of ones of an appropriate dimension.
 \begin{lem}
 For $\omega \in \Omega$ we can construct a feasible\todo{what does feasible mean?} $Q \in \mathcal{Q}$ such that $Q(\omega) = \min\left\{\frac{P(\omega)}{1-\alpha}, 1\right\}$.
 \end{lem}
-
 \begin{proof}
-  Two possible scenarios exist.
+Two possible scenarios exist.
 \item[Case 1]: $P(A) \geq 1 - \alpha$. In this scenario, $Q(A)$ must equal 1 since $\frac{1}{1 - \alpha} P(A) > 1 $. Thus, every element in $A$ should be scaled by $\frac{1}{P(A)}$ if in $A$ and set to 0 otherwise. Since  $P(A) \geq 1 - \alpha$, we can imply the reciprocal $\frac{1}{P(A)} \leq \frac{1}{1-\alpha}$ is also true.  
 \item[Case 2]: $P(A) < (1 - \alpha)$. In this scenario, $Q(A) \leq \frac{1}{1 - \alpha} \cdot  P(A) < 1$. For any given $A$, we can construct a Q(A) such that $Q(A) = \frac{1}{1 - \alpha} \cdot  P(A)$. This can be done by setting $Q(a)$ to $\frac{1}{1 - \alpha} \cdot P(a)$ for all $a$ in $A$ and $P(a) \cdot  d$ otherwise such that $\frac{1}{1 - \alpha} * P(A) + d*P(B) = 1$, where $B$ contains all elements not in $A$. It is provable that $d \leq \frac{1}{1 - \alpha}$, which is required for the constructed \(Q\) to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{1 - \alpha} \ge 1$. Since $P(A) + P(B) = 1$,  $d \le 1$ in order for $\frac{1}{1 - \alpha} \cdot  P(A) + d\cdot P(B) = 1$ to hold. Since $1 \leq \frac{1}{1-\alpha}$, this implies $d\le \leq \frac{1}{1 - \alpha}$.
-
 \end{proof}
+
 \begin{lem}
-  $Q(\omega) = \min\left\{\frac{P(\omega)}{1-a}, 1\right\}$ is a submodular function that satisfies Assumption
-  4.1
+  $Q(\omega) = \min\left\{\frac{P(\omega)}{1-a}, 1\right\}$ is a submodular function that satisfies Assumption~4.1.
 \end{lem}
 \begin{proof}
 The left hand side of the minimum function will be a sum of all positive values for an admissible $\alpha$. This is equivalent to the budget additive function, which has proven to be a submodular function in the literature \todo{must find citation that aren't lecture notes}.
 
 Unless by adding a new element $S_i$ such that the value of the submodular function becomes 1, $f(S_i) + f(i + 1) = f(S_{ i+1 })$ by definition. Since $f(S_i)$ \todo{Cut off sentence}
-%\end{lem}
 \end{proof}
 
-
-%\subsection{EVaR}
-
-%\begin{algorithm}
- % \begin{algorithmic}
-%{Input: vector $x$, pmf $p$ solution for %CVar and maximum divergence \beta}
-%\State{Define vector $p'$ such that every element $p'_i = \frac{1}{\sum_{j} p_j} * p_i$ }
-%\State{If $\sum_{i=1}p'_i\phi(p'_i/q_i) \leq \epsilon$, this is the solution}
-%\State{ }
-%\end{algorithmic}
-%\end{algorithm}
-
-
 \subsection{TVaR}
+
 From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1^2$. Thus, the coherent risk measure TVaR with the divergence constraint $\|p - q\|_1 \leq \sqrt{2\alpha ln(2)}$ must be $\leq EVaR_\alpha(p)$. Submodular function is $Q(\omega) = \min\left\{\beta/2 + P(\omega), 1\right\}$.
 
 \begin{algorithm}
@@ -586,7 +570,35 @@ This work was partly supported by \todo{who supported us? Thank you Marek ;)}
 
 \section{Proofs and Details for \cref{sec:var-linear}}
 
+\begin{algorithm}
+\algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $x \in \Real^n$ with probability mass function $p \in \Delta^n$ and $f, b \in \Real$}}
+\algrenewcommand\algorithmicensure{\textbf{Output: indices of partion $i, j \in \Real$}}
+\caption{Hoare's partition scheme}\label{alg:partition}
+  \begin{algorithmic}[1]
+    \Require{}
+    \Ensure{} 
+    \State{$i \gets f + \lceil\frac{b-f}{2}\rceil$}
+    \State{$\lambda \gets f$} % less than
+    \State{$\xi \gets f$} % equal to
+    \State{$\mu \gets b$} % greater than
+    \While{$\xi \leq \mu$}
+      \If{$x[\xi] < x[i]$}
+        \State{swap $x[\xi]$ with $x[\lambda]$}
+        \State{swap $p[\xi]$ with $p[\lambda]$}
+        \State{$\lambda \gets \mu + 1$}
+        \State{$\xi \gets \xi + 1$}
+      \ElsIf{$x[\xi] > x[i]$}
+        \State{$\mu \gets \mu - 1$}
+      \Else{}
+        \State{$\xi \gets \xi + 1$}
+      \EndIf{}
+    \EndWhile{}
+    \State{\Return{($\lambda - 1$, $\mu$)} \Comment{last element less than the pivot, first element greater than the pivot}}
+  \end{algorithmic}
+\end{algorithm}
+
 \section{Proofs and Details for \cref{sec:phi-divergence}}
+
 
 \section{No-sort Polymatroid}
 
@@ -793,34 +805,6 @@ Code and results for these experiments as well as the implementations of all con
     \State{\Return{$val$}}
   \end{algorithmic}
 \end{algorithm}
-
-\begin{algorithm}
-\algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $x \in \Real^n$ with probability mass function $p \in \Delta^n$ and $f, b \in \Real$}}
-\algrenewcommand\algorithmicensure{\textbf{Output: indices of partion $i, j \in \Real$}}
-\caption{Hoare's partition scheme}\label{alg:partition}
-  \begin{algorithmic}[1]
-    \Require{}
-    \Ensure{} 
-    \State{$i \gets f + \lceil\frac{b-f}{2}\rceil$}
-    \State{$\lambda \gets f$} % less than
-    \State{$\xi \gets f$} % equal to
-    \State{$\mu \gets b$} % greater than
-    \While{$\xi \leq \mu$}
-      \If{$x[\xi] < x[i]$}
-        \State{swap $x[\xi]$ with $x[\lambda]$}
-        \State{swap $p[\xi]$ with $p[\lambda]$}
-        \State{$\lambda \gets \mu + 1$}
-        \State{$\xi \gets \xi + 1$}
-      \ElsIf{$x[\xi] > x[i]$}
-        \State{$\mu \gets \mu - 1$}
-      \Else{}
-        \State{$\xi \gets \xi + 1$}
-      \EndIf{}
-    \EndWhile{}
-    \State{\Return{($\lambda - 1$, $\mu$)} \Comment{last element less than the pivot, first element greater than the pivot}}
-  \end{algorithmic}
-\end{algorithm}
-
 
 
 \section{Greedy Algorithm}

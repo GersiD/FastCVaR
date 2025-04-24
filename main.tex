@@ -361,9 +361,9 @@ We note this assumption essentially state that the submodular function must be a
   
     \State{$left \gets 1$}
     \State{$right \gets n$}
-    \While{$left  - right \geq 1$} \todo{?? left - right would never be $\geq$ 1}
+    \While{$right  - left \geq 1$} 
     
-    \State{$mid \gets partition(left, right, c)$}
+    \State{$mid \gets partition(left, right, c)$}\todo{Where is $c$ defined?}
     \If{$f(S_{mid}) = f(N)$}
        \State{Let $x_i :=  \begin{cases}0 & \text{for } i > mid,\dots 
        \end{cases}$}
@@ -425,7 +425,7 @@ For $\omega \in \Omega$ we can construct a feasible\todo{what does feasible mean
 \begin{proof}
 The left hand side of the minimum function will be a sum of all positive values for an admissible $\alpha$. This is equivalent to the budget additive function, which has proven to be a submodular function in the literature \todo{must find citation that aren't lecture notes}.
 
-Unless by adding a new element $S_i$ such that the value of the submodular function becomes 1, $f(S_i) + f(i + 1) = f(S_{ i+1 })$ by definition. Since $f(S_i)$
+Unless by adding a new element $S_i$ such that the value of the submodular function becomes 1, $f(S_i) + f(i + 1) = f(S_{ i+1 })$ by definition. Since $f(S_i)$ \todo{Cut off sentence}
 %\end{lem}
 \end{proof}
 
@@ -443,7 +443,7 @@ Unless by adding a new element $S_i$ such that the value of the submodular funct
 
 
 \subsection{TVaR}
-From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1^2$. Thus, the coherent risk measure TVaR with the divergence constraint $\|p - q\|_1 \leq \sqrt{2*ln(2)*\alpha}$ must be $\leq EVaR_\alpha(p)$. Submodular function is $Q(\omega) = \min\left\{\beta/2 + P(\omega), 1\right\}$
+From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1^2$. Thus, the coherent risk measure TVaR with the divergence constraint $\|p - q\|_1 \leq \sqrt{2\alpha ln(2)}$ must be $\leq EVaR_\alpha(p)$. Submodular function is $Q(\omega) = \min\left\{\beta/2 + P(\omega), 1\right\}$.
 
 \begin{algorithm}
   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and maximum divergence $\beta$}}
@@ -466,6 +466,81 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1
     \State{\Return{$\lambda$}} \todo{I dont think this is right}
   \end{algorithmic}
 \end{algorithm}
+
+% \subsection{Piece-wise Linear Minimization}
+% \maeve{Incorporate projection.jl }
+
+% \subsection{Quick CVaR}
+
+% \begin{algorithm}
+%   %\floatname{algorithm}{Quick CVaR}
+%   \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ with probability mass function p and $\alpha \in [0,1]$}}
+%   \algrenewcommand\algorithmicensure{\textbf{Output: $CVaR_\alpha(\tilde{X})$}}
+%   \caption{QCVaR}\label{alg:quick_cvar}
+%   \begin{algorithmic}[1]
+%     \Require{}
+%     \Ensure{} 
+%     \todo{Make absolutely sure that you tell the reader that we use 1 or 0 based indexing}
+%     \State{$q^+_\alpha \gets \text{quick\_quantile}(x, p, \alpha)$}
+%     \State{$val \gets 0$}
+%     \State{$p_{left} \gets 1$}
+%     \For{$i \in 0 \dots n$}
+%       \State{$inc \gets \min(\frac{p[i]}{\alpha}, p_{left})$}
+%       \State{$val += x[i] * inc$}
+%       \State{$p_{left} -= inc$}
+%       \If{$p_{left} \leq 0$}
+%         \State{Break}
+%       \EndIf{}
+%     \EndFor{}
+%     \State{\Return{$val$}}
+%   \end{algorithmic}
+% \end{algorithm}
+
+% \begin{algorithm}
+% \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $x \in \Real^n$ with probability mass function $p \in \Delta^n$ and $f, b \in \Real$}}
+% \algrenewcommand\algorithmicensure{\textbf{Output: indices of partion $i, j \in \Real$}}
+% \caption{Hoare's partition scheme}\label{alg:partition}
+%   \begin{algorithmic}[1]
+%     \Require{}
+%     \Ensure{} 
+%     \State{$i \gets f + \lceil\frac{b-f}{2}\rceil$}
+%     \State{$\lambda \gets f$} % less than
+%     \State{$\xi \gets f$} % equal to
+%     \State{$\mu \gets b$} % greater than
+%     \While{$\xi \leq \mu$}
+%       \If{$x[\xi] < x[i]$}
+%         \State{swap $x[\xi]$ with $x[\lambda]$}
+%         \State{swap $p[\xi]$ with $p[\lambda]$}
+%         \State{$\lambda \gets \mu + 1$}
+%         \State{$\xi \gets \xi + 1$}
+%       \ElsIf{$x[\xi] > x[i]$}
+%         \State{$\mu \gets \mu - 1$}
+%       \Else{}
+%         \State{$\xi \gets \xi + 1$}
+%       \EndIf{}
+%     \EndWhile{}
+%     \State{\Return{($\lambda - 1$, $\mu$)} \Comment{last element less than the pivot, first element greater than the pivot}}
+%   \end{algorithmic}
+% \end{algorithm}
+
+
+
+% \section{Greedy Algorithm}
+
+% \mm{Why would we need the weights to be non-negative?}
+
+% \begin{algorithm} \label{alg:greedy-polymatroid}
+%     \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = \{1 \ldots n\}$, non-decreasing submodular function $f : 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
+%     \algrenewcommand\algorithmicensure{\textbf{Output: }$\max \{f(S) : S\subseteq N\}$}
+%   \caption{Greedy algorithm from Submodular Functions, Polymatroids, TDI}
+%  \begin{algorithmic}[1]
+%     \Require{}
+%     \Ensure{}
+%     \State{Order the elements such that $c_1 \geq c_2 \cdots \geq c_n$.}
+%     \State{Let $S_i := \{1, \dots, i\}$ and $S_0 := \emptyset$}
+%     \State{Let $x_i :=  \begin{cases}f(S_i) - f(S_{i-1}) & \text{for } i = 1,\dots, r \\ 0 & \text{otherwise} \end{cases}$}
+% \end{algorithmic}
+% \end{algorithm}
 
 
 
@@ -531,11 +606,11 @@ We note this assumption essentially state that the submodular function must be a
   
     \State{$left \gets 1$}
     \State{$right \gets n$}
-    \While{$left  - right \geq 1$}\todo{?? left - right would never be $\geq$ 1}
+    \While{$right - left \geq 1$}
     
     \State{$mid \gets partition(left, right, c)$}
     \If{$f(S_{mid}) = f(N)$}
-       \State{Let $x_i :=  \begin{cases}0 & \text{for } i \geq mid \end{cases}$}
+       \State{Let $x_i :=  \begin{cases}0 & \text{if  } f(S_{mid}) = f(N) \text{ for } i \geq mid \\ f(i) \end{cases}$}
     \Else
           \State{Let $x_i :=  \begin{cases}f(i) & \text{for } i \leq mid \end{cases}$}
     \EndIf{}      

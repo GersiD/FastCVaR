@@ -167,7 +167,7 @@ where $\mathcal{Q}$ is a subset of all probability measures on $\Omega$~\cite[Pr
 \[
  \mathcal{Q} := \left\{ q \in \Real^{\Omega} \mid I_{\varphi}(p \| q) \le \beta  \right\} 
 \]
-Phi-divergence risk measures can be defined as a coherent risk measure for which $\mathcal{Q}$ contains all $Q$ such that $I_\phi(P, Q) \le \beta$, where $\beta$ is some constant typically dependent on the risk level. $\varphi$-entropic (also known as $g$-entropic risk measures) can be seen as the primal representation of these risk measures. All $\varphi$-entropic risk measures take on the following form for $\beta \in \Real$ and any proper, lower semi-continuous, and convex function $\varphi\colon \Real \to \bar{\Real}$~\cite{Ahmadi-Javid2011,Ahmadi-Javid2017}: 
+Phi-divergence risk measures can be defined as a coherent risk measure for which $\mathcal{Q}$ contains all $Q$ such that $I_\phi(P, Q) \le \beta$, where $\beta$ is a constant typically dependent on the risk level. $\varphi$-entropic (also known as $g$-entropic risk measures) can be seen as the primal representation of these risk measures. All $\varphi$-entropic risk measures take on the following form for $\beta \in \Real$ and any proper, lower semi-continuous, and convex function $\varphi\colon \Real \to \bar{\Real}$~\cite{Ahmadi-Javid2011,Ahmadi-Javid2017}: 
 \[
 \ER_{g,\beta}(\tilde{x}) = \sup_{t > 0, v \in \Real} t \left(v + \E { - \varphi\opt \left(-\frac{\tilde{x}}{t} + v + \beta \right)}\right),
 \] 
@@ -325,7 +325,7 @@ During the loop: There are five possible scenarios at each iteration:
  Finally we prove that the time complexity of our proposed algorithm is linear in the expected case. 
 \begin{lem}
   \Cref{alg:quick_quantile} achieves a time complexity of $\mathcal{O}(N)$
-  where $N$ is the number of elements in $\tilde{x}$.
+  where $N$ is the number of elements in $\text{Ghatkopar}', 'Mumbai', 'childrlde{x}$.
 \end{lem}
 \begin{proof}
   From \todo{insert citation here}, the time complexity for the while loop with the Dutch partition scheme is $O(n)$ in the expected case. Since line 4 will at most take as many steps as a single call to the partition function, and the remaining lines in each iteration of the while loop take constant time, the overall complexity remains unchanged. 
@@ -352,7 +352,8 @@ We note this assumption essentially state that the submodular function must be a
   
     \State{$left \gets 1$}
     \State{$right \gets n$}
-    \While{$left  - right \geq 1$}
+    \While{$left  - right \geq 1$} \todo{?? left - right would never be $\geq$ 1}
+    
     \State{$mid \gets partition(left, right, c)$}
     \If{$f(S_{mid}) = f(N)$}
        \State{Let $x_i :=  \begin{cases}0 & \text{for } i > mid,\dots 
@@ -413,9 +414,9 @@ For $\omega \in \Omega$ we can construct a feasible\todo{what does feasible mean
   4.1
 \end{lem}
 \begin{proof}
-The left hand side of the minimum function will be a summation that has all positive values for admissible $\alpha$. Thus this is equivalent to the budget additive function, which has proven to be a submodular function in the literature (must find citation that aren't lecture notes).
+The left hand side of the minimum function will be a sum of all positive values for an admissible $\alpha$. This is equivalent to the budget additive function, which has proven to be a submodular function in the literature \todo{must find citation that aren't lecture notes}.
 
-Unless adding a new element $S_i$ will make the value of the submodular function 1, $f(S_i) + f({i + 1}) = f(S_{ i+1 })$ by definition. Since $f(S_i)$
+Unless by adding a new element $S_i$ such that the value of the submodular function becomes 1, $f(S_i) + f(i + 1) = f(S_{ i+1 })$ by definition. Since $f(S_i)$
 %\end{lem}
 \end{proof}
 
@@ -450,7 +451,7 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1
     \For{$i \in 1 \dots n$}
       \If{$q[i] > \quant^+$}
         \State{$\lambda \gets \lambda - q[i]$}
-        \State{$q[i] \gets 0$}
+        \State{$q[i] \gets 0$} \todo{Wouldn't it be best to return $\lambda$ here?}
       \EndIf{}
     \EndFor{}
     \State{\Return{$\lambda$}} \todo{I dont think this is right}
@@ -476,7 +477,7 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1
     \State{$q^+_\alpha \gets \text{quick\_quantile}(x, p, \alpha)$}
     \State{$val \gets 0$}
     \State{$p_{left} \gets 1$}
-    \For{$i = 0 \dots n$}
+    \For{$i \in 0 \dots n$}
       \State{$inc \gets \min(\frac{p[i]}{\alpha}, p_{left})$}
       \State{$val += x[i] * inc$}
       \State{$p_{left} -= inc$}
@@ -523,7 +524,7 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1
 
 \begin{algorithm} \label{alg:greedy-polymatroid}
     \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
-    \algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
+    \algrenewcommand\algorithmicensure{\textbf{Output: }$\max \{f(S) : S\subseteq N\}$}
   \caption{Greedy algorithm from Submodular Functions, Polymatroids, TDI}
  \begin{algorithmic}[1]
     \Require{}
@@ -595,12 +596,13 @@ We note this assumption essentially state that the submodular function must be a
   
     \State{$left \gets 1$}
     \State{$right \gets n$}
-    \While{$left  - right \geq 1$}
+    \While{$left  - right \geq 1$}\todo{?? left - right would never be $\geq$ 1}
+    
     \State{$mid \gets partition(left, right, c)$}
     \If{$f(S_{mid}) = f(N)$}
-       \State{Let $x_i :=  \begin{cases}0 & \text{for } i \geq mid,\dots \end{cases}$}
+       \State{Let $x_i :=  \begin{cases}0 & \text{for } i \geq mid \end{cases}$}
     \Else
-          \State{Let $x_i :=  \begin{cases}f(i) & \text{for } i \leq mid,\dots \end{cases}$}
+          \State{Let $x_i :=  \begin{cases}f(i) & \text{for } i \leq mid \end{cases}$}
     \EndIf{}      
     
     

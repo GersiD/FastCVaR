@@ -426,8 +426,7 @@ Unless by adding a new element $S_i$ such that the value of the submodular funct
 \end{proof}
 
 \subsection{TVaR}
-
-From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1^2$. Thus, the coherent risk measure TVaR with the divergence constraint $\|p - q\|_1 \leq \sqrt{2\alpha ln(2)}$ must be $\leq EVaR_\alpha(p)$. Submodular function is $Q(\omega) = \min\left\{\beta/2 + P(\omega), 1\right\}$.
+From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1^2$. Thus, the coherent risk measure TVaR with the divergence constraint $\|p - q\|_1 \leq \sqrt{2\alpha ln(2)}$ must be $\leq$ EVaR$_\alpha(p)$. Submodular function is $Q(\omega) = \min\left\{\beta/2 + P(\omega), 1\right\}$.
 
 \begin{algorithm}
   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and maximum divergence $\beta$}}

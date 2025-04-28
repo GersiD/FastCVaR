@@ -43,14 +43,15 @@ for i, method in enumerate(methods):
     mean_val = mean_std_ms.iloc[0, i]  # Mean value in ms
     std_val = mean_std_ms.iloc[1, i]   # Std-dev value in ms
     if 'q' in method:
-        method = f"\\textbf{{{method}}}"  # Bold for Q-methods
-    latex_table += f"{method} & {mean_val:.4f} & {std_val:.4f} \\\\ \n"
+        latex_table += f"\\textbf{{{method}}} & \\textbf{{{mean_val:.4f}}} & \\textbf{{{std_val:.4f}}} \\\\ \n"
+    else:
+        latex_table += f"{method} & {mean_val:.4f} & {std_val:.4f} \\\\ \n"
 
 # Close the table
 latex_table += r"""
 \hline
 \end{tabular}
-\caption{Mean and Standard Deviation of Runtimes (in milliseconds) for Risk Measures}
+\caption{Results for our Stock Market experiment.}
 \end{table}
 """
 

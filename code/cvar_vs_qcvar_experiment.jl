@@ -92,8 +92,8 @@ println("Starting experiments")
 for dist in ["uniform"]
   println("Running experiments for $dist")
   p_f = p_gen_func(dist) # returns a function that takes n and returns a probability distribution
-  stop = 10000000 # 10 million
-  step = 1000000 # 100 thousand
+  stop = Int(1e7)# 10 million
+  step = Int(1e6)# 1 million
   start = step
   # Number of trials per experiment
   # One experiment is running the CVaR and qCVaR algorithms and collecting the time taken.
@@ -114,7 +114,7 @@ for dist in ["uniform"]
     # println("Experiment $i / $len --- n = $n")
     x = rand(Float64, n) .* 100
     p = p_f(n)
-    α = 0.6
+    α = 0.95
     c, qc, v, qv, t, qt = run_one_experiment(x, p, α)
     cvar_results[i] = c
     qcvar_results[i] = qc

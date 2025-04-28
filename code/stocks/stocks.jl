@@ -22,33 +22,33 @@ function run_one_experiment(x, p, α)
   tmpx = deepcopy(x)
   tmpp = deepcopy(p)
   local start = time_ns()
-  slow_cvar_result = CVaR(tmpx, tmpp, α).value
-  slow_time = (time_ns() - start)
+  slow_cvar_result = CVaR(tmpx, tmpp, α, check_inputs=false).value
+  slow_time = (time_ns() - start) * 1e-6
   tmpx = deepcopy(x)
   tmpp = deepcopy(p)
   start = time_ns()
   fast_cvar_result = qCVaR!(tmpx, tmpp, α).value
-  fast_time = (time_ns() - start)
+  fast_time = (time_ns() - start) * 1e-6
   tmpx = deepcopy(x)
   tmpp = deepcopy(p)
   start = time_ns()
-  VaR(tmpx, tmpp, α).value
-  var_time = (time_ns() - start)
+  VaR(tmpx, tmpp, α, check_inputs=false).value
+  var_time = (time_ns() - start) * 1e-6
   tmpx = deepcopy(x)
   tmpp = deepcopy(p)
   start = time_ns()
   qql!(tmpx, tmpp, α).value
-  qvar_time = (time_ns() - start)
+  qvar_time = (time_ns() - start) * 1e-6
   tmpx = deepcopy(x)
   tmpp = deepcopy(p)
   start = time_ns()
   worstcase_l1(tmpx, tmpp, α)
-  tvar_time = (time_ns() - start)
+  tvar_time = (time_ns() - start) * 1e-6
   tmpx = deepcopy(x)
   tmpp = deepcopy(p)
   start = time_ns()
   TVaR!(tmpx, tmpp, α)
-  qtvar_time = (time_ns() - start)
+  qtvar_time = (time_ns() - start) * 1e-6
   local δ = abs(slow_cvar_result - fast_cvar_result)
   if δ >= 1e-6
     println("CVaR: $slow_cvar_result, qCVaR: $fast_cvar_result, diff: $δ")
@@ -88,15 +88,15 @@ for i in ProgressBar(range(1, stop=size(df, 1)))
   for j in 1:trials
     # println("Running trial $j")
     # Run the experiment
-    results_trial = run_one_experiment(x, p, α)
+    c, qc, v, qv, t, qt = run_one_experiment(x, p, α)
     # Append the results to the results vector
     push!(results, (n=i,
-      cvar=results_trial.cvar,
-      qcvar=results_trial.qcvar,
-      var=results_trial.var,
-      qvar=results_trial.qvar,
-      tvar=results_trial.tvar,
-      qtvar=results_trial.qtvar))
+      cvar=c,
+      qcvar=qc,
+      var=v,
+      qvar=qv,
+      tvar=t,
+      qtvar=qt))
   end
 end
 # Save the DataFrame

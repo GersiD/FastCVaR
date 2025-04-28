@@ -24,34 +24,34 @@ Returns:
 function run_one_experiment(x, p, α)
   tmpx = deepcopy(x)
   tmpp = deepcopy(p)
-  local start = now()
+  local start = time_ns()
   slow_cvar_result = CVaR(tmpx, tmpp, α, check_inputs=false).value
-  slow_time = (now() - start).value
+  slow_time = (time_ns() - start) * 1e-6
   tmpx = deepcopy(x)
   tmpp = deepcopy(p)
-  start = now()
+  start = time_ns()
   fast_cvar_result = qCVaR!(tmpx, tmpp, α).value
-  fast_time = (now() - start).value
+  fast_time = (time_ns() - start) * 1e-6
   tmpx = deepcopy(x)
   tmpp = deepcopy(p)
-  start = now()
+  start = time_ns()
   VaR(tmpx, tmpp, α, check_inputs=false).value
-  var_time = (now() - start).value
+  var_time = (time_ns() - start) * 1e-6
   tmpx = deepcopy(x)
   tmpp = deepcopy(p)
-  start = now()
+  start = time_ns()
   qql!(tmpx, tmpp, α).value
-  qvar_time = (now() - start).value
+  qvar_time = (time_ns() - start) * 1e-6
   tmpx = deepcopy(x)
   tmpp = deepcopy(p)
-  start = now()
+  start = time_ns()
   worstcase_l1(tmpx, tmpp, α)
-  tvar_time = (now() - start).value
+  tvar_time = (time_ns() - start) * 1e-6
   tmpx = deepcopy(x)
   tmpp = deepcopy(p)
-  start = now()
+  start = time_ns()
   TVaR!(tmpx, tmpp, α)
-  qtvar_time = (now() - start).value
+  qtvar_time = (time_ns() - start) * 1e-6
   local δ = abs(slow_cvar_result - fast_cvar_result)
   if δ >= 1e-6
     println("CVaR: $slow_cvar_result, qCVaR: $fast_cvar_result, diff: $δ")
@@ -88,7 +88,8 @@ end
 #     -- sparse = pick log(n) random indices and set to 1 normalize
 # -- 6 plots for each of the tvar cvar var
 println("Starting experiments")
-for dist in ["uniform", "sparse"]
+# for dist in ["uniform", "sparse"]
+for dist in ["uniform"]
   println("Running experiments for $dist")
   p_f = p_gen_func(dist) # returns a function that takes n and returns a probability distribution
   stop = 10000000 # 10 million

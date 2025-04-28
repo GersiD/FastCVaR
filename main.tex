@@ -103,7 +103,7 @@ For coherent risk measures, it has been shown that computing these risk measures
 % the remainder of the paper is organized as follows.
 \todo{The remainder of this work is organized as follows.}
 
-\section{Preliminaries}
+\section{Preliminaries}\label{sec:preliminaries}
 
 \paragraph{Notation}
 
@@ -127,7 +127,7 @@ probability measure $\mathbb{P} \in \Delta^N$. We consider a random variable to 
 We assume the same equivalence for probability distributions.
 We use $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ to denote the extended real line.
 
-\paragraph{Value-at-Risk and Quantiles}
+\paragraph{Value-at-Risk}
 %\todo{something is very wrong here, consider a bernouli random variable [0, 1] with probability 0.5, and $\alpha = 0.5$, then $\quant^+_\alpha(\tilde{x}) = 1$ following the definition in \cref{eq:quantile-definition} but it should be $0$ according to the \href{https://github.com/RiskAverseRL/RiskMeasures.jl/blob/e7ccc8a8d8a5126ea9bf63988b9f9a485fe8e876/test/runtests.jl\#L67}{code}.}
 
 Quantile of a random variable $\tilde{x} \in \mathbb{X}$ at level $\alpha \in [0,1]$ is any value $\tau\in \Real$ such that $\mathbb{P}({\tilde{x} \le \tau}) \ge \alpha$ and $\mathbb{P}({\tilde{x} \ge \tau}) \ge 1-\alpha$. The quantile may not be unique however always lies in the interval $[\quant^-_{\alpha}(\tilde{x}), \quant^+_{\alpha}(\tilde{x})]$ where
@@ -167,7 +167,7 @@ where $\mathcal{Q}$ is a subset of all probability measures on $\Omega$~\cite[Pr
 \[
  \mathcal{Q} := \left\{ q \in \Real^{\Omega} \mid I_{\varphi}(p \| q) \le \beta  \right\} 
 \]
-Phi-divergence risk measures can be defined as a coherent risk measure for which $\mathcal{Q}$ contains all $Q$ such that $I_\phi(P, Q) \le \beta$, where $\beta$ is some constant typically dependent on the risk level. $\varphi$-entropic (also known as $g$-entropic risk measures) can be seen as the primal representation of these risk measures. All $\varphi$-entropic risk measures take on the following form for $\beta \in \Real$ and any proper, lower semi-continuous, and convex function $\varphi\colon \Real \to \bar{\Real}$~\cite{Ahmadi-Javid2011,Ahmadi-Javid2017}: 
+Phi-divergence risk measures can be defined as a coherent risk measure for which $\mathcal{Q}$ contains all $Q$ such that $I_\phi(P, Q) \le \beta$, where $\beta$ is a constant typically dependent on the risk level. $\varphi$-entropic (also known as $g$-entropic risk measures) can be seen as the primal representation of these risk measures. All $\varphi$-entropic risk measures take on the following form for $\beta \in \Real$ and any proper, lower semi-continuous, and convex function $\varphi\colon \Real \to \bar{\Real}$~\cite{Ahmadi-Javid2011,Ahmadi-Javid2017}: 
 \[
 \ER_{g,\beta}(\tilde{x}) = \sup_{t > 0, v \in \Real} t \left(v + \E { - \varphi\opt \left(-\frac{\tilde{x}}{t} + v + \beta \right)}\right),
 \] 
@@ -186,7 +186,7 @@ The primal formulation is
          \textbf{Risk measure} & $\varphi(y)$  & $\varphi\opt(x)$ & $\beta$ \\
          \midrule        
          $\mathbb{E}$           & $\begin{cases} 0 &\text{if } y = 1 \\ \infty & \text{otherwise}  \end{cases}$ & $x$ & $0$  \\
-         $\cvaro_{\alpha}$     & $\begin{cases} 0 &\text{if } y \in [0, \frac{1}{1 -\alpha}] \\ \infty & \text{otherwise}  \end{cases}$ & $\max \left\{ 0, \frac{1}{1 - \alpha} x \right\} $& $0$ \\
+         $\cvaro_{\alpha}$     & $\begin{cases} 0 &\text{if } y \in [0, \frac{1}{\alpha}] \\ \infty & \text{otherwise}  \end{cases}$ & $\max \left\{ 0, \frac{1}{\alpha} x \right\} $& $0$ \\
          $\evaro_{\alpha}$     & $\begin{cases} y \log y &\text{if } y > 0 \\ 0 &\text{if } y =  0 \\  \infty &\text{if } y < 0 \end{cases}$ & $\exp{ x - 1 }$ & $-\log(\alpha)$ \\
          $\tvaro_{\alpha}$     & $|y - 1|$ & $ \begin{cases} x &\text{if } |x| \le 1\\ \infty &\text{otherwise} \end{cases} $& $\sqrt{2 \cdot \log 2 \cdot (-\log(\alpha)) }$ \\
          \bottomrule
@@ -225,24 +225,20 @@ Conventional algorithms such as \cref{alg:greedy-polymatroid} solve \eqref{eq:po
 
 \cite{adam2019projectionscanonicalsimplexadditional}
 
-\section{Fast Algorithm for VaR}
-In this section, we develop a quick algorithm to compute the VaR of a random variable according to definition 1. The algorithm is based on the well-known quickselect algorithm, and uses the Hoare partition scheme. We first restate some well-known properties of the Hoare Partition scheme.
-\begin{lemma}
-The Hoare's partition scheme $i_k, x^k, p^k \gets \operatorname{partition}(x^{k-1}, p^{k-1}, f_{k-1}, b_{k-1})$ does the following:
-  \begin{enumerate}
-  \item $j \le i_k \Rightarrow x^k_j \le x^k_{i_k}$
-  \item $j > i_k \Rightarrow x^k_j > x^k_{i_k}$
-  \item $\exists l \ge i_k$ such that $ l \le j \le i_k \Rightarrow x^k_{i_k} = x^k_j $ and $ j < l \Rightarrow x^k_{i_k} > x^k_j $
-  \item the algorithm runs in time linear (if mean of means pivot scheme) in $b_k - f_k$
-  \end{enumerate}
-  Note that only the elements $x^k_j$ for $j = f_k, \dots, b_k$ makes it possible to achieve the desired time complexity.
-\end{lemma}
-The above conditions primarily state that each call to the partition scheme performs partial sorting such that all elements less than or equal to the pivot will be at a lower index, and elements greater than the pivot will be at a higher index. 
-The following is the full algorithm. Intuitively, the algorithm picks a pivot and applies the partition in order to easily compute the probability of all outcomes smaller than or equal to that of the pivot. Then it determines whether the quantile can exist on the left side of the pivot or on the right side and shrinks the search space, parameterized by the variables $front$ and $back$, accordingly.
+\section{Computing VaR in Linear Time} \label{sec:var-linear}
+In this section, we develop a quick algorithm to compute the VaR of a random variable according to definition 1. The algorithm is based on the well-known quickselect algorithm, and uses the Hoare partition scheme.
+
+\mm{How regular algorithms work for VaR, sorting based approach.}
+
+\mm{algorithm describing the main idea and challenge. Tie this to quickselect and why this is not just a quick select algorithm.}
+
+
+%We first restate some well-known properties of the Hoare Partition scheme.
+Our QVaR algorithm is described in \cref{alg:quick_quantile}. The algorithm works as follows. \mm{refer to the actual variables and line numbers in the algorithm.} The algorithm picks a pivot and applies the partition to easily compute the probability of all outcomes smaller than or equal to that of the pivot. Then it determines whether the quantile can exist on the left side of the pivot or on the right side and shrinks the search space, parameterized by the variables $front$ and $back$, accordingly.
 \begin{algorithm}
   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and $\alpha \in [0,1]$}}
   \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
-  \caption{Quick Quantile algorithm for VaR. $\mathds{1}(bool)$ denotes the indicator function.}\label{alg:quick_quantile}
+  \caption{QVaR: Linear-time algorithm for VaR. $\mathds{1}(bool)$ denotes the indicator function.}\label{alg:quick_quantile}
 
   \begin{algorithmic}[1]
     \Require{} \Ensure{}
@@ -261,8 +257,21 @@ The following is the full algorithm. Intuitively, the algorithm picks a pivot an
   \end{algorithmic}
 \end{algorithm}
 
-In order to prove that the algorithm is optimal, we first show that $\quant_{\alpha}^-(\tilde{x})$ is an element in the array. 
 
+
+\begin{lemma}
+The Hoare's partition scheme $i_k, x^k, p^k \gets \operatorname{partition}(x^{k-1}, p^{k-1}, f_{k-1}, b_{k-1})$ does the following:
+  \begin{enumerate}
+  \item $j \le i_k \Rightarrow x^k_j \le x^k_{i_k}$
+  \item $j > i_k \Rightarrow x^k_j > x^k_{i_k}$
+  \item $\exists l \ge i_k$ such that $ l \le j \le i_k \Rightarrow x^k_{i_k} = x^k_j $ and $ j < l \Rightarrow x^k_{i_k} > x^k_j $
+  \item the algorithm runs in time linear (if mean of means pivot scheme) in $b_k - f_k$
+  \end{enumerate}
+  Note that only the elements $x^k_j$ for $j = f_k, \dots, b_k$ makes it possible to achieve the desired time complexity.
+\end{lemma}
+The above conditions primarily state that each call to the partition scheme performs partial sorting such that all elements less than or equal to the pivot will be at a lower index, and elements greater than the pivot will be at a higher index. 
+
+In order to prove that the algorithm is optimal, we first show that $\quant_{\alpha}^-(\tilde{x})$ is an element in the array. 
 \begin{lem}
 Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite $\Omega$. Then, there exist $\omega_1, \omega_2\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_1)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_2)$ for each $\alpha\in (0,1)$.
 \end{lem}
@@ -325,7 +334,7 @@ During the loop: There are five possible scenarios at each iteration:
  Finally we prove that the time complexity of our proposed algorithm is linear in the expected case. 
 \begin{lem}
   \Cref{alg:quick_quantile} achieves a time complexity of $\mathcal{O}(N)$
-  where $N$ is the number of elements in $\tilde{x}$.
+  where $N$ is the number of elements in $\text{Ghatkopar}', 'Mumbai', 'childrlde{x}$.
 \end{lem}
 \begin{proof}
   From \todo{insert citation here}, the time complexity for the while loop with the Dutch partition scheme is $O(n)$ in the expected case. Since line 4 will at most take as many steps as a single call to the partition function, and the remaining lines in each iteration of the while loop take constant time, the overall complexity remains unchanged. 
@@ -334,40 +343,69 @@ During the loop: There are five possible scenarios at each iteration:
 
 
 
-\section{Fast Algorithms for \texorpdfstring{$\varphi$}{phi}-divergence Risk Measures}
+\section{Computing \texorpdfstring{$\varphi$}{phi}-divergence Risk Measures in Linear Time} \label{sec:phi-divergence}
 
-\subsection{General Algorithm}
-Our first contribution is an algorithm for solving the maximum weight independent set problem \todo{need to introduce this problem} without sorting for polymatroids. We note that certain additional assumptions have to be satisfied on the submodular function as follows \todo{flow}.
 
-\todo{need label and change all hard coded references to 4.1}
+\mm{TODO: Use VaR in the algorithm intead of doing the work. }
+
+% \subsection{General Algorithm}
+Our first contribution is an algorithm for solving the minimum-weight Independent Set without sorting for polymatroids. We note that certain additional assumptions have to be satisfied in the submodular function as follows. Note that $i$ represents the index of the $i$th smallest element in the set and $f(S_i)$ represents the set of elements less than or equal to the $i$th smallest element. 
+%\begin{assumption}
+%Assume for $P_f$ that $f(U)$ is such that for all $S_i, S_{ i+1 } %\cup E$ where $S_i \cup (i + 1) = S_{ i+1 } $ and $f(S_{ i+1 }) < f(E)$, $f(S_i) + f({i + 1}) = f(S_{ i+1 })$.
+%\end{assumption}
 \begin{assumption}
-Assume for $P_f$ that $f(U)$ is such that for all $S_i, S_{ i+1 } \cup E$ where $S_i \cup (i + 1) = S_{ i+1 } $ and $f(S_{ i+1 }) < f(E)$, $f(S_i) + f({i + 1}) = f(S_{ i+1 })$.
+For a set $E$, the submodular function $f$ is such that for all $S_i \neq \emptyset, S_{ i+1 } \cup E$ where $ S_i \cup (i + 1) = S_{ i+1 } $ and $f(S_{ i+1 }) < f(E)$, $f(S_i) + f({i + 1}) - c = f(S_{ i+1 })$, where c is some constant.  If $f(S_i) = \emptyset$ then $f(S_i) + f({i + 1})= f(S_{ i+1 })$.
 \end{assumption}
-We note this assumption essentially state that the submodular function must be a piecewise linear function. 
+
+%\begin{algorithm} 
+%\algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 %\ldots n]$, non-decreasing submodular function $f\colon 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
+%\algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
+%\caption{Linear-time Algorithm CVaR/TVaR}\label{alg:maximum-weight-independent}
+ %\begin{algorithmic}[1]
+ %    \Require{}
+ %    \Ensure{}
+ %   \State{$left \gets 1$}
+ %   \State{$right \gets n$}
+ %   \While{$right  - left \geq 1$} 
+    
+ %   \State{$mid \gets partition(left, right, c)$}\todo{Where is $c$ defined?}
+ %   \If{$f(S_{mid}) = f(N)$}
+ %      \State{Let $x_i :=  \begin{cases}0 & \text{for } i > mid,\dots 
+ %      \end{cases}$}
+ %      \State{$right \gets mid$}
+ %   \Else
+ %         \State{Let $x_i :=  \begin{cases}f(i) & \text{for } i \leq mid,\dots \end{cases}$}
+ %         \State{$left \gets mid + 1$}
+ %   \EndIf{}      
+ %   \EndWhile{}
+ %   \State{$x_{right} \gets f(N) - f(S_{right - 1})$}
+%\end{algorithmic}
+%\end{algorithm}
+
 \begin{algorithm} 
-    \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
-    \algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
-  \caption{No sort Maximum Weighted Independent Set}\label{alg:maximum-weight-independent}
- \begin{algorithmic}[1]
+\algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f\colon 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$ and Assumption 4,1} 
+\algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
+\caption{Linear-time Algorithm CVaR/TVaR}\label{alg:maximum-weight-independent}
+\begin{algorithmic}[1]
      \Require{}
      \Ensure{}
-  
     \State{$left \gets 1$}
     \State{$right \gets n$}
-    \While{$left  - right \geq 1$}
+    \If{$c > 0$}
+    \State{$x_1 = f(1)$} 
+    \EndIf{}
+    \While{$right  - left \geq 1$} 
+    
     \State{$mid \gets partition(left, right, c)$}
-    \If{$f(S_{mid}) = f(N)$}
+    \State{$\alpha \gets 1$}
+    \If{$\sum_{i = front}^{back} (f(i) - c)   + \mathbb{1}(front=1)*c = \alpha$}
        \State{Let $x_i :=  \begin{cases}0 & \text{for } i > mid,\dots 
        \end{cases}$}
        \State{$right \gets mid$}
     \Else
           \State{Let $x_i :=  \begin{cases}f(i) & \text{for } i \leq mid,\dots \end{cases}$}
           \State{$left \gets mid + 1$}
-          
     \EndIf{}      
-    
-    
-    
     \EndWhile{}
     \State{$x_{right} \gets f(N) - f(S_{right - 1})$}
 \end{algorithmic}
@@ -386,24 +424,24 @@ The proof for this algorithm is simple and shows that the output is equal to tha
 \end{lem}
 
 \subsection{CVaR}
+
 As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk (CVaR) is a convex risk measure that generalizes Value-at-Risk (VaR) and can be defined as
 \begin{equation} \label{eq:primal_cvar}
   \begin{aligned}
     \cvaro_\alpha(\tilde{x})
   &= \min \left\{  \Ex{\bm{\xi}}{ \tilde{x}  } \mid
-  \bm{\xi} \leq \frac{1}{1-\alpha} p, \bm{\xi} \in \Delta^n \right\} \\
-  &= \min \left\{\bm{\xi}\tr \bm{x} \mid \bm{\xi} \leq \frac{1}{1-\alpha} \bm{p},
+  \bm{\xi} \leq \frac{1}{\alpha} p, \bm{\xi} \in \Delta^n \right\} \\
+  &= \min \left\{\bm{\xi}\tr \bm{x} \mid \bm{\xi} \leq \frac{1}{\alpha} \bm{p},
      \xi\tr \bm{1} = 1, \bm{\xi} \geq 0\right\}\\
-  &= \max \left\{ z - \frac{1}{1-\alpha} \Ex{\bm{p}}{z-\bm{x}}_+ \mid z \in \Real\right\} \\
-  &= \max \left\{ z - \frac{1}{1-\alpha} \bm{p}\tr(z-\bm{x})_+ \mid z \in \Real\right\}.
+  &= \max \left\{ z - \frac{1}{\alpha} \Ex{\bm{p}}{z-\bm{x}}_+ \mid z \in \Real\right\} \\
+  &= \max \left\{ z - \frac{1}{\alpha} \bm{p}\tr(z-\bm{x})_+ \mid z \in \Real\right\}.
   \end{aligned}
 \end{equation}
 Here, $\bm{1}$ is a vector of ones of an appropriate dimension. 
 
 \begin{lem}
-For $\omega \in \Omega$ we can construct a feasible\todo{what does feasible mean?} $Q \in \mathcal{Q}$ such that $Q(\omega) = \min\left\{\frac{P(\omega)}{1-\alpha}, 1\right\}$.
+For $\omega \in \Omega$ we can construct a feasible\todo{what does feasible mean?} $Q \in \mathcal{Q}$ such that $Q(\omega) = \min\left\{\frac{P(\omega)}{\alpha}, 1\right\}$.
 \end{lem}
-
 \begin{proof}
   \todo{why?}
   Two possible scenarios exist.
@@ -412,9 +450,9 @@ For $\omega \in \Omega$ we can construct a feasible\todo{what does feasible mean
 \item[Case 2]: $P(A) < (1 - \alpha)$. In this scenario, $Q(A) \leq \frac{1}{1 - \alpha} \cdot  P(A) < 1$. For any given $A$, we can construct a Q(A) such that $Q(A) = \frac{1}{1 - \alpha} \cdot  P(A)$. This can be done by setting $Q(a)$ to $\frac{1}{1 - \alpha} \cdot P(a)$ for all $a$ in $A$ and $P(a) \cdot  d$ otherwise such that $\frac{1}{1 - \alpha} * P(A) + d*P(B) = 1$, where $B$ contains all elements not in $A$. It is provable that $d \leq \frac{1}{1 - \alpha}$, which is required for the constructed \(Q\) to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{1 - \alpha} \ge 1$. Since $P(A) + P(B) = 1$,  $d \le 1$ in order for $\frac{1}{1 - \alpha} \cdot  P(A) + d\cdot P(B) = 1$ to hold. Since $1 \leq \frac{1}{1-\alpha}$, this implies $d\le \leq \frac{1}{1 - \alpha}$.
 
 \end{proof}
+
 \begin{lem}
-  $Q(\omega) = \min\left\{\frac{P(\omega)}{1-a}, 1\right\}$ is a submodular function that satisfies Assumption
-  4.1
+  $Q(\omega) = \min\left\{\frac{P(\omega)}{\alpha}, 1\right\}$ is a submodular function that satisfies Assumption~4.1.
 \end{lem}
 \begin{proof}
 The left hand side of the minimum function will be a summation that has all positive values for admissible $\alpha$. Thus this is equivalent to the budget additive function, which has proven to be a submodular function in the literature \todo{must find citation that isn't lecture notes}.
@@ -423,19 +461,6 @@ The left hand side of the minimum function will be a summation that has all posi
 Unless adding a new element $S_i$ will make the value of the submodular function 1, $f(S_i) + f({i + 1}) = f(S_{ i+1 })$ by definition. Since $f(S_i)$ 
 %\end{lem}
 \end{proof}
-
-
-%\subsection{EVaR}
-
-%\begin{algorithm}
- % \begin{algorithmic}
-%{Input: vector $x$, pmf $p$ solution for %CVar and maximum divergence \beta}
-%\State{Define vector $p'$ such that every element $p'_i = \frac{1}{\sum_{j} p_j} * p_i$ }
-%\State{If $\sum_{i=1}p'_i\phi(p'_i/q_i) \leq \epsilon$, this is the solution}
-%\State{ }
-%\end{algorithmic}
-%\end{algorithm}
-
 
 \subsection{TVaR}
 \todo{What does the following statement intend to prove or demonstrate?}
@@ -456,43 +481,131 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1
     \For{$i \in 1 \dots n$}
       \If{$q[i] > \quant^+$}
         \State{$\lambda \gets \lambda - q[i]$}
-        \State{$q[i] \gets 0$}
+        \State{$q[i] \gets 0$} \todo{Wouldn't it be best to return $\lambda$ here?}
       \EndIf{}
     \EndFor{}
     \State{\Return{$\lambda$}} \todo{I dont think this is right}
   \end{algorithmic}
 \end{algorithm}
 
-\section{Algorithms}
+% \subsection{Piece-wise Linear Minimization}
+% \maeve{Incorporate projection.jl }
 
-\subsection{Piece-wise Linear Minimization}
-\maeve{Incorporate projection.jl }
+% \subsection{Quick CVaR}
 
-\subsection{Quick CVaR}
+% \begin{algorithm}
+%   %\floatname{algorithm}{Quick CVaR}
+%   \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ with probability mass function p and $\alpha \in [0,1]$}}
+%   \algrenewcommand\algorithmicensure{\textbf{Output: $CVaR_\alpha(\tilde{X})$}}
+%   \caption{QCVaR}\label{alg:quick_cvar}
+%   \begin{algorithmic}[1]
+%     \Require{}
+%     \Ensure{} 
+%     \todo{Make absolutely sure that you tell the reader that we use 1 or 0 based indexing}
+%     \State{$q^+_\alpha \gets \text{quick\_quantile}(x, p, \alpha)$}
+%     \State{$val \gets 0$}
+%     \State{$p_{left} \gets 1$}
+%     \For{$i \in 0 \dots n$}
+%       \State{$inc \gets \min(\frac{p[i]}{\alpha}, p_{left})$}
+%       \State{$val += x[i] * inc$}
+%       \State{$p_{left} -= inc$}
+%       \If{$p_{left} \leq 0$}
+%         \State{Break}
+%       \EndIf{}
+%     \EndFor{}
+%     \State{\Return{$val$}}
+%   \end{algorithmic}
+% \end{algorithm}
 
-\begin{algorithm}
-  %\floatname{algorithm}{Quick CVaR}
-  \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ with probability mass function p and $\alpha \in [0,1]$}}
-  \algrenewcommand\algorithmicensure{\textbf{Output: $CVaR_\alpha(\tilde{X})$}}
-  \caption{QCVaR}\label{alg:quick_cvar}
-  \begin{algorithmic}[1]
-    \Require{}
-    \Ensure{} 
-    \todo{Make absolutely sure that you tell the reader that we use 1 or 0 based indexing}
-    \State{$q^+_\alpha \gets \text{quick\_quantile}(x, p, \alpha)$}
-    \State{$val \gets 0$}
-    \State{$p_{left} \gets 1$}
-    \For{$i = 0 \dots n$}
-      \State{$inc \gets \min(\frac{p[i]}{\alpha}, p_{left})$}
-      \State{$val += x[i] * inc$}
-      \State{$p_{left} -= inc$}
-      \If{$p_{left} \leq 0$}
-        \State{Break}
-      \EndIf{}
-    \EndFor{}
-    \State{\Return{$val$}}
-  \end{algorithmic}
-\end{algorithm}
+% \begin{algorithm}
+% \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $x \in \Real^n$ with probability mass function $p \in \Delta^n$ and $f, b \in \Real$}}
+% \algrenewcommand\algorithmicensure{\textbf{Output: indices of partion $i, j \in \Real$}}
+% \caption{Hoare's partition scheme}\label{alg:partition}
+%   \begin{algorithmic}[1]
+%     \Require{}
+%     \Ensure{} 
+%     \State{$i \gets f + \lceil\frac{b-f}{2}\rceil$}
+%     \State{$\lambda \gets f$} % less than
+%     \State{$\xi \gets f$} % equal to
+%     \State{$\mu \gets b$} % greater than
+%     \While{$\xi \leq \mu$}
+%       \If{$x[\xi] < x[i]$}
+%         \State{swap $x[\xi]$ with $x[\lambda]$}
+%         \State{swap $p[\xi]$ with $p[\lambda]$}
+%         \State{$\lambda \gets \mu + 1$}
+%         \State{$\xi \gets \xi + 1$}
+%       \ElsIf{$x[\xi] > x[i]$}
+%         \State{$\mu \gets \mu - 1$}
+%       \Else{}
+%         \State{$\xi \gets \xi + 1$}
+%       \EndIf{}
+%     \EndWhile{}
+%     \State{\Return{($\lambda - 1$, $\mu$)} \Comment{last element less than the pivot, first element greater than the pivot}}
+%   \end{algorithmic}
+% \end{algorithm}
+
+
+
+% \section{Greedy Algorithm}
+
+% \mm{Why would we need the weights to be non-negative?}
+
+% \begin{algorithm} \label{alg:greedy-polymatroid}
+%     \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = \{1 \ldots n\}$, non-decreasing submodular function $f : 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
+%     \algrenewcommand\algorithmicensure{\textbf{Output: }$\max \{f(S) : S\subseteq N\}$}
+%   \caption{Greedy algorithm from Submodular Functions, Polymatroids, TDI}
+%  \begin{algorithmic}[1]
+%     \Require{}
+%     \Ensure{}
+%     \State{Order the elements such that $c_1 \geq c_2 \cdots \geq c_n$.}
+%     \State{Let $S_i := \{1, \dots, i\}$ and $S_0 := \emptyset$}
+%     \State{Let $x_i :=  \begin{cases}f(S_i) - f(S_{i-1}) & \text{for } i = 1,\dots, r \\ 0 & \text{otherwise} \end{cases}$}
+% \end{algorithmic}
+% \end{algorithm}
+
+
+
+\section{Experiments}
+
+To evaluate the algorithms developed in \cref{alg:quick_cvar} and \cref{alg:quick_quantile} we numerically compare their speedup against their cannonical sorting-based counterparts. To ensure that the random variable causes as little difference in the runtime comparison we run our experiments both with uniform and sparse random variables. More detail on the experimental setup can be found in \cref{sec:appendix_experiments}.
+
+For the numerical results we refer to the cannonical implementations as their un-altered risk measure name, and for the no-sort implementations we append the ``Q'' prefix.
+
+Our results represented by Figures \ref{fig:all_sparse}, and \ref{fig:all_uniform} are rendered on plots with a 95\% confidence interval band computed over 10 random seeds. These bands are tight due to the little variance in the measured runtimes between seeds.
+
+Demonstrating the speedup of the quick algorithms over their sorting based counterparts, we observe that the quick algorithms are significantly faster than their sorting based counterparts. Especially in the case of CVaR and VaR which are extensively used in the industries aformentioned in \cref{sec:intro}.
+The results demonstrate approximately log speedup in the runtime of the quick algorithms which is consistent with the theoretical complexity of the algorithms, see \cref{sec:appendix_experiments}. This log speedup coincides with a noticeable speedup in runtime across the tested random variable sizes. For the ease of the reader to note multiplicative decreases in runtime, we present the results in both linear and log scale.
+
+In the fields of interest for this work, finance, healthcare, robotics, ect. . The computation of risk measures is
+often done over large random variables where the runtime and sensitivity of the algorithms to the size of the random variable is a concern. 
+The results presented in this section are chiefly concerned with demonstrating our ability to compute risk measures quickly, fulfilling the practical need.
+
+\begin{figure}
+  \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_linear.pdf}
+  \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_log.pdf}
+  \caption{Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{sparse} random variable.}
+  \label{fig:all_sparse}
+\end{figure}
+\begin{figure}
+  \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_uniform_linear.pdf}
+  \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_uniform_log.pdf}
+  \caption{Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{uniform} random variable.}
+  \label{fig:all_uniform}
+\end{figure}
+
+\section{Conclusion}
+
+We have formulated and demonstrated the correctness of a new algorithm for computing the maximum weight independent set for polymatroids without sorting.
+Which allowed us to solve many common risk measures such as CVaR, VaR, and TVaR in $O(N)$ time.
+This speedup is significant in the context of risk measures as they are often used in large scale applications such as finance, healthcare and robotics.
+
+This work was partly supported by \todo{who supported us? Thank you Marek ;)}
+
+\bibliography{fastcvar.bib}
+
+\appendix
+
+\section{Proofs and Details for \cref{sec:var-linear}}
 
 \begin{algorithm}
 \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $x \in \Real^n$ with probability mass function $p \in \Delta^n$ and $f, b \in \Real$}}
@@ -521,67 +634,8 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1
   \end{algorithmic}
 \end{algorithm}
 
+\section{Proofs and Details for \cref{sec:phi-divergence}}
 
-
-\section{Greedy Algorithm}
-
-\mm{Why would we need the weights to be non-negative?}
-
-\begin{algorithm} \label{alg:greedy-polymatroid}
-    \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
-    \algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
-  \caption{Greedy algorithm from Submodular Functions, Polymatroids, TDI}
- \begin{algorithmic}[1]
-    \Require{}
-    \Ensure{}
-    \State{Order the elements such that $c_1 \geq c_2 \cdots \geq c_n$.}
-    \State{Let $S_i := \{1, \dots, i\}$ and $S_0 := \emptyset$}
-    \State{Let $x_i :=  \begin{cases}f(S_i) - f(S_{i-1}) & \text{for } i = 1,\dots, r \\ 0 & \text{otherwise} \end{cases}$}
-\end{algorithmic}
-\end{algorithm}
-
-
-
-
-\section{Experiments}
-
-To evaluate the algorithms developed in \cref{alg:quick_cvar} and \cref{alg:quick_quantile} we numerically compare their speedup against their cannonical sorting-based counterparts. To ensure that the random variable causes as little difference in the runtime comparison we run our experiments both with uniform and sparse random variables. More detail on the experimental setup can be found in \cref{sec:appendix_experiments}.
-
-For the numerical results we refer to the cannonical implementations as their un-altered risk measure name, and for the no-sort implementations we append the ``Q'' prefix.
-
-Our results represented by Figures \ref{fig:all_sparse}, and \ref{fig:all_uniform} are rendered on plots with a 95\% confidence interval band computed over 10 random seeds. These bands are tight due to the little variance in the measured runtimes between seeds.
-
-Demonstrating the speedup of the quick algorithms over their sorting based counterparts, we observe that the quick algorithms are significantly faster than their sorting based counterparts. Especially in the case of CVaR and VaR which are extensively used in the industries aformentioned in \cref{sec:intro}.
-The results demonstrate approximately log speedup in the runtime of the quick algorithms which is consistent with the theoretical complexity of the algorithms, see \cref{sec:appendix_experiments}. This log speedup coincides with a noticeable speedup in runtime across the tested random variable sizes. For the ease of the reader to note multiplicative decreases in runtime, we present the results in both linear and log scale.
-
-In the fields of interest for this work, finance, healthcare, robotics, ect. . The computation of risk measures is
-often done over large random variables where the runtime and sensitivity of the algorithms to the size of the random variable is a concern. 
-The results presented in this section are chiefly concerned with demonstrating our ability to compute risk measures quickly, fulfilling the practical need.
-
-\begin{figure}[htbp]
-  \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_linear.pdf}
-  \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_log.pdf}
-  \caption{Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{sparse} random variable.}
-  \label{fig:all_sparse}
-\end{figure}
-\begin{figure}[htbp]
-  \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_uniform_linear.pdf}
-  \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_uniform_log.pdf}
-  \caption{Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{uniform} random variable.}
-  \label{fig:all_uniform}
-\end{figure}
-
-\section{Conclusion}
-
-We have formulated and demonstrated the correctness of a new algorithm for computing the maximum weight independent set for polymatroids without sorting.
-Which allowed us to solve many common risk measures such as CVaR, VaR, and TVaR in $O(N)$ time.
-This speedup is significant in the context of risk measures as they are often used in large scale applications such as finance, healthcare and robotics.
-
-This work was partly supported by \todo{who supported us? Thank you Marek ;)}
-
-\bibliography{fastcvar.bib}
-
-\appendix
 
 \section{No-sort Polymatroid}
 
@@ -601,12 +655,13 @@ We note this assumption essentially state that the submodular function must be a
   
     \State{$left \gets 1$}
     \State{$right \gets n$}
-    \While{$left  - right \geq 1$}
+    \While{$right - left \geq 1$}
+    
     \State{$mid \gets partition(left, right, c)$}
     \If{$f(S_{mid}) = f(N)$}
-       \State{Let $x_i :=  \begin{cases}0 & \text{for } i \geq mid,\dots \end{cases}$}
+       \State{Let $x_i :=  \begin{cases}0 & \text{if  } f(S_{mid}) = f(N) \text{ for } i \geq mid \\ f(i) \end{cases}$}
     \Else
-          \State{Let $x_i :=  \begin{cases}f(i) & \text{for } i \leq mid,\dots \end{cases}$}
+          \State{Let $x_i :=  \begin{cases}f(i) & \text{for } i \leq mid \end{cases}$}
     \EndIf{}      
     
     
@@ -626,7 +681,7 @@ The optimal solution will always be $f(S_i) - f(S_{i-1})$ assuming the weight $c
 \section{Comonotonicity of Risk}
 
 \begin{definition}
-  Two random variables $\tilde{x}$ and $\tilde{y}$ are said to be comonotonic if
+Two random variables $\tilde{x}$ and $\tilde{y}$ are said to be comonotonic if
   \begin{align*}
     (\tilde{x}(\omega) - \tilde{x}(\omega'))(\tilde{y}(\omega) - \tilde{y}(\omega')) \geq 0 \quad \forall \; \omega, \omega' \in \Omega.
   \end{align*}
@@ -755,6 +810,60 @@ Code and results for these experiments as well as the implementations of all con
   \caption{Linear regression fit of a logaritmic function to the ratio of the time taken to compute $\cvar{0.5}{\tilde{x}}$ by sorting (CVaR) and quickselect (QCVaR).}
   \label{fig:cvar_div_qcvar}
 \end{figure}
+
+
+\section{Algorithms}
+
+\subsection{Piece-wise Linear Minimization}
+\maeve{Incorporate projection.jl }
+
+\subsection{Quick CVaR}
+
+\begin{algorithm}
+  %\floatname{algorithm}{Quick CVaR}
+  \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ with probability mass function p and $\alpha \in [0,1]$}}
+  \algrenewcommand\algorithmicensure{\textbf{Output: $CVaR_\alpha(\tilde{X})$}}
+  \caption{QCVaR}\label{alg:quick_cvar}
+  \begin{algorithmic}[1]
+    \Require{}
+    \Ensure{} 
+    \todo{Make absolutely sure that you tell the reader that we use 1 or 0 based indexing}
+    \State{$q^+_\alpha \gets \text{quick\_quantile}(x, p, \alpha)$}
+    \State{$val \gets 0$}
+    \State{$p_{left} \gets 1$}
+    \For{$i \in 0 \dots n$}
+      \State{$inc \gets \min(\frac{p[i]}{\alpha}, p_{left})$}
+      \State{$val += x[i] * inc$}
+      \State{$p_{left} -= inc$}
+      \If{$p_{left} \leq 0$}
+        \State{Break}
+      \EndIf{}
+    \EndFor{}
+    \State{\Return{$val$}}
+  \end{algorithmic}
+\end{algorithm}
+
+
+\section{Greedy Algorithm}
+
+\mm{Why would we need the weights to be non-negative?}
+
+\begin{algorithm} \label{alg:greedy-polymatroid}
+    \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
+    \algrenewcommand\algorithmicensure{\textbf{Output: }$\max \{f(S) : S\subseteq N\}$}
+  \caption{Greedy algorithm from Submodular Functions, Polymatroids, TDI}
+ \begin{algorithmic}[1]
+    \Require{}
+    \Ensure{}
+    \State{Order the elements such that $c_1 \geq c_2 \cdots \geq c_n$.}
+    \State{Let $S_i := \{1, \dots, i\}$ and $S_0 := \emptyset$}
+    \State{Let $x_i :=  \begin{cases}f(S_i) - f(S_{i-1}) & \text{for } i = 1,\dots, r \\ 0 & \text{otherwise} \end{cases}$}
+\end{algorithmic}
+\end{algorithm}
+
+
+
+
 \end{document}
 
 %%% Local Variables:

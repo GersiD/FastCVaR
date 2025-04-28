@@ -66,7 +66,7 @@
 \newtheorem{example}{Example}
 
 
-\title{Computing VaR, CVaR, and TVaR in Linear Time}% and $\varphi$-divergence Risk Measures}
+\title{Nosort: Computing VaR, CVaR, and TVaR in Linear Time}% and $\varphi$-divergence Risk Measures}
 %\author{Palash Agrawal, Gersi Doko, Maeve Burwell, Marek Petrik}
 %\date{}
 
@@ -85,19 +85,25 @@ Monetary measures of risk generalize the expectation operator to be able to repr
 
 %However, in many applications such as robotics, finance, and autonomous systems, solutions must account for performance with respect to worst case scenarios rather than simply maximizing the mean. Therefore, it has become a common practice to optimize policies with respect to a risk measure~\cite{Follmer2016}, which focuses on the tails of the reward distribution rather than the expectation. 
 
-% what are we doing; our contributions 
-In this work, we make  risk measures fast. Not just fast, very fast. We can solve several common risk measures in linear time, including VaR and CVaR. Our approach is general and encapsulates new cool amazing useful risk $\varphi$-divergence measures that can be solved in linear time. We call one of these TVaR and this matters because \todo{motivate} 
+% what are we doing; our contributions
+This paper proposes new fast algorithms for computing risk measures of discrete random variables. First, we propose a new linear-time VaR evaluation algorithm. Our VaR algorithm, which we call \emph{quickquantile}, builds on the well-known ideas of quickselect but generalizes it to quantile. The worst-case linear-time upper bound of quickquantile matches the linear-time lower bound~\cite{}. Second, building on quickquantile we propose a general algorithm for evaluating some $\varphi$-divergence risk measures~\cite{}, which include CVaR and Total-Value-at-Risk (TVaR)~\cite{}. The algorithm, which we call \emph{quickdivergence}, works by representing certain $\varphi$-divergence risk measures as a linear minimization over polymatroids. The linear worst-case runtime of quickdivergence also matches the known lower bounds on the runtime~\cite{}. 
+
+As far as we know, no prior work has studied linear-time algorithms for risk measures. The conventional VaR algorithm for a discrete random variable must sort its values before it can evaluate its risk. As a result, the sort's runtime, which requires $\Omega(n \log n)$ operations where $n$ is the number of the probability mass function~(pmf) entries, dominates the runtime complexity of VaR.
+
+Coherent risk measures, like CVaR and TVaR, can be evaluated by solving convex optimization problems. Although most of these optimization problems are tractable, their time complexity is too large to be practical. Most practical implementations rely on specific properties of these optimization problems to compute the solution more efficiently. For example, all existing CVaR algorithms must sort the values of the random variable to compute its value. As in the case of VaR, the $\Omega(n \log  n)$ time complexity of the sort in the CVaR algorithms dominates the complexity and prevents linear time computation. In this paper, we circumvent the complexity of sorting by developing no-sort algorithms.
+
+\mm{--- Here ---}
+For coherent risk measures, it has been shown that computing these risk measures is equivalent to solving a robust optimization problem where a probability distribution must be selected to minimize the expectation of a random variable subject to a divergence constraint from a normal distribution. For certain risk measures that satistfy an additional property known as comonotinicity, it is known that this optimization problem can be casted as the maximum weighted independent set problem (MWIS) on a polymathic.
 
 % how we are doing this? connect phi-divergence risk measures and polymatroids
-For certain classes of polymatroids, we solve the Maximum-Weight-Independent-Sum (MWIS) problem in $O(N)$ time. In turn we demonstrate multiple examples of coherent and comonotonic risk measures which benifit from this observation. Finally for phi-divergence risk measures, which are a subset of coherent risk measures such that the divergence constraint is a phi-divergence, we establish the necessary conditions on the divergence in order for the resulting optimization problem to compute the risk measure be a MWIS.
+% For certain classes of polymatroids, we solve the Maximum-Weight-Independent-Sum (MWIS) problem in $O(N)$ time. In turn we demonstrate multiple examples of coherent and comonotonic risk measures which benifit from this observation. Finally for phi-divergence risk measures, which are a subset of coherent risk measures such that the divergence constraint is a phi-divergence, we establish the necessary conditions on the divergence in order for the resulting optimization problem to compute the risk measure be a MWIS.
 
 % justify why this is important
-In applications like finance, healthcare, and robotics, certain properties of risk measures have been established as desirable. These include positive homogeneity, subadditivity, translation invariance, and monotonicity~\citep{Follmer2016}. Risk measures that satisfy these properties are known as coherent risk measures. Coherent risk measures, when optimized, allow for policies which are risk-sensitive. In the applications of finance, healthcare, and robotics risk-sensitive policies often best match human preferences in their respective domains\todo{cite}. These human preferences, when summed, equate to ensuring good performance even in situations of uncertainty.
+% In applications like finance, healthcare, and robotics, certain properties of risk measures have been established as desirable. These include positive homogeneity, subadditivity, translation invariance, and monotonicity~\citep{Follmer2016}. Risk measures that satisfy these properties are known as coherent risk measures. Coherent risk measures, when optimized, allow for policies which are risk-sensitive. In the applications of finance, healthcare, and robotics risk-sensitive policies often best match human preferences in their respective domains\todo{cite}. These human preferences, when summed, equate to ensuring good performance even in situations of uncertainty.
 
 % justify why this is novel
-Many applications of risk measures in the aformentioned fields require that they are efficiently computed. Compute time and resources are a major concern in real-world applications. For example, in finance, the computation of risk measures is often a bottleneck in portfolio optimization and risk management where trades are often made on intervals of milliseconds. Likewise in robotics, the computation of risk measures is often a bottleneck in real-time decision making. In healthcare, the computation of risk measures is often a bottleneck in clinical decision support systems which may care for a large quanity of patients.
+% Many applications of risk measures in the aformentioned fields require that they are efficiently computed. Compute time and resources are a major concern in real-world applications. For example, in finance, the computation of risk measures is often a bottleneck in portfolio optimization and risk management where trades are often made on intervals of milliseconds. Likewise in robotics, the computation of risk measures is often a bottleneck in real-time decision making. In healthcare, the computation of risk measures is often a bottleneck in clinical decision support systems which may care for a large quanity of patients.
 
-For coherent risk measures, it has been shown that computing these risk measures is equivalent to solving a robust optimization problem where a probability distribution must be selected to minimize the expectation of a random variable subject to a divergence constraint from a normal distribution. For certain risk measures that satistfy an additional property known as comonotinicity, it is known that this optimization problem can be casted as the maximum weighted independent set problem (MWIS) on a polymathic.
 
 % the remainder of the paper is organized as follows.
 \todo{The remainder of this work is organized as follows.}

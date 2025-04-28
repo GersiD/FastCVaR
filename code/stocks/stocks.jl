@@ -65,12 +65,12 @@ println("Number of rows: ", size(df, 1))
 window = 10
 trials = 10
 results = Vector{NamedTuple{(:n, :cvar, :qcvar, :var, :qvar, :tvar, :qtvar),Tuple{Int64,Float64,Float64,Float64,Float64,Float64,Float64}}}()
-for i in range(1, stop=size(df, 1))
-  println("Processing row: ", i)
+for i in ProgressBar(range(1, stop=size(df, 1)))
+  # println("Processing row: ", i)
   # Get the data for the current window
   row = df[i, :]
   if ismissing(row[:Mean]) || ismissing(row[:Std])
-    println("Row $i is missing data, skipping")
+    # println("Row $i is missing data, skipping")
     continue
   end
   μ = row[:Mean]
@@ -78,7 +78,7 @@ for i in range(1, stop=size(df, 1))
   # @show row
   lower_return = μ - 3 * σ
   upper_return = μ + 3 * σ
-  x = collect(lower_return:0.01:upper_return)
+  x = collect(range(lower_return, stop=upper_return, length=10000))
   dist = Normal(μ, σ)
   p = pdf.(dist, x)
   p ./= sum(p)
@@ -101,4 +101,4 @@ for i in range(1, stop=size(df, 1))
 end
 # Save the DataFrame
 results_df = DataFrame(results)
-CSV.write("./plots/stock_matchup.csv", results_df)
+CSV.write("./stocks/stock_matchup.csv", results_df)

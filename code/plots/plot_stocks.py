@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from scipy import stats
 
 # Load the CSV with the results (assuming the file is named 'experiment_runtimes_with_ids.csv')
-df = pd.read_csv("./plots/stock_matchup.csv")
+df = pd.read_csv("./stocks/stock_matchup.csv")
 
 # Group by timestep and calculate mean and standard deviation
 grouped = df.groupby('n').agg(

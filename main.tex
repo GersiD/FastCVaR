@@ -15,7 +15,8 @@
 
 \usepackage{graphicx} % Required for inserting images
 \usepackage{mpemath}
-\usepackage[colorlinks=true]{hyperref} % For hyperlinks in the PDF like citations
+\usepackage[dvipsnames]{xcolor} 
+\usepackage[colorlinks=true,citecolor=BlueViolet]{hyperref} % For hyperlinks in the PDF like citations
 \usepackage{dsfont}
 \usepackage{amsmath}
 \usepackage{mathtools}
@@ -26,8 +27,6 @@
 \usepackage{natbib}
 \usepackage{booktabs}
 \usepackage{setspace}
-% \usepackage{fullpage} % neurips complained
-\usepackage[dvipsnames]{xcolor} % Saved my life during a conference once
 
 
 \newcommand{\gersi}[1]{\textcolor{red}{#1}}
@@ -67,24 +66,24 @@
 \newtheorem{example}{Example}
 
 
-% \title{CVaR in Linear Time}
-\title{Fast Algorithms for VaR and $\varphi$-divergence Risk Measures}
-\author{Palash Agrawal, Gersi Doko, Maeve Burwell, Marek Petrik}
-\date{}
+\title{Computing VaR, CVaR, and TVaR in Linear Time}% and $\varphi$-divergence Risk Measures}
+%\author{Palash Agrawal, Gersi Doko, Maeve Burwell, Marek Petrik}
+%\date{}
 
 \begin{document}
 
 \maketitle
-\todo{
-  \begin{itemize}
-    \item check formatting for neurips, no more than 9 pages
-  \end{itemize}
-}
+
+\begin{abstract}
+Monetary risk measures have gained popularity in expressing decision-makers' preferences for risk aversion. Value-at-Risk (VaR) and Conditional-Value-at-Risk are some of the most common risk measures. This paper proposes new algorithms for computing these risk measures for discrete distributions in linear time. Our algorithms improve on existing algorithms---which must sort the random variable---by at least a logarithmic factor. Our algorithms adapt the quickselect algorithm and combine it with a general polymatroid representation of $\varphi$-divergence risk measures.    
+\end{abstract}
 
 \section{Introduction}\label{sec:intro}
 
-% 1-2 paragraphs for general motivation ... what are risk measures and why they matter
-In standard paradigms of reinforcement learning and decision making, it is common to maximize the expectation of the cumulative discounted future reward which depends on future states, policy actions, and translation dynamics~\cite{Sutton1998}. However, in many applications such as robotics, finance, and autonomous systems, solutions must account for performance with respect to worst case scenarios rather than simply maximizing the mean. Therefore, it has become a common practice to optimize policies with respect to a risk measure~\cite{Follmer2016}, which focuses on the tails of the reward distribution rather than the expectation. 
+Monetary measures of risk generalize the expectation operator to be able to represent the risk aversion of decision makers in domains that range from robotics~\cite{} to finance~\cite{} to infrastructure maintenance~\cite{}. Value-at-Risk~(VaR) and Conditional-Value-at-Risk~(CVaR) are the most popular risk measures and have been making inroads in reinforcement learning, machine learning, and decision-making~\cite {Petrik2024}. Machine learning and reinforcement learning algorithms typically must compute the risk measures for discrete random variables. Fast algorithms for computing risk measures are necessary in several machine-learning settings~\cite{}. For example, when used as a part of an optimization algorithm, the risk measure may need to be evaluated in every iteration of the algorithm and can represent a significant computational bottleneck~\cite{}. 
+
+
+%However, in many applications such as robotics, finance, and autonomous systems, solutions must account for performance with respect to worst case scenarios rather than simply maximizing the mean. Therefore, it has become a common practice to optimize policies with respect to a risk measure~\cite{Follmer2016}, which focuses on the tails of the reward distribution rather than the expectation. 
 
 % what are we doing; our contributions 
 In this work, we make  risk measures fast. Not just fast, very fast. We can solve several common risk measures in linear time, including VaR and CVaR. Our approach is general and encapsulates new cool amazing useful risk $\varphi$-divergence measures that can be solved in linear time. We call one of these TVaR and this matters because \todo{motivate} 

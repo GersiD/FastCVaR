@@ -608,6 +608,23 @@ The results presented in this section are chiefly concerned with demonstrating o
   \caption{Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{uniform} random variable.}
   \label{fig:all_uniform}
 \end{figure}
+\begin{table}[ht]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+Method & Mean (ms) & Std Dev (ms) \\
+\hline
+CVaR & 1407.6715 & 193.9207 \\ 
+\textbf{qCVaR} & 49.2078 & 88.8513 \\ 
+VaR & 1388.6795 & 234.1583 \\ 
+\textbf{qVar} & 23.2522 & 5.1837 \\ 
+TVaR & 54.2414 & 167.6987 \\ 
+\textbf{qTVaR} & 75.5935 & 236.7072 \\ 
+
+\hline
+\end{tabular}
+\caption{Results for our Stock Market experiment.}
+\end{table}
 
 \section{Conclusion}
 

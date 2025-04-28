@@ -11,13 +11,14 @@ from sklearn.utils.sparsefuncs import mean_variance_axis
 
 class Plotter(object):
     """Wrapper class that keeps track of a dataset and its info for plotting"""
-    def __init__(self, filename: str, df: pd.DataFrame, slow_cols: list[str], fast_cols: list[str], col2Name: dict[str, str], col2Marker: dict[str, str], special: str = ""):
+    def __init__(self, filename: str, df: pd.DataFrame, slow_cols: list[str], fast_cols: list[str], col2Name: dict[str, str], col2Marker: dict[str, str], col2Color: dict[str, str], special: str = ""):
         self.filename:str = filename
         self.df: pd.DataFrame = df 
         self.slow_cols: list[str] = slow_cols # which col is slow
         self.fast_cols: list[str] = fast_cols # which col is fast
         self.col2Name: dict[str, str] = col2Name # column name to display on graph
         self.col2Marker: dict[str, str] = col2Marker # column name to display on graph
+        self.col2Color: dict[str, str] = col2Color
         self.special:str = special # e.g. 'uniform', 'sparse' for final filename
         self.CI = self.compute_cis_means() # confidence intervals for each method
         # Set the font type to TrueType Globally
@@ -61,9 +62,9 @@ def plot_slow_vs_fast_data(plotter: Plotter, slow: str, fast: str):
     unique_sizes = plotter.df['n'].unique()
     cis_slow, means_slow = plotter.CI[slow]
     cis_fast, means_fast = plotter.CI[fast]
-    plt.plot(unique_sizes, means_slow, label=plotter.col2Name[slow], marker=plotter.col2Marker[slow]) # pyright: ignore[reportArgumentType]
+    plt.plot(unique_sizes, means_slow, label=plotter.col2Name[slow], marker=plotter.col2Marker[slow], color=plotter.col2Color[slow]) # pyright: ignore[reportArgumentType]
     plt.fill_between(unique_sizes, np.array(means_slow) - np.array(cis_slow), np.array(means_slow) + np.array(cis_slow), alpha=0.2)# pyright: ignore[reportArgumentType]
-    plt.plot(unique_sizes, means_fast, label=plotter.col2Name[fast], marker=plotter.col2Marker[fast])# pyright: ignore[reportArgumentType]
+    plt.plot(unique_sizes, means_fast, label=plotter.col2Name[fast], marker=plotter.col2Marker[fast], color=plotter.col2Color[fast])# pyright: ignore[reportArgumentType]
     plt.fill_between(unique_sizes, np.array(means_fast) - np.array(cis_fast), np.array(means_fast) + np.array(cis_fast), alpha=0.2)# pyright: ignore[reportArgumentType]
 
 def plot_one_slow_vs_fast(plotter: Plotter, slow: str, fast: str):
@@ -157,6 +158,7 @@ if __name__ == "__main__":
     slow = ['cvar','var','tvar']
     fast = ['qcvar','qvar','qtvar']
     col2Name = {'cvar': 'CVaR', 'qcvar': 'QCVaR', 'var': 'VaR', 'qvar': 'QVaR', 'tvar': 'TVaR', 'qtvar': 'QTVaR'}
+    col2Color = {'cvar': 'blue', 'qcvar': 'blue', 'var': 'green', 'qvar': 'green', 'tvar': 'purple', 'qtvar': 'purple'}
     # markers = ["o", "v", "s", "P", "X", "D", "p", "*", "h", "H", "d", "8"]
     col2Marker = {'cvar': 'o', 'qcvar': '*', 'var': 's', 'qvar': 'P', 'tvar': 'X', 'qtvar': 'D'}
     # plot_cvar_div_qcvar(df)
@@ -167,9 +169,9 @@ if __name__ == "__main__":
         # cvar: Time to compute CVaR
         # qcvar: Time to compute QCVaR
         df = pd.read_csv(csv_file)
-        plotter = Plotter(csv_file, df, slow, fast, col2Name, col2Marker, dist)
+        plotter = Plotter(csv_file, df, slow, fast, col2Name, col2Marker, col2Color, dist)
         plot_all_slow_vs_fast(plotter)
     csv_file = "./plots/cvar_vs_qcvar_for_log_fit.csv"
     df = pd.read_csv(csv_file)
-    plotter = Plotter(csv_file, df, ["cvar"], ["qcvar"], col2Name, col2Marker, "")
+    plotter = Plotter(csv_file, df, ["cvar"], ["qcvar"], col2Name, col2Marker, col2Color, "")
     plot_cvar_div_qcvar(plotter)

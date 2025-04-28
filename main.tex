@@ -337,7 +337,9 @@ During the loop: There are five possible scenarios at each iteration:
 \section{Fast Algorithms for \texorpdfstring{$\varphi$}{phi}-divergence Risk Measures}
 
 \subsection{General Algorithm}
-Our first contribution is an algorithm for solving the maximum weight Independent Set without sorting for polymatroids. We note that certain additional assumptions have to be satisfied on the submodular function as follows.
+Our first contribution is an algorithm for solving the maximum weight independent set problem \todo{need to introduce this problem} without sorting for polymatroids. We note that certain additional assumptions have to be satisfied on the submodular function as follows \todo{flow}.
+
+\todo{need label and change all hard coded references to 4.1}
 \begin{assumption}
 Assume for $P_f$ that $f(U)$ is such that for all $S_i, S_{ i+1 } \cup E$ where $S_i \cup (i + 1) = S_{ i+1 } $ and $f(S_{ i+1 }) < f(E)$, $f(S_i) + f({i + 1}) = f(S_{ i+1 })$.
 \end{assumption}
@@ -376,7 +378,7 @@ The proof for this algorithm is simple and shows that the output is equal to tha
 \end{lem}
 \begin{proof}
   \todo{This doesnt follow from Algorithm \ref{alg:maximum-weight-independent}}
-  \textcolor{blue}{The optimal solution will always be $f(S_i) - f(S_{i-1})$ assuming the weight $c_i \geq 0$}. Therefore choose $f(i)$ for $f(S_i) < f(N)$, and by \todo{what is Assumption 1? link?}\textcolor{blue}{Assumption 1} this equals $f(S_i) - f(S_{i - 1})$. If $f(S_i) = f(N)$ and $f(S_{i - 1}) = f(N)$, then $x_i = 0$ by the algorithm.
+  \todo{The optimal solution will always be $f(S_i) - f(S_{i-1})$ assuming the weight $c_i \geq 0$}. Therefore choose $f(i)$ for $f(S_i) < f(N)$, and by \todo{what is Assumption 1? link?}\todo{Assumption 1} this equals $f(S_i) - f(S_{i - 1})$. If $f(S_i) = f(N)$ and $f(S_{i - 1}) = f(N)$, then $x_i = 0$ by the algorithm.
 \end{proof}
 
 \begin{lem}
@@ -403,7 +405,9 @@ For $\omega \in \Omega$ we can construct a feasible\todo{what does feasible mean
 \end{lem}
 
 \begin{proof}
+  \todo{why?}
   Two possible scenarios exist.
+  \todo{what is $A$}
 \item[Case 1]: $P(A) \geq 1 - \alpha$. In this scenario, $Q(A)$ must equal 1 since $\frac{1}{1 - \alpha} P(A) > 1 $. Thus, every element in $A$ should be scaled by $\frac{1}{P(A)}$ if in $A$ and set to 0 otherwise. Since  $P(A) \geq 1 - \alpha$, we can imply the reciprocal $\frac{1}{P(A)} \leq \frac{1}{1-\alpha}$ is also true.  
 \item[Case 2]: $P(A) < (1 - \alpha)$. In this scenario, $Q(A) \leq \frac{1}{1 - \alpha} \cdot  P(A) < 1$. For any given $A$, we can construct a Q(A) such that $Q(A) = \frac{1}{1 - \alpha} \cdot  P(A)$. This can be done by setting $Q(a)$ to $\frac{1}{1 - \alpha} \cdot P(a)$ for all $a$ in $A$ and $P(a) \cdot  d$ otherwise such that $\frac{1}{1 - \alpha} * P(A) + d*P(B) = 1$, where $B$ contains all elements not in $A$. It is provable that $d \leq \frac{1}{1 - \alpha}$, which is required for the constructed \(Q\) to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{1 - \alpha} \ge 1$. Since $P(A) + P(B) = 1$,  $d \le 1$ in order for $\frac{1}{1 - \alpha} \cdot  P(A) + d\cdot P(B) = 1$ to hold. Since $1 \leq \frac{1}{1-\alpha}$, this implies $d\le \leq \frac{1}{1 - \alpha}$.
 
@@ -413,9 +417,10 @@ For $\omega \in \Omega$ we can construct a feasible\todo{what does feasible mean
   4.1
 \end{lem}
 \begin{proof}
-The left hand side of the minimum function will be a summation that has all positive values for admissible $\alpha$. Thus this is equivalent to the budget additive function, which has proven to be a submodular function in the literature (must find citation that aren't lecture notes).
+The left hand side of the minimum function will be a summation that has all positive values for admissible $\alpha$. Thus this is equivalent to the budget additive function, which has proven to be a submodular function in the literature \todo{must find citation that isn't lecture notes}.
 
-Unless adding a new element $S_i$ will make the value of the submodular function 1, $f(S_i) + f({i + 1}) = f(S_{ i+1 })$ by definition. Since $f(S_i)$
+\todo{What does the following statement intend to prove or demonstrate?}
+Unless adding a new element $S_i$ will make the value of the submodular function 1, $f(S_i) + f({i + 1}) = f(S_{ i+1 })$ by definition. Since $f(S_i)$ 
 %\end{lem}
 \end{proof}
 
@@ -433,6 +438,7 @@ Unless adding a new element $S_i$ will make the value of the submodular function
 
 
 \subsection{TVaR}
+\todo{What does the following statement intend to prove or demonstrate?}
 From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1^2$. Thus, the coherent risk measure TVaR with the divergence constraint $\|p - q\|_1 \leq \sqrt{2*ln(2)*\alpha}$ must be $\leq EVaR_\alpha(p)$. Submodular function is $Q(\omega) = \min\left\{\beta/2 + P(\omega), 1\right\}$
 
 \begin{algorithm}

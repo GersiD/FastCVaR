@@ -157,8 +157,6 @@ $\varphi$-divergences can be defined as
 \] 
 for two discrete, absolutely continuous probability distributions $p$ and $q$, and convex $\phi$ such that $\phi(1)=0$. 
 
-
-
 Recall that any coherent risk measure can be defined as 
 \begin{align}\label{eq:correspondence_coherent_risk}
   \rho(X)=\sup_{Q\in \mathcal{Q}}\mathbb{E}_Q [-X],
@@ -167,16 +165,34 @@ where $\mathcal{Q}$ is a subset of all probability measures on $\Omega$~\cite[Pr
 \[
  \mathcal{Q} := \left\{ q \in \Real^{\Omega} \mid I_{\varphi}(p \| q) \le \beta  \right\} 
 \]
+
 Phi-divergence risk measures can be defined as a coherent risk measure for which $\mathcal{Q}$ contains all $Q$ such that $I_\phi(P, Q) \le \beta$, where $\beta$ is a constant typically dependent on the risk level. $\varphi$-entropic (also known as $g$-entropic risk measures) can be seen as the primal representation of these risk measures. All $\varphi$-entropic risk measures take on the following form for $\beta \in \Real$ and any proper, lower semi-continuous, and convex function $\varphi\colon \Real \to \bar{\Real}$~\cite{Ahmadi-Javid2011,Ahmadi-Javid2017}: 
 \[
 \ER_{g,\beta}(\tilde{x}) = \sup_{t > 0, v \in \Real} t \left(v + \E { - \varphi\opt \left(-\frac{\tilde{x}}{t} + v + \beta \right)}\right),
 \] 
 where $\varphi^{\star}$ the convex conjugate of the $\varphi$-divergence $\varphi$. EVaR, for example, is a well known example of phi-divergence risk measure where the phi-Divergence is the KL-divergence~\cite{Ahmadi-Javid2017}.
 
+
 The primal formulation is
 \[
 \ER_{g,\beta}(\tilde{x}) = \inf \left\{q\tr x \mid I_{\varphi}(p \| q) \le \beta,   q\in \Real^N \right\}   
 \] 
+
+
+
+As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk (CVaR) is a convex risk measure that generalizes Value-at-Risk (VaR) and can be defined as
+\begin{equation} \label{eq:primal_cvar}
+  \begin{aligned}
+    \cvaro_\alpha(\tilde{x})
+  &= \min \left\{  \Ex{\bm{\xi}}{ \tilde{x}  } \mid
+  \bm{\xi} \leq \frac{1}{\alpha} p, \bm{\xi} \in \Delta^n \right\} \\
+  &= \min \left\{\bm{\xi}\tr \bm{x} \mid \bm{\xi} \leq \frac{1}{\alpha} \bm{p},
+     \xi\tr \bm{1} = 1, \bm{\xi} \geq 0\right\}\\
+  &= \max \left\{ z - \frac{1}{\alpha} \Ex{\bm{p}}{z-\bm{x}}_+ \mid z \in \Real\right\} \\
+  &= \max \left\{ z - \frac{1}{\alpha} \bm{p}\tr(z-\bm{x})_+ \mid z \in \Real\right\}.
+  \end{aligned}
+\end{equation}
+Here, $\bm{1}$ is a vector of ones of an appropriate dimension. 
 
 
 \begin{table}
@@ -205,11 +221,11 @@ f(\mathcal{A}) + f(\mathcal{B}) \geq f(\mathcal{A} \cup \mathcal{B}) + f(\mathca
 \]
 We define the polymatroid associated to $f$ to be the following polytope:
 \[
-  Q_f = \left\{ \bm{q} \in \Real_+^E  \mid  \sum_{e \in \mathcal{U}} \bm{q}(e) \leq f(\mathcal{U}), \;\; \forall \; \mathcal{U} \subseteq \mathcal{E} \right\}.
+  \mathcal{Q}_f = \left\{ \bm{q} \in \Real_+^E  \mid  \sum_{e \in \mathcal{U}} \bm{q}(e) \leq f(\mathcal{U}), \;\; \forall \; \mathcal{U} \subseteq \mathcal{E} \right\}.
 \]
 This polytope is of special interest for computing risk measures, as we will see later on that all coherent and comonotonic risk measures can be computed by solving
 \begin{align}\label{eq:polytope}
-  \max_{q}\left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in Q_f\right\}
+  \max_{q}\left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}
 \end{align}
 
 \begin{theorem}[Corollary 4.95 in~\cite{Follmer2016}]
@@ -350,12 +366,18 @@ During the loop: There are five possible scenarios at each iteration:
 
 % \subsection{General Algorithm}
 Our first contribution is an algorithm for solving the minimum-weight Independent Set without sorting for polymatroids. We note that certain additional assumptions have to be satisfied in the submodular function as follows. Note that $i$ represents the index of the $i$th smallest element in the set and $f(S_i)$ represents the set of elements less than or equal to the $i$th smallest element. 
-%\begin{assumption}
-%Assume for $P_f$ that $f(U)$ is such that for all $S_i, S_{ i+1 } %\cup E$ where $S_i \cup (i + 1) = S_{ i+1 } $ and $f(S_{ i+1 }) < f(E)$, $f(S_i) + f({i + 1}) = f(S_{ i+1 })$.
-%\end{assumption}
-\begin{assumption}
-For a set $E$, the submodular function $f$ is such that for all $S_i \neq \emptyset, S_{ i+1 } \cup E$ where $ S_i \cup (i + 1) = S_{ i+1 } $ and $f(S_{ i+1 }) < f(E)$, $f(S_i) + f({i + 1}) - c = f(S_{ i+1 })$, where c is some constant.  If $f(S_i) = \emptyset$ then $f(S_i) + f({i + 1})= f(S_{ i+1 })$.
+
+\mm{this is motivated by the maximum independent set algorithm}
+\begin{assumption} \label{asm:submodular-function}
+  For $\mathcal{N} = \left\{ 1, \dots , N \right\}$, the function $f\colon 2^{\mathcal{N}} \to \Real_+$ $f(\emptyset) = 0$, $f(N) = 1$, $f$ is \emph{sub-modular} and satisfies also that:
+  \begin{enumerate}
+  \item $f(\mathcal{O}) = g(\mathbb{P}[\mathcal{O}]), \forall \mathcal{O} \subseteq \Omega$, for some $g\colon \Real_+ \to  \Real_+$
+  \item $g$ is linear on $\left\{ t > 0 \mid  g(t) \le 1 \right\}$ 
+  \end{enumerate}
+   % $S_i \neq \emptyset, S_{ i+1 } \cup E$ where $ S_i \cup \{i + 1\} = S_{ i+1 } $ and $f(S_{ i+1 }) < f(E)$, $f(S_i) + f(\{i + 1\}) - c = f(S_{ i+1 })$, where c is some constant.  If $f(S_i) = \emptyset$ then $f(S_i) + f(\{i + 1\})= f(S_{ i+1 })$.
 \end{assumption}
+
+\mm{the point 1. above is satisfied for any law-invariant comonotonic coherent risk measure. Follmer and Schied}
 
 %\begin{algorithm} 
 %\algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 %\ldots n]$, non-decreasing submodular function $f\colon 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
@@ -383,7 +405,7 @@ For a set $E$, the submodular function $f$ is such that for all $S_i \neq \empty
 %\end{algorithm}
 
 \begin{algorithm} 
-\algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f\colon 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$ and Assumption 4,1} 
+\algrenewcommand\algorithmicrequire{\textbf{Input: } Finite $N = [1 \ldots n]$, $f\colon 2^N \to  \Real_+$ satisfying \cref{asm:submodular-function} } 
 \algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
 \caption{Linear-time Algorithm CVaR/TVaR}\label{alg:maximum-weight-independent}
 \begin{algorithmic}[1]
@@ -425,27 +447,22 @@ The proof for this algorithm is simple and shows that the output is equal to tha
 
 \subsection{CVaR}
 
-As observed in~\cite{rockefeller1996variational}, the Conditional Value-at-Risk (CVaR) is a convex risk measure that generalizes Value-at-Risk (VaR) and can be defined as
-\begin{equation} \label{eq:primal_cvar}
-  \begin{aligned}
-    \cvaro_\alpha(\tilde{x})
-  &= \min \left\{  \Ex{\bm{\xi}}{ \tilde{x}  } \mid
-  \bm{\xi} \leq \frac{1}{\alpha} p, \bm{\xi} \in \Delta^n \right\} \\
-  &= \min \left\{\bm{\xi}\tr \bm{x} \mid \bm{\xi} \leq \frac{1}{\alpha} \bm{p},
-     \xi\tr \bm{1} = 1, \bm{\xi} \geq 0\right\}\\
-  &= \max \left\{ z - \frac{1}{\alpha} \Ex{\bm{p}}{z-\bm{x}}_+ \mid z \in \Real\right\} \\
-  &= \max \left\{ z - \frac{1}{\alpha} \bm{p}\tr(z-\bm{x})_+ \mid z \in \Real\right\}.
-  \end{aligned}
-\end{equation}
-Here, $\bm{1}$ is a vector of ones of an appropriate dimension. 
 
 \begin{lem}
-For $\omega \in \Omega$ we can construct a feasible\todo{what does feasible mean?} $Q \in \mathcal{Q}$ such that $Q(\omega) = \min\left\{\frac{P(\omega)}{\alpha}, 1\right\}$.
+  For $\mathcal{O} \subseteq \Omega$, define $f\colon 2^{\Omega} \to \Real_+$:
+  \[
+    f(\mathcal{O}) = \min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\}
+    .
+  \]
+  Then
+  \[
+  \cvar{\alpha }{\tilde{x} } = \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}.
+  \]
 \end{lem}
 \begin{proof}
 Two possible scenarios exist.
-\item[Case 1]: $P(A) \geq \alpha$. In this scenario, $Q(A)$ must equal 1 since $\frac{1}{\alpha} P(A) > 1 $. Thus, every element in $A$ should be scaled by $\frac{1}{P(A)}$ if in $A$ and set to 0 otherwise. Since  $P(A) \geq \alpha$, we can imply the reciprocal $\frac{1}{P(A)} \leq \frac{1}{\alpha}$ is also true.  
-\item[Case 2]: $P(A) < \alpha$. In this scenario, $Q(A) \leq \frac{1}{\alpha} \cdot  P(A) < 1$. For any given $A$, we can construct a Q(A) such that $Q(A) = \frac{1}{\alpha} \cdot  P(A)$. This can be done by setting $Q(a)$ to $\frac{1}{\alpha} \cdot P(a)$ for all $a$ in $A$ and $P(a) \cdot  d$ otherwise such that $\frac{1}{\alpha} * P(A) + d*P(B) = 1$, where $B$ contains all elements not in $A$. It is provable that $d \leq \frac{1}{\alpha}$, which is required for the constructed \(Q\) to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{\alpha} \ge 1$. Since $P(A) + P(B) = 1$,  $d \le 1$ in order for $\frac{1}{\alpha} \cdot  P(A) + d\cdot P(B) = 1$ to hold. Since $1 \leq \frac{1}{\alpha}$, this implies $d\le \leq \frac{1}{\alpha}$.
+\item[Case 1]: $P(A) \geq \alpha$. In this scenario, $f(A)$ must equal 1 since $\frac{1}{\alpha} P(A) > 1 $. Thus, every element in $A$ should be scaled by $\frac{1}{P(A)}$ if in $A$ and set to 0 otherwise. Since  $P(A) \geq \alpha$, we can imply the reciprocal $\frac{1}{P(A)} \leq \frac{1}{\alpha}$ is also true.  
+\item[Case 2]: $P(A) < \alpha$. In this scenario, $f(A) \leq \frac{1}{\alpha} \cdot  P(A) < 1$. For any given $A$, we can construct a f(A) such that $f(A) = \frac{1}{\alpha} \cdot  P(A)$. This can be done by setting $f(a)$ to $\frac{1}{\alpha} \cdot P(a)$ for all $a$ in $A$ and $P(a) \cdot  d$ otherwise such that $\frac{1}{\alpha} * P(A) + d*P(B) = 1$, where $B$ contains all elements not in $A$. It is provable that $d \leq \frac{1}{\alpha}$, which is required for the constructed \(f\) to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{\alpha} \ge 1$. Since $P(A) + P(B) = 1$,  $d \le 1$ in order for $\frac{1}{\alpha} \cdot  P(A) + d\cdot P(B) = 1$ to hold. Since $1 \leq \frac{1}{\alpha}$, this implies $d\le \leq \frac{1}{\alpha}$.
 \end{proof}
 
 \begin{lem}

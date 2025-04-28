@@ -52,13 +52,16 @@ function run_one_experiment(x, p, α)
   start = time_ns()
   TVaR!(tmpx, tmpp, α)
   qtvar_time = (time_ns() - start) * 1e-6
+  start = time_ns()
+  expectation = sum(tmpx .* tmpp)
+  expectation_time = (time_ns() - start) * 1e-6
   local δ = abs(slow_cvar_result - fast_cvar_result)
   if δ >= 1e-6
     println("CVaR: $slow_cvar_result, qCVaR: $fast_cvar_result, diff: $δ")
     error("Results are not equal!")
   end
   (slow_cvar_time=slow_time, fast_cvar_time=fast_time, var_time=var_time,
-    qvar_time=qvar_time, tvar_time=tvar_time, qtvar_time=qtvar_time)
+    qvar_time=qvar_time, tvar_time=tvar_time, qtvar_time=qtvar_time, expectation_time=expectation_time)
 end
 
 function p_gen_func(dist)
@@ -108,6 +111,7 @@ for dist in ["uniform"]
   qvar_results = zeros(Float64, len)
   tvar_results = zeros(Float64, len)
   qtvar_results = zeros(Float64, len)
+  expectation_results = zeros(Float64, len)
   for i ∈ ProgressBar(1:len)
     GC.enable(false)
     n = experiments[i]
@@ -115,13 +119,14 @@ for dist in ["uniform"]
     x = rand(Float64, n) .* 100
     p = p_f(n)
     α = 0.95
-    c, qc, v, qv, t, qt = run_one_experiment(x, p, α)
+    c, qc, v, qv, t, qt, e = run_one_experiment(x, p, α)
     cvar_results[i] = c
     qcvar_results[i] = qc
     var_results[i] = v
     qvar_results[i] = qv
     tvar_results[i] = t
     qtvar_results[i] = qt
+    expectation_results[i] = e
     GC.enable(true)
     x = nothing
     p = nothing
@@ -135,7 +140,8 @@ for dist in ["uniform"]
       var=var_results,
       qvar=qvar_results,
       tvar=tvar_results,
-      qtvar=qtvar_results
+      qtvar=qtvar_results,
+      expectation=expectation_results
     )
   )
 end

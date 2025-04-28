@@ -601,12 +601,12 @@ In the fields of interest for this work, finance, healthcare, robotics, ect. . T
 often done over large random variables where the runtime and sensitivity of the algorithms to the size of the random variable is a concern. 
 The results presented in this section are chiefly concerned with demonstrating our ability to compute risk measures quickly, fulfilling the practical need.
 
-\begin{figure}
-  \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_linear.pdf}
-  \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_log.pdf}
-  \caption{Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{sparse} random variable.}
-  \label{fig:all_sparse}
-\end{figure}
+% \begin{figure}
+%   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_linear.pdf}
+%   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_log.pdf}
+%   \caption{Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{sparse} random variable.}
+%   \label{fig:all_sparse}
+% \end{figure}
 \begin{figure}
   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_uniform_linear.pdf}
   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_uniform_log.pdf}
@@ -620,12 +620,12 @@ The results presented in this section are chiefly concerned with demonstrating o
 \hline
 Method & Mean (ms) & Std Dev (ms) \\
 \hline
-CVaR & 0.6311 & 0.7459 \\ 
-\textbf{qCVaR} & \textbf{0.5949} & \textbf{0.4964} \\ 
-VaR & 0.4327 & 0.5021 \\ 
-\textbf{qVar} & \textbf{0.3198} & \textbf{0.0658} \\ 
-TVaR & 0.7732 & 0.8358 \\ 
-\textbf{qTVaR} & \textbf{1.0545} & \textbf{0.8250} \\ 
+CVaR & 0.3912 & 0.0382 \\ 
+\textbf{qCVaR} & \textbf{0.1426} & \textbf{0.0307} \\ 
+VaR & 0.3733 & 0.0321 \\ 
+\textbf{qVar} & \textbf{0.1199} & \textbf{0.0287} \\ 
+TVaR & 0.3993 & 0.0414 \\ 
+\textbf{qTVaR} & \textbf{0.1786} & \textbf{0.0356} \\ 
 
 \hline
 \end{tabular}

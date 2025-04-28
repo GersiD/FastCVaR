@@ -38,34 +38,22 @@ class Plotter(object):
         """
         results: dict[str, tuple] = defaultdict(tuple)
         unique_sizes = self.df['n'].unique()
-        for slow_col, fast_col in zip(self.slow_cols, self.fast_cols):
-            cis_slow = []
-            cis_fast = []
-            means_slow = []
-            means_fast = []
+        for col in self.slow_cols + self.fast_cols:
+            cis = []
+            means = []
             for size in unique_sizes:
                 df_size = df[df['n'] == size]
-                ci_slow = 1.96 * (df_size[slow_col].std() / (np.sqrt(len(df_size[slow_col]))-1))
-                ci_fast = 1.96 * (df_size[fast_col].std() / (np.sqrt(len(df_size[fast_col]))-1))
-                cis_slow.append(ci_slow)
-                cis_fast.append(ci_fast)
-                means_slow.append(df_size[slow_col].mean())
-                means_fast.append(df_size[fast_col].mean())
-            results[slow_col] = (cis_slow, means_slow)
-            results[fast_col] = (cis_fast, means_fast)
+                ci_slow = 1.96 * (df_size[col].std() / (np.sqrt(len(df_size[col]))-1))
+                cis.append(ci_slow)
+                means.append(df_size[col].mean())
+            results[col] = (cis, means)
         return results
 
-def plot_slow_vs_fast_data(plotter: Plotter, slow: str, fast: str):
-    """
-    Load the slow and fast data into the plt object for the caller to configure and plot.
-    """
+def plot_means_and_cis(plotter: Plotter, col: str):
     unique_sizes = plotter.df['n'].unique()
-    cis_slow, means_slow = plotter.CI[slow]
-    cis_fast, means_fast = plotter.CI[fast]
-    plt.plot(unique_sizes, means_slow, label=plotter.col2Name[slow], marker=plotter.col2Marker[slow], color=plotter.col2Color[slow]) # pyright: ignore[reportArgumentType]
-    plt.fill_between(unique_sizes, np.array(means_slow) - np.array(cis_slow), np.array(means_slow) + np.array(cis_slow), alpha=0.2)# pyright: ignore[reportArgumentType]
-    plt.plot(unique_sizes, means_fast, label=plotter.col2Name[fast], marker=plotter.col2Marker[fast], color=plotter.col2Color[fast])# pyright: ignore[reportArgumentType]
-    plt.fill_between(unique_sizes, np.array(means_fast) - np.array(cis_fast), np.array(means_fast) + np.array(cis_fast), alpha=0.2)# pyright: ignore[reportArgumentType]
+    cis, means = plotter.CI[col]
+    plt.plot(unique_sizes, means, label=plotter.col2Name[col], marker=plotter.col2Marker[col], color=plotter.col2Color[col]) # pyright: ignore[reportArgumentType]
+    plt.fill_between(unique_sizes, np.array(means) - np.array(cis), np.array(means) + np.array(cis), alpha=0.2)# pyright: ignore[reportArgumentType]
 
 def plot_one_slow_vs_fast(plotter: Plotter, slow: str, fast: str):
     """
@@ -75,7 +63,8 @@ def plot_one_slow_vs_fast(plotter: Plotter, slow: str, fast: str):
     """
     # There may be multiple trials for the same n
     # We need to compute the mean and confidence interval
-    plot_slow_vs_fast_data(plotter, slow, fast)
+    plot_means_and_cis(plotter, slow)
+    plot_means_and_cis(plotter, fast)
     plt.yscale('log')
     plt.xscale('log')
     plt.xlabel('Length of Random Variable (n)')
@@ -85,7 +74,8 @@ def plot_one_slow_vs_fast(plotter: Plotter, slow: str, fast: str):
     plt.savefig(f'./plots/( plotter.slow_name )_vs_(plotter.fast_name)_{plotter.special}_log.pdf')
     # plt.show()
     plt.clf()
-    plot_slow_vs_fast_data(plotter, slow, fast)
+    plot_means_and_cis(plotter, slow)
+    plot_means_and_cis(plotter, fast)
     plt.xlabel('Length of Random Variable (n)')
     plt.ylabel('Time (ms)')
     plt.legend()
@@ -100,8 +90,10 @@ def plot_all_slow_vs_fast(plotter: Plotter):
     in a log scale.
     and a linear scale.
     """
-    for slow, fast in zip(plotter.slow_cols, plotter.fast_cols):
-        plot_slow_vs_fast_data(plotter, slow, fast)
+    for slow in plotter.slow_cols:
+        plot_means_and_cis(plotter, slow)
+    for fast in plotter.fast_cols:
+        plot_means_and_cis(plotter, fast)
     plt.yscale('log')
     plt.xscale('log')
     plt.xlabel('Length of Random Variable (n)')
@@ -111,8 +103,10 @@ def plot_all_slow_vs_fast(plotter: Plotter):
     plt.savefig(f'./plots/all_slow_vs_fast_{plotter.special}_log.pdf')
     # plt.show()
     plt.clf()
-    for slow, fast in zip(plotter.slow_cols, plotter.fast_cols):
-        plot_slow_vs_fast_data(plotter, slow, fast)
+    for slow in plotter.slow_cols:
+        plot_means_and_cis(plotter, slow)
+    for fast in plotter.fast_cols:
+        plot_means_and_cis(plotter, fast)
     plt.xlabel('Length of Random Variable (n)')
     plt.ylabel('Time (ms)')
     plt.legend()
@@ -153,16 +147,16 @@ def plot_cvar_div_qcvar(plotter: Plotter):
 if __name__ == "__main__":
     import os
     assert os.path.exists('./plots'), 'plots folder not found make sure you run this script from the fastcvar/code directory'
-    assert os.path.exists('./plots/cvar_vs_qcvar_sparse.csv'), 'cvar_vs_qcvar.csv not found'
     assert os.path.exists('./plots/cvar_vs_qcvar_uniform.csv'), 'cvar_vs_qcvar.csv not found'
     slow = ['cvar','var','tvar']
-    fast = ['qcvar','qvar','qtvar']
-    col2Name = {'cvar': 'CVaR', 'qcvar': 'QCVaR', 'var': 'VaR', 'qvar': 'QVaR', 'tvar': 'TVaR', 'qtvar': 'QTVaR'}
-    col2Color = {'cvar': 'blue', 'qcvar': 'blue', 'var': 'green', 'qvar': 'green', 'tvar': 'purple', 'qtvar': 'purple'}
+    fast = ['qcvar','qvar','qtvar', 'expectation']
+    col2Name = {'cvar': 'CVaR', 'qcvar': 'QCVaR', 'var': 'VaR', 'qvar': 'QVaR', 'tvar': 'TVaR', 'qtvar': 'QTVaR', 'expectation': 'E'}
+    col2Color = {'cvar': 'blue', 'qcvar': 'blue', 'var': 'green', 'qvar': 'green', 'tvar': 'purple', 'qtvar': 'purple', 'expectation': 'pink'}
     # markers = ["o", "v", "s", "P", "X", "D", "p", "*", "h", "H", "d", "8"]
-    col2Marker = {'cvar': 'o', 'qcvar': '*', 'var': 's', 'qvar': 'P', 'tvar': 'X', 'qtvar': 'D'}
+    col2Marker = {'cvar': 'o', 'qcvar': '*', 'var': 's', 'qvar': 'P', 'tvar': 'X', 'qtvar': 'D', 'expectation': 'p'}
     # plot_cvar_div_qcvar(df)
-    for dist in ['sparse', 'uniform']:
+    # for dist in ['sparse', 'uniform']:
+    for dist in ['uniform']:
         csv_file = f"./plots/cvar_vs_qcvar_{dist}.csv"
         # Columns: n, cvar, qcvar
         # n: number of samples

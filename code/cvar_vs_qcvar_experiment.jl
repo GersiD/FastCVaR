@@ -25,7 +25,7 @@ function run_one_experiment(x, p, α)
   tmpx = deepcopy(x)
   tmpp = deepcopy(p)
   local start = now()
-  slow_cvar_result = CVaR(tmpx, tmpp, α).value
+  slow_cvar_result = CVaR(tmpx, tmpp, α, check_inputs=false).value
   slow_time = (now() - start).value
   tmpx = deepcopy(x)
   tmpp = deepcopy(p)
@@ -35,7 +35,7 @@ function run_one_experiment(x, p, α)
   tmpx = deepcopy(x)
   tmpp = deepcopy(p)
   start = now()
-  VaR(tmpx, tmpp, α).value
+  VaR(tmpx, tmpp, α, check_inputs=false).value
   var_time = (now() - start).value
   tmpx = deepcopy(x)
   tmpp = deepcopy(p)

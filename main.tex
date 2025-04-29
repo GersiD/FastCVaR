@@ -96,7 +96,7 @@ Numerous efficient algorithms have been designed for structured optimization pro
 
 Our algorithms' time complexity improves on the state of the art by a logarithmic factor. Although this improvement may seem unimportant,  it is an acceleration that is practically meaningful without any serious drawbacks. Our algorithms are simple and easy to implement with little added complexity compared with the state-of-the-art. Our numerical results show that they can lead to an order of magnitude speedup for realistic large problems, a significant speedup for moderately sized problems, and match the performance of existing algorithms for small problems.
 
-The remainder of the paper is organized as follows. \Cref{sec:preliminaries} describes the necessary background on risk measures, $\varphi$-divergence, and polymatroid optimization. Then, \Cref{sec:var-linear} describes \emph{quickquantile}, a new algorithm that computes VaR in linear time for a random variable defined by a pmf. Then, \cref{sec:phi-divergence} builds on the \emph{quickquantile} to develop \emph{quickdivergence}, an algorithm that evaluates certain $\varphi$-divergence risk measures in linear time. We evaluate the algorithms numerically on synthetic and realistic problems in \cref{sec:experiments}.
+The remainder of the paper is organized as follows. \Cref{sec:preliminaries} describes the necessary background on risk measures, $\varphi$-divergence, and polymatroid optimization. Then, \Cref{sec:var-linear} describes \emph{quickquantile}, a new algorithm that computes VaR in linear time for a random variable defined by a pmf. Then, \cref{sec:phi-divergence} builds on the \emph{quickquantile} to develop \emph{quickdivergence}, an algorithm that evaluates certain $\varphi$-divergence risk measures in linear time. We evaluate the algorithms numerically on synthetic and realistic problems in \cref{sec:experiments}. A tested implementation of the algorithms in Julia is available at \textcolor{green}{REDACTED}.
 
 % For coherent risk measures, it has been shown that computing these risk measures is equivalent to solving a robust optimization problem where a probability distribution must be selected to minimize the expectation of a random variable subject to a divergence constraint from a normal distribution. For certain risk measures that satistfy an additional property known as comonotinicity, it is known that this optimization problem can be casted as the maximum weighted independent set problem (MWIS) on a polymathic.
 
@@ -111,50 +111,20 @@ The remainder of the paper is organized as follows. \Cref{sec:preliminaries} des
 
 % the remainder of the paper is organized as follows.
 
-\section{Preliminaries}\label{sec:preliminaries}
+\section{Preliminaries: Monetary Risk Measures}\label{sec:preliminaries}
 
-\paragraph{Notation}
-
-We use calligraphic letters to denote sets, a tilde to denote random variables, and bold lowercase letters to denote vectors.
-
-% We also adopt the standard convention that $\mathcal{A}^{\mathcal{B}}$ represents the set of all functions from a set $\mathcal{B}$ to a set $\mathcal{A}$ and treat vectors as a function from indexes to real numbers.
-
-% $\bm{1}$ denotes the vector of ones and $\mathds{1}(bool)$ denotes the indicator function.
-
-% We use the convention that comparison operators are defined on vector spaces element-wise, that is for $x, y \in \Real^n$ then $x \leq y \iff x_i \leq y_i \quad \; \forall \; i \in 1\dots n$.
-
-% Finally, $\Delta^n$ denotes the standard $n$-simplex while $\Delta_k^n$ denotes the k-capped simplex~\cite{kcapped_ang}.
-
-
-
-We assume a probability space with finite outcomes $\Omega = \left\{ 1, \dots , N \right\}$, events $\mathcal{F}$, and
-probability measure $\mathbb{P} \in \Delta^N$. We consider a random variable to be any mapping $\tilde{x}\colon \Omega \to \Real$. Or equivalently as vectors on $\Omega$. For example, the vector $\bm{x}\in \Real^N$ equivalent to $\tilde{x}$ is constructed as
-\[
- x_w = \tilde{x}( \omega ), \quad\forall \omega \in \Omega .
-\]
-We assume the same equivalence for probability distributions.
-We use $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ to denote the extended real line.
+In this work, we restrict our attention to random variables defined on finite probability spaces $(\Omega, 2^{\Omega}, \bm{p})$ where $\Omega := \left\{ 1, \dots , n \right\}$, $\bm{p} \in \Delta_n$, and $\Delta_n$ is the $n$-dimensional probability simplex. We use a tilde to indicate a random variable, such as $\tilde{x}\colon \Omega \to \Real$. Vectors are denoted with a lower-case bold font, such as $\bm{x} \in \Real^n$ and $x_i, i = 1, \dots , n$ is the $i$-th element of the vector. We use $\tilde{x}$ and $\bm{x}$ interchangeably, such that $x_i = \tilde{x}(i), i\in 1, \dots , n$. Sets are denoted with calligraphic letters. Finally, we use $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ to denote the extended real line.
 
 \paragraph{Value-at-Risk}
-%\todo{something is very wrong here, consider a bernouli random variable [0, 1] with probability 0.5, and $\alpha = 0.5$, then $\quant^+_\alpha(\tilde{x}) = 1$ following the definition in \cref{eq:quantile-definition} but it should be $0$ according to the \href{https://github.com/RiskAverseRL/RiskMeasures.jl/blob/e7ccc8a8d8a5126ea9bf63988b9f9a485fe8e876/test/runtests.jl\#L67}{code}.}
-
 Quantile of a random variable $\tilde{x} \in \mathbb{X}$ at level $\alpha \in [0,1]$ is any value $\tau\in \Real$ such that $\mathbb{P}({\tilde{x} \le \tau}) \ge \alpha$ and $\mathbb{P}({\tilde{x} \ge \tau}) \ge 1-\alpha$. The quantile may not be unique however always lies in the interval $[\quant^-_{\alpha}(\tilde{x}), \quant^+_{\alpha}(\tilde{x})]$ where
-\begin{align} \label{eq:quantile-definition}
-%\label{eq:upper-quantile-definition}
-  \quant_{\alpha}^+(\tilde{x})
-  &\;:=\;
-    \max\; \left\{\tau \in \bar{\Real} \mid \mathbb{P}[\tilde{x} < \tau]  \le \alpha\right\}, 
-      %\label{eq:low-quantile-definition}
-  &\quant_{\alpha}^-(\tilde{x})
-  &\;:=\;
-    \min\; \left\{\tau \in \bar{\Real} \mid \mathbb{P}[\tilde{x} \le \tau]   \ge \alpha\right\}.
-\end{align}
 The maximum in~\eqref{eq:quantile-definition} exists because $\mathbb{P}[\tilde{x} < \tau]$ is lower semi-continuous and the minimum in~\eqref{eq:quantile-definition} exists because $\mathbb{P}[\tilde{x} \le \tau]$ is upper semi-continuous with respect to $\tau$. Note that $\quant^+_1(\tilde{x}) = \infty$, $\quant^-_0(\tilde{x}) = -\infty$, otherwise $\quant^+_\alpha, \quant^-_\alpha$ are bounded for all $\alpha \in (0,1)$ and $\tilde{x} \in \mathcal{L}^\infty$.
 
 Monetary risk measures generalize the expectation operator to allow for risk sensitive distinctions in otherwise equivalent distributions~\cite{Follmer2016}.~\emph{Value-at-Risk}~(VaR) is one of the oldest, simplest, and most common risk measures~\cite{Follmer2016,Shapiro2014}. $\varo : \mathbb{X} \to \bar{\Real}$ at a risk level $\alpha \in [0,1]$ of a random variable $\tilde{x}\in \mathbb{X}$ is defined as:
 \begin{equation}
   \label{eq:var-definition}
-\varo_{\alpha}(\tilde{x}) \;:=\;  \quant^+_{ \alpha }(\tilde{x}).  
+  \varo_{\alpha}(\tilde{x})
+  \;:=\;
+    \max\; \left\{\tau \in \bar{\Real} \mid \mathbb{P}[\tilde{x} < \tau]  \le \alpha\right\}.
 \end{equation}
 
 \paragraph{$\varphi$-divergence Risk Measures}
@@ -165,14 +135,13 @@ $\varphi$-divergences can be defined as
 \] 
 for two discrete, absolutely continuous probability distributions $p$ and $q$, and convex $\phi$ such that $\phi(1)=0$. 
 
-Recall that any coherent risk measure can be defined as 
+Recall that any coherent risk measure can be defined~\cite[Prop. 2.84]{Follmer2016} 
 \begin{align}\label{eq:correspondence_coherent_risk}
-  \rho(X)=\sup_{Q\in \mathcal{Q}}\mathbb{E}_Q [-X],
-\end{align}
-where $\mathcal{Q}$ is a subset of all probability measures on $\Omega$~\cite[Prop. 2.84]{Follmer2016}.
-\[
+  \rho(\tilde{x})=\sup_{q\in \mathcal{Q}} \bm{q}\tr \bm{x},
+  \qquad
  \mathcal{Q} := \left\{ q \in \Real^{\Omega} \mid I_{\varphi}(p \| q) \le \beta  \right\} 
-\]
+\end{align}
+where $\mathcal{Q}$ is a subset of all probability measures on $\Omega$.
 
 Phi-divergence risk measures can be defined as a coherent risk measure for which $\mathcal{Q}$ contains all $Q$ such that $I_\phi(P, Q) \le \beta$, where $\beta$ is a constant typically dependent on the risk level. $\varphi$-entropic (also known as $g$-entropic risk measures) can be seen as the primal representation of these risk measures. All $\varphi$-entropic risk measures take on the following form for $\beta \in \Real$ and any proper, lower semi-continuous, and convex function $\varphi\colon \Real \to \bar{\Real}$~\cite{Ahmadi-Javid2011,Ahmadi-Javid2017}: 
 \[
@@ -221,29 +190,6 @@ Here, $\bm{1}$ is a vector of ones of an appropriate dimension.
 
 \todo{check this is correct : Gersi}
 
-\paragraph{Polymatroids}
-
-Let $\mathcal{E}$ be a finite set, and $f : \{\mathcal{X} \mid \mathcal{X} \subseteq \mathcal{E} \} \to \Real_+$ be a non-decreasing submodular function. That is, for each $\mathcal{A} \subseteq \mathcal{B} \subseteq \mathcal{E}$ we have $f(\mathcal{A}) \leq f(\mathcal{B})$, and for each $\mathcal{A}, \mathcal{B} \subseteq \mathcal{E}$ we have 
-\[
-f(\mathcal{A}) + f(\mathcal{B}) \geq f(\mathcal{A} \cup \mathcal{B}) + f(\mathcal{A} \cap \mathcal{B}).
-\]
-We define the polymatroid associated to $f$ to be the following polytope:
-\[
-  \mathcal{Q}_f = \left\{ \bm{q} \in \Real_+^E  \mid  \sum_{e \in \mathcal{U}} \bm{q}(e) \leq f(\mathcal{U}), \;\; \forall \; \mathcal{U} \subseteq \mathcal{E} \right\}.
-\]
-This polytope is of special interest for computing risk measures, as we will see later on that all coherent and comonotonic risk measures can be computed by solving
-\begin{align}\label{eq:polytope}
-  \max_{q}\left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}
-\end{align}
-
-\begin{theorem}[Corollary 4.95 in~\cite{Follmer2016}]
-  For any coherent and comonotonic risk measure $\rho\colon \mathbb{X}\to \Real$, let $c:= \rho(\one_{\mathcal{A}})$ for each $\mathcal{A} \subseteq \Omega$. Then
-  \[
-   \rho(\tilde{x}) = \sup_{q\in \mm{??}} q\tr  x.
-  \]
-\end{theorem}
-
-Conventional algorithms such as \cref{alg:greedy-polymatroid} solve \eqref{eq:polytope} using a greedy approach that requires sorting. We will show in \todo{reference section} that for a special class of submodular functions $f$, sorting is not necessary.
 
 \paragraph{Other work}
 
@@ -370,7 +316,29 @@ During the loop: There are five possible scenarios at each iteration:
 \section{Computing \texorpdfstring{$\varphi$}{phi}-divergence Risk Measures in Linear Time} \label{sec:phi-divergence}
 
 
-\mm{TODO: Use VaR in the algorithm intead of doing the work. }
+First, we introduce polymatroids. Let $\mathcal{E}$ be a finite set, and $f \colon  \{\mathcal{X} \mid \mathcal{X} \subseteq \mathcal{E} \} \to \Real_+$ be a non-decreasing submodular function. That is, for each $\mathcal{A} \subseteq \mathcal{B} \subseteq \mathcal{E}$ we have $f(\mathcal{A}) \leq f(\mathcal{B})$, and for each $\mathcal{A}, \mathcal{B} \subseteq \mathcal{E}$ we have 
+\[
+f(\mathcal{A}) + f(\mathcal{B}) \geq f(\mathcal{A} \cup \mathcal{B}) + f(\mathcal{A} \cap \mathcal{B}).
+\]
+We define the polymatroid associated to $f$ to be the following polytope:
+\[
+  \mathcal{Q}_f = \left\{ \bm{q} \in \Real_+^E  \mid  \sum_{e \in \mathcal{U}} \bm{q}(e) \leq f(\mathcal{U}), \;\; \forall \; \mathcal{U} \subseteq \mathcal{E} \right\}.
+\]
+This polytope is of special interest for computing risk measures, as we will see later on that all coherent and comonotonic risk measures can be computed by solving
+\begin{align}\label{eq:polytope}
+  \max_{q}\left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}
+\end{align}
+
+\begin{theorem}[Corollary 4.95 in~\cite{Follmer2016}]
+  For any coherent and comonotonic risk measure $\rho\colon \mathbb{X}\to \Real$, let $c:= \rho(\one_{\mathcal{A}})$ for each $\mathcal{A} \subseteq \Omega$. Then
+  \[
+   \rho(\tilde{x}) = \sup_{q\in \mm{??}} q\tr  x.
+  \]
+\end{theorem}
+
+Conventional algorithms such as \cref{alg:greedy-polymatroid} solve \eqref{eq:polytope} using a greedy approach that requires sorting. We will show in \todo{reference section} that for a special class of submodular functions $f$, sorting is not necessary.
+
+\mm{TODO: Use VaR in the algorithm instead of redoing the work. }
 
 % \subsection{General Algorithm}
 Our first contribution is an algorithm for solving the minimum-weight Independent Set without sorting for polymatroids. We note that certain additional assumptions have to be satisfied in the submodular function as follows. Note that $i$ represents the index of the $i$th smallest element in the set and $f(S_i)$ represents the set of elements less than or equal to the $i$th smallest element. 

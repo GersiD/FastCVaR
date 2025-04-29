@@ -92,16 +92,13 @@ There is limited prior work on fast algorithms for evaluating risk measures. The
 
 Coherent risk measures, like CVaR and TVaR, can be evaluated by solving convex optimization problems~\cite{}. Although most of these optimization problems are tractable, their time complexity is too large to be practical. Most practical implementations rely on specific properties of these optimization problems to compute the solution more efficiently. For example, all existing CVaR algorithms must sort the values of the random variable to compute its value~\cite{}. As in the case of VaR, the $\Omega(n \log  n)$ time complexity of the sort in the CVaR algorithms dominates the complexity and prevents linear time computation. In this paper, we circumvent the complexity of sorting by developing no-sort algorithms.
 
-\mm{--- draft ---}
+Numerous efficient algorithms have been designed for structured optimization problems that are similar to CVaR and TVaR evaluations. Some example of such structured optimization problems are the projection onto the simplex~\cite{}, projection on k-capped simplex~\cite{}, linear optimization on the intersection of $L_p$ or $\varphi$-divergence balls and the probability simplex as arise in robust optimizations~\cite{}, optimization for $\varphi$-divergence risk measures~\cite{}, and on polytopes defined by submodular functions which are known as polymatroids~\cite{}. Most of these algorithms require sorting the input variables, which has $O(n \log  n)$ complexity. Even though some of the papers mention the possibility of linear time algorithms, they neither describe nor study them. One exception is \cite{Condat2016}, which proposes a linear-time algorithm for computing the projection onto the simplex. 
 
-There is no shortage of fast algorithms for solving structured optimization problems similar to the ones that arise in evaluating risk measures. Some of the related problems are the projection onto the simplex~\cite{}, projection on k-capped simplex~\cite{}, linear optimization on the intersection of $L_p$ and the probability simplex as arise in robust optimizations~\cite{}, and optimization for $\varphi$-divergence risk measures~\cite{}. The vast majority of these algorithms require sorting the input variables which has $O(n \log  n)$ complexity. Even though some of the papers mention the possibility of linear time algorithms, they neither describe nor study them. One exception is \cite{Condat2016}, which proposes a linear-time algorithm for computing the projection onto the simplex. 
+Our algorithms' time complexity improves on the state of the art by a logarithmic factor. Although this improvement may seem unimportant,  it is an acceleration that is practically meaningful without any serious drawbacks. Our algorithms are simple and easy to implement with little added complexity compared with the state-of-the-art. Our numerical results show that they can lead to an order of magnitude speedup for realistic large problems, a significant speedup for moderately sized problems, and match the performance of existing algorithms for small problems.
 
-Another related subject is the optimization of linear functions on polymatroids. Polymatroids are polyhedra that are constrained by a submodular function~\cite{}. Some risk measures are known to admit polymatroid representations~\cite{Follmer2016}. We take advantage of this property when designing our optimization problems.  
+The remainder of the paper is organized as follows. \Cref{sec:preliminaries} describes the necessary background on risk measures, $\varphi$-divergence, and polymatroid optimization. Then, \Cref{sec:var-linear} describes \emph{quickquantile}, a new algorithm that computes VaR in linear time for a random variable defined by a pmf. Then, \cref{sec:phi-divergence} builds on the \emph{quickquantile} to develop \emph{quickdivergence}, an algorithm that evaluates certain $\varphi$-divergence risk measures in linear time. We evaluate the algorithms numerically on synthetic and realistic problems in \cref{sec:experiments}.
 
-\mm{discuss that the speedup is only logarithmic. This is not great, but surprisingly makes some difference, and does not slow down even for small random variables (provide numerical results supporting this)}
-
-\mm{--- Here ---}
-For coherent risk measures, it has been shown that computing these risk measures is equivalent to solving a robust optimization problem where a probability distribution must be selected to minimize the expectation of a random variable subject to a divergence constraint from a normal distribution. For certain risk measures that satistfy an additional property known as comonotinicity, it is known that this optimization problem can be casted as the maximum weighted independent set problem (MWIS) on a polymathic.
+% For coherent risk measures, it has been shown that computing these risk measures is equivalent to solving a robust optimization problem where a probability distribution must be selected to minimize the expectation of a random variable subject to a divergence constraint from a normal distribution. For certain risk measures that satistfy an additional property known as comonotinicity, it is known that this optimization problem can be casted as the maximum weighted independent set problem (MWIS) on a polymathic.
 
 % how we are doing this? connect phi-divergence risk measures and polymatroids
 % For certain classes of polymatroids, we solve the Maximum-Weight-Independent-Sum (MWIS) problem in $O(N)$ time. In turn we demonstrate multiple examples of coherent and comonotonic risk measures which benifit from this observation. Finally for phi-divergence risk measures, which are a subset of coherent risk measures such that the divergence constraint is a phi-divergence, we establish the necessary conditions on the divergence in order for the resulting optimization problem to compute the risk measure be a MWIS.
@@ -112,9 +109,7 @@ For coherent risk measures, it has been shown that computing these risk measures
 % justify why this is novel
 % Many applications of risk measures in the aformentioned fields require that they are efficiently computed. Compute time and resources are a major concern in real-world applications. For example, in finance, the computation of risk measures is often a bottleneck in portfolio optimization and risk management where trades are often made on intervals of milliseconds. Likewise in robotics, the computation of risk measures is often a bottleneck in real-time decision making. In healthcare, the computation of risk measures is often a bottleneck in clinical decision support systems which may care for a large quanity of patients.
 
-
 % the remainder of the paper is organized as follows.
-\todo{The remainder of this work is organized as follows.}
 
 \section{Preliminaries}\label{sec:preliminaries}
 
@@ -594,7 +589,7 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1
 
 
 
-\section{Experiments}
+\section{Experiments} \label{sec:experiments}
 
 To evaluate the algorithms developed in \cref{alg:quick_cvar} and \cref{alg:quick_quantile} we numerically compare their speedup against their cannonical sorting-based counterparts. To ensure that the random variable causes as little difference in the runtime comparison we run our experiments both with uniform and sparse random variables. More detail on the experimental setup can be found in \cref{sec:appendix_experiments}.
 

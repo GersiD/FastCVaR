@@ -137,7 +137,7 @@ where $\bm{1}$ is a vector of ones of an appropriate size and the minimization f
 
 In this paper, we study a general class of risk measures known as $\varphi$-divergence
 \begin{equation} \label{eq:fdiv-dual}
-\ER_{g,\beta}(\tilde{x}) := \inf \left\{\bm{q}\tr \bm{x} \mid I_{\varphi}(\bm{p} \| \bm{q}) \le \beta, \bm{q} \in \Delta_n \right\}.   
+  \ER_{g,\beta}(\tilde{x}) := \inf \left\{\bm{q}\tr \bm{x} \mid H_{\varphi}(\bm{p} \| \bm{q}) \le \beta, \bm{q} \in \Delta_n \right\}.   
 \end{equation} 
 $\varphi$-divergences can be defined as 
 \[
@@ -149,7 +149,7 @@ Recall that any coherent risk measure can be defined~\cite[Prop. 2.84]{Follmer20
 \begin{align}\label{eq:correspondence_coherent_risk}
   \rho(\tilde{x})=\sup_{q\in \mathcal{Q}} \bm{q}\tr \bm{x},
   \qquad
- \mathcal{Q} := \left\{ q \in \Real^{\Omega} \mid I_{\varphi}(p \| q) \le \beta  \right\} 
+ \mathcal{Q} := \left\{ \bm{q} \in \Real^{\Omega} \mid H_{\varphi}(\bm{p} \| \bm{q}) \le \beta  \right\} 
 \end{align}
 where $\mathcal{Q}$ is a subset of all probability measures on $\Omega$.
 

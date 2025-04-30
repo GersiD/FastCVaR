@@ -140,20 +140,18 @@ Recall that any coherent risk measure which accepts random variables representin
   \rho(\tilde{x}) &=\inf_{q\in \mathcal{Q} \subseteq{\Delta^n} } \bm{q}\tr \bm{x}.
 \end{align}
 
-In this paper, we study a general class of risk measures known as $\varphi$-divergence risk measures. These can be
-defined as
+In this work, we study a general class of coherent risk measures known as $\varphi$-divergence risk measures. These can be defined as
 \begin{align} \label{eq:fdiv-dual}
-  \ER_{g,\beta}(\tilde{x}) := \inf \left\{\bm{q}\tr \bm{x} \mid I_{\varphi}(\bm{p} \| \bm{q}) \le \beta, \bm{q} \in \Delta_n \right\} \\
+  \ER_{\varphi,\beta}(\tilde{x}) := \inf \left\{\bm{q}\tr \bm{x} \mid I_{\varphi}(\bm{p} \| \bm{q}) \le \beta, \bm{q} \in \Delta_n \right\} \\
   I_\varphi(\bm{p} \| \bm{q}) = \sum_{i \in \Omega } \bm{q}_{i} \cdot \varphi\left(\frac{\bm{p}_i}{\bm{q}_i}\right).
 \end{align} 
 For two discrete, absolutely continuous probability distributions $p$ and $q$, and convex $\varphi$ such that $\varphi(1)=0$. 
 
-Phi-divergence risk measures can be defined as a coherent risk measure for which $\mathcal{Q}$ contains all $Q$ such that $I_\phi(P, Q) \le \beta$, where $\beta$ is a constant typically dependent on the risk level. $\varphi$-entropic (also known as $g$-entropic risk measures) can be seen as the primal representation of these risk measures. All $\varphi$-entropic risk measures take on the following form for $\beta \in \Real$ and any proper, lower semi-continuous, and convex function $\varphi\colon \Real \to \bar{\Real}$~\cite{Ahmadi-Javid2011,Ahmadi-Javid2017}: 
+All $\varphi$-divergence risk measures also take on the following dual form for $\beta \in \Real$ and any proper, lower semi-continuous, and convex function $\varphi\colon \Real \to \bar{\Real}$~\cite{Ahmadi-Javid2011,Ahmadi-Javid2017}: 
 \begin{equation} \label{eq:fdiv-primal}
-\ER_{g,\beta}(\tilde{x}) = \sup \left\{t \cdot \left(v + \E { - \varphi\opt \left(- t^{-1} \cdot \bm{x} + (v + \beta) \cdot \bm{1} \right)}\right) \mid  t,v \in \Real, t > 0\right\},
+\ER_{\varphi,\beta}(\tilde{x}) = \sup \left\{t \cdot \left(v + \E { - \varphi\opt \left(- t^{-1} \cdot \bm{x} + (v + \beta) \cdot \bm{1} \right)}\right) \mid  t,v \in \Real, t > 0\right\},
 \end{equation} 
-where $\varphi^{\star}$ the convex conjugate of the $\varphi$-divergence $\varphi$. EVaR, for example, is a well known example of phi-divergence risk measure where the phi-Divergence is the KL-divergence~\cite{Ahmadi-Javid2017}.
-
+where $\varphi^{\star}$ the convex conjugate of the $\varphi$-divergence $\varphi$. EVaR, for example, is a well known example of $\varphi$-divergence risk measure where the $\varphi$ is the KL-divergence~\cite{Ahmadi-Javid2017}.
 
 \begin{table}
     \centering
@@ -173,9 +171,6 @@ where $\varphi^{\star}$ the convex conjugate of the $\varphi$-divergence $\varph
          \bottomrule
     \end{tabular}
 \end{table}
-
-\todo{check this is correct : Gersi}
-
 
 \paragraph{Other work}
 

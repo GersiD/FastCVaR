@@ -28,13 +28,10 @@
 \usepackage{booktabs}
 \usepackage{setspace}
 
-
 \newcommand{\gersi}[1]{\textcolor{red}{#1}}
 \newcommand{\palash}[1]{\textcolor{green}{#1}}
 \newcommand{\mm}[1]{\textcolor{magenta}{[#1]}}
 \newcommand{\maeve}[1]{\textcolor{blue}{[#1]}}
-
-
 
 \bibliographystyle{abbrvnat}
 
@@ -177,15 +174,16 @@ where $\varphi^{\star}$ the convex conjugate of the $\varphi$-divergence $\varph
 \cite{adam2019projectionscanonicalsimplexadditional}
 
 \section{Computing VaR in Linear Time} \label{sec:var-linear}
-In this section, we develop a quick algorithm to compute the VaR of a random variable according to definition 1. The algorithm is based on the well-known quickselect algorithm, and uses the Hoare partition scheme.
+In this section, we develop a quick algorithm to compute the VaR of a random variable according to \todo{no hard code}definition 1. The algorithm is based on the well-known quickselect algorithm, and uses the Hoare partition scheme~\cite{}.
 
-\mm{How regular algorithms work for VaR, sorting based approach.}
+\mm{How regular algorithms work for VaR, sorting based approach\cref{alg:slow_quantile}.}
 
 \mm{algorithm describing the main idea and challenge. Tie this to quickselect and why this is not just a quick select algorithm.}
 
 
 %We first restate some well-known properties of the Hoare Partition scheme.
 Our QVaR algorithm is described in \cref{alg:quick_quantile}. The algorithm works as follows. \mm{refer to the actual variables and line numbers in the algorithm.} The algorithm picks a pivot and applies the partition to easily compute the probability of all outcomes smaller than or equal to that of the pivot. Then it determines whether the quantile can exist on the left side of the pivot or on the right side and shrinks the search space, parameterized by the variables $front$ and $back$, accordingly.
+\todo{for algorithms should we bold vectors to keep with notation?}
 \begin{algorithm}
   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and $\alpha \in [0,1]$}}
   \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
@@ -208,8 +206,23 @@ Our QVaR algorithm is described in \cref{alg:quick_quantile}. The algorithm work
   \end{algorithmic}
 \end{algorithm}
 
+\begin{algorithm}
+  \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and $\alpha \in [0,1]$}}
+  \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
+  \caption{VaR: Canonical algorithm for VaR. $\mathds{1}(bool)$ denotes the indicator function.}\label{alg:slow_quantile}
 
-
+  \begin{algorithmic}[1]
+  \Require{} \Ensure{}
+  \State{$x \gets \text{sort-decending}(x)$}
+  \State{$a \gets 1$}
+  \For{$i=1$ to $n$}
+  \State{$a \gets a - \bm{p}_{\bm{x}_i}$}
+    \If{$a \leq \alpha$}
+      \State{\Return{$x_i$}}
+    \EndIf{}
+  \EndFor{}
+  \end{algorithmic}
+\end{algorithm}
 \begin{lemma}
 The Hoare's partition scheme $i_k, x^k, p^k \gets \operatorname{partition}(x^{k-1}, p^{k-1}, f_{k-1}, b_{k-1})$ does the following:
   \begin{enumerate}
@@ -229,6 +242,7 @@ Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite
 \begin{proof}
 
   \mm{define feasible}
+  \todo{fix this proof to not assume unique values}
 Recall the definition:
  \[
   \quant_{\alpha}^+(\tilde{x})
@@ -237,10 +251,11 @@ Recall the definition:
  \] 
 Assume the random variable $ x $ has $ n $ unique values, such that $ x_1 < x_2 < \cdots < x_n $.  We can assume this without loss of generality because VaR is law invariant~\cite{Follmer2016}.  
 
-Suppose for the sake of contradiction that there is no $\omega\in \Omega $ such that $\quant^+_{\alpha}(\tilde{x}) = \tilde{x}(\omega)$. That may mean:
+Suppose for the sake of contradiction that there is no $\omega\in \Omega $ such that $\quant^+_{\alpha}(\tilde{x}) = \tilde{x}(\omega)$. That may mean \todo{defend why this may mean only these cases}:
 \begin{enumerate}
 \item[Case 1] $\exists x_{i}, x_{i + 1} \in \tilde{x}(\Omega)$ such that $\quant^+_{\alpha}(\tilde{x}) \in (x_{i}, x_{i + 1})$.
-Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})  $. Then, let $\tau' = \tau\opt  + \frac{1}{2}(x_{i+1} - \tau\opt)$. Because $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition}, $\P{ \tilde{x} < \tau' } =  \P{ \tilde{x} < \tau\opt  }\le \alpha$, $\tau\opt $ cannot be optimal.
+
+  Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})  $. Then, let $\tau' = \tau\opt  + \frac{1}{2}(x_{i+1} - \tau\opt)$. Because $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition}, $\P{ \tilde{x} < \tau' } =  \P{ \tilde{x} < \tau\opt  }\le \alpha$, $\tau\opt $ cannot be optimal.
 \item[Case 2] $\quant^+_{\alpha}(\tilde{x}) < \min \tilde{x}$ 
   
   Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})  $. Then, let $\tau' = \tau\opt + \frac{1}{2}(x_{1} - \tau\opt)$. Because $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition}, $\P{ \tilde{x} < \tau' } =  \P{ \tilde{x} < \tau\opt  }\le \alpha$, $\tau\opt $ cannot be optimal.
@@ -257,8 +272,9 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
 
 \begin{lem}
 \Cref{alg:quick_quantile} computes $\quant^+$.
- Loop Invariant: Before and after every iteration $\quant^+$ will remain in the array $x$ at an index $i$ such that $ f_k \leq i \leq b_k $ or if $f_k > b_k$ , then $\quant^+ = b_k$.
 \begin{proof}
+  \todo{proof needs justification}
+ Loop Invariant: Before and after every iteration $\quant^+$ will remain in the array $x$ at an index $i$ such that $ f_k \leq i \leq b_k $ or if $f_k > b_k$ , then $\quant^+ = b_k$.
 During the first loop: Every element in $x$ has an index $i$ such that $ front \leq i \leq back $, where $front=1$ and $back=n$. By Lemma 1, there exists an element with index $i$ such that $\quant^+ = x[i] $.
  
 During the loop: There are five possible scenarios at each iteration:
@@ -282,13 +298,13 @@ During the loop: There are five possible scenarios at each iteration:
 
  \end{proof}
  \end{lem}
- Finally we prove that the time complexity of our proposed algorithm is linear in the expected case. 
+
 \begin{lem}
   \Cref{alg:quick_quantile} achieves a time complexity of $\mathcal{O}(n)$
   where $n$ is the number of elements in the random variable.
 \end{lem}
 \begin{proof}
-  From \todo{insert citation here}, the time complexity for the while loop with the Dutch partition scheme is $O(n)$ in the expected case. Since line 4 will at most take as many steps as a single call to the partition function, and the remaining lines in each iteration of the while loop take constant time, the overall complexity remains unchanged. 
+  The time complexity for the Dutch partition scheme is $O(n)$ in the expected case\todo{cite}\cite{}. Since line 4 will at most take as many steps as a single call to the partition function, and the remaining lines in each iteration of the while loop take constant time, the overall complexity remains unchanged. 
 \end{proof}
 
 
@@ -297,14 +313,19 @@ During the loop: There are five possible scenarios at each iteration:
 \section{Computing \texorpdfstring{$\varphi$}{phi}-divergence Risk Measures in Linear Time} \label{sec:phi-divergence}
 
 
-First, we introduce polymatroids. Let $\mathcal{E}$ be a finite set, and $f \colon  \{\mathcal{X} \mid \mathcal{X} \subseteq \mathcal{E} \} \to \Real_+$ be a non-decreasing submodular function. That is, for each $\mathcal{A} \subseteq \mathcal{B} \subseteq \mathcal{E}$ we have $f(\mathcal{A}) \leq f(\mathcal{B})$, and for each $\mathcal{A}, \mathcal{B} \subseteq \mathcal{E}$ we have 
+To compute $\varphi$-divergence risk measures we turn to polymatroids. We remind the reader that for a function $f \colon \mathcal{Q} \to \Real_+$ we say that $f$ is sub-modular if for each $\mathcal{A} \subseteq \mathcal{B} \subseteq \mathcal{E}$ we have $f(\mathcal{A}) \leq f(\mathcal{B})$, and for each $\mathcal{A}, \mathcal{B} \subseteq \mathcal{E}$ we have 
 \[
 f(\mathcal{A}) + f(\mathcal{B}) \geq f(\mathcal{A} \cup \mathcal{B}) + f(\mathcal{A} \cap \mathcal{B}).
 \]
-We define the polymatroid associated to $f$ to be the following polytope:
-\[
-  \mathcal{Q}_f = \left\{ \bm{q} \in \Real_+^E  \mid  \sum_{e \in \mathcal{U}} \bm{q}(e) \leq f(\mathcal{U}), \;\; \forall \; \mathcal{U} \subseteq \mathcal{E} \right\}.
-\]
+\begin{definition}
+  For a finite set $\mathcal{E}$, and a non-decreasing sub-modular function $f\colon 2^{\mathcal{E}} \to \Real_+$ we
+  define the polymatroid $\mathcal{Q}_f$ as
+  \[
+    \mathcal{Q}_f = \left\{ \bm{q} \in \Real_+^E  \mid  \sum_{e \in \mathcal{U}} \bm{q}(e) \leq f(\mathcal{U}), \;\; \forall \; \mathcal{U} \subseteq \mathcal{E} \right\}.
+  \]
+\end{definition}
+
+\todo{need to defend why we call this a polytope, its a polymatroid}
 This polytope is of special interest for computing risk measures, as we will see later on that all coherent and comonotonic risk measures can be computed by solving
 \begin{align}\label{eq:polytope}
   \max_{q}\left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}

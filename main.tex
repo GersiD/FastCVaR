@@ -75,24 +75,24 @@
 \maketitle
 
 \begin{abstract}
-Monetary risk measures have gained popularity in expressing decision-makers' preferences for risk aversion. Value-at-Risk (VaR) and Conditional-Value-at-Risk are some of the most common risk measures. This paper proposes new algorithms for computing these risk measures for discrete distributions in linear time. Our algorithms improve on existing algorithms---which must sort the random variable---by at least a logarithmic factor. Our algorithms adapt the quickselect algorithm and combine it with a general polymatroid representation of $\varphi$-divergence risk measures. The numerical results shows that our new algorithms offer an order of magnitude speedup for large domains and a library implementation of the algorithms is available at \textcolor{green}{REDACTED}.     
+Monetary risk measures have gained popularity in expressing decision-makers' preferences for risk aversion. Value-at-Risk (VaR) and Conditional-Value-at-Risk are very common risk measures. This paper proposes novel algorithms for computing these risk measures for discrete distributions in linear time. Our algorithms improve on existing algorithms---which must sort the random variable---by at least a logarithmic factor. Our algorithms adapt the quickselect algorithm and combine it with a general polymatroid representation of $\varphi$-divergence risk measures. The numerical results shows that our new algorithms offer an order of magnitude speedup for large domains and a library implementation of the algorithms is available at \textcolor{green}{REDACTED}.     
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
 
-Monetary measures of risk generalize the expectation operator to be able to represent the risk aversion of decision makers in domains that range from robotics~\cite{} to finance~\cite{} to infrastructure maintenance~\cite{}. Value-at-Risk~(VaR) and Conditional-Value-at-Risk~(CVaR) are the most popular risk measures and have been making inroads in reinforcement learning, machine learning, and decision-making~\cite {Petrik2024}. Machine learning and reinforcement learning algorithms typically must compute the risk measures for discrete random variables. Fast algorithms for computing risk measures are necessary in several machine-learning settings~\cite{}. For example, when used as a part of an optimization algorithm, the risk measure may need to be evaluated in every iteration of the algorithm and can represent a significant computational bottleneck~\cite{}. 
+Monetary measures of risk generalize the expectation operator to be able to represent the risk aversion of decision makers in domains that range from robotics~\cite{} to finance~\cite{} to infrastructure maintenance~\cite{}. Value-at-Risk~(VaR) and Conditional-Value-at-Risk~(CVaR) are the most popular risk measures and have been making inroads in reinforcement learning, machine learning, and decision-making~\cite{Petrik2024}. Machine learning and reinforcement learning algorithms typically must compute the risk measures for discrete random variables. Fast algorithms for computing risk measures are necessary in several machine-learning settings~\cite{}. For example, when used as a part of an optimization algorithm, the risk measure may need to be evaluated in every iteration of the algorithm and can represent a significant computational bottleneck~\cite{}. 
 
 
 %However, in many applications such as robotics, finance, and autonomous systems, solutions must account for performance with respect to worst case scenarios rather than simply maximizing the mean. Therefore, it has become a common practice to optimize policies with respect to a risk measure~\cite{Follmer2016}, which focuses on the tails of the reward distribution rather than the expectation. 
 
 % what are we doing; our contributions
-This paper proposes new fast algorithms for computing risk measures of discrete random variables. First, we propose a new linear-time VaR evaluation algorithm. Our VaR algorithm, which we call \emph{quickquantile}, builds on the well-known ideas of quickselect but generalizes it to quantile. The worst-case linear-time upper bound of quickquantile matches the linear-time lower bound~\cite{}. Second, building on quickquantile we propose a general algorithm for evaluating some $\varphi$-divergence risk measures~\cite{}, which include CVaR and Total-Value-at-Risk (TVaR)~\cite{}. The algorithm, which we call \emph{quickdivergence}, works by representing certain $\varphi$-divergence risk measures as a linear minimization over polymatroids. The linear worst-case runtime of quickdivergence also matches the known lower bounds on the runtime~\cite{}. 
+This paper proposes new fast algorithms for computing risk measures of discrete random variables. First, we propose a new linear-time VaR evaluation algorithm. Our VaR algorithm, which we call \emph{quickquantile}, builds on the well-known ideas of quickselect but generalizes it to quantiles. The worst-case linear-time upper bound of \emph{quickquantile} matches the linear-time lower bound~\cite{}. Second, building on \emph{quickquantile} we propose a general algorithm for evaluating some $\varphi$-divergence risk measures~\cite{}, which include CVaR and Total-Value-at-Risk (TVaR)~\cite{}. The algorithm, which we call \emph{quickdivergence}, works by representing certain $\varphi$-divergence risk measures as a linear minimization over polymatroids. The linear worst-case runtime of \emph{quickdivergence} also matches the known lower bounds on the runtime~\cite{}. 
 
-There is limited prior work on fast algorithms for evaluating risk measures. The conventional VaR algorithm for a discrete random variable must sort its values before it can evaluate its risk. As a result, the sort's runtime, which requires $\Omega(n \log n)$ operations where $n$ is the number of the probability mass function~(pmf) entries~\cite{}, dominates the runtime complexity of VaR. As far as we know, no prior work has proposed or studied linear-time algorithms for risk measures.
+There is limited prior work on fast algorithms for evaluating risk measures. The conventional VaR algorithm for a discrete random variable must sort its values before it can evaluate its risk. As a result, the sort's runtime, which requires $\Omega(n \log n)$ operations where $n$ is the number of the probability mass function~(pmf) entries~\cite{}, dominates the runtime complexity of VaR. To the best of our knowladge at the time of writing, no prior work has proposed or studied linear-time algorithms for any of the above risk measures.
 
 Coherent risk measures, like CVaR and TVaR, can be evaluated by solving convex optimization problems~\cite{}. Although most of these optimization problems are tractable, their time complexity is too large to be practical. Most practical implementations rely on specific properties of these optimization problems to compute the solution more efficiently. For example, all existing CVaR algorithms must sort the values of the random variable to compute its value~\cite{}. As in the case of VaR, the $\Omega(n \log  n)$ time complexity of the sort in the CVaR algorithms dominates the complexity and prevents linear time computation. In this paper, we circumvent the complexity of sorting by developing no-sort algorithms.
 
-Numerous efficient algorithms have been designed for structured optimization problems that are similar to CVaR and TVaR evaluations. Some example of such structured optimization problems are the projection onto the simplex~\cite{}, projection on k-capped simplex~\cite{}, linear optimization on the intersection of $L_p$ or $\varphi$-divergence balls and the probability simplex as arise in robust optimizations~\cite{}, optimization for $\varphi$-divergence risk measures~\cite{}, and on polytopes defined by submodular functions which are known as polymatroids~\cite{}. Most of these algorithms require sorting the input variables, which has $O(n \log  n)$ complexity. Even though some of the papers mention the possibility of linear time algorithms, they neither describe nor study them. One exception is \cite{Condat2016}, which proposes a linear-time algorithm for computing the projection onto the simplex. 
+Numerous efficient algorithms have been designed for structured optimization problems that are similar to CVaR and TVaR evaluations. Some example of such structured optimization problems are the projection onto the simplex~\cite{}, projection on k-capped simplex~\cite{kcapped_ang}, linear optimization on the intersection of $L_p$ or $\varphi$-divergence balls and the probability simplex as arise in robust optimizations~\cite{}, optimization for $\varphi$-divergence risk measures~\cite{}, and on polytopes defined by submodular functions which are known as polymatroids~\cite{}. Many of these algorithms require sorting the input variables, which has $O(n \log  n)$ complexity. There has been mention of the possibility of linear time algorithms however, we could find neither work describing nor studying them. One exception is \cite{Condat2016}, which proposes a linear-time algorithm for computing the projection onto the simplex, which does not leverage quickselect. 
 
 Our algorithms' time complexity improves on the state of the art by a logarithmic factor. Although this improvement may seem unimportant,  it is an acceleration that is practically meaningful without any serious drawbacks. Our algorithms are simple and easy to implement with little added complexity compared with the state-of-the-art. Our numerical results show that they can lead to an order of magnitude speedup for realistic large problems, a significant speedup for moderately sized problems, and match the performance of existing algorithms for small problems.
 
@@ -113,7 +113,7 @@ The remainder of the paper is organized as follows. \Cref{sec:preliminaries} des
 
 \section{Preliminaries: Monetary Risk Measures}\label{sec:preliminaries}
 
-In this work, we restrict our attention to random variables defined on finite probability spaces $(\Omega, 2^{\Omega}, \bm{p})$ where $\Omega := \left\{ 1, \dots , n \right\}$, $\bm{p} \in \Delta_n$, and $\Delta_n$ is the $n$-dimensional probability simplex. We use a tilde to indicate a random variable, such as $\tilde{x}\colon \Omega \to \Real$. Vectors are denoted with a lower-case bold font, such as $\bm{x} \in \Real^n$ and $x_i, i = 1, \dots , n$ is the $i$-th element of the vector. We use $\tilde{x}$ and $\bm{x}$ interchangeably, such that $x_i = \tilde{x}(i), i\in 1, \dots , n$. Sets are denoted with calligraphic letters. Finally, we use $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ to denote the extended real line.
+In this work, we restrict our attention to random variables defined on finite probability spaces $(\Omega, 2^{\Omega}, \bm{p})$ where $\Omega := \left\{ 1, \dots , n \right\}$, $\bm{p} \in \Delta_n$, and $\Delta_n$ is the $n$-dimensional probability simplex. We use a tilde to indicate a random variable, such as $\tilde{x}\colon \Omega \to \Real$. Vectors are denoted with a lower-case bold font, such as $\bm{x} \in \Real^n$ and $\bm{x}_i, i = 1, \dots , n$ is the $i$-th element of the vector. We use $\tilde{x}$ and $\bm{x}$ interchangeably, such that $\bm{x}_i = \tilde{x}(i), i\in 1, \dots , n$. Sets are denoted with calligraphic letters. Finally, we use $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ to denote the extended real line.
 
 Monetary risk measures generalize the expectation operator to account for the uncertainty in the distribution of a random variable~\cite{Follmer2016}. \emph{Value-at-Risk}~(VaR) is one of the most popular and interpretable risk measures~\cite{Follmer2016,Shapiro2014}. It is defined for $\alpha\in [0,1]$ for any $\tilde{x}\in \mathbb{X}$ as~\cite{Follmer2016}
 \begin{equation}
@@ -121,10 +121,10 @@ Monetary risk measures generalize the expectation operator to account for the un
   \varo_{\alpha}(\tilde{x})
   \;:=\;
     \max\; \left\{\tau \in \bar{\Real} \mid \mathbb{P}[\tilde{x} < \tau]  \le \alpha\right\}.
-\end{equation}
-The maximum in~\eqref{eq:var-definition} exists because $\tau \mapsto \mathbb{P}[\tilde{x} < \tau]$ is a lower semi-continuous function. Note that $\varo_0[\tilde{x}] = \min_{i = 1, \dots , n} x_i$ and $\varo_{1}[ \tilde{x} ] = \infty$.
+\end{equation}jj
+The maximum in~\eqref{eq:var-definition} exists because $\tau \mapsto \mathbb{P}[\tilde{x} < \tau]$ is a lower semi-continuous function. Note that $\varo_0[\tilde{x}] = \min\left\{\bm{x}_i \mid i \in [1...n], \bm{p}_i > 0 \right\}$ and $\varo_{1}[ \tilde{x} ] = \infty$.
 
-Another important risk measures is \emph{Conditional-Value-at-Risk} (CVaR) is another common risk measure. CVaR for a random variable $\tilde{x} \in \mathbb{X}$ and a risk level $\alpha \in (0,1]$ is defined as~\cite{Follmer2016}
+Another risk measure of interest is \emph{Conditional-Value-at-Risk} (CVaR). CVaR for a random variable $\tilde{x} \in \mathbb{X}$ and a risk level $\alpha \in (0,1]$ is defined as~\cite{Follmer2016}
 \begin{equation} \label{eq:primal_cvar}
     \cvaro_\alpha(\tilde{x})
   := \max_{z \in \Real} \left(z - \alpha^{-1} \bm{p}\tr[z \cdot \bm{1} -\bm{x}]_+\right) 
@@ -133,34 +133,26 @@ Another important risk measures is \emph{Conditional-Value-at-Risk} (CVaR) is an
   %\bm{\xi} \leq \frac{1}{\alpha} p, \bm{\xi} \in \Delta^n \right\} \\
   %&= \max \left\{ z - \frac{1}{\alpha} \Ex{\bm{p}}{z-\bm{x}}_+ \mid z \in \Real\right\} \\
 \end{equation}
-where $\bm{1}$ is a vector of ones of an appropriate size and the minimization formulation follows from a convex conjugate representation~\cite{Follmer2016}. The CVaR is usually continuously extended to $\cvaro_0[\tilde{x}] = \min_{i = 1, \dots , n} x_i$.
+where $\bm{1}$ is a vector of ones of an appropriate size and the minimization formulation follows from a convex conjugate representation~\cite{Follmer2016}. The CVaR is usually continuously extended to $\cvaro_0[\tilde{x}] = \min\left\{\bm{x}_i \mid i \in [1...n], \bm{p}_i > 0 \right\}$.
 
-In this paper, we study a general class of risk measures known as $\varphi$-divergence
-\begin{equation} \label{eq:fdiv-dual}
-\ER_{g,\beta}(\tilde{x}) := \inf \left\{\bm{q}\tr \bm{x} \mid I_{\varphi}(\bm{p} \| \bm{q}) \le \beta, \bm{q} \in \Delta_n \right\}.   
-\end{equation} 
-$\varphi$-divergences can be defined as 
-\[
-  I_\varphi(\bm{p} \| \bm{q}) = \sum_{i \in \Omega } q_{i} \cdot \varphi\left(\frac{p_i}{q_i}\right)
-\] 
-for two discrete, absolutely continuous probability distributions $p$ and $q$, and convex $\phi$ such that $\phi(1)=0$. 
-
-Recall that any coherent risk measure can be defined~\cite[Prop. 2.84]{Follmer2016} 
+Recall that any coherent risk measure which accepts random variables representing rewards can be defined as~\cite[Prop. 2.84]{Follmer2016} 
 \begin{align}\label{eq:correspondence_coherent_risk}
-  \rho(\tilde{x})=\sup_{q\in \mathcal{Q}} \bm{q}\tr \bm{x},
-  \qquad
- \mathcal{Q} := \left\{ q \in \Real^{\Omega} \mid I_{\varphi}(p \| q) \le \beta  \right\} 
+  \rho(\tilde{x}) &=\inf_{q\in \mathcal{Q} \subseteq{\Delta^n} } \bm{q}\tr \bm{x}.
 \end{align}
-where $\mathcal{Q}$ is a subset of all probability measures on $\Omega$.
+
+In this paper, we study a general class of risk measures known as $\varphi$-divergence risk measures. These can be
+defined as
+\begin{align} \label{eq:fdiv-dual}
+  \ER_{g,\beta}(\tilde{x}) := \inf \left\{\bm{q}\tr \bm{x} \mid I_{\varphi}(\bm{p} \| \bm{q}) \le \beta, \bm{q} \in \Delta_n \right\} \\
+  I_\varphi(\bm{p} \| \bm{q}) = \sum_{i \in \Omega } \bm{q}_{i} \cdot \varphi\left(\frac{\bm{p}_i}{\bm{q}_i}\right).
+\end{align} 
+For two discrete, absolutely continuous probability distributions $p$ and $q$, and convex $\varphi$ such that $\varphi(1)=0$. 
 
 Phi-divergence risk measures can be defined as a coherent risk measure for which $\mathcal{Q}$ contains all $Q$ such that $I_\phi(P, Q) \le \beta$, where $\beta$ is a constant typically dependent on the risk level. $\varphi$-entropic (also known as $g$-entropic risk measures) can be seen as the primal representation of these risk measures. All $\varphi$-entropic risk measures take on the following form for $\beta \in \Real$ and any proper, lower semi-continuous, and convex function $\varphi\colon \Real \to \bar{\Real}$~\cite{Ahmadi-Javid2011,Ahmadi-Javid2017}: 
 \begin{equation} \label{eq:fdiv-primal}
 \ER_{g,\beta}(\tilde{x}) = \sup \left\{t \cdot \left(v + \E { - \varphi\opt \left(- t^{-1} \cdot \bm{x} + (v + \beta) \cdot \bm{1} \right)}\right) \mid  t,v \in \Real, t > 0\right\},
 \end{equation} 
 where $\varphi^{\star}$ the convex conjugate of the $\varphi$-divergence $\varphi$. EVaR, for example, is a well known example of phi-divergence risk measure where the phi-Divergence is the KL-divergence~\cite{Ahmadi-Javid2017}.
-
-
-
 
 
 \begin{table}
@@ -208,7 +200,7 @@ Our QVaR algorithm is described in \cref{alg:quick_quantile}. The algorithm work
     \Require{} \Ensure{}
     \State{$f_0 \gets 1$, $b_0 \gets n$, $x^0 = x$, $p^0 = p$, $k=1$, $\alpha_0 = \alpha$ } \Comment{Init front $f_0$ and back $b_0$}
     \While{$b_k - f_k \geq 1$}
-      \State{$i_k, x^k, p^k \gets \operatorname{hoare\_partition}(x^{k-1}, p^{k-1}, f_{k-1}, b_{k-1})$} %\Comment{Hoares partition scheme}}
+      \State{$i_k, x^k, p^k \gets \operatorname{hoare\_partition}(x^{k-1}, p^{k-1}, f_{k-1}, b_{k-1})$} %\Comment{Hoares partition scheme}
     \State{$t_k \gets \sum_{j=f_{k-1}}^{i_k} p^k_j$}
       \If{$\alpha_k < t_k$}
       \State{$b_k \gets i_k$, $\alpha_k \gets \alpha_{k-1}$}

@@ -342,7 +342,7 @@ Our first contribution is an algorithm for solving the minimum-weight Independen
   For $\mathcal{N} = \left\{ 1, \dots , N \right\}$, the function $f\colon 2^{\mathcal{N}} \to \Real_+$ $f(\emptyset) = 0$, $f(N) = 1$, $f$ is \emph{sub-modular} and satisfies also that:
   \begin{enumerate}
   \item $f(\mathcal{O}) = g(\mathbb{P}[\mathcal{O}]), \forall \mathcal{O} \subseteq \Omega$, for some $g\colon \Real_+ \to  \Real_+$
-  \item $g$ is linear on $\left\{ t > 0 \mid  g(t) \le 1 \right\}$ 
+  \item $g$ is linear on $\left\{ t > 0 \mid  g(t) \le 1 \right\}$. Equivalently we can express $g$ as a function $c +\sum_{i \subset N}m_i *p(i)$ on this interval, where $c$ and $m_i$ are constants. 
   \end{enumerate}
    % $S_i \neq \emptyset, S_{ i+1 } \cup E$ where $ S_i \cup \{i + 1\} = S_{ i+1 } $ and $f(S_{ i+1 }) < f(E)$, $f(S_i) + f(\{i + 1\}) - c = f(S_{ i+1 })$, where c is some constant.  If $f(S_i) = \emptyset$ then $f(S_i) + f(\{i + 1\})= f(S_{ i+1 })$.
 \end{assumption}
@@ -384,22 +384,22 @@ Our first contribution is an algorithm for solving the minimum-weight Independen
     \State{$left \gets 1$}
     \State{$right \gets n$}
     \If{$c > 0$}
-    \State{$x_1 = f(1)$} 
+    \State{$x_1 = f(min(x_i))$} 
     \EndIf{}
     \While{$right  - left \geq 1$} 
     
     \State{$mid \gets partition(left, right, c)$}
     \State{$\alpha \gets 1$}
-    \If{$\sum_{i = front}^{back} (f(i) - c)   + \mathbb{1}(front=1)*c = \alpha$}
+    \If{$c +\sum_{i \subset (front, back)}m_i *p(i) \geq \alpha$}
        \State{Let $x_i :=  \begin{cases}0 & \text{for } i > mid,\dots 
        \end{cases}$}
        \State{$right \gets mid$}
     \Else
-          \State{Let $x_i :=  \begin{cases}f(i) & \text{for } i \leq mid,\dots \end{cases}$}
+          \State{Let $x_i :=  \begin{cases}m_i*p(i) & \text{for } i \leq mid,\dots \end{cases}$}
           \State{$left \gets mid + 1$}
     \EndIf{}      
     \EndWhile{}
-    \State{$x_{right} \gets f(N) - f(S_{right - 1})$}
+    \State{$x_{right} \gets 1 - m_i *p(i)$}
 \end{algorithmic}
 \end{algorithm}
 The proof for this algorithm is simple and shows that the output is equal to that of Algorithm 4 (the standard greedy algorithm), which has already been shown to be both feasible and optimal.
@@ -407,8 +407,8 @@ The proof for this algorithm is simple and shows that the output is equal to tha
   \cref{alg:maximum-weight-independent} returns a optimal solution \todo{optimal for what optimization?} to the maximum-weight-independent set for polymatroids.
 \end{lem}
 \begin{proof}
-  \todo{This doesnt follow from Algorithm \ref{alg:maximum-weight-independent}}
-  \todo{The optimal solution will always be $f(S_i) - f(S_{i-1})$ assuming the weight $c_i \geq 0$}. Therefore choose $f(i)$ for $f(S_i) < f(N)$, and by \todo{what is Assumption 1? link?}\todo{Assumption 1} this equals $f(S_i) - f(S_{i - 1})$. If $f(S_i) = f(N)$ and $f(S_{i - 1}) = f(N)$, then $x_i = 0$ by the algorithm.
+  
+The optimal solution will always be $f(S_i + 1) - f(S_{i})$ assuming the weight $c_i \geq 0$. For $f(S_{i+1} \leq 1$ and $f(S_i) < 1$, $f(S_i + 1) - f(S_i) = c  +\sum_{i \subset (1, i + 1)}m_{i + 1} *p(i + 1) - c  +\sum_{i \subset (1, i)}m_i *p(i) = m_{i + 1} *p(i + 1).$ For $f(S_{i+1} = 1$ and $f(S_i) < 1$, $f(S_i) - f(S_i-1) = 1 - c  +\sum_{i \subset (1, i )}m_i *p(i) = 1 - m_i *p(i).$
 \end{proof}
 
 \begin{lem}

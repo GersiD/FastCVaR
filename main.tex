@@ -334,7 +334,9 @@ Our first contribution is an algorithm for solving the minimum-weight Independen
   For $\mathcal{N} = \left\{ 1, \dots , N \right\}$, the function $f\colon 2^{\mathcal{N}} \to \Real_+$ $f(\emptyset) = 0$, $f(N) = 1$, $f$ is \emph{sub-modular} and satisfies also that:
   \begin{enumerate}
   \item $f(\mathcal{O}) = g(\mathbb{P}[\mathcal{O}]), \forall \mathcal{O} \subseteq \Omega$, for some $g\colon \Real_+ \to  \Real_+$
-  \item $g$ is linear on $\left\{ t > 0 \mid  g(t) \le 1 \right\}$. Equivalently we can express $g$ as a function $c +\sum_{i \subset N}m_i *p(i)$ on this interval, where $c$ and $m_i$ are constants. 
+  \item
+  % $g$ is linear on $\left\{ t > 0 \mid  g(t) \le 1 \right\}$. Equivalently we can express $g$ as a function $c +\sum_{i \subset N}m_i *p(i)$ on this interval, where $c$ and $m_i$ are constants.
+  $g$ can be written in the form $min(c +\sum_{i \subset N}m_i *p(i), 1)$ for all $\mathbb{P}[\mathcal{O}] \neq 0$ where $c$ and $m_i$ are constants
   \end{enumerate}
    % $S_i \neq \emptyset, S_{ i+1 } \cup E$ where $ S_i \cup \{i + 1\} = S_{ i+1 } $ and $f(S_{ i+1 }) < f(E)$, $f(S_i) + f(\{i + 1\}) - c = f(S_{ i+1 })$, where c is some constant.  If $f(S_i) = \emptyset$ then $f(S_i) + f(\{i + 1\})= f(S_{ i+1 })$.
 \end{assumption}
@@ -383,14 +385,23 @@ Our first contribution is an algorithm for solving the minimum-weight Independen
     \State{$mid \gets partition(left, right, c)$}
     \State{$\alpha \gets 1$}
     \If{$c +\sum_{i \subset (front, back)}m_i *p(i) \geq \alpha$}
-       \State{Let $x_i :=  \begin{cases}0 & \text{for } i > mid,\dots 
-       \end{cases}$}
+       %\State{Let $x_i :=  \begin{cases}0 & \text{for } i > mid,\dots 
+       %\end{cases}$}
        \State{$right \gets mid$}
     \Else
-          \State{Let $x_i :=  \begin{cases}m_i*p(i) & \text{for } i \leq mid,\dots \end{cases}$}
+          %\State{Let $x_i :=  \begin{cases}m_i*p(i) & \text{for } i \leq mid,\dots \end{cases}$}
           \State{$left \gets mid + 1$}
     \EndIf{}      
     \EndWhile{}
+    \If{$c > 0$}
+    \State{Let $x_i :=  \begin{cases}m_i*p(i) & \text{for } 1 < i \leq mid,\dots \end{cases}$}
+    
+    \Else{
+    \State{Let $x_i :=  \begin{cases}m_i*p(i) & \text{for } i \leq mid,\dots \end{cases}$}
+    
+    
+    }
+    \EndIf{}
     \State{$x_{right} \gets 1 - m_i *p(i)$}
 \end{algorithmic}
 \end{algorithm}

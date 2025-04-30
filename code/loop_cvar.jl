@@ -13,7 +13,7 @@ Returns:
   and `gt` is the index of the start of the right partition, the difference between the two 
   contain values equal to the pivot.
   x = [1,2,2,3]
-  prtition!(x, 2, 1, 4) # (2, 4)
+  partition!(x, 2, 1, 4) # (2, 4)
 """
 function partition!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, f::Int, b::Int)
   pivot_ind = f + Int(ceil((b - f) / 2))

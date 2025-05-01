@@ -118,7 +118,7 @@ Monetary risk measures generalize the expectation operator to account for the un
   \varo_{\alpha}(\tilde{x})
   \;:=\;
     \max\; \left\{\tau \in \bar{\Real} \mid \mathbb{P}[\tilde{x} < \tau]  \le \alpha\right\}.
-\end{equation}jj
+\end{equation}
 The maximum in~\eqref{eq:var-definition} exists because $\tau \mapsto \mathbb{P}[\tilde{x} < \tau]$ is a lower semi-continuous function. Note that $\varo_0[\tilde{x}] = \min\left\{\bm{x}_i \mid i \in [1...n], \bm{p}_i > 0 \right\}$ and $\varo_{1}[ \tilde{x} ] = \infty$.
 
 Another risk measure of interest is \emph{Conditional-Value-at-Risk} (CVaR). CVaR for a random variable $\tilde{x} \in \mathbb{X}$ and a risk level $\alpha \in (0,1]$ is defined as~\cite{Follmer2016}
@@ -349,10 +349,14 @@ Our first contribution is an algorithm for solving the minimum-weight Independen
 \begin{assumption} \label{asm:submodular-function}
   For $\mathcal{N} = \left\{ 1, \dots , N \right\}$, the function $f\colon 2^{\mathcal{N}} \to \Real_+$ $f(\emptyset) = 0$, $f(N) = 1$, $f$ is \emph{sub-modular} and satisfies also that:
   \begin{enumerate}
-  \item $f(\mathcal{O}) = g(\mathbb{P}[\mathcal{O}]), \forall \mathcal{O} \subseteq \Omega$, for some $g\colon \Real_+ \to  \Real_+$
+  \item $f(\mathcal{O}) = g(\mathbb{P}[\mathcal{O}]), \forall \mathcal{O} \subseteq \Omega$, for some $g\colon [0,1] \to  [0,1]$
   \item The function $g$ has the following form for some $c\in [0,1]$ and $m \in \Real$:
     \[
-      g(x) := \min \left(c + m  \cdot x, 1 \right).
+      g(x) :=
+      \begin{cases}        
+        \min \left(c + m  \cdot x, 1 \right) &\text{if } x > 0 \\
+        0 &\text{otherwise}.
+      \end{cases}
     \]
   \end{enumerate}
    % $S_i \neq \emptyset, S_{ i+1 } \cup E$ where $ S_i \cup \{i + 1\} = S_{ i+1 } $ and $f(S_{ i+1 }) < f(E)$, $f(S_i) + f(\{i + 1\}) - c = f(S_{ i+1 })$, where c is some constant.  If $f(S_i) = \emptyset$ then $f(S_i) + f(\{i + 1\})= f(S_{ i+1 })$.
@@ -419,12 +423,10 @@ Our first contribution is an algorithm for solving the minimum-weight Independen
     %\EndIf{}      
     %\EndWhile{}
     \If{$c > 0$}
-    \State{Let $x_i :=  \begin{cases}m_i \cdot p(i) & \text{for } 1 < i \leq mid,\dots \end{cases}$}
+    \State{Let $x_i \gets  \begin{cases}m_i \cdot p(i) & \text{for } 1 < i \leq mid,\dots \end{cases}$}
     
     \Else{
-    \State{Let $x_i :=  \begin{cases}m_i \cdot  p(i) & \text{for } i \leq mid,\dots \end{cases}$}
-    
-    
+    \State{Let $x_i \gets  \begin{cases}m_i \cdot  p(i) & \text{for } i \leq mid,\dots \end{cases}$}
     }
     \EndIf{}
     \State{$x_{mid} \gets 1 - m_i *p(i)$}
@@ -478,7 +480,7 @@ Unless adding a new element $S_i$ will make the value of the submodular function
 
 \subsection{TVaR}
 \todo{What does the following statement intend to prove or demonstrate?}
-From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1^2$. Thus, the coherent risk measure TVaR with the divergence constraint $\|p - q\|_1 \leq \sqrt{2*ln(2)*\alpha}$ must be $\leq EVaR_\alpha(p)$. Submodular function is $Q(\omega) = \min\left\{\beta/2 + P(\omega), 1\right\}$
+From previous work, we know that $D(p\|q) \leq \frac{1}{2 \log(2)} \, \|p - q\|_1^2$. Thus, the coherent risk measure TVaR with the divergence constraint $\|p - q\|_1 \leq \sqrt{2 \log(2) \alpha}$ must be $\leq EVaR_\alpha[p]$ \mm{what is $p$ and why is the here?}. Submodular function is $Q(\omega) = \min\left\{\beta/2 + P(\omega), 1\right\}$
 
 % \begin{algorithm}
 %   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and maximum divergence $\beta$}}

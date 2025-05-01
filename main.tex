@@ -328,7 +328,7 @@ f(\mathcal{A}) + f(\mathcal{B}) \geq f(\mathcal{A} \cup \mathcal{B}) + f(\mathca
 \todo{need to defend why we call this a polytope, its a polymatroid}
 This polytope is of special interest for computing risk measures, as we will see later on that all coherent and comonotonic risk measures can be computed by solving
 \begin{align}\label{eq:polytope}
-  \max_{q}\left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}
+  \max_{\bm{q}\in \Real}\left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}
 \end{align}
 
 \begin{theorem}[Corollary 4.95 in~\cite{Follmer2016}]
@@ -419,10 +419,10 @@ Our first contribution is an algorithm for solving the minimum-weight Independen
     %\EndIf{}      
     %\EndWhile{}
     \If{$c > 0$}
-    \State{Let $x_i :=  \begin{cases}m_i*p(i) & \text{for } 1 < i \leq mid,\dots \end{cases}$}
+    \State{Let $x_i :=  \begin{cases}m_i \cdot p(i) & \text{for } 1 < i \leq mid,\dots \end{cases}$}
     
     \Else{
-    \State{Let $x_i :=  \begin{cases}m_i*p(i) & \text{for } i \leq mid,\dots \end{cases}$}
+    \State{Let $x_i :=  \begin{cases}m_i \cdot  p(i) & \text{for } i \leq mid,\dots \end{cases}$}
     
     
     }
@@ -480,27 +480,27 @@ Unless adding a new element $S_i$ will make the value of the submodular function
 \todo{What does the following statement intend to prove or demonstrate?}
 From previous work, we know that $D(p\|q) \leq \frac{1}{2 \ln(2)} \, \|p - q\|_1^2$. Thus, the coherent risk measure TVaR with the divergence constraint $\|p - q\|_1 \leq \sqrt{2*ln(2)*\alpha}$ must be $\leq EVaR_\alpha(p)$. Submodular function is $Q(\omega) = \min\left\{\beta/2 + P(\omega), 1\right\}$
 
-\begin{algorithm}
-  \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and maximum divergence $\beta$}}
-  \algrenewcommand\algorithmicensure{\textbf{Output: new distribution $q$}}
-  \caption{Linear Time Algorithm for TVaR}\label{alg:quick_tvar}
-  \begin{algorithmic}[1]
-    \Require{}
-    \Ensure{}
-    \State{$m \gets \arg\min \left\{ x_i \mid  i = 1, \dots, n \right\}$}
-    \State{$\delta \gets \min\left\{\frac{\beta}{2}, 1 - p_m\right\} $}
-    \State{$\quant^+ \gets \operatorname{QuickQuantile}(x, q, \delta)$ }
-    \State{$q_m \gets q_m + \delta$}
-    \State{$\lambda \gets \delta$}
-    \For{$i \in 1 \dots n$}
-      \If{$q[i] > \quant^+$}
-        \State{$\lambda \gets \lambda - q[i]$}
-        \State{$q[i] \gets 0$} \todo{Wouldn't it be best to return $\lambda$ here?}
-      \EndIf{}
-    \EndFor{}
-    \State{\Return{$\lambda$}} \todo{I dont think this is right}
-  \end{algorithmic}
-\end{algorithm}
+% \begin{algorithm}
+%   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and maximum divergence $\beta$}}
+%   \algrenewcommand\algorithmicensure{\textbf{Output: new distribution $q$}}
+%   \caption{Linear Time Algorithm for TVaR}\label{alg:quick_tvar}
+%   \begin{algorithmic}[1]
+%     \Require{}
+%     \Ensure{}
+%     \State{$m \gets \arg\min \left\{ x_i \mid  i = 1, \dots, n \right\}$}
+%     \State{$\delta \gets \min\left\{\frac{\beta}{2}, 1 - p_m\right\} $}
+%     \State{$\quant^+ \gets \operatorname{QuickQuantile}(x, q, \delta)$ }
+%     \State{$q_m \gets q_m + \delta$}
+%     \State{$\lambda \gets \delta$}
+%     \For{$i \in 1 \dots n$}
+%       \If{$q[i] > \quant^+$}
+%         \State{$\lambda \gets \lambda - q[i]$}
+%         \State{$q[i] \gets 0$} \todo{Wouldn't it be best to return $\lambda$ here?}
+%       \EndIf{}
+%     \EndFor{}
+%     \State{\Return{$\lambda$}} \todo{I dont think this is right}
+%   \end{algorithmic}
+% \end{algorithm}
 
 % \subsection{Piece-wise Linear Minimization}
 % \maeve{Incorporate projection.jl }

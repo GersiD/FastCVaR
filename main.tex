@@ -350,9 +350,9 @@ Our first contribution is an algorithm for solving the minimum-weight Independen
   For $\mathcal{N} = \left\{ 1, \dots , N \right\}$, the function $f\colon 2^{\mathcal{N}} \to \Real_+$ $f(\emptyset) = 0$, $f(N) = 1$, $f$ is \emph{sub-modular} and satisfies also that:
   \begin{enumerate}
   \item $f(\mathcal{O}) = g(\mathbb{P}[\mathcal{O}]), \forall \mathcal{O} \subseteq \Omega$, for some $g\colon \Real_+ \to  \Real_+$
-  \item
+  \item $g\colon \Real \to \Real$ has the following form
   % $g$ is linear on $\left\{ t > 0 \mid  g(t) \le 1 \right\}$. 
-  $g$ as a function $min(c + m * \sum_{i \subset N}*p(i), 1)$. %on this interval, where $c$ and $m$ are constants.
+  $g$ as a function $g(x) := \min \left(c + m  \cdot x, 1 \right)$. %on this interval, where $c$ and $m$ are constants.
   %We can express $g$ as a function %$c +\sum_{i \subset N}m_i *p(i)$ %on this interval, where $c$ and %$m_i$ are constants.
   %$g$ can be written in the form %$min(c +h(\sum_{i \subset %N}p(i)), 1)$ for all $\mathbb{P}%[\mathcal{O}] \neq 0$ where $c$ %is a constant and $h$ is a %function such that the second %derivative is $\leq$ 0 on the %interval $(0, 1)$, strictly %increasing on the interval $(0, %1)$, and $h(1) \geq 1$ We also %assume$h$ is invertible.% 
   \end{enumerate}

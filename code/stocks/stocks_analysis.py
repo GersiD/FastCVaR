@@ -19,17 +19,18 @@ mean_std = df[['cvar', 'qcvar', 'var', 'qvar', 'tvar', 'qtvar']].agg(['mean', 's
 
 # Prepare the LaTeX table
 latex_table = r"""
-\begin{table}[ht]
+\begin{table}
 \centering
-\begin{tabular}{|c|c|c|c|c|c|c|}
-\hline
+\begin{tabular}{lrr}
+\toprule
 Method & Mean (ms) & Std Dev (ms) \\
-\hline
 """
 
 # Add rows with the mean and std-dev values for each method
 methods = ['CVaR', 'qCVaR', 'VaR', 'qVar', 'TVaR', 'qTVaR']
 for i, method in enumerate(methods):
+    if i % 2 ==0:
+        latex_table += "\\midrule \n"
     mean_val = mean_std.iloc[0, i]  # Mean value in ms
     std_val = mean_std.iloc[1, i]   # Std-dev value in ms
     if 'q' in method:
@@ -39,7 +40,7 @@ for i, method in enumerate(methods):
 
 # Close the table
 latex_table += r"""
-\hline
+\bottomrule
 \end{tabular}
 \caption{Results for our Stock Market experiment.}
 \end{table}

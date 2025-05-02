@@ -92,7 +92,7 @@ end
 # -- 6 plots for each of the tvar cvar var
 println("Starting experiments")
 # for dist in ["uniform", "sparse"]
-for dist in ["uniform"]
+for dist in ["uniform", "sparse"]
   println("Running experiments for $dist")
   p_f = p_gen_func(dist) # returns a function that takes n and returns a probability distribution
   stop = Int(1e7)# 10 million

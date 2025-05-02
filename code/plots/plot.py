@@ -155,8 +155,7 @@ if __name__ == "__main__":
     # markers = ["o", "v", "s", "P", "X", "D", "p", "*", "h", "H", "d", "8"]
     col2Marker = {'cvar': 'o', 'qcvar': '*', 'var': 's', 'qvar': 'P', 'tvar': 'X', 'qtvar': 'D', 'expectation': 'p'}
     # plot_cvar_div_qcvar(df)
-    # for dist in ['sparse', 'uniform']:
-    for dist in ['uniform']:
+    for dist in ['sparse', 'uniform']:
         csv_file = f"./plots/cvar_vs_qcvar_{dist}.csv"
         # Columns: n, cvar, qcvar
         # n: number of samples

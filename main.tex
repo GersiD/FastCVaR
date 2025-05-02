@@ -485,11 +485,10 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \log(2)} \, \|p - q\|_
 
 \section{Experiments} \label{sec:experiments}
 
-To evaluate the algorithms developed in \cref{alg:quick_cvar} and \cref{alg:quick_quantile} we numerically compare their speed up against their canonical sorting-based counterparts. To ensure that the random variable causes as little difference in the runtime comparison we run our experiments both with uniform and sparse random variables. More detail on the experimental setup can be found in \cref{sec:appendix_experiments}.
+To evaluate the algorithms developed in \cref{alg:quick_quantile} and \cref{alg:quick_cvar} we numerically compare their speed up against their canonical sorting-based counterparts. We refer to the canonical implementations as their unaltered risk measure name, and for the no-sort implementations we append the ``Q'' prefix. To ensure that our choice of random variable is not influencing runtime, we test other distributions in \cref{sec:appendix_experiments}. More detail on the experimental setup can be found in \cref{sec:appendix_experiments}.
 
-For the numerical results we refer to the canonical implementations as their unaltered risk measure name, and for the no-sort implementations we append the ``Q'' prefix.
-
-Our results represented by Figures \ref{fig:all_sparse}, and \ref{fig:all_uniform} are rendered on plots with a 95\% confidence interval band computed over 10 random seeds. These bands are tight due to the little variance in the measured runtimes between seeds.
+The results in \cref{fig:all_uniform} represents a 95\% confidence interval band computed over 10 random seeds. 
+These bands are tight due to the little variance in the measured runtimes between seeds.
 
 Demonstrating the speed-up of the quick algorithms over their sorting based counterparts, we observe that the quick algorithms are significantly faster than their sorting based counterparts. Especially in the case of CVaR and VaR which are extensively used in the industries aforementioned in \cref{sec:intro}.
 The results demonstrate approximately log speed up in the runtime of the quick algorithms which is consistent with the theoretical complexity of the algorithms, see \cref{sec:appendix_experiments}. This log speed up coincides with a noticeable speed-up in runtime across the tested random variable sizes. For the ease of the reader to note multiplicative decreases in runtime, we present the results in both linear and log scale.
@@ -638,6 +637,12 @@ Two random variables $\tilde{x}$ and $\tilde{y}$ are said to be comonotonic if
 \end{table}
 
 \section{Experiments}\label{sec:appendix_experiments}
+\begin{figure}
+  \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_linear.pdf}
+  \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_log.pdf}
+  \caption{Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{sparse} random variable.}
+  \label{fig:all_sparse}
+\end{figure}
 Code and results for these experiments as well as the implementations of all contained risk measures can be found at\todo{REDACTED}.
 \begin{figure}[htbp]
   \centering
@@ -679,6 +684,22 @@ time in ms $\pm$ the 95\% confidence interval for each method.
 
 \cref{tab:small_results} shows that even for smaller settings our method is faster than the sorting based methods. The results are consistent with the theoretical complexity of the algorithms, which is $O(n \log n)$ for the sorting based methods and $O(n)$ for the quickselect based methods.
 
+\subsection{Computer Specifications}
+
+The results obtained in this work were all generated on a computer with the following Specifications.
+\begin{itemize}
+  \item AMD Ryzen Thread ripper 3970X 32-Core (64) @ 4.55 GHz
+  \item 256 GB RAM
+  \item Linux 6.14.4-arch1-2 x86\_64
+  \item Julia 1.11.5
+\end{itemize}
+
+The activity of other users on the system is minimized to account for scheduling conflicts.
+The presence of multithreading in our language of choice (Julia) is not used in this work, as while
+the runtime of the experiments would be shorter, we observed individual threads ``thrashing'', where 
+they would suddenly take twice or three times as long on one particular iteration. 
+We conjecture that this is due to the garbage collector. For this reason, we manually disable the 
+Julia garbage collector, even when running synchronously.
 
 \section{Algorithms}
 
@@ -728,12 +749,6 @@ time in ms $\pm$ the 95\% confidence interval for each method.
 
 
 % Graveyard
-% \begin{figure}
-%   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_linear.pdf}
-%   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_log.pdf}
-%   \caption{Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{sparse} random variable.}
-%   \label{fig:all_sparse}
-% \end{figure}
 % \begin{algorithm}
 %   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and maximum divergence $\beta$}}
 %   \algrenewcommand\algorithmicensure{\textbf{Output: new distribution $q$}}

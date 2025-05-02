@@ -63,7 +63,7 @@
 \newtheorem{example}{Example}
 
 
-\title{Nosort: Computing VaR and Coherent Comonotonic Risk Measures in Linear Time}% and $\varphi$-divergence Risk Measures}
+\title{No sort: Computing VaR and Coherent Comonotonic Risk Measures in Linear Time}% and $\varphi$-divergence Risk Measures}
 %\author{Palash Agrawal, Gersi Doko, Maeve Burwell, Marek Petrik}
 %\date{}
 
@@ -72,7 +72,7 @@
 \maketitle
 
 \begin{abstract}
-Monetary risk measures have gained popularity in expressing decision-makers' preferences for risk aversion. Value-at-Risk (VaR) and Conditional-Value-at-Risk are very common risk measures. This paper proposes novel algorithms for computing these risk measures for discrete distributions in linear time. Our algorithms improve on existing algorithms---which must sort the random variable---by at least a logarithmic factor. Our algorithms adapt the quickselect algorithm and combine it with a general polymatroid representation of $\varphi$-divergence risk measures. The numerical results shows that our new algorithms offer an order of magnitude speedup for large domains and a library implementation of the algorithms is available at \textcolor{green}{REDACTED}.     
+Monetary risk measures have gained popularity in expressing decision-makers' preferences for risk aversion. Value-at-Risk (VaR) and Conditional-Value-at-Risk are very common risk measures. This paper proposes novel algorithms for computing these risk measures for discrete distributions in linear time. Our algorithms improve on existing algorithms---which must sort the random variable---by at least a logarithmic factor. Our algorithms adapt the quickselect algorithm and combine it with a general polymatroid representation of $\varphi$-divergence risk measures. The numerical results show that our new algorithms offer an order of magnitude speed up for large domains and a library implementation of the algorithms is available at \textcolor{green}{REDACTED}.     
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
@@ -85,13 +85,13 @@ Monetary measures of risk generalize the expectation operator to be able to repr
 % what are we doing; our contributions
 This paper proposes new fast algorithms for computing risk measures of discrete random variables. First, we propose a new linear-time VaR evaluation algorithm. Our VaR algorithm, which we call \emph{quickquantile}, builds on the well-known ideas of quickselect but generalizes it to quantiles. The worst-case linear-time upper bound of \emph{quickquantile} matches the linear-time lower bound~\cite{}. Second, building on \emph{quickquantile} we propose a general algorithm for evaluating some $\varphi$-divergence risk measures~\cite{}, which include CVaR and Total-Value-at-Risk (TVaR)~\cite{}. The algorithm, which we call \emph{quickdivergence}, works by representing certain $\varphi$-divergence risk measures as a linear minimization over polymatroids. The linear worst-case runtime of \emph{quickdivergence} also matches the known lower bounds on the runtime~\cite{}. 
 
-There is limited prior work on fast algorithms for evaluating risk measures. The conventional VaR algorithm for a discrete random variable must sort its values before it can evaluate its risk. As a result, the sort's runtime, which requires $\Omega(n \log n)$ operations where $n$ is the number of the probability mass function~(pmf) entries~\cite{}, dominates the runtime complexity of VaR. To the best of our knowladge at the time of writing, no prior work has proposed or studied linear-time algorithms for any of the above risk measures.
+There is limited prior work on fast algorithms for evaluating risk measures. The conventional VaR algorithm for a discrete random variable must sort its values before it can evaluate its risk. As a result, the sort's runtime, which requires $\Omega(n \log n)$ operations where $n$ is the number of the probability mass function~(pmf) entries~\cite{}, dominates the runtime complexity of VaR. To the best of our knowledge at the time of writing, no prior work has proposed or studied linear-time algorithms for any of the above risk measures.
 
 Coherent risk measures, like CVaR and TVaR, can be evaluated by solving convex optimization problems~\cite{}. Although most of these optimization problems are tractable, their time complexity is too large to be practical. Most practical implementations rely on specific properties of these optimization problems to compute the solution more efficiently. For example, all existing CVaR algorithms must sort the values of the random variable to compute its value~\cite{}. As in the case of VaR, the $\Omega(n \log  n)$ time complexity of the sort in the CVaR algorithms dominates the complexity and prevents linear time computation. In this paper, we circumvent the complexity of sorting by developing no-sort algorithms.
 
 Numerous efficient algorithms have been designed for structured optimization problems that are similar to CVaR and TVaR evaluations. Some example of such structured optimization problems are the projection onto the simplex~\cite{}, projection on k-capped simplex~\cite{kcapped_ang}, linear optimization on the intersection of $L_p$ or $\varphi$-divergence balls and the probability simplex as arise in robust optimizations~\cite{}, optimization for $\varphi$-divergence risk measures~\cite{}, and on polytopes defined by submodular functions which are known as polymatroids~\cite{}. Many of these algorithms require sorting the input variables, which has $O(n \log  n)$ complexity. There has been mention of the possibility of linear time algorithms however, we could find neither work describing nor studying them. One exception is \cite{Condat2016}, which proposes a linear-time algorithm for computing the projection onto the simplex, which does not leverage quickselect. 
 
-Our algorithms' time complexity improves on the state of the art by a logarithmic factor. Although this improvement may seem unimportant,  it is an acceleration that is practically meaningful without any serious drawbacks. Our algorithms are simple and easy to implement with little added complexity compared with the state-of-the-art. Our numerical results show that they can lead to an order of magnitude speedup for realistic large problems, a significant speedup for moderately sized problems, and match the performance of existing algorithms for small problems.
+Our algorithms' time complexity improves on the state of the art by a logarithmic factor. Although this improvement may seem unimportant,  it is an acceleration that is practically meaningful without any serious drawbacks. Our algorithms are simple and easy to implement with little added complexity compared with the state-of-the-art. Our numerical results show that they can lead to an order of magnitude speed up for realistic large problems, a significant speed up for moderately sized problems, and match the performance of existing algorithms for small problems.
 
 The remainder of the paper is organized as follows. \Cref{sec:preliminaries} describes the necessary background on risk measures, $\varphi$-divergence, and polymatroid optimization. Then, \Cref{sec:var-linear} describes \emph{quickquantile}, a new algorithm that computes VaR in linear time for a random variable defined by a pmf. Then, \cref{sec:phi-divergence} builds on the \emph{quickquantile} to develop \emph{quickdivergence}, an algorithm that evaluates certain $\varphi$-divergence risk measures in linear time. We evaluate the algorithms numerically on synthetic and realistic problems in \cref{sec:experiments}. A tested implementation of the algorithms in Julia is available at \textcolor{green}{REDACTED}.
 
@@ -274,7 +274,7 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
 \Cref{alg:quick_quantile} computes $\quant^+$.
 \begin{proof}
   \todo{proof needs justification}
- Loop Invariant: Before and after every iteration $\quant^+$ will remain in the array $x$ at an index $i$ such that $ f_k \leq i \leq b_k $ or if $f_k > b_k$ , then $\quant^+ = b_k$.
+ Loop Invariant: Before and after every iteration $\quant^+$ will remain in the array $x$ at an index $i$ such that $ f_k \leq i \leq b_k $ or if $f_k > b_k$, then $\quant^+ = b_k$.
 During the first loop: Every element in $x$ has an index $i$ such that $ front \leq i \leq back $, where $front=1$ and $back=n$. By Lemma 1, there exists an element with index $i$ such that $\quant^+ = x[i] $.
  
 During the loop: There are five possible scenarios at each iteration:
@@ -285,12 +285,12 @@ During the loop: There are five possible scenarios at each iteration:
  \item[Case 2]: The tail is selected such that $\alpha < t_k$. In this case $b_k$ is set to $i_k$ such that $b_k = f_k$. Assume there exists $\tau\opt $ such that $\tau\opt > x[i_k]$, and $x[\tau\opt]=\quant^+$. Then $P[x < x[\tau\opt]] \geq t_k > \alpha$, which means that $x[\tau\opt]$ is not feasible with \eqref{eq:var-definition}. The algorithm terminates after this iteration.
 
 
-\item[Case 3]: Tail is selected such that $\alpha \geq t_k$. In this case $f_k$ is set to $i_k + 1$ such that $f_k < b_k$ . Assume there exists $\tau\opt $ such that $\tau\opt \leq x[i_k] $, and $x[\tau\opt]=\quant^+$. Let $\tau' = i_k$. $P[x < x[\tau']] \leq tail < \alpha$. If $x[\tau\opt] <  x[\tau']$ then $x[\tau\opt]$ can not be optimal by \eqref{eq:var-definition}.Thus, $\quant_{\alpha}^+(\tilde{x}) \geq x^f_{i_k} $ and $\quant_{\alpha}^+(\tilde{x}) \leq x^b_{i_k}$ and loop invariant is satisfied. 
+\item[Case 3]: Tail is selected such that $\alpha \geq t_k$. In this case $f_k$ is set to $i_k + 1$ such that $f_k < b_k$. Assume there exists $\tau\opt $ such that $\tau\opt \leq x[i_k] $, and $x[\tau\opt]=\quant^+$. Let $\tau' = i_k$. $P[x < x[\tau']] \leq tail < \alpha$. If $x[\tau\opt] <  x[\tau']$ then $x[\tau\opt]$ can not be optimal by \eqref{eq:var-definition}. Thus, $\quant_{\alpha}^+(\tilde{x}) \geq x^f_{i_k} $ and $\quant_{\alpha}^+(\tilde{x}) \leq x^b_{i_k}$ and loop invariant is satisfied. 
  
- \item[Case 4]: Tail is selected such that $\alpha \geq t_k$. In this case assume $f_k$ is set to $ind + 1$ such that $f_k = b_k$ . 
+ \item[Case 4]: Tail is selected such that $\alpha \geq t_k$. In this case assume $f_k$ is set to $ind + 1$ such that $f_k = b_k$. 
  All the elements are no longer in the range $[front, back]$ could not have been $\quant_{\alpha}^+(\tilde{x})$ (see Case 1 and Case 2), and $\quant_{\alpha}^+(\tilde{x})$ must exist in x per lemma 1. Thus, $\quant_{\alpha}^+(\tilde{x}) = b_k$ and loop invariant is satisfied. The algorithm terminates at this condition. 
 
-  \item[Case 5]: Tail is selected such that $\alpha \geq t_k$. In this case assume that $f_k$ is set to $i_k + 1$ such that $f_k > b_k$ . 
+  \item[Case 5]: Tail is selected such that $\alpha \geq t_k$. In this case assume that $f_k$ is set to $i_k + 1$ such that $f_k > b_k$. 
  Thus $b_k = i_k$. From case 1, we know any $\tau\opt $ larger than $b_k$ is not feasible and since $b_k = i_k$, $P[x < x[b_k]] \leq \alpha$. Since all feasible elements are $\leq b_k$, $b_k$ is optimal by \eqref{eq:var-definition}. 
 
 
@@ -471,7 +471,7 @@ The optimal solution will always be $f(S_i + 1) - f(S_{i})$, where $S_i$ is the 
   $Q(\omega) = \min\left\{\frac{P(\omega)}{\alpha}, 1\right\}$ is a submodular function that satisfies Assumption~4.1.
 \end{lem}
 \begin{proof}
-The left hand side of the minimum function will be a summation that has all positive values for admissible $\alpha$. Thus this is equivalent to the budget additive function, which has proven to be a submodular function in the literature \todo{must find citation that isn't lecture notes}.
+The left-hand side of the minimum function will be a summation that has all positive values for admissible $\alpha$. Thus this is equivalent to the budget additive function, which has proven to be a submodular function in the literature\todo{must find citation that isn't lecture notes}.
 
 \todo{What does the following statement intend to prove or demonstrate?}
 Unless adding a new element $S_i$ will make the value of the submodular function 1, $f(S_i) + f({i + 1}) = f(S_{ i+1 })$ by definition. Since $f(S_i)$ 
@@ -482,6 +482,258 @@ Unless adding a new element $S_i$ will make the value of the submodular function
 \todo{What does the following statement intend to prove or demonstrate?}
 From previous work, we know that $D(p\|q) \leq \frac{1}{2 \log(2)} \, \|p - q\|_1^2$. Thus, the coherent risk measure TVaR with the divergence constraint $\|p - q\|_1 \leq \sqrt{2 \log(2) \alpha}$ must be $\leq EVaR_\alpha[p]$ \mm{what is $p$ and why is the here?}. Submodular function is $Q(\omega) = \min\left\{\beta/2 + P(\omega), 1\right\}$
 
+
+\section{Experiments} \label{sec:experiments}
+
+To evaluate the algorithms developed in \cref{alg:quick_cvar} and \cref{alg:quick_quantile} we numerically compare their speed up against their canonical sorting-based counterparts. To ensure that the random variable causes as little difference in the runtime comparison we run our experiments both with uniform and sparse random variables. More detail on the experimental setup can be found in \cref{sec:appendix_experiments}.
+
+For the numerical results we refer to the canonical implementations as their unaltered risk measure name, and for the no-sort implementations we append the ``Q'' prefix.
+
+Our results represented by Figures \ref{fig:all_sparse}, and \ref{fig:all_uniform} are rendered on plots with a 95\% confidence interval band computed over 10 random seeds. These bands are tight due to the little variance in the measured runtimes between seeds.
+
+Demonstrating the speed-up of the quick algorithms over their sorting based counterparts, we observe that the quick algorithms are significantly faster than their sorting based counterparts. Especially in the case of CVaR and VaR which are extensively used in the industries aforementioned in \cref{sec:intro}.
+The results demonstrate approximately log speed up in the runtime of the quick algorithms which is consistent with the theoretical complexity of the algorithms, see \cref{sec:appendix_experiments}. This log speed up coincides with a noticeable speed-up in runtime across the tested random variable sizes. For the ease of the reader to note multiplicative decreases in runtime, we present the results in both linear and log scale.
+
+In the fields of interest for this work, finance, healthcare, robotics, etc. The computation of risk measures is
+often done over large random variables where the runtime and sensitivity of the algorithms to the size of the random variable is a concern. 
+The results presented in this section are chiefly concerned with demonstrating our ability to compute risk measures quickly, fulfilling the practical need.
+
+\begin{figure}
+  \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_uniform_linear.pdf}
+  \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_uniform_log.pdf}
+  \caption{Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{uniform} random variable.}
+  \label{fig:all_uniform}
+\end{figure}
+
+\begin{table}
+\centering
+\caption{Results for our Stock Market experiment.}
+\begin{tabular}{lrr}
+\toprule
+Method & Mean (ms) & Std Dev (ms) \\
+  \midrule
+CVaR & 0.3912 & 0.0382 \\ 
+  \textbf{qCVaR} & \textbf{0.1426} & \textbf{0.0307} \\
+  \midrule
+VaR & 0.3733 & 0.0321 \\ 
+  \textbf{qVar} & \textbf{0.1199} & \textbf{0.0287} \\ 
+  \midrule
+TVaR & 0.3993 & 0.0414 \\ 
+\textbf{qTVaR} & \textbf{0.1786} & \textbf{0.0356} \\ 
+  \bottomrule
+\end{tabular}
+\end{table}
+
+
+
+\section{Conclusion}
+
+We have formulated and demonstrated the correctness of a new algorithm for computing the maximum weight independent set for polymatroids without sorting.
+Which allowed us to solve many common risk measures such as CVaR, VaR, and TVaR in $O(N)$ time.
+This speed up is significant in the context of risk measures as they are often used in large scale applications such as finance, healthcare and robotics.
+
+% This work was partly supported by \todo{who supported us? Thank you Marek ;)}
+
+\bibliography{fastcvar.bib}
+
+\appendix
+
+\section{Proofs and Details for \cref{sec:var-linear}}
+
+\begin{algorithm}
+\algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $x \in \Real^n$ with probability mass function $p \in \Delta^n$ and $f, b \in \Real$}}
+\algrenewcommand\algorithmicensure{\textbf{Output: indices of partition $i, j \in \Real$}}
+\caption{Hoare's partition scheme}\label{alg:partition}
+  \begin{algorithmic}[1]
+    \Require{}
+    \Ensure{} 
+    \State{$i \gets f + \lceil\frac{b-f}{2}\rceil$}
+    \State{$\lambda \gets f$} % less than
+    \State{$\xi \gets f$} % equal to
+    \State{$\mu \gets b$} % greater than
+    \While{$\xi \leq \mu$}
+      \If{$x[\xi] < x[i]$}
+        \State{swap $x[\xi]$ with $x[\lambda]$}
+        \State{swap $p[\xi]$ with $p[\lambda]$}
+        \State{$\lambda \gets \mu + 1$}
+        \State{$\xi \gets \xi + 1$}
+      \ElsIf{$x[\xi] > x[i]$}
+        \State{$\mu \gets \mu - 1$}
+      \Else{}
+        \State{$\xi \gets \xi + 1$}
+      \EndIf{}
+    \EndWhile{}
+    \State{\Return{($\lambda - 1$, $\mu$)} \Comment{last element less than the pivot, first element greater than the pivot}}
+  \end{algorithmic}
+\end{algorithm}
+
+\section{Proofs and Details for \cref{sec:phi-divergence}}
+
+
+\section{No-sort Polymatroid}
+
+Our first contribution new algorithm for solving the maximum weight Independent Set without sorting for polymatroids. We note that certain additional assumptions have to be satisfied on the submodular function as follows.
+\begin{assumption}
+Assume for $P_f$ that $f(U)$ is such that for all $S_i, S_{ i+1 } \cup E$ where $S_i \cup (i + 1) = S_{ i+1 } $ and $f(S_{ i+1 }) < f(E)$, $f(S_i) + f({i + 1}) = f(S_{ i+1 })$.
+\end{assumption}
+We note this assumption essentially state that the submodular function must be a piecewise linear function. 
+\begin{algorithm}
+  \todo{fix typos}
+    \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
+    \algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
+  \caption{algorithm}{New algorithm}
+ \begin{algorithmic}[1]
+     \Require{}
+     \Ensure{}
+  
+    \State{$left \gets 1$}
+    \State{$right \gets n$}
+    \While{$right - left \geq 1$}
+    
+    \State{$mid \gets partition(left, right, c)$}
+    \If{$f(S_{mid}) = f(N)$}
+       \State{Let $x_i :=  \begin{cases}0 & \text{if  } f(S_{mid}) = f(N) \text{ for } i \geq mid \\ f(i) \end{cases}$}
+    \Else
+          \State{Let $x_i :=  \begin{cases}f(i) & \text{for } i \leq mid \end{cases}$}
+    \EndIf{}      
+    
+    
+    
+    \EndWhile{}
+    \State{$x_{right} \gets f(N) - f(S_{right - 1})$}
+\end{algorithmic}
+\end{algorithm}
+The proof for this algorithm is simple and shows that output is equal to that of Algorithm 4 (the standard greedy algorithm), which has already proved to be both feasible and optimal.
+\begin{lem}
+Algorithm 1 returns a feasible and optimal solution to the maximum weight independent set for polymatroids.
+\end{lem}
+\begin{proof}
+The optimal solution will always be $f(S_i) - f(S_{i-1})$ assuming the weight $c_i \geq 0$. Our solution is $f(i)$ for $f(S_i) < f(N)$, and by assumption 1 this equals $f(S_i) - f(S_{i - 1})$. If $f(S_i) = f(N)$ and $f(S_{i - 1}) = f(N)$, then $x_i = 0$ by the algorithm.
+\end{proof}
+
+\section{Comonotonicity of Risk}
+
+\begin{definition}
+Two random variables $\tilde{x}$ and $\tilde{y}$ are said to be comonotonic if
+  \begin{align*}
+    (\tilde{x}(\omega) - \tilde{x}(\omega'))(\tilde{y}(\omega) - \tilde{y}(\omega')) \geq 0 \quad \forall \; \omega, \omega' \in \Omega.
+  \end{align*}
+\end{definition}
+\begin{definition}
+  A risk measure is said to be comonotonic if given comonotonic random variables $\tilde{x}$ and $\tilde{y}$
+  \begin{align*}
+    \rho(\tilde{x} + \tilde{y}) = \rho(\tilde{x}) + \rho(\tilde{y}).
+  \end{align*}
+\end{definition}
+
+\begin{table}[htbp]
+\begin{tabular}{lll}
+  \textbf{Risk Measure} &  \textbf{Comonotone?} & \\
+  CVaR &  Yes & \\
+  VaR &   Yes & \\
+  TVaR &  Yes & \\
+  EVaR &  No & \\
+  Expectile & No &
+\end{tabular}
+\end{table}
+
+\section{Experiments}\label{sec:appendix_experiments}
+Code and results for these experiments as well as the implementations of all contained risk measures can be found at\todo{REDACTED}.
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.70\textwidth]{./code/plots/cvar_div_qcvar.pdf}
+  \caption{Linear regression fit of a logarithmic function to the ratio of the time taken to compute $\cvar{0.5}{\tilde{x}}$ by sorting (CVaR) and quickselect (QCVaR).}
+  \label{fig:cvar_div_qcvar}
+\end{figure}
+
+
+\begin{table} 
+\begin{tabular}{lccccccc}
+\toprule
+ & cvar & qcvar & var & qvar & tvar & qtvar & expectation \\
+n &  &  &  &  &  &  &  \\
+\midrule
+1000 & 0.03 ± 0.01 & \textbf{0.01 ± 0.01} & 0.03 ± 0.01 & \textbf{0.01 ± 0.01} & 0.03 ± 0.01 & \textbf{0.02 ± 0.01} & 0.00 ± 0.00 \\
+2000 & 0.07 ± 0.01 & \textbf{0.03 ± 0.02} & 0.06 ± 0.01 & \textbf{0.02 ± 0.01} & 0.06 ± 0.01 & \textbf{0.03 ± 0.01} & 0.00 ± 0.00 \\
+3000 & 0.10 ± 0.01 & \textbf{0.04 ± 0.02} & 0.09 ± 0.02 & \textbf{0.03 ± 0.02} & 0.10 ± 0.01 & \textbf{0.05 ± 0.01} & 0.00 ± 0.00 \\
+4000 & 0.14 ± 0.01 & \textbf{0.05 ± 0.03} & 0.13 ± 0.03 & \textbf{0.04 ± 0.03} & 0.13 ± 0.01 & \textbf{0.07 ± 0.02} & 0.00 ± 0.00 \\
+5000 & 0.18 ± 0.02 & \textbf{0.06 ± 0.03} & 0.17 ± 0.01 & \textbf{0.04 ± 0.03} & 0.17 ± 0.02 & \textbf{0.08 ± 0.02} & 0.00 ± 0.00 \\
+6000 & 0.21 ± 0.02 & \textbf{0.07 ± 0.04} & 0.20 ± 0.02 & \textbf{0.06 ± 0.04} & 0.21 ± 0.02 & \textbf{0.10 ± 0.03} & 0.00 ± 0.01 \\
+7000 & 0.25 ± 0.01 & \textbf{0.09 ± 0.05} & 0.24 ± 0.02 & \textbf{0.06 ± 0.04} & 0.24 ± 0.02 & \textbf{0.12 ± 0.03} & 0.01 ± 0.00 \\
+8000 & 0.29 ± 0.02 & \textbf{0.09 ± 0.05} & 0.27 ± 0.02 & \textbf{0.07 ± 0.05} & 0.28 ± 0.02 & \textbf{0.13 ± 0.04} & 0.01 ± 0.00 \\
+9000 & 0.33 ± 0.02 & \textbf{0.11 ± 0.06} & 0.31 ± 0.02 & \textbf{0.08 ± 0.06} & 0.32 ± 0.02 & \textbf{0.14 ± 0.04} & 0.01 ± 0.00 \\
+10000 & 0.37 ± 0.02 & \textbf{0.11 ± 0.06} & 0.34 ± 0.02 & \textbf{0.09 ± 0.06} & 0.35 ± 0.03 & \textbf{0.16 ± 0.05} & 0.01 ± 0.00 \\
+\bottomrule
+\end{tabular}
+\caption{Mean time (ms) ± 95\% standard deviation of each method. $n$ is the number of elements in the random variable.}
+\label{tab:small_results}
+\end{table}
+
+We test our algorithm on small scale problems where the difference in runtimes is not as significant,
+however these problems occur frequently in practice. \cref{tab:small_results} is consistent with the experimental
+results obtained in \cref{sec:experiments}, namely our no-sort methods outperform the sorting based methods in runtime.
+
+The results obtained in \cref{tab:small_results} were generated using a similar process to that of \cref{sec:experiments} 
+where instead of 10 trails per experiment, we used 50 trails per experiment. \cref{tab:small_results} shows the mean
+time in ms $\pm$ the 95\% confidence interval for each method.
+
+\cref{tab:small_results} shows that even for smaller settings our method is faster than the sorting based methods. The results are consistent with the theoretical complexity of the algorithms, which is $O(n \log n)$ for the sorting based methods and $O(n)$ for the quickselect based methods.
+
+
+\section{Algorithms}
+
+\subsection{Quick CVaR}
+
+\begin{algorithm}
+  %\floatname{algorithm}{Quick CVaR}
+  \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ with probability mass function p and $\alpha \in [0,1]$}}
+  \algrenewcommand\algorithmicensure{\textbf{Output: $CVaR_\alpha(\tilde{X})$}}
+  \caption{QCVaR}\label{alg:quick_cvar}
+  \begin{algorithmic}[1]
+    \Require{}
+    \Ensure{} 
+    \todo{Make absolutely sure that you tell the reader that we use 1 or 0 based indexing}
+    \State{$q^+_\alpha \gets \text{quick\_quantile}(x, p, \alpha)$}
+    \State{$val \gets 0$}
+    \State{$p_{left} \gets 1$}
+    \For{$i \in 0 \dots n$}
+      \State{$inc \gets \min(\frac{p[i]}{\alpha}, p_{left})$}
+      \State{$val += x[i] * inc$}
+      \State{$p_{left} -= inc$}
+      \If{$p_{left} \leq 0$}
+        \State{Break}
+      \EndIf{}
+    \EndFor{}
+    \State{\Return{$val$}}
+  \end{algorithmic}
+\end{algorithm}
+
+
+\section{Greedy Algorithm}
+
+\mm{Why would we need the weights to be non-negative?}
+
+\begin{algorithm} \label{alg:greedy-polymatroid}
+    \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
+    \algrenewcommand\algorithmicensure{\textbf{Output: }$\max \{f(S) : S\subseteq N\}$}
+  \caption{Greedy algorithm from Submodular Functions, Polymatroids, TDI}
+ \begin{algorithmic}[1]
+    \Require{}
+    \Ensure{}
+    \State{Order the elements such that $c_1 \geq c_2 \cdots \geq c_n$.}
+    \State{Let $S_i := \{1, \dots, i\}$ and $S_0 := \emptyset$}
+    \State{Let $x_i :=  \begin{cases}f(S_i) - f(S_{i-1}) & \text{for } i = 1,\dots, r \\ 0 & \text{otherwise} \end{cases}$}
+\end{algorithmic}
+\end{algorithm}
+
+
+% Graveyard
+% \begin{figure}
+%   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_linear.pdf}
+%   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_log.pdf}
+%   \caption{Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{sparse} random variable.}
+%   \label{fig:all_sparse}
+% \end{figure}
 % \begin{algorithm}
 %   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and maximum divergence $\beta$}}
 %   \algrenewcommand\algorithmicensure{\textbf{Output: new distribution $q$}}
@@ -578,169 +830,6 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \log(2)} \, \|p - q\|_
 %     \State{Let $x_i :=  \begin{cases}f(S_i) - f(S_{i-1}) & \text{for } i = 1,\dots, r \\ 0 & \text{otherwise} \end{cases}$}
 % \end{algorithmic}
 % \end{algorithm}
-
-
-
-\section{Experiments} \label{sec:experiments}
-
-To evaluate the algorithms developed in \cref{alg:quick_cvar} and \cref{alg:quick_quantile} we numerically compare their speedup against their cannonical sorting-based counterparts. To ensure that the random variable causes as little difference in the runtime comparison we run our experiments both with uniform and sparse random variables. More detail on the experimental setup can be found in \cref{sec:appendix_experiments}.
-
-For the numerical results we refer to the cannonical implementations as their un-altered risk measure name, and for the no-sort implementations we append the ``Q'' prefix.
-
-Our results represented by Figures \ref{fig:all_sparse}, and \ref{fig:all_uniform} are rendered on plots with a 95\% confidence interval band computed over 10 random seeds. These bands are tight due to the little variance in the measured runtimes between seeds.
-
-Demonstrating the speedup of the quick algorithms over their sorting based counterparts, we observe that the quick algorithms are significantly faster than their sorting based counterparts. Especially in the case of CVaR and VaR which are extensively used in the industries aformentioned in \cref{sec:intro}.
-The results demonstrate approximately log speedup in the runtime of the quick algorithms which is consistent with the theoretical complexity of the algorithms, see \cref{sec:appendix_experiments}. This log speedup coincides with a noticeable speedup in runtime across the tested random variable sizes. For the ease of the reader to note multiplicative decreases in runtime, we present the results in both linear and log scale.
-
-In the fields of interest for this work, finance, healthcare, robotics, ect. . The computation of risk measures is
-often done over large random variables where the runtime and sensitivity of the algorithms to the size of the random variable is a concern. 
-The results presented in this section are chiefly concerned with demonstrating our ability to compute risk measures quickly, fulfilling the practical need.
-
-% \begin{figure}
-%   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_linear.pdf}
-%   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_log.pdf}
-%   \caption{Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{sparse} random variable.}
-%   \label{fig:all_sparse}
-% \end{figure}
-\begin{figure}
-  \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_uniform_linear.pdf}
-  \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_uniform_log.pdf}
-  \caption{Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{uniform} random variable.}
-  \label{fig:all_uniform}
-\end{figure}
-
-\begin{table}
-\centering
-\caption{Results for our Stock Market experiment.}
-\begin{tabular}{lrr}
-\toprule
-Method & Mean (ms) & Std Dev (ms) \\
-  \midrule
-CVaR & 0.3912 & 0.0382 \\ 
-  \textbf{qCVaR} & \textbf{0.1426} & \textbf{0.0307} \\
-  \midrule
-VaR & 0.3733 & 0.0321 \\ 
-  \textbf{qVar} & \textbf{0.1199} & \textbf{0.0287} \\ 
-  \midrule
-TVaR & 0.3993 & 0.0414 \\ 
-\textbf{qTVaR} & \textbf{0.1786} & \textbf{0.0356} \\ 
-  \bottomrule
-\end{tabular}
-\end{table}
-
-
-
-\section{Conclusion}
-
-We have formulated and demonstrated the correctness of a new algorithm for computing the maximum weight independent set for polymatroids without sorting.
-Which allowed us to solve many common risk measures such as CVaR, VaR, and TVaR in $O(N)$ time.
-This speedup is significant in the context of risk measures as they are often used in large scale applications such as finance, healthcare and robotics.
-
-% This work was partly supported by \todo{who supported us? Thank you Marek ;)}
-
-\bibliography{fastcvar.bib}
-
-\appendix
-
-\section{Proofs and Details for \cref{sec:var-linear}}
-
-\begin{algorithm}
-\algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $x \in \Real^n$ with probability mass function $p \in \Delta^n$ and $f, b \in \Real$}}
-\algrenewcommand\algorithmicensure{\textbf{Output: indices of partion $i, j \in \Real$}}
-\caption{Hoare's partition scheme}\label{alg:partition}
-  \begin{algorithmic}[1]
-    \Require{}
-    \Ensure{} 
-    \State{$i \gets f + \lceil\frac{b-f}{2}\rceil$}
-    \State{$\lambda \gets f$} % less than
-    \State{$\xi \gets f$} % equal to
-    \State{$\mu \gets b$} % greater than
-    \While{$\xi \leq \mu$}
-      \If{$x[\xi] < x[i]$}
-        \State{swap $x[\xi]$ with $x[\lambda]$}
-        \State{swap $p[\xi]$ with $p[\lambda]$}
-        \State{$\lambda \gets \mu + 1$}
-        \State{$\xi \gets \xi + 1$}
-      \ElsIf{$x[\xi] > x[i]$}
-        \State{$\mu \gets \mu - 1$}
-      \Else{}
-        \State{$\xi \gets \xi + 1$}
-      \EndIf{}
-    \EndWhile{}
-    \State{\Return{($\lambda - 1$, $\mu$)} \Comment{last element less than the pivot, first element greater than the pivot}}
-  \end{algorithmic}
-\end{algorithm}
-
-\section{Proofs and Details for \cref{sec:phi-divergence}}
-
-
-\section{No-sort Polymatroid}
-
-Our first contribution new algorithm for solving the maximum weight Independent Set without sorting for polymatroids. We note that certain additional assumptions have to be satisfied on the submodular function as follows.
-\begin{assumption}
-Assume for $P_f$ that $f(U)$ is such that for all $S_i, S_{ i+1 } \cup E$ where $S_i \cup (i + 1) = S_{ i+1 } $ and $f(S_{ i+1 }) < f(E)$, $f(S_i) + f({i + 1}) = f(S_{ i+1 })$.
-\end{assumption}
-We note this assumption essentially state that the submodular function must be a piecewise linear function. 
-\begin{algorithm}
-  \todo{fix typos}
-    \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
-    \algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
-  \caption{algorithm}{New algorithm}
- \begin{algorithmic}[1]
-     \Require{}
-     \Ensure{}
-  
-    \State{$left \gets 1$}
-    \State{$right \gets n$}
-    \While{$right - left \geq 1$}
-    
-    \State{$mid \gets partition(left, right, c)$}
-    \If{$f(S_{mid}) = f(N)$}
-       \State{Let $x_i :=  \begin{cases}0 & \text{if  } f(S_{mid}) = f(N) \text{ for } i \geq mid \\ f(i) \end{cases}$}
-    \Else
-          \State{Let $x_i :=  \begin{cases}f(i) & \text{for } i \leq mid \end{cases}$}
-    \EndIf{}      
-    
-    
-    
-    \EndWhile{}
-    \State{$x_{right} \gets f(N) - f(S_{right - 1})$}
-\end{algorithmic}
-\end{algorithm}
-The proof for this algorithm is simple and shows that output is equal to that of Algorithm 4 (the standard greedy algorithm), which has already proved to be both feasible and optimal.
-\begin{lem}
-Algorithm 1 returns a feasible and optimal solution to the maximum weight independent set for polymatroids.
-\end{lem}
-\begin{proof}
-The optimal solution will always be $f(S_i) - f(S_{i-1})$ assuming the weight $c_i \geq 0$. Our solution is $f(i)$ for $f(S_i) < f(N)$, and by assumption 1 this equals $f(S_i) - f(S_{i - 1})$. If $f(S_i) = f(N)$ and $f(S_{i - 1}) = f(N)$, then $x_i = 0$ by the algorithm.
-\end{proof}
-
-\section{Comonotonicity of Risk}
-
-\begin{definition}
-Two random variables $\tilde{x}$ and $\tilde{y}$ are said to be comonotonic if
-  \begin{align*}
-    (\tilde{x}(\omega) - \tilde{x}(\omega'))(\tilde{y}(\omega) - \tilde{y}(\omega')) \geq 0 \quad \forall \; \omega, \omega' \in \Omega.
-  \end{align*}
-\end{definition}
-\begin{definition}
-  A risk measure is said to be comonotonic if given comonotonic random variables $\tilde{x}$ and $\tilde{y}$
-  \begin{align*}
-    \rho(\tilde{x} + \tilde{y}) = \rho(\tilde{x}) + \rho(\tilde{y}).
-  \end{align*}
-\end{definition}
-
-\begin{table}[htbp]
-\begin{tabular}{lll}
-  \textbf{Risk Measure} &  \textbf{Comonotone?} & \\
-  CVaR &  Yes & \\
-  VaR &   Yes & \\
-  TVaR &  Yes & \\
-  EVaR &  No & \\
-  Expectile & No &
-\end{tabular}
-\end{table}
-
 % \section{k-capped simplex}
 
 % \begin{equation}
@@ -839,100 +928,6 @@ Two random variables $\tilde{x}$ and $\tilde{y}$ are said to be comonotonic if
 
 %   \end{algorithmic}
 % \end{algorithm}
-\section{Experiments}\label{sec:appendix_experiments}
-Code and results for these experiments as well as the implementations of all contained risk measures can be found at \todo{REDACTED}.
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.70\textwidth]{./code/plots/cvar_div_qcvar.pdf}
-  \caption{Linear regression fit of a logaritmic function to the ratio of the time taken to compute $\cvar{0.5}{\tilde{x}}$ by sorting (CVaR) and quickselect (QCVaR).}
-  \label{fig:cvar_div_qcvar}
-\end{figure}
-
-
-\begin{table} 
-\begin{tabular}{lccccccc}
-\toprule
- & cvar & qcvar & var & qvar & tvar & qtvar & expectation \\
-n &  &  &  &  &  &  &  \\
-\midrule
-1000 & 0.03 ± 0.01 & \textbf{0.01 ± 0.01} & 0.03 ± 0.01 & \textbf{0.01 ± 0.01} & 0.03 ± 0.01 & \textbf{0.02 ± 0.01} & 0.00 ± 0.00 \\
-2000 & 0.07 ± 0.01 & \textbf{0.03 ± 0.02} & 0.06 ± 0.01 & \textbf{0.02 ± 0.01} & 0.06 ± 0.01 & \textbf{0.03 ± 0.01} & 0.00 ± 0.00 \\
-3000 & 0.10 ± 0.01 & \textbf{0.04 ± 0.02} & 0.09 ± 0.02 & \textbf{0.03 ± 0.02} & 0.10 ± 0.01 & \textbf{0.05 ± 0.01} & 0.00 ± 0.00 \\
-4000 & 0.14 ± 0.01 & \textbf{0.05 ± 0.03} & 0.13 ± 0.03 & \textbf{0.04 ± 0.03} & 0.13 ± 0.01 & \textbf{0.07 ± 0.02} & 0.00 ± 0.00 \\
-5000 & 0.18 ± 0.02 & \textbf{0.06 ± 0.03} & 0.17 ± 0.01 & \textbf{0.04 ± 0.03} & 0.17 ± 0.02 & \textbf{0.08 ± 0.02} & 0.00 ± 0.00 \\
-6000 & 0.21 ± 0.02 & \textbf{0.07 ± 0.04} & 0.20 ± 0.02 & \textbf{0.06 ± 0.04} & 0.21 ± 0.02 & \textbf{0.10 ± 0.03} & 0.00 ± 0.01 \\
-7000 & 0.25 ± 0.01 & \textbf{0.09 ± 0.05} & 0.24 ± 0.02 & \textbf{0.06 ± 0.04} & 0.24 ± 0.02 & \textbf{0.12 ± 0.03} & 0.01 ± 0.00 \\
-8000 & 0.29 ± 0.02 & \textbf{0.09 ± 0.05} & 0.27 ± 0.02 & \textbf{0.07 ± 0.05} & 0.28 ± 0.02 & \textbf{0.13 ± 0.04} & 0.01 ± 0.00 \\
-9000 & 0.33 ± 0.02 & \textbf{0.11 ± 0.06} & 0.31 ± 0.02 & \textbf{0.08 ± 0.06} & 0.32 ± 0.02 & \textbf{0.14 ± 0.04} & 0.01 ± 0.00 \\
-10000 & 0.37 ± 0.02 & \textbf{0.11 ± 0.06} & 0.34 ± 0.02 & \textbf{0.09 ± 0.06} & 0.35 ± 0.03 & \textbf{0.16 ± 0.05} & 0.01 ± 0.00 \\
-\bottomrule
-\end{tabular}
-\caption{Mean time (ms) ± 95\% standard deviation of each method. $n$ is the number of elements in the random variable.}
-\label{tab:small_results}
-\end{table}
-
-We test our algorithm on small scale problems where the difference in runtimes is not as significant,
-however these problems occur frequently in practice. \cref{tab:small_results} is consistent with the experimental
-results obtained in \cref{sec:experiments}, namely our no-sort methods outperform the sorting based methods in runtime.
-
-The results obtained in \cref{tab:small_results} were generated using a similar process to that of \cref{sec:experiments} 
-where instead of 10 trails per experiment, we used 50 trails per experiment. \cref{tab:small_results} shows the mean
-time in ms $\pm$ the 95\% confidence interval for each method.
-
-\cref{tab:small_results} shows that even for smaller settings our method is faster than the sorting based methods. The results are consistent with the theoretical complexity of the algorithms, which is $O(n \log n)$ for the sorting based methods and $O(n)$ for the quickselect based methods.
-
-
-\section{Algorithms}
-
-\subsection{Piece-wise Linear Minimization}
-\maeve{Incorporate projection.jl }
-
-\subsection{Quick CVaR}
-
-\begin{algorithm}
-  %\floatname{algorithm}{Quick CVaR}
-  \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ with probability mass function p and $\alpha \in [0,1]$}}
-  \algrenewcommand\algorithmicensure{\textbf{Output: $CVaR_\alpha(\tilde{X})$}}
-  \caption{QCVaR}\label{alg:quick_cvar}
-  \begin{algorithmic}[1]
-    \Require{}
-    \Ensure{} 
-    \todo{Make absolutely sure that you tell the reader that we use 1 or 0 based indexing}
-    \State{$q^+_\alpha \gets \text{quick\_quantile}(x, p, \alpha)$}
-    \State{$val \gets 0$}
-    \State{$p_{left} \gets 1$}
-    \For{$i \in 0 \dots n$}
-      \State{$inc \gets \min(\frac{p[i]}{\alpha}, p_{left})$}
-      \State{$val += x[i] * inc$}
-      \State{$p_{left} -= inc$}
-      \If{$p_{left} \leq 0$}
-        \State{Break}
-      \EndIf{}
-    \EndFor{}
-    \State{\Return{$val$}}
-  \end{algorithmic}
-\end{algorithm}
-
-
-\section{Greedy Algorithm}
-
-\mm{Why would we need the weights to be non-negative?}
-
-\begin{algorithm} \label{alg:greedy-polymatroid}
-    \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
-    \algrenewcommand\algorithmicensure{\textbf{Output: }$\max \{f(S) : S\subseteq N\}$}
-  \caption{Greedy algorithm from Submodular Functions, Polymatroids, TDI}
- \begin{algorithmic}[1]
-    \Require{}
-    \Ensure{}
-    \State{Order the elements such that $c_1 \geq c_2 \cdots \geq c_n$.}
-    \State{Let $S_i := \{1, \dots, i\}$ and $S_0 := \emptyset$}
-    \State{Let $x_i :=  \begin{cases}f(S_i) - f(S_{i-1}) & \text{for } i = 1,\dots, r \\ 0 & \text{otherwise} \end{cases}$}
-\end{algorithmic}
-\end{algorithm}
-
-
-
 
 \end{document}
 

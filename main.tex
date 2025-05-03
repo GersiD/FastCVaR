@@ -95,6 +95,8 @@ Our algorithms' time complexity improves on the state of the art by a logarithmi
 
 The remainder of the paper is organized as follows. \Cref{sec:preliminaries} describes the necessary background on risk measures, $\varphi$-divergence, and polymatroid optimization. Then, \Cref{sec:var-linear} describes \emph{quickquantile}, a new algorithm that computes VaR in linear time for a random variable defined by a pmf. Then, \cref{sec:phi-divergence} builds on the \emph{quickquantile} to develop \emph{quickdivergence}, an algorithm that evaluates certain $\varphi$-divergence risk measures in linear time. We evaluate the algorithms numerically on synthetic and realistic problems in \cref{sec:experiments}. A tested implementation of the algorithms in Julia is available at \textcolor{green}{REDACTED}.
 
+
+\cite{adam2019projectionscanonicalsimplexadditional}
 % For coherent risk measures, it has been shown that computing these risk measures is equivalent to solving a robust optimization problem where a probability distribution must be selected to minimize the expectation of a random variable subject to a divergence constraint from a normal distribution. For certain risk measures that satistfy an additional property known as comonotinicity, it is known that this optimization problem can be casted as the maximum weighted independent set problem (MWIS) on a polymathic.
 
 % how we are doing this? connect phi-divergence risk measures and polymatroids
@@ -112,47 +114,50 @@ The remainder of the paper is organized as follows. \Cref{sec:preliminaries} des
 
 In this work, we restrict our attention to random variables defined on finite probability spaces $(\Omega, 2^{\Omega}, \bm{p})$ where $\Omega := \left\{ 1, \dots , n \right\}$, $\bm{p} \in \Delta_n$, and $\Delta_n$ is the $n$-dimensional probability simplex. We use a tilde to indicate a random variable, such as $\tilde{x}\colon \Omega \to \Real$. Vectors are denoted with a lower-case bold font, such as $\bm{x} \in \Real^n$ and $\bm{x}_i, i = 1, \dots , n$ is the $i$-th element of the vector. We use $\tilde{x}$ and $\bm{x}$ interchangeably, such that $\bm{x}_i = \tilde{x}(i), i\in 1, \dots , n$. Sets are denoted with calligraphic letters. Finally, we use $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ to denote the extended real line.
 
-Monetary risk measures generalize the expectation operator to account for the uncertainty in the distribution of a random variable~\cite{Follmer2016}. \emph{Value-at-Risk}~(VaR) is one of the most popular and interpretable risk measures~\cite{Follmer2016,Shapiro2014}. It is defined for $\alpha\in [0,1]$ for any $\tilde{x}\in \mathbb{X}$ as~\cite{Follmer2016}
+\emph{Monetary risk measures} $\rho\colon \mathbb{X} \to \bar{\Real}$ generalize the expectation operator to account for the uncertainty in the distribution of a real-valued random variable~\cite{Follmer2016}. In this paper, we assume that the risk measures are applied to random variables that represent rewards and that a higher risk value is preferable to a lower risk value. 
+
+\emph{Value-at-Risk}~(VaR) is one of the most popular and interpretable risk measures~\cite{Follmer2016,Shapiro2014}. It is defined for $\alpha\in [0,1)$ for any $\tilde{x}\in \mathbb{X}$ as~\cite{Follmer2016}
 \begin{equation}
   \label{eq:var-definition}
   \varo_{\alpha}(\tilde{x})
   \;:=\;
     \max\; \left\{\tau \in \bar{\Real} \mid \mathbb{P}[\tilde{x} < \tau]  \le \alpha\right\}.
 \end{equation}
-The maximum in~\eqref{eq:var-definition} exists because $\tau \mapsto \mathbb{P}[\tilde{x} < \tau]$ is a lower semi-continuous function. Note that $\varo_0[\tilde{x}] = \min\left\{\bm{x}_i \mid i \in [1...n], \bm{p}_i > 0 \right\}$ and $\varo_{1}[ \tilde{x} ] = \infty$.
+The maximum in~\eqref{eq:var-definition} exists because $\tau \mapsto \mathbb{P}[\tilde{x} < \tau]$ is a lower semi-continuous function. It is easy to see that $\varo_0[\tilde{x}] = \ess \inf [\tilde{x}]$, and typically the risk measures is extended as $\varo_{1}[ \tilde{x} ] = \infty$.
 
-Another risk measure of interest is \emph{Conditional-Value-at-Risk} (CVaR). CVaR for a random variable $\tilde{x} \in \mathbb{X}$ and a risk level $\alpha \in (0,1]$ is defined as~\cite{Follmer2016}
+We also consider the \emph{Conditional-Value-at-Risk}~(CVaR), a common risk measure, which is defined for a random variable $\tilde{x} \in \mathbb{X}$ and risk level $\alpha \in (0,1]$ as~\cite{Follmer2016}
 \begin{equation} \label{eq:primal_cvar}
     \cvaro_\alpha(\tilde{x})
   := \max_{z \in \Real} \left(z - \alpha^{-1} \bm{p}\tr[z \cdot \bm{1} -\bm{x}]_+\right) 
-  = \min \left\{\bm{q}\tr \bm{x} \mid \bm{q} \leq \alpha^{-1} \cdot \bm{p},\, \bm{q}\in \Delta_n \right\},
+  = \min \left\{\bm{q}\tr \bm{x} \mid \bm{q} \leq \alpha^{-1} \bm{p},\, \bm{q}\in \Delta_n \right\},
     %&= \min \left\{  \Ex{\bm{\xi}}{ \tilde{x}  } \mid
   %\bm{\xi} \leq \frac{1}{\alpha} p, \bm{\xi} \in \Delta^n \right\} \\
   %&= \max \left\{ z - \frac{1}{\alpha} \Ex{\bm{p}}{z-\bm{x}}_+ \mid z \in \Real\right\} \\
 \end{equation}
-where $\bm{1}$ is a vector of ones of an appropriate size and the minimization formulation follows from a convex conjugate representation~\cite{Follmer2016}. The CVaR is usually continuously extended to $\cvaro_0[\tilde{x}] = \min\left\{\bm{x}_i \mid i \in [1...n], \bm{p}_i > 0 \right\}$.
+where $\bm{1}$ is a vector of ones. CVaR is usually continuously extended as $\cvaro_0[\tilde{x}] = \ess\inf[\tilde{x}]$.
 
-Recall that any coherent risk measure which accepts random variables representing rewards can be defined as~\cite[Prop. 2.84]{Follmer2016} 
-\begin{align}\label{eq:correspondence_coherent_risk}
-  \rho(\tilde{x}) &=\inf_{q\in \mathcal{Q} \subseteq{\Delta^n} } \bm{q}\tr \bm{x}.
-\end{align}
-
-In this work, we study a general class of coherent risk measures known as $\varphi$-divergence risk measures. These can be defined as
+\emph{$\varphi$-divergence risk measures} generalize CVaR to a broader class of related risk measures~\cite{Ahmadi-Javid2017} as shown in \cref{tab:divergences}. A general divergence risk measure $\ER_{\varphi, \beta}\colon \mathbb{X} \to  \bar{\Real}$  is defined for risk parameters $\varphi\colon \Real \to \bar{\Real}$ and $\beta\in \Real_+$ as
 \begin{align} \label{eq:fdiv-dual}
-  \ER_{\varphi,\beta}(\tilde{x}) := \inf \left\{\bm{q}\tr \bm{x} \mid I_{\varphi}(\bm{p} \| \bm{q}) \le \beta, \bm{q} \in \Delta_n \right\} \\
-  I_\varphi(\bm{p} \| \bm{q}) = \sum_{i \in \Omega } \bm{q}_{i} \cdot \varphi\left(\frac{\bm{p}_i}{\bm{q}_i}\right).
+  \ER_{\varphi,\beta}(\tilde{x}) := \inf \left\{\bm{q}\tr \bm{x} \mid H_{\varphi}(\bm{p} \| \bm{q}) \le \beta, \bm{q} \in \Delta_n \right\},
+  \quad
+  H_\varphi(\bm{p} \| \bm{q}) := \sum_{i \in \Omega} q_i \cdot \varphi\left(\frac{p_i}{q_i}\right),
 \end{align} 
-For two discrete, absolutely continuous probability distributions $p$ and $q$, and convex $\varphi$ such that $\varphi(1)=0$. 
-
-All $\varphi$-divergence risk measures also take on the following dual form for $\beta \in \Real$ and any proper, lower semi-continuous, and convex function $\varphi\colon \Real \to \bar{\Real}$~\cite{Ahmadi-Javid2011,Ahmadi-Javid2017}: 
+where $H_{\varphi}$ is a $\varphi$-divergence~\cite{Bayraksan2015}, $\varphi$ is convex, and $\varphi(1)=0$. Note that all $\varphi$-divergence risk measures also have the following equivalent dual representation~\cite{Ahmadi-Javid2011,Ahmadi-Javid2017}: 
 \begin{equation} \label{eq:fdiv-primal}
-\ER_{\varphi,\beta}(\tilde{x}) = \sup \left\{t \cdot \left(v + \E { - \varphi\opt \left(- t^{-1} \cdot \bm{x} + (v + \beta) \cdot \bm{1} \right)}\right) \mid  t,v \in \Real, t > 0\right\},
+\ER_{\varphi,\beta}(\tilde{x}) = \sup_{t,v \in \Real\,:\, t > 0}t \cdot \left(v - \E { \varphi\opt \left(- \frac{\tilde{x}}{t} + v + \beta \right)}\right) ,
 \end{equation} 
-where $\varphi^{\star}$ the convex conjugate of the $\varphi$-divergence $\varphi$. EVaR, for example, is a well known example of $\varphi$-divergence risk measure where the $\varphi$ is the KL-divergence~\cite{Ahmadi-Javid2017}.
+where $\varphi\opt$ is the convex conjugate of $\varphi$. EVaR, for example, is a well known example of $\varphi$-divergence risk measure where the $\varphi$ is the KL-divergence~\cite{Ahmadi-Javid2017}.
+
+Finally, it is important to note that $\varphi$-divergence risk measures are coherent, which means they are convex and positively homogeneous. It is well-known that any coherent risk measure $\rho\colon \mathbb{X}\to \bar{\Real}$ satisfies that~\citep[Prop. 2.84]{Follmer2016} 
+\begin{align}\label{eq:correspondence_coherent_risk}
+  \rho(\tilde{x}) &=\inf_{\bm{q}\in \mathcal{Q}} \bm{q}\tr \bm{x},
+\end{align}
+for some closed convex non-empty set $\Delta^n$.
+
 
 \begin{table}
     \centering
-    \caption{Selected $\varphi$-divergence risk measures with functions in \eqref{eq:fdiv-primal} and \eqref{eq:fdiv-dual}.}
+    \caption{Selected $\varphi$-divergence risk measures and functions in \eqref{eq:fdiv-primal} and \eqref{eq:fdiv-dual}.}
     \label{tab:divergences}
     \begin{tabular}{l|ccc}
          \toprule
@@ -164,14 +169,10 @@ where $\varphi^{\star}$ the convex conjugate of the $\varphi$-divergence $\varph
       \midrule
       $\evaro_{\alpha}$     & $\begin{cases} y \log y &\text{if } y > 0 \\ 0 &\text{if } y =  0 \\  \infty &\text{if } y < 0 \end{cases}$ & $\exp{ x - 1 }$ & $-\log(\alpha)$ \\
       \midrule
-         $\tvaro_{\alpha}$     & $|y - 1|$ & $ \begin{cases} x &\text{if } |x| \le 1\\ \infty &\text{otherwise} \end{cases} $& $\sqrt{2 \cdot \log 2 \cdot (-\log(\alpha)) }$ \\
+         $\tvaro_{\alpha}$     & $|y - 1|$ & $ \begin{cases} x &\text{if } |x| \le 1\\ \infty &\text{otherwise} \end{cases} $& $\sqrt{- 2 \log 2 \cdot \log(\alpha) }$ \\
          \bottomrule
     \end{tabular}
 \end{table}
-
-\paragraph{Other work}
-
-\cite{adam2019projectionscanonicalsimplexadditional}
 
 \section{Computing VaR in Linear Time} \label{sec:var-linear}
 In this section, we develop a quick algorithm to compute the VaR of a random variable according to \todo{no hard code}definition 1. The algorithm is based on the well-known quickselect algorithm, and uses the Hoare partition scheme~\cite{}.

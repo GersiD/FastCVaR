@@ -22,6 +22,7 @@
 \usepackage{mathtools}
 \usepackage[capitalise,noabbrev]{cleveref}
 \usepackage{algorithm,algorithmicx,algpseudocode}
+% \usepackage{algorithm2e}
 \usepackage{bm}
 \usepackage{amsthm}
 \usepackage{natbib}
@@ -138,21 +139,23 @@ where $\bm{1}$ is a vector of ones. CVaR is usually continuously extended as $\c
 
 \emph{$\varphi$-divergence risk measures} generalize CVaR to a broader class of related risk measures~\cite{Ahmadi-Javid2017} as shown in \cref{tab:divergences}. A general divergence risk measure $\ER_{\varphi, \beta}\colon \mathbb{X} \to  \bar{\Real}$  is defined for risk parameters $\varphi\colon \Real \to \bar{\Real}$ and $\beta\in \Real_+$ as
 \begin{align} \label{eq:fdiv-dual}
-  \ER_{\varphi,\beta}(\tilde{x}) := \inf \left\{\bm{q}\tr \bm{x} \mid H_{\varphi}(\bm{p} \| \bm{q}) \le \beta, \bm{q} \in \Delta_n \right\},
+  \ER_{\varphi,\beta}(\tilde{x}) := \inf \left\{\bm{q}\tr \bm{x} \mid H_{\varphi}(\bm{q} \| \bm{p}) \le \beta, \bm{q} \ll \bm{p} \right\},
   \quad
-  H_\varphi(\bm{p} \| \bm{q}) := \sum_{i \in \Omega} q_i \cdot \varphi\left(\frac{p_i}{q_i}\right),
+  H_\varphi(\bm{q} \| \bm{p}) := \sum_{i \in \Omega} p_i \cdot \varphi\left(\frac{q_i}{p_i}\right),
 \end{align} 
-where $H_{\varphi}$ is a $\varphi$-divergence~\cite{Bayraksan2015}, $\varphi$ is convex, and $\varphi(1)=0$. Note that all $\varphi$-divergence risk measures also have the following equivalent dual representation~\cite{Ahmadi-Javid2011,Ahmadi-Javid2017}: 
+where $H_{\varphi}$ is a $\varphi$-divergence~\cite{Bayraksan2015}, and $\bm{q} \ll \bm{p}$ indicates that $\bm{q} \in \Delta_n$ and $p_i =0 \implies q_i = 0, \forall  i = \in \Omega$ The function $\varphi$ is convex and satisfies that $\varphi(1)=0$. Note that all $\varphi$-divergence risk measures also have the following equivalent dual representation~\cite{Ahmadi-Javid2011,Ahmadi-Javid2017}: 
 \begin{equation} \label{eq:fdiv-primal}
 \ER_{\varphi,\beta}(\tilde{x}) = \sup_{t,v \in \Real\,:\, t > 0}t \cdot \left(v - \E { \varphi\opt \left(- \frac{\tilde{x}}{t} + v + \beta \right)}\right) ,
 \end{equation} 
-where $\varphi\opt$ is the convex conjugate of $\varphi$. EVaR, for example, is a well known example of $\varphi$-divergence risk measure where the $\varphi$ is the KL-divergence~\cite{Ahmadi-Javid2017}.
+where $\varphi\opt$ is the convex conjugate of $\varphi$. 
 
-Finally, it is important to note that $\varphi$-divergence risk measures are coherent, which means they are convex and positively homogeneous. It is well-known that any coherent risk measure $\rho\colon \mathbb{X}\to \bar{\Real}$ satisfies that~\citep[Prop. 2.84]{Follmer2016} 
-\begin{align}\label{eq:correspondence_coherent_risk}
-  \rho(\tilde{x}) &=\inf_{\bm{q}\in \mathcal{Q}} \bm{q}\tr \bm{x},
-\end{align}
-for some closed convex non-empty set $\Delta^n$.
+Finally, it is important to note that $\varphi$-divergence risk measures are coherent, which means they are convex and positively homogeneous. Any coherent risk measure $\rho\colon \mathbb{X}\to \bar{\Real}$ satisfies for some closed convex non-empty set $\Delta^n$ that~\citep[Prop. 2.84]{Follmer2016} 
+\begin{equation*}
+% \label{eq:correspondence_coherent_risk}
+  \rho(\tilde{x}) =\inf_{\bm{q}\in \mathcal{Q}} \bm{q}\tr \bm{x}.
+\end{equation*}
+
+In the remainder of the paper, we first propose a linear-time algorithm for computing VaR and then we build on it to propose a linear time algorithm for certain $\varphi$-divergence risk measures. 
 
 
 \begin{table}
@@ -194,7 +197,7 @@ Our QVaR algorithm is described in \cref{alg:quick_quantile}. The algorithm work
     \Require{} \Ensure{}
     \State{$f_0 \gets 1$, $b_0 \gets n$, $x^0 = x$, $p^0 = p$, $k=1$, $\alpha_0 = \alpha$ } \Comment{Init front $f_0$ and back $b_0$}
     \While{$b_k - f_k \geq 1$}
-      \State{$i_k, x^k, p^k \gets \operatorname{hoare\_partition}(x^{k-1}, p^{k-1}, f_{k-1}, b_{k-1})$} %\Comment{Hoares partition scheme}
+      \State{$i_k, x^k, p^k \gets \operatorname{partition}(x^{k-1}, p^{k-1}, f_{k-1}, b_{k-1})$} %\Comment{Hoares partition scheme}
     \State{$t_k \gets \sum_{j=f_{k-1}}^{i_k} p^k_j$}
       \If{$\alpha_k < t_k$}
       \State{$b_k \gets i_k$, $\alpha_k \gets \alpha_{k-1}$}
@@ -570,46 +573,46 @@ This speed up is significant in the context of risk measures as they are often u
 \section{Proofs and Details for \cref{sec:phi-divergence}}
 
 
-\section{No-sort Polymatroid}
+% \section{No-sort Polymatroid}
 
-Our first contribution new algorithm for solving the maximum weight Independent Set without sorting for polymatroids. We note that certain additional assumptions have to be satisfied on the submodular function as follows.
-\begin{assumption}
-Assume for $P_f$ that $f(U)$ is such that for all $S_i, S_{ i+1 } \cup E$ where $S_i \cup (i + 1) = S_{ i+1 } $ and $f(S_{ i+1 }) < f(E)$, $f(S_i) + f({i + 1}) = f(S_{ i+1 })$.
-\end{assumption}
-We note this assumption essentially state that the submodular function must be a piecewise linear function. 
-\begin{algorithm}
-  \todo{fix typos}
-    \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
-    \algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
-  \caption{algorithm}{New algorithm}
- \begin{algorithmic}[1]
-     \Require{}
-     \Ensure{}
+% Our first contribution new algorithm for solving the maximum weight Independent Set without sorting for polymatroids. We note that certain additional assumptions have to be satisfied on the submodular function as follows.
+% \begin{assumption}
+% Assume for $P_f$ that $f(U)$ is such that for all $S_i, S_{ i+1 } \cup E$ where $S_i \cup (i + 1) = S_{ i+1 } $ and $f(S_{ i+1 }) < f(E)$, $f(S_i) + f({i + 1}) = f(S_{ i+1 })$.
+% \end{assumption}
+% We note this assumption essentially state that the submodular function must be a piecewise linear function. 
+% \begin{algorithm}
+%   \todo{fix typos}
+%     \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
+%     \algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
+%   \caption{algorithm}{New algorithm}
+%  \begin{algorithmic}[1]
+%      \Require{}
+%      \Ensure{}
   
-    \State{$left \gets 1$}
-    \State{$right \gets n$}
-    \While{$right - left \geq 1$}
+%     \State{$left \gets 1$}
+%     \State{$right \gets n$}
+%     \While{$right - left \geq 1$}
     
-    \State{$mid \gets partition(left, right, c)$}
-    \If{$f(S_{mid}) = f(N)$}
-       \State{Let $x_i :=  \begin{cases}0 & \text{if  } f(S_{mid}) = f(N) \text{ for } i \geq mid \\ f(i) \end{cases}$}
-    \Else
-          \State{Let $x_i :=  \begin{cases}f(i) & \text{for } i \leq mid \end{cases}$}
-    \EndIf{}      
+%     \State{$mid \gets partition(left, right, c)$}
+%     \If{$f(S_{mid}) = f(N)$}
+%        \State{Let $x_i :=  \begin{cases}0 & \text{if  } f(S_{mid}) = f(N) \text{ for } i \geq mid \\ f(i) \end{cases}$}
+%     \Else
+%           \State{Let $x_i :=  \begin{cases}f(i) & \text{for } i \leq mid \end{cases}$}
+%     \EndIf{}      
     
     
     
-    \EndWhile{}
-    \State{$x_{right} \gets f(N) - f(S_{right - 1})$}
-\end{algorithmic}
-\end{algorithm}
-The proof for this algorithm is simple and shows that output is equal to that of Algorithm 4 (the standard greedy algorithm), which has already proved to be both feasible and optimal.
-\begin{lem}
-Algorithm 1 returns a feasible and optimal solution to the maximum weight independent set for polymatroids.
-\end{lem}
-\begin{proof}
-The optimal solution will always be $f(S_i) - f(S_{i-1})$ assuming the weight $c_i \geq 0$. Our solution is $f(i)$ for $f(S_i) < f(N)$, and by assumption 1 this equals $f(S_i) - f(S_{i - 1})$. If $f(S_i) = f(N)$ and $f(S_{i - 1}) = f(N)$, then $x_i = 0$ by the algorithm.
-\end{proof}
+%     \EndWhile{}
+%     \State{$x_{right} \gets f(N) - f(S_{right - 1})$}
+% \end{algorithmic}
+% \end{algorithm}
+% The proof for this algorithm is simple and shows that output is equal to that of Algorithm 4 (the standard greedy algorithm), which has already proved to be both feasible and optimal.
+% \begin{lem}
+% Algorithm 1 returns a feasible and optimal solution to the maximum weight independent set for polymatroids.
+% \end{lem}
+% \begin{proof}
+% The optimal solution will always be $f(S_i) - f(S_{i-1})$ assuming the weight $c_i \geq 0$. Our solution is $f(i)$ for $f(S_i) < f(N)$, and by assumption 1 this equals $f(S_i) - f(S_{i - 1})$. If $f(S_i) = f(N)$ and $f(S_{i - 1}) = f(N)$, then $x_i = 0$ by the algorithm.
+% \end{proof}
 
 \section{Comonotonicity of Risk}
 

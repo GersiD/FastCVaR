@@ -608,27 +608,34 @@ Now, suppose that \cref{alg:slow-quantile} terminates with value $q\opt$. Then, 
 
 \subsection{Partition Algorithm}
 
-\begin{algorithm}
-  \caption{Hoare's partition scheme}\label{alg:partition}
-  \Input{Random variable $\bm{x} \in \Real^n$ with probability mass function $\bm{p} \in \Delta^n$ and $f, b \in \Real$}
-  \Output{indices of partition $i, j \in \Real$}
+\mm{We should describe the intuition for the partition algorithm here somewhere}
 
-  $i \gets f + \lceil\frac{b-f}{2}\rceil$ \tcp*{Pivot, use Median-of-medians for $O(n)$}
-  $l \gets f$ \tcp*{less than}
-  $k \gets f$ \tcp*{equal to}
-  $m \gets b$ \tcp*{greater than}
-  \While{$k \leq m$}
+\begin{algorithm}
+  \caption{\texttt{partition}: Dutch national flag algorithm ~\cite[chapter 14]{Dijkstra1976}}
+  \label{alg:partition}
+  \Input{Random variable $\bm{x} \in \Real^n$ with probability mass function $\bm{p} \in \Delta^n$, pivot $i$, and front and back indices $f, b \in \Real$}
+  \Output{indices $s$, $t$ and $\bm{x}$ and $\bm{p}$ such that $j \le s \implies x_j < x_i$}
+  % $i \gets f + \lceil\frac{b-f}{2}\rceil$ \tcp*{Pivot: Median-of-medians for $O(b-f)$ runtime}
+  $l \gets f$ \tcp*{less: $j\in [f,l) \implies x_j < x_i$}
+  $e \gets f$ \tcp*{equal: $j \in [l,e] \implies x_j = x_i$ }
+  $g \gets b$ \tcp*{greater:$j \in [g,b] \implies x_j > x_i$}
+  \While{$e \leq g$}
   {
-    \If{$x_k < x_i$}
+    \If{$x_e < x_i$}
     {
-      swap: $x_k \leftrightarrow x_l$ and $p_k \leftrightarrow p_l$\;
-      $l \gets m + 1$;
-      $k \gets k + 1$\;
+      swap: $x_e \leftrightarrow x_l$ and $p_e \leftrightarrow p_l$\;
+      $l \gets l + 1$ \;
+      \tcp{the $x_j$ invariant holds here}
+      $e \gets e + 1$\;
     }
-    \lElseIf{$x_k > x_i$} {$m \gets m - 1$}
-    \lElse {$k \gets k + 1$}
+    \ElseIf{$x_e > x_i$} {
+      swap: $x_e\leftrightarrow x_g$ and $p_e \leftrightarrow p_g$\;
+      \tcp{the $x_j$ invariant holds here}
+      $g \gets g - 1$\;
+    }
+    \lElse {$e \gets e + 1$}
   }
-  \KwRet{$(l-1, \bm{x}, \bm{p})$}\;
+  \KwRet{$(l-1, e-1, \bm{x}, \bm{p})$}\;
   %\tcp{last element less than the pivot, first element greater than the pivot}
 \end{algorithm}
 

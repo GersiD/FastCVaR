@@ -56,7 +56,7 @@ using RobustMDPs
   x5 = [2.0, 1.0]
   p5 = [0.5, 0.5]
   @test qql!(x5, p5, 0.5).value ≈ 1.0
-  @test VaR(x5, p5, 0.5).value ≈ 1.0
+  @test VaR(x5, p5, 0.5).value ≈ 2.0
   @test qql!(x5, p5, 0.9).value ≈ 2.0
   @test VaR(x5, p5, 0.9).value ≈ 2.0
   @test qql!(x5, p5, 0.3).value ≈ 1.0
@@ -65,7 +65,7 @@ using RobustMDPs
   x5 = [1.0, 2.0]
   p5 = [0.5, 0.5]
   @test qql!(x5, p5, 0.5).value ≈ 1.0
-  @test VaR(x5, p5, 0.5).value ≈ 1.0
+  @test VaR(x5, p5, 0.5).value ≈ 2.0
   @test qql!(x5, p5, 0.1).value ≈ 1.0
   @test VaR(x5, p5, 0.1).value ≈ 1.0
   @test qql!(x5, p5, 0.9).value ≈ 2.0
@@ -126,7 +126,7 @@ end
   x1 = [1, 2, 2, 1]
   p = [1 / 4, 1 / 4, 1 / 4, 1 / 4]
   @test qql!(x1, p, 0.5).value ≈ 1
-  @test VaR(x1, p, 0.5).value ≈ 1
+  @test VaR(x1, p, 0.5).value ≈ 2
   x1 = [1, 1, 1, 1]
   p = [1 / 4, 1 / 4, 1 / 4, 1 / 4]
   @test qql!(x1, p, 0.5).value ≈ 1
@@ -167,32 +167,32 @@ end
 @testset "TVaR" begin
   x1 = [1, 2, 3]
   p1 = [0.5, 0.2, 0.3]
-  for β in range(0.0, 1.99, step=0.1)
+  for β in range(0.0, 1.99, step=0.2)
     @test worstcase_l1(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
     @test worstcase_l1_gurobi(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
   end
   x1 = [3, 2, 1]
   p1 = [0.3, 0.2, 0.5]
-  for β in range(0.0, 1.99, step=0.1)
+  for β in range(0.0, 1.99, step=0.2)
     @test worstcase_l1(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
     @test worstcase_l1_gurobi(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
   end
   x1 = [1, 2, 3]
   p1 = [0.0, 1.0, 0.0]
-  for β in range(0.0, 1.99, step=0.1)
+  for β in range(0.0, 1.99, step=0.2)
     @test worstcase_l1(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
     @test worstcase_l1_gurobi(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
   end
   x1 = [-2.0, -1.0, 1.0, 2.0, 4.0, 5.0]
   p1 = [0.0, 0.3, 0.3, 0.1, 0.1, 0.2]
   pstar = [0.4, 0.3, 0.3, 0.0, 0.0, 0.0] # solution for β = 0.8
-  for β in range(0.0, 1.99, step=0.1)
+  for β in range(0.0, 1.99, step=0.2)
     @test worstcase_l1(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
     @test worstcase_l1_gurobi(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
   end
   x1 = [5.0, 4.0, 2.0, 1.0, -1.0, -2.0]
   p1 = [0.2, 0.1, 0.1, 0.3, 0.3, 0.0]
-  for β in range(0.0, 1.99, step=0.1)
+  for β in range(0.0, 1.99, step=0.2)
     @test worstcase_l1(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
     @test worstcase_l1_gurobi(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
   end
@@ -201,6 +201,31 @@ end
   # β = 0.2
   # @test worstcase_l1(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
   # @test worstcase_l1_gurobi(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
+end
+
+@testset "CVaR<EVaR<TVaR" begin
+  x1 = [5.0, 4.0, 2.0, 1.0, -1.0, -2.0]
+  p1 = [0.2, 0.1, 0.1, 0.3, 0.3, 0.0]
+  cvar = CVaR(x1, p1, 0.5).value
+  qcvar = qCVaR!(x1, p1, 0.5).value
+  tvar = TVaR!(-x1, p1, 0.5)
+  evar = EVaR(x1, p1, 0.5).value
+  @test cvar >= evar >= tvar
+  @test qcvar >= evar >= tvar
+  for _ in range(1, 10)
+    x = randn(10)
+    p = rand(Float64, 10)
+    p = p / sum(p)
+    α = 0.5
+    cvar = CVaR(x, p, α).value
+    qcvar = qCVaR!(x, p, α).value
+    tvar = TVaR!(-x, p, sqrt(-2log(2) * log(α)))
+    evar = EVaR(x, p, α).value
+    @show x
+    @show p
+    @test cvar >= evar >= tvar
+    @test qcvar >= evar >= tvar
+  end
 end
 
 

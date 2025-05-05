@@ -213,41 +213,36 @@ Our QVaR algorithm is described in \cref{alg:quick-quantile}. The algorithm work
 % \end{algorithm}
 \begin{algorithm}
   \caption{QVaR: Linear-time algorithm for VaR}\label{alg:quick-quantile}
-
   \Input{vector $\bm{x}$, pmf $\bm{p}$ and $\alpha \in [0,1)$}
   \Output{$\alpha$-quantile of $\tilde{x}$}
-
-  $f_0 \gets 1$, $b_0 \gets n$, $x^0 = x$, $p^0 = p$, $k=1$, $\alpha_0 = \alpha$ \tcp*{Init front $f_0$ and back $b_0$}
+  $f_0 \gets 1$, $b_0 \gets n$, $\bm{x}^0 = \bm{x}$, $\bm{p}^0 = \bm{p}$, $k=1$, $\alpha_0 = \alpha$ \;
+  %\tcp*{Init front $f_0$ and back $b_0$}
   \While{$b_k - f_k \geq 1$}
   {
-    $i_k, x^k, p^k \gets \operatorname{partition}(x^{k-1}, p^{k-1}, f_{k-1}, b_{k-1})$
-    \tcp*{Guarantee \cref{lem:hoare-partition}}
+    $i_k, \bm{x}^k, \bm{p}^k \gets \operatorname{partition}(\bm{x}^{k-1}, \bm{p}^{k-1}, f_{k-1}, b_{k-1})$
+    \tcp*{~\cref{alg:partition} \& \cref{lem:hoare-partition}}
     $t_k \gets \sum_{j=f_{k-1}}^{i_k} p^k_j$ \;
-    \lIf{$\alpha_k < t_k$}
-    {
-      $b_k \gets i_k$, $\alpha_k \gets \alpha_{k-1}$
-    }
-    \lElse
-    {
-      $f_k \gets i_k + 1$, $\alpha_k \gets \alpha_{k-1} - t_k$
-    }
+    \lIf{$\alpha_k < t_k$} {$b_k \gets i_k$, $\alpha_k \gets \alpha_{k-1}$}
+    \lElse {$f_k \gets i_k + 1$, $\alpha_k \gets \alpha_{k-1} - t_k$}
     $k \gets k + 1$\; 
   }
   \KwRet{$x^k_{b_k}$}\;    
 \end{algorithm}  
 
 
-
 \begin{lemma} \label{lem:hoare-partition}
-The Hoare's partition scheme $i_k, x^k, p^k \gets \operatorname{partition}(x^{k-1}, p^{k-1}, f_{k-1}, b_{k-1})$ does the following:
-  \begin{enumerate}
-  \item $j \le i_k \Rightarrow x^k_j \le x^k_{i_k}$
-  \item $j > i_k \Rightarrow x^k_j > x^k_{i_k}$
-  \item $\exists l \ge i_k$ such that $ l \le j \le i_k \Rightarrow x^k_{i_k} = x^k_j $ and $ j < l \Rightarrow x^k_{i_k} > x^k_j $
-  \item the algorithm runs in time linear (if mean of means pivot scheme) in $b_k - f_k$
+Suppose that $i, \bm{x}, \bm{p} \gets \operatorname{partition}(\bm{x'}, \bm{p'}, f, b)$ for some $\bm{x}\in \Real^n, \bm{p}\in \Delta^n$ and $f, b\in \Nats, f < b$ is computed using  \cref{alg:partition}. Then $i \in [f, ]$:
+  \begin{enumerate}[nosep]
+  \item $j \le i \implies x'_j \le x_i$
+  \item $j > i \implies x_j > x_i$
+  \item $\exists l \ge i$ such that $ l \le j \le i \implies x_i = x_j $ and $ j < l \implies x_i > x_j $
   \end{enumerate}
-  Note that only the elements $x^k_j$ for $j = f_k, \dots, b_k$ makes it possible to achieve the desired time complexity.
+  Moreover, the algorithm runs in $O(b - f)$ time.
 \end{lemma}
+\begin{proof}
+  \mm{TODO}
+\end{proof}
+
 The above conditions primarily state that each call to the partition scheme performs partial sorting such that all elements less than or equal to the pivot will be at a lower index, and elements greater than the pivot will be at a higher index. 
 
 In order to prove that the algorithm is optimal, we first show that $\quant_{\alpha}^-(\tilde{x})$ is an element in the array. 
@@ -615,33 +610,26 @@ Now, suppose that \cref{alg:slow-quantile} terminates with value $q\opt$. Then, 
 
 \begin{algorithm}
   \caption{Hoare's partition scheme}\label{alg:partition}
-
-  \Input{Random variable $x \in \Real^n$ with probability mass function $p \in \Delta^n$ and $f, b \in \Real$}
+  \Input{Random variable $\bm{x} \in \Real^n$ with probability mass function $\bm{p} \in \Delta^n$ and $f, b \in \Real$}
   \Output{indices of partition $i, j \in \Real$}
 
-  $i \gets f + \lceil\frac{b-f}{2}\rceil$\;
-  $\lambda \gets f$\; \tcp{less than}
-  $\xi \gets f$\; \tcp{equal to}
-  $\mu \gets b$\; \tcp{greater than}
-  \While{$\xi \leq \mu$}
+  $i \gets f + \lceil\frac{b-f}{2}\rceil$ \tcp*{Pivot, use Median-of-medians for $O(n)$}
+  $l \gets f$ \tcp*{less than}
+  $k \gets f$ \tcp*{equal to}
+  $m \gets b$ \tcp*{greater than}
+  \While{$k \leq m$}
   {
-    \If{$x[\xi] < x[i]$}
+    \If{$x_k < x_i$}
     {
-      swap $x[\xi]$ with $x[\lambda]$\;
-      swap $p[\xi]$ with $p[\lambda]$\;
-      $\lambda \gets \mu + 1$\;
-      $\xi \gets \xi + 1$\;
+      swap: $x_k \leftrightarrow x_l$ and $p_k \leftrightarrow p_l$\;
+      $l \gets m + 1$;
+      $k \gets k + 1$\;
     }
-    \ElseIf{$x[\xi] > x[i]$}
-    {
-      $\mu \gets \mu - 1$\;
-    }
-    \Else
-    {
-      $\xi \gets \xi + 1$\;
-    }
+    \lElseIf{$x_k > x_i$} {$m \gets m - 1$}
+    \lElse {$k \gets k + 1$}
   }
-  \KwRet{($\lambda - 1$, $\mu$)}\; \tcp{last element less than the pivot, first element greater than the pivot}
+  \KwRet{$(l-1, \bm{x}, \bm{p})$}\;
+  %\tcp{last element less than the pivot, first element greater than the pivot}
 \end{algorithm}
 
 

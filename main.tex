@@ -1,6 +1,7 @@
 \documentclass{article}
 % if you need to pass options to natbib, use, e.g.:
-%     \PassOptionsToPackage{numbers, compress}{natbib}
+
+\PassOptionsToPackage{numbers, sort&compress}{natbib}
 % before loading neurips_2025
 % ready for submission
 \usepackage{neurips_2025}
@@ -12,28 +13,15 @@
 % to avoid loading the natbib package, add option nonatbib:
 %    \usepackage[nonatbib]{neurips_2025}
 
-
-\usepackage{graphicx} % Required for inserting images
-\usepackage{mpemath}
-\usepackage[dvipsnames]{xcolor} 
 \usepackage[colorlinks=true,citecolor=BlueViolet]{hyperref} % For hyperlinks in the PDF like citations
-\usepackage{dsfont}
-\usepackage{amsmath}
-\usepackage{mathtools}
-\usepackage[capitalise,noabbrev]{cleveref}
-% \usepackage{algorithm,algorithmicx,algpseudocode}
-% \usepackage{algorithm2e}
-\usepackage[ruled,linesnumbered,vlined,noend]{algorithm2e}
-
+\usepackage{mpemath}
+\usepackage{graphicx} % Required for inserting images
+\usepackage[dvipsnames]{xcolor} 
 
 \SetKwInOut{Input}{Input}
 \SetKwInOut{Output}{Output}
 
-\usepackage{bm}
-\usepackage{amsthm}
-\usepackage{natbib}
 \usepackage{booktabs}
-\usepackage{setspace}
 
 \newcommand{\gersi}[1]{\textcolor{red}{#1}}
 \newcommand{\palash}[1]{\textcolor{green}{#1}}
@@ -41,6 +29,8 @@
 \newcommand{\maeve}[1]{\textcolor{blue}{[#1]}}
 
 \bibliographystyle{abbrvnat}
+
+\newcommand{\Nats}{\mathbb{N}}
 
 \DeclareMathOperator{\kl}{KL}
 \DeclareMathOperator{\ER}{ER}
@@ -50,24 +40,22 @@
 \DeclareMathOperator{\conv}{conv}
 \newcommand{\quant}{{\mathfrak{q}}}
 
-\DeclarePairedDelimiter{\spannorm}{\lVert}{\rVert_s}
-
 \renewcommand{\cite}{\citep}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % THEOREMS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\theoremstyle{plain}
-\newtheorem{theorem}{Theorem}[section]
-\newtheorem{proposition}[theorem]{Proposition}
-\newtheorem{lemma}[theorem]{Lemma}
-\newtheorem{corollary}[theorem]{Corollary}
-\theoremstyle{definition}
-\newtheorem{definition}[theorem]{Definition}
-\newtheorem{assumption}[theorem]{Assumption}
-\theoremstyle{remark}
-\newtheorem{remark}{Remark}
-\newtheorem{example}{Example}
+% \theoremstyle{plain}
+% \newtheorem{theorem}{Theorem}[section]
+% \newtheorem{proposition}[theorem]{Proposition}
+% \newtheorem{lemma}[theorem]{Lemma}
+% \newtheorem{corollary}[theorem]{Corollary}
+% \theoremstyle{definition}
+% \newtheorem{definition}[theorem]{Definition}
+% \newtheorem{assumption}[theorem]{Assumption}
+% \theoremstyle{remark}
+% \newtheorem{remark}{Remark}
+% \newtheorem{example}{Example}
 
 
 \title{No sort: Computing VaR and Coherent Comonotonic Risk Measures in Linear Time}% and $\varphi$-divergence Risk Measures}
@@ -119,7 +107,7 @@ The remainder of the paper is organized as follows. \Cref{sec:preliminaries} des
 
 \section{Preliminaries: Monetary Risk Measures}\label{sec:preliminaries}
 
-In this work, we restrict our attention to random variables defined on finite probability spaces $(\Omega, 2^{\Omega}, \bm{p})$ where $\Omega := \left\{ 1, \dots , n \right\}$, $\bm{p} \in \Delta_n$, and $\Delta_n$ is the $n$-dimensional probability simplex. We use a tilde to indicate a random variable, such as $\tilde{x}\colon \Omega \to \Real$. Vectors are denoted with a lower-case bold font, such as $\bm{x} \in \Real^n$ and $\bm{x}_i, i = 1, \dots , n$ is the $i$-th element of the vector. We use $\tilde{x}$ and $\bm{x}$ interchangeably, such that $\bm{x}_i = \tilde{x}(i), i\in 1, \dots , n$. Sets are denoted with calligraphic letters. Finally, we use $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ to denote the extended real line.
+In this work, we restrict our attention to random variables defined on finite probability spaces $(\Omega, 2^{\Omega}, \bm{p})$ where $\Omega := \left\{ 1, \dots , n \right\}$, $\bm{p} \in \Delta_n$, and $\Delta_n$ is the $n$-dimensional probability simplex. We use a tilde to indicate a random variable, such as $\tilde{x}\colon \Omega \to \Real$. The set of real-valued random variables is denoted by $\mathbb{X}$. Vectors are denoted with a lower-case bold font, such as $\bm{x} \in \Real^n$ and $\bm{x}_i, i = 1, \dots , n$ is the $i$-th element of the vector. We use $\tilde{x}$ and $\bm{x}$ interchangeably, such that $\bm{x}_i = \tilde{x}(i), i\in 1, \dots , n$. Sets are denoted with calligraphic letters. Finally, we use $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ to denote the extended real line. 
 
 \emph{Monetary risk measures} $\rho\colon \mathbb{X} \to \bar{\Real}$ generalize the expectation operator to account for the uncertainty in the distribution of a real-valued random variable~\cite{Follmer2016}. In this paper, we assume that the risk measures are applied to random variables that represent rewards and that a higher risk value is preferable to a lower risk value. 
 
@@ -130,7 +118,14 @@ In this work, we restrict our attention to random variables defined on finite pr
   \;:=\;
     \max\; \left\{\tau \in \bar{\Real} \mid \mathbb{P}[\tilde{x} < \tau]  \le \alpha\right\}.
 \end{equation}
-The maximum in~\eqref{eq:var-definition} exists because $\tau \mapsto \mathbb{P}[\tilde{x} < \tau]$ is a lower semi-continuous function. It is easy to see that $\varo_0[\tilde{x}] = \ess \inf [\tilde{x}]$, and typically the risk measures is extended as $\varo_{1}[ \tilde{x} ] = \infty$.
+The maximum in~\eqref{eq:var-definition} exists because $\tau \mapsto \mathbb{P}[\tilde{x} < \tau]$ is a lower semi-continuous function. It is easy to see that $\varo_0[\tilde{x}] = \ess \inf [\tilde{x}]$, and typically the risk measures is extended as $\varo_{1}[ \tilde{x} ] = \infty$. The \emph{quantile} $\quant_{\alpha}$ for $\tilde{x}$ is defined as the set
+\[
+  \quant_{\alpha}[\tilde{x}] := \left\{ z\in \Real \mid  \P{ \tilde{x} \le z } \ge \alpha , \P{ \tilde{x} \ge z } \ge 1-\alpha  \right\},
+  \quad
+  \quant^+_{\alpha}[\tilde{x}] = \max \quant_{\alpha},
+  \quad
+  \quant^-_{\alpha}[\tilde{x}] = \min \quant_{\alpha}.
+\]
 
 We also consider the \emph{Conditional-Value-at-Risk}~(CVaR), a common risk measure, which is defined for a random variable $\tilde{x} \in \mathbb{X}$ and risk level $\alpha \in (0,1]$ as~\cite{Follmer2016}
 \begin{equation} \label{eq:primal_cvar}
@@ -155,7 +150,7 @@ where $H_{\varphi}$ is a $\varphi$-divergence~\cite{Bayraksan2015}, and $\bm{q} 
 \end{equation} 
 where $\varphi\opt$ is the convex conjugate of $\varphi$. 
 
-Finally, it is important to note that $\varphi$-divergence risk measures are coherent, which means they are convex and positively homogeneous. Any coherent risk measure $\rho\colon \mathbb{X}\to \bar{\Real}$ satisfies for some closed convex non-empty set $\Delta^n$ that~\citep[Prop. 2.84]{Follmer2016} 
+Finally, it is important to note that $\varphi$-divergence risk measures are coherent, which means they are convex and positively homogeneous. Any coherent risk measure $\rho\colon \mathbb{X}\to \bar{\Real}$ satisfies for some closed convex non-empty set $\mathcal{Q} \subseteq \Delta^n$ that~\citep[Prop. 2.84]{Follmer2016} 
 \begin{equation*}
 % \label{eq:correspondence_coherent_risk}
   \rho(\tilde{x}) =\inf_{\bm{q}\in \mathcal{Q}} \bm{q}\tr \bm{x}.
@@ -187,18 +182,18 @@ In the remainder of the paper, we first propose a linear-time algorithm for comp
 
 In this section, we develop a quick algorithm to compute the VaR of a discrete random variable. The algorithm is extends the well-known quickselect algorithm to account to non-uniform weghts. We also take a special care to allow random variables $\tilde{x}$ with duplicate values such that $\tilde{x}(\omega_1) = \tilde{x}$
 
-\mm{How regular algorithms work for VaR, sorting based approach\cref{alg:slow_quantile}.}
+\mm{How regular algorithms work for VaR, sorting based approach\cref{alg:slow-quantile}.}
 
 \mm{algorithm describing the main idea and challenge. Tie this to quickselect and why this is not just a quick select algorithm.}
 
 
 %We first restate some well-known properties of the Hoare Partition scheme.
-Our QVaR algorithm is described in \cref{alg:quick_quantile}. The algorithm works as follows. \mm{refer to the actual variables and line numbers in the algorithm.} The algorithm picks a pivot and applies the partition to easily compute the probability of all outcomes smaller than or equal to that of the pivot. Then it determines whether the quantile can exist on the left side of the pivot or on the right side and shrinks the search space, parameterized by the variables $front$ and $back$, accordingly.
+Our QVaR algorithm is described in \cref{alg:quick-quantile}. The algorithm works as follows. \mm{refer to the actual variables and line numbers in the algorithm.} The algorithm picks a pivot and applies the partition to easily compute the probability of all outcomes smaller than or equal to that of the pivot. Then it determines whether the quantile can exist on the left side of the pivot or on the right side and shrinks the search space, parameterized by the variables $front$ and $back$, accordingly.
 \todo{for algorithms should we bold vectors to keep with notation?}
 % \begin{algorithm}
 %   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and $\alpha \in [0,1]$}}
 %   \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
-%   \caption{QVaR: Linear-time algorithm for VaR. $\mathds{1}(bool)$ denotes the indicator function.}\label{alg:quick_quantile}
+%   \caption{QVaR: Linear-time algorithm for VaR. $\mathds{1}(bool)$ .}\label{alg:quick-quantile}
 
 %   \begin{algorithmic}[1]
 %     \Require{} \Ensure{}
@@ -217,16 +212,17 @@ Our QVaR algorithm is described in \cref{alg:quick_quantile}. The algorithm work
 %   \end{algorithmic}
 % \end{algorithm}
 \begin{algorithm}
-  \caption{QVaR: Linear-time algorithm for VaR. $\mathds{1}(bool)$ denotes the indicator function.}\label{alg:quick_quantile}
+  \caption{QVaR: Linear-time algorithm for VaR}\label{alg:quick-quantile}
 
-  \Input{vector $x$, pmf $p$ and $\alpha \in [0,1]$}
-  \Output{$\alpha$-quantile of $\tilde{X}$}
+  \Input{vector $\bm{x}$, pmf $\bm{p}$ and $\alpha \in [0,1)$}
+  \Output{$\alpha$-quantile of $\tilde{x}$}
 
   $f_0 \gets 1$, $b_0 \gets n$, $x^0 = x$, $p^0 = p$, $k=1$, $\alpha_0 = \alpha$ \tcp*{Init front $f_0$ and back $b_0$}
   \While{$b_k - f_k \geq 1$}
   {
-    $i_k, x^k, p^k \gets \operatorname{partition}(x^{k-1}, p^{k-1}, f_{k-1}, b_{k-1})$\; 
-    $t_k \gets \sum_{j=f_{k-1}}^{i_k} p^k_j$\;
+    $i_k, x^k, p^k \gets \operatorname{partition}(x^{k-1}, p^{k-1}, f_{k-1}, b_{k-1})$
+    \tcp*{Guarantee \cref{lem:hoare-partition}}
+    $t_k \gets \sum_{j=f_{k-1}}^{i_k} p^k_j$ \;
     \lIf{$\alpha_k < t_k$}
     {
       $b_k \gets i_k$, $\alpha_k \gets \alpha_{k-1}$
@@ -235,15 +231,15 @@ Our QVaR algorithm is described in \cref{alg:quick_quantile}. The algorithm work
     {
       $f_k \gets i_k + 1$, $\alpha_k \gets \alpha_{k-1} - t_k$
     }
-    $k \gets k + 1$\;
+    $k \gets k + 1$\; 
   }
-  \KwRet{$x^k_{b_k}$}\;
-\end{algorithm}
+  \KwRet{$x^k_{b_k}$}\;    
+\end{algorithm}  
 
 % \begin{algorithm}
 %   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and $\alpha \in [0,1]$}}
 %   \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
-%   \caption{VaR: Canonical algorithm for VaR. $\mathds{1}(bool)$ denotes the indicator function.}\label{alg:slow_quantile}
+%   \caption{VaR: Canonical algorithm for VaR. $\mathds{1}(bool)$ denotes the indicator function.}\label{alg:slow-quantile}
 
 %   \begin{algorithmic}[1]
 %   \Require{} \Ensure{}
@@ -259,24 +255,40 @@ Our QVaR algorithm is described in \cref{alg:quick_quantile}. The algorithm work
 % \end{algorithm}
 
 \begin{algorithm}
-  \caption{VaR: Canonical algorithm for VaR. $\mathds{1}(bool)$ denotes the indicator function.}\label{alg:slow_quantile}
-
-  \Input{vector $x$, pmf $p$ and $\alpha \in [0,1]$}
-  \Output{$\alpha$-quantile of $\tilde{X}$}
-
-  $x \gets \text{sort-decending}(x)$\;
-  $a \gets 1$\;
-  \For{$i=1$ to $n$}
-  {
-    $a \gets a - \bm{p}_{\bm{x}_i}$\;
-    \If{$a \leq \alpha$}
-    {
-      \KwRet{$x_i$}\;
-    }
-  }
+\caption{VaR: Standard VaR algorithm}
+\label{alg:slow-quantile}
+\Input{vector $\bm{x}$, probability $\bm{p}$, and $\alpha \in [0,1)$}
+\Output{$\alpha$-quantile of $\tilde{X}$}
+Sort $\bm{x}$ indexes to get $\bm{k}\in \Nats^n$ such that $i > j \implies x_{k_i} > x_{k_j}, \; \forall i, j \in 1, \dots , n$\;
+$q_{n+1} \gets 0$ \;
+\For{$i=n, \dots , 1$} {
+    $q_i \gets q_{i+1} + p_{k_i}$
+    \tcp*{$q_i = \P{\tilde{x} \ge x_{k_i}}$ if $x_{k_i}$ unique}
+    \lIf{$q_i \ge 1-\alpha$} {\KwRet{$x_{k_i}$}}
+}
 \end{algorithm}
 
-\begin{lemma}
+\begin{proposition}
+For a random variable $\tilde{x} \in \mathbb{X}$ and $\alpha\in [0,1)$, \cref{alg:slow-quantile} returns $\var{\alpha}{\tilde{x}}$.
+\end{proposition}
+\begin{proof}
+First, we show by induction on $i$ from $n$ to $1$ that
+\begin{equation} \label{eq:proof-q-j}
+  q_j = \P{\tilde{x} \ge x_{k_i}},
+  \quad\text{where}\quad
+  j = \min \left\{ j = 1, \dots , i \mid x_{k_j} = x_{k_i} \right\}.
+\end{equation}
+The base case is immediate. The inductive case for $i-1$ from $i$ follows by algebraic manipulation from the fact that $x_{k_i}$ is sorted increasingly:
+\begin{align*}
+\P{\tilde{x} \ge x_{k_{i-1}}} 
+ &= \P{\tilde{x} = x_{k_{i-1}}} + \P{\tilde{x} > x_{k_{i-1}}}
+ = \P{\tilde{x} = x_{k_{i-1}}} + \P{\tilde{x} \ge x_{k_{i}}} \\
+ &= \P{\tilde{x} = x_{k_{i-1}}} + q_i = \sum_{l=j}^{i-1} q_{k_j} + q_{k_i} = q_{k_{i-1}}.
+\end{align*}
+Now, suppose that \cref{alg:slow-quantile} terminates with value $q\opt$. Then, if the algorithm terminates in iteration $i\opt$ then from \eqref{eq:proof-q-j}, we have that $\P{\tilde{x} \ge q\opt} = q_{j\opt} \ge 1-\alpha$ where $j\opt$ is defined as in \eqref{eq:proof-q-j}. Therefore, $q\opt \le \var{\alpha}{\tilde{x}}$. To prove the converse inequality, suppose that $q\opt > \var{\alpha}{\tilde{x}}$, and therefore $\P{\tilde{x} \ge q\opt} < 1-\alpha$. Then, this a contradition since \eqref{eq:proof-q-j} combined with the termination criterion implies that $\P{\tilde{x} \ge q\opt} < 1-\alpha$.
+\end{proof}
+
+\begin{lemma} \label{lem:hoare-partition}
 The Hoare's partition scheme $i_k, x^k, p^k \gets \operatorname{partition}(x^{k-1}, p^{k-1}, f_{k-1}, b_{k-1})$ does the following:
   \begin{enumerate}
   \item $j \le i_k \Rightarrow x^k_j \le x^k_{i_k}$
@@ -289,9 +301,9 @@ The Hoare's partition scheme $i_k, x^k, p^k \gets \operatorname{partition}(x^{k-
 The above conditions primarily state that each call to the partition scheme performs partial sorting such that all elements less than or equal to the pivot will be at a lower index, and elements greater than the pivot will be at a higher index. 
 
 In order to prove that the algorithm is optimal, we first show that $\quant_{\alpha}^-(\tilde{x})$ is an element in the array. 
-\begin{lem}
+\begin{lemma}
 Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite $\Omega$. Then, there exist $\omega_1, \omega_2\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_1)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_2)$ for each $\alpha\in (0,1)$.
-\end{lem}
+\end{lemma}
 \begin{proof}
 
   \mm{define feasible}
@@ -323,8 +335,9 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
 \end{enumerate}
 \end{proof}
 
-\begin{lem}
-\Cref{alg:quick_quantile} computes $\quant^+$.
+\begin{lemma}
+  \Cref{alg:quick-quantile} computes $\quant^+$.
+  \end{lemma}
 \begin{proof}
   \todo{proof needs justification}
  Loop Invariant: Before and after every iteration $\quant^+$ will remain in the array $x$ at an index $i$ such that $ f_k \leq i \leq b_k $ or if $f_k > b_k$, then $\quant^+ = b_k$.
@@ -341,23 +354,16 @@ During the loop: There are five possible scenarios at each iteration:
 \item[Case 3]: Tail is selected such that $\alpha \geq t_k$. In this case $f_k$ is set to $i_k + 1$ such that $f_k < b_k$. Assume there exists $\tau\opt $ such that $\tau\opt \leq x[i_k] $, and $x[\tau\opt]=\quant^+$. Let $\tau' = i_k$. $P[x < x[\tau']] \leq tail < \alpha$. If $x[\tau\opt] <  x[\tau']$ then $x[\tau\opt]$ can not be optimal by \eqref{eq:var-definition}. Thus, $\quant_{\alpha}^+(\tilde{x}) \geq x^f_{i_k} $ and $\quant_{\alpha}^+(\tilde{x}) \leq x^b_{i_k}$ and loop invariant is satisfied. 
  
  \item[Case 4]: Tail is selected such that $\alpha \geq t_k$. In this case assume $f_k$ is set to $ind + 1$ such that $f_k = b_k$. 
- All the elements are no longer in the range $[front, back]$ could not have been $\quant_{\alpha}^+(\tilde{x})$ (see Case 1 and Case 2), and $\quant_{\alpha}^+(\tilde{x})$ must exist in x per lemma 1. Thus, $\quant_{\alpha}^+(\tilde{x}) = b_k$ and loop invariant is satisfied. The algorithm terminates at this condition. 
+ All the elements are no longer in the range $[f_k, b_k]$ could not have been $\quant_{\alpha}^+(\tilde{x})$ (see Case 1 and Case 2), and $\quant_{\alpha}^+(\tilde{x})$ must exist in $x$ per Lemma~1 \mm{do NOT hardcode}. Thus, $\quant_{\alpha}^+(\tilde{x}) = b_k$ and loop invariant is satisfied. The algorithm terminates at this condition. 
 
-  \item[Case 5]: Tail is selected such that $\alpha \geq t_k$. In this case assume that $f_k$ is set to $i_k + 1$ such that $f_k > b_k$. 
- Thus $b_k = i_k$. From case 1, we know any $\tau\opt $ larger than $b_k$ is not feasible and since $b_k = i_k$, $P[x < x[b_k]] \leq \alpha$. Since all feasible elements are $\leq b_k$, $b_k$ is optimal by \eqref{eq:var-definition}. 
-
-
-
-
+\item[Case 5]: Tail is selected such that $\alpha \geq t_k$. In this case assume that $f_k$ is set to $i_k + 1$ such that $f_k > b_k$. Thus $b_k = i_k$. From case 1, we know any $\tau\opt $ larger than $b_k$ is not feasible and since $b_k = i_k$, $P[x < x[b_k]] \leq \alpha$. Since all feasible elements are $\leq b_k$, $b_k$ is optimal by \eqref{eq:var-definition}. 
  \end{proof}
- \end{lem}
 
-\begin{lem}
-  \Cref{alg:quick_quantile} achieves a time complexity of $\mathcal{O}(n)$
-  where $n$ is the number of elements in the random variable.
-\end{lem}
+\begin{proposition}
+\Cref{alg:quick-quantile} runs in $\mathcal{O}(n)$ time if the median-of-medians algorithm is used to select the pivot. 
+\end{proposition}
 \begin{proof}
-  The time complexity for the Dutch partition scheme is $O(n)$ in the expected case\todo{cite}\cite{}. Since line 4 will at most take as many steps as a single call to the partition function, and the remaining lines in each iteration of the while loop take constant time, the overall complexity remains unchanged. 
+\mm{when making a claim either reference a lemma in this paper or ideally a theorem or a lemma in another paper} The time complexity for the Dutch partition scheme is $O(n)$ in the expected case\todo{cite}\cite{}. Since line 4 \mm{do NOT hardcode, you can use labels and cref to reference lines} will at most take as many steps as a single call to the partition function, and the remaining lines in each iteration of the while loop take constant time, the overall complexity remains unchanged. 
 \end{proof}
 
 
@@ -479,40 +485,39 @@ Our first contribution is an algorithm for solving the minimum-weight Independen
   \If{$c > 0$}
   {
     $x_1 = f(\min_{i \in 1, \dots , N} x_i )$\;
-    \lIf{$ \min \left\{c, 1 - x_1\right\} < c$}
-    {
+    \lIf{$ \min \left\{c, 1 - x_1\right\} < c$} {
       \KwRet{ \mm{return what?}}
     }
   }
-  $mid = QuickQuantile(p, x, \alpha = (1 - c)/m$\;
+  $m = \operatorname{QuickQuantile}(p, x, \alpha = (1 - c)/m) $\;
   \If{$c > 0$}
   {
-    Let $x_i \gets  \begin{cases}m_i \cdot p(i) & \text{for } 1 < i \leq mid,\dots \end{cases}$\;
+    Let $x_i \gets  \begin{cases}m_i \cdot p_i & \text{for } 1 < i \leq mid,\dots \end{cases}$\;
   }
   \Else
   {
-    Let $x_i \gets  \begin{cases}m_i \cdot  p(i) & \text{for } i \leq mid,\dots \end{cases}$\;
+    Let $x_i \gets  \begin{cases}m_i \cdot p_i & \text{for } i \leq mid,\dots \end{cases}$\;
   }
-  $x_{mid} \gets 1 - m_i *p(i)$\;
+  $x_{m} \gets 1 - m_i p_i$\;
 \end{algorithm}
 
 
-\begin{lem}
-  \cref{alg:maximum-weight-independent} returns a optimal solution \todo{optimal for what optimization?} to the maximum-weight-independent set for polymatroids.
-\end{lem}
+\begin{lemma}
+  \cref{alg:maximum-weight-independent} returns a optimal solution \todo{optimal for what optimization?} to the maximum-weight-independent set for polymatroids. 
+\end{lemma}
 \begin{proof}
   
 The optimal solution will always be $f(S_i + 1) - f(S_{i})$, where $S_i$ is the set of all elements that have values $\leq i$.  For $f(S_{i+1}) \leq 1$ and $f(S_i) < 1$, $f(S_i + 1) - f(S_i) = c  +\sum_{i \subset (1, i + 1)}p(i + 1) - c  +\sum_{i \subset (1, i)}m_i *p(i) = m_{i + 1} *p(i + 1).$ For $f(S_{i+1} = 1$ and $f(S_i) < 1$, $f(S_i) - f(S_i-1) = 1 - c  +\sum_{i \subset (1, i )}m_i *p(i) = 1 - m_i *p(i).$ We know that element $i$ such that $f(S_{i+1} = 1$ and $f(S_i) < 1$ is the max $i$ such that $(c  +m *\sum_{i \subset (1, i )}p(i)) < 1  $, which equals the max $i$ such that $(\sum_{i \subset (1, i )}p(i)) < (1 - c)/m .$
 \end{proof}
 
-\begin{lem}
+\begin{lemma}
   \cref{alg:maximum-weight-independent} run with expected complexity $\mathcal{O}(N * f(i))$ for all $i$ in set $S$.
-\end{lem}
+\end{lemma}
 
 \subsection{CVaR}
 
 
-\begin{lem}
+\begin{lemma}
   For $\mathcal{O} \subseteq \Omega$, define $f\colon 2^{\Omega} \to \Real_+$:
   \[
     f(\mathcal{O}) = \min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\}
@@ -522,7 +527,7 @@ The optimal solution will always be $f(S_i + 1) - f(S_{i})$, where $S_i$ is the 
   \[
   \cvar{\alpha }{\tilde{x} } = \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}.
   \]
-\end{lem}
+\end{lemma}
 \begin{proof}
   Due to the set of constraints, we know that $f(\mathcal{O})$ must be $\leq \frac{\mathbb{P}[\mathcal{O}]}{\alpha}$ and $f(\mathcal{O})$ must be $\leq 1$. Furthermore, we can construct $q$ such that $q(\mathcal{O}) =\min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\} $ for any $\mathcal{O}$.
 \item[Case 1]: $P(\mathcal{O}) \geq \alpha$. In this scenario, $Q(\mathcal{O})$ = 1 since $\frac{1}{\alpha} P(\mathcal{O}) > 1 $. Thus, every element in $\mathcal{O}$ should be scaled by $\frac{1}{P(\mathcal{O})}$ and all other elements should be set to 0 . Since  $P(\mathcal{O}) \geq \alpha$, we can imply the reciprocal $\frac{1}{P(\mathcal{O})} \leq \frac{1}{1-\alpha}$ is also true.  
@@ -539,7 +544,7 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \log(2)} \, \|p - q\|_
 
 \section{Experiments} \label{sec:experiments}
 
-To evaluate the algorithms developed in \cref{alg:quick_quantile} and \cref{alg:quick_cvar} we numerically compare their speed up against their canonical sorting-based counterparts. We refer to the canonical implementations as their unaltered risk measure name, and for the no-sort implementations we append the ``Q'' prefix. To ensure that our choice of random variable is not influencing runtime, we test other distributions in \cref{sec:appendix_experiments}. More detail on the experimental setup can be found in \cref{sec:appendix_experiments}.
+To evaluate the algorithms developed in \cref{alg:quick-quantile} and \cref{alg:quick_cvar} we numerically compare their speed up against their canonical sorting-based counterparts. We refer to the canonical implementations as their unaltered risk measure name, and for the no-sort implementations we append the ``Q'' prefix. To ensure that our choice of random variable is not influencing runtime, we test other distributions in \cref{sec:appendix_experiments}. More detail on the experimental setup can be found in \cref{sec:appendix_experiments}.
 
 The results in \cref{fig:all_uniform} represents a 95\% confidence interval band computed over 10 random seeds. 
 These bands are tight due to the little variance in the measured runtimes between seeds.
@@ -689,9 +694,9 @@ This speed up is significant in the context of risk measures as they are often u
 % \end{algorithmic}
 % \end{algorithm}
 % The proof for this algorithm is simple and shows that output is equal to that of Algorithm 4 (the standard greedy algorithm), which has already proved to be both feasible and optimal.
-% \begin{lem}
+% \begin{lemma}
 % Algorithm 1 returns a feasible and optimal solution to the maximum weight independent set for polymatroids.
-% \end{lem}
+% \end{lemma}
 % \begin{proof}
 % The optimal solution will always be $f(S_i) - f(S_{i-1})$ assuming the weight $c_i \geq 0$. Our solution is $f(i)$ for $f(S_i) < f(N)$, and by assumption 1 this equals $f(S_i) - f(S_{i - 1})$. If $f(S_i) = f(N)$ and $f(S_{i - 1}) = f(N)$, then $x_i = 0$ by the algorithm.
 % \end{proof}
@@ -965,7 +970,7 @@ Julia garbage collector, even when running synchronously.
 % \begin{algorithm}
 %   \algrenewcommand\algorithmicrequire{\textbf{Input:   $\tilde{X}$ as vector $x$ to project and sum constraint k}}
 %   \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
-%   \caption{algorithm}{K-capped}\label{alg:quick_quantile}
+%   \caption{algorithm}{K-capped}\label{alg:quick-quantile}
 %   \begin{algorithmic}[1]
 %     \Require{}
 %     \Ensure{}

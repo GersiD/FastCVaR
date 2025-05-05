@@ -8,14 +8,12 @@
 \ProcessOptions
 
 %\ifarticlestyle
-%    \RequirePackage[ruled,linesnumbered]{algorithm2e}
-%\else
-%    \RequirePackage[ruled,vlined,linesnumbered,algochapter]{algorithm2e}
-%\fi
 \RequirePackage{amsmath}
-\RequirePackage{amsthm}
+\RequirePackage{mathtools}
 \RequirePackage{amsbsy}
 \RequirePackage{amssymb}
+\RequirePackage{amsthm}
+\RequirePackage{thmtools}
 \RequirePackage{array}
 \RequirePackage{aliascnt}
 \RequirePackage{color}
@@ -25,6 +23,8 @@
 %\RequirePackage{arydshln}
 \RequirePackage[american]{babel}
 \RequirePackage{bm}
+\RequirePackage[ruled,linesnumbered,vlined,noend]{algorithm2e}
+\RequirePackage[capitalise]{cleveref}
 
 \definecolor{mydarkblue}{rgb}{0,0.03,0.15}
 
@@ -35,18 +35,18 @@
 \hfuzz2pt % Don't report over-full h-boxes if over-edge is small
 % THEOREMS -------------------------------------------------------
 
-\newtheorem{thm}{Theorem}
-\newtheorem{cor}{Corollary}
-\newtheorem{lem}{Lemma}
-\newtheorem{prop}{Proposition}
-\newtheorem{con}{Conjecture}
-\newtheorem{exm}{Example}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
 \theoremstyle{definition}
-\newtheorem{defn}{Definition}
-\newtheorem{asm}{Assumption}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
 \theoremstyle{remark}
-\newtheorem{rem}{Remark}
-%\newtheorem{fact}{Fact}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
 
 % cref names
 %\crefname{prop}{Proposition}{Proposition}
@@ -138,7 +138,6 @@
 \newcommand{\minimize}[1]{\operatorname*{minimize}_{#1} &}
 \newcommand{\maximize}[1]{\operatorname*{maximize}_{#1} &}
 
-\theoremstyle{plain}
 % The following is the style with an extra alignment for equalities, as used % % in my thesis:
 %\newenvironment{mathprog}{\begin{equation}\begin{array}{>{\displaystyle}l>{\displaystyle}r>{\displaystyle}l>{\displaystyle}l}}{\end{array}\end{equation}}
 % The following is the style where there is NO extra alignment for equalities, but there % is extra column for quantifications, such as for all i...

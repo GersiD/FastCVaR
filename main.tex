@@ -216,11 +216,10 @@ Our QVaR algorithm is described in \cref{alg:quick-quantile}. The algorithm work
   \Input{vector $\bm{x}$, pmf $\bm{p}$ and $\alpha \in [0,1)$}
   \Output{$\alpha$-quantile of $\tilde{x}$}
   $f_0 \gets 1$, $b_0 \gets n$, $\bm{x}^0 = \bm{x}$, $\bm{p}^0 = \bm{p}$, $k=1$, $\alpha_0 = \alpha$ \;
-  %\tcp*{Init front $f_0$ and back $b_0$}
-  \While{$b_k - f_k \geq 1$}
-  {
-    $i_k, \bm{x}^k, \bm{p}^k \gets \operatorname{partition}(\bm{x}^{k-1}, \bm{p}^{k-1}, f_{k-1}, b_{k-1})$
-    \tcp*{~\cref{alg:partition} \& \cref{lem:hoare-partition}}
+  \While{$b_k - f_k \geq 1$} {
+     $i' \gets f + \lceil\frac{b-f}{2}\rceil$ \tcp*{Pivot: Median-of-medians for $O(b-f)$ runtime}
+      $i_k, \_, \bm{x}^k, \bm{p}^k \gets \operatorname{partition}(\bm{x}^{k-1}, \bm{p}^{k-1}, i', f_{k-1}, b_{k-1})$
+    \tcp*{~\cref{alg:partition}, \cref{lem:hoare-partition}}
     $t_k \gets \sum_{j=f_{k-1}}^{i_k} p^k_j$ \;
     \lIf{$\alpha_k < t_k$} {$b_k \gets i_k$, $\alpha_k \gets \alpha_{k-1}$}
     \lElse {$f_k \gets i_k + 1$, $\alpha_k \gets \alpha_{k-1} - t_k$}

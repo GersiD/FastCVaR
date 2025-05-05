@@ -21,8 +21,14 @@
 \usepackage{amsmath}
 \usepackage{mathtools}
 \usepackage[capitalise,noabbrev]{cleveref}
-\usepackage{algorithm,algorithmicx,algpseudocode}
+% \usepackage{algorithm,algorithmicx,algpseudocode}
 % \usepackage{algorithm2e}
+\usepackage[ruled,linesnumbered,vlined,noend]{algorithm2e}
+
+
+\SetKwInOut{Input}{Input}
+\SetKwInOut{Output}{Output}
+
 \usepackage{bm}
 \usepackage{amsthm}
 \usepackage{natbib}
@@ -188,45 +194,87 @@ In this section, we develop a quick algorithm to compute the VaR of a random var
 %We first restate some well-known properties of the Hoare Partition scheme.
 Our QVaR algorithm is described in \cref{alg:quick_quantile}. The algorithm works as follows. \mm{refer to the actual variables and line numbers in the algorithm.} The algorithm picks a pivot and applies the partition to easily compute the probability of all outcomes smaller than or equal to that of the pivot. Then it determines whether the quantile can exist on the left side of the pivot or on the right side and shrinks the search space, parameterized by the variables $front$ and $back$, accordingly.
 \todo{for algorithms should we bold vectors to keep with notation?}
+% \begin{algorithm}
+%   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and $\alpha \in [0,1]$}}
+%   \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
+%   \caption{QVaR: Linear-time algorithm for VaR. $\mathds{1}(bool)$ denotes the indicator function.}\label{alg:quick_quantile}
+
+%   \begin{algorithmic}[1]
+%     \Require{} \Ensure{}
+%     \State{$f_0 \gets 1$, $b_0 \gets n$, $x^0 = x$, $p^0 = p$, $k=1$, $\alpha_0 = \alpha$ } \Comment{Init front $f_0$ and back $b_0$}
+%     \While{$b_k - f_k \geq 1$}
+%       \State{$i_k, x^k, p^k \gets \operatorname{partition}(x^{k-1}, p^{k-1}, f_{k-1}, b_{k-1})$} %\Comment{Hoares partition scheme}
+%     \State{$t_k \gets \sum_{j=f_{k-1}}^{i_k} p^k_j$}
+%       \If{$\alpha_k < t_k$}
+%       \State{$b_k \gets i_k$, $\alpha_k \gets \alpha_{k-1}$}
+%       \Else{}
+%       \State{$f_k \gets i_k + 1$, $\alpha_k \gets \alpha_{k-1} - t_k$}
+%     \EndIf{}
+%     \State $k \gets k + 1$
+%     \EndWhile{}
+%     \State{\Return{$x^k_{b_k}$}}
+%   \end{algorithmic}
+% \end{algorithm}
 \begin{algorithm}
-  \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and $\alpha \in [0,1]$}}
-  \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
   \caption{QVaR: Linear-time algorithm for VaR. $\mathds{1}(bool)$ denotes the indicator function.}\label{alg:quick_quantile}
 
-  \begin{algorithmic}[1]
-    \Require{} \Ensure{}
-    \State{$f_0 \gets 1$, $b_0 \gets n$, $x^0 = x$, $p^0 = p$, $k=1$, $\alpha_0 = \alpha$ } \Comment{Init front $f_0$ and back $b_0$}
-    \While{$b_k - f_k \geq 1$}
-      \State{$i_k, x^k, p^k \gets \operatorname{partition}(x^{k-1}, p^{k-1}, f_{k-1}, b_{k-1})$} %\Comment{Hoares partition scheme}
-    \State{$t_k \gets \sum_{j=f_{k-1}}^{i_k} p^k_j$}
-      \If{$\alpha_k < t_k$}
-      \State{$b_k \gets i_k$, $\alpha_k \gets \alpha_{k-1}$}
-      \Else{}
-      \State{$f_k \gets i_k + 1$, $\alpha_k \gets \alpha_{k-1} - t_k$}
-    \EndIf{}
-    \State $k \gets k + 1$
-    \EndWhile{}
-    \State{\Return{$x^k_{b_k}$}}
-  \end{algorithmic}
+  \Input{vector $x$, pmf $p$ and $\alpha \in [0,1]$}
+  \Output{$\alpha$-quantile of $\tilde{X}$}
+
+  $f_0 \gets 1$, $b_0 \gets n$, $x^0 = x$, $p^0 = p$, $k=1$, $\alpha_0 = \alpha$ \tcp*{Init front $f_0$ and back $b_0$}
+  \While{$b_k - f_k \geq 1$}
+  {
+    $i_k, x^k, p^k \gets \operatorname{partition}(x^{k-1}, p^{k-1}, f_{k-1}, b_{k-1})$\; 
+    $t_k \gets \sum_{j=f_{k-1}}^{i_k} p^k_j$\;
+    \lIf{$\alpha_k < t_k$}
+    {
+      $b_k \gets i_k$, $\alpha_k \gets \alpha_{k-1}$
+    }
+    \lElse
+    {
+      $f_k \gets i_k + 1$, $\alpha_k \gets \alpha_{k-1} - t_k$
+    }
+    $k \gets k + 1$\;
+  }
+  \KwRet{$x^k_{b_k}$}\;
 \end{algorithm}
+
+% \begin{algorithm}
+%   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and $\alpha \in [0,1]$}}
+%   \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
+%   \caption{VaR: Canonical algorithm for VaR. $\mathds{1}(bool)$ denotes the indicator function.}\label{alg:slow_quantile}
+
+%   \begin{algorithmic}[1]
+%   \Require{} \Ensure{}
+%   \State{$x \gets \text{sort-decending}(x)$}
+%   \State{$a \gets 1$}
+%   \For{$i=1$ to $n$}
+%   \State{$a \gets a - \bm{p}_{\bm{x}_i}$}
+%     \If{$a \leq \alpha$}
+%       \State{\Return{$x_i$}}
+%     \EndIf{}
+%   \EndFor{}
+%   \end{algorithmic}
+% \end{algorithm}
 
 \begin{algorithm}
-  \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and $\alpha \in [0,1]$}}
-  \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
   \caption{VaR: Canonical algorithm for VaR. $\mathds{1}(bool)$ denotes the indicator function.}\label{alg:slow_quantile}
 
-  \begin{algorithmic}[1]
-  \Require{} \Ensure{}
-  \State{$x \gets \text{sort-decending}(x)$}
-  \State{$a \gets 1$}
+  \Input{vector $x$, pmf $p$ and $\alpha \in [0,1]$}
+  \Output{$\alpha$-quantile of $\tilde{X}$}
+
+  $x \gets \text{sort-decending}(x)$\;
+  $a \gets 1$\;
   \For{$i=1$ to $n$}
-  \State{$a \gets a - \bm{p}_{\bm{x}_i}$}
+  {
+    $a \gets a - \bm{p}_{\bm{x}_i}$\;
     \If{$a \leq \alpha$}
-      \State{\Return{$x_i$}}
-    \EndIf{}
-  \EndFor{}
-  \end{algorithmic}
+    {
+      \KwRet{$x_i$}\;
+    }
+  }
 \end{algorithm}
+
 \begin{lemma}
 The Hoare's partition scheme $i_k, x^k, p^k \gets \operatorname{partition}(x^{k-1}, p^{k-1}, f_{k-1}, b_{k-1})$ does the following:
   \begin{enumerate}
@@ -393,49 +441,61 @@ Our first contribution is an algorithm for solving the minimum-weight Independen
 %\end{algorithmic}
 %\end{algorithm}
 
-\begin{algorithm} 
-\algrenewcommand\algorithmicrequire{\textbf{Input: } Finite $N = [1 \ldots n]$, $f\colon 2^N \to  \Real_+$ satisfying \cref{asm:submodular-function} } 
-\algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
-\caption{Linear-time Algorithm CVaR/TVaR}\label{alg:maximum-weight-independent}
-\begin{algorithmic}[1]
-     \Require{}
-     \Ensure{}
-    %\State{$left \gets 1$}
-    %\State{$right \gets n$}
-    \If{$c > 0$}
-    \State{$x_1 = f(min(x_i))$}
-    \State{$temp_c = min(c, 1 - x_1)$}
+% \begin{algorithm} 
+% \algrenewcommand\algorithmicrequire{\textbf{Input: } Finite $N = [1 \ldots n]$, $f\colon 2^N \to  \Real_+$ satisfying \cref{asm:submodular-function} } 
+% \algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
+% \caption{Linear-time Algorithm CVaR/TVaR}\label{alg:maximum-weight-independent}
+% \begin{algorithmic}[1]
+%      \Require{}
+%      \Ensure{}
+%     %\State{$left \gets 1$}
+%     %\State{$right \gets n$}
+%     \If{$c > 0$}
+%     \State{$x_1 = f(min(x_i))$}
+%     \State{$temp_c = min(c, 1 - x_1)$}
+%     \If{$temp_c < c$}
+%     \State{return}
+%     \EndIf{}
+%     \EndIf{}
+%     \State{$mid = QuickQuantile(p, x, \alpha = (1 - c)/m$}
+%     \If{$c > 0$}
+%     \State{Let $x_i \gets  \begin{cases}m_i \cdot p(i) & \text{for } 1 < i \leq mid,\dots \end{cases}$}
+    
+%     \Else{
+%     \State{Let $x_i \gets  \begin{cases}m_i \cdot  p(i) & \text{for } i \leq mid,\dots \end{cases}$}
+%     }
+%     \EndIf{}
+%     \State{$x_{mid} \gets 1 - m_i *p(i)$}
+% \end{algorithmic}
+% \end{algorithm}
+
+\begin{algorithm}
+  \caption{Linear-time Algorithm CVaR/TVaR}\label{alg:maximum-weight-independent}
+
+  \Input{Finite $N = [1 \ldots n]$, $f\colon 2^N \to  \Real_+$ satisfying \cref{asm:submodular-function}}
+  \Output{$\max \{f(S) : S\subseteq N\}$}
+
+  \If{$c > 0$}
+  {
+    $x_1 = f(min(x_i))$\;
+    $temp_c = min(c, 1 - x_1)$\;
     \If{$temp_c < c$}
-    \State{return}
-    \EndIf{}
-    \EndIf{}
-    \State{$mid = QuickQuantile(p, x, \alpha = (1 - c)/m$}
-    
- %   \While{$right  - left \geq 1$} 
-    
-%    \State{$mid \gets partition(left, right, c)$}
-%    \State{$\alpha \gets (1 - c)/m$}
-%    \If{$\sum_{i \subset (front, back)}p(i) \geq \alpha$}
-       %\State{Let $x_i :=  %\begin{cases}0 & \text{for } i %> mid,\dots 
-       %\end{cases}$}
-      % \State{$right \gets mid$}
-    %\Else
-          %\State{Let $x_i :=  %\begin{cases}m_i*p(i) & %\text{for } i \leq %mid,\dots \end{cases}$}
-          %\State{$left \gets mid + 1$}
-          % \State{$left \gets mid + 1$}
-          
-    %\EndIf{}      
-    %\EndWhile{}
-    \If{$c > 0$}
-    \State{Let $x_i \gets  \begin{cases}m_i \cdot p(i) & \text{for } 1 < i \leq mid,\dots \end{cases}$}
-    
-    \Else{
-    \State{Let $x_i \gets  \begin{cases}m_i \cdot  p(i) & \text{for } i \leq mid,\dots \end{cases}$}
+    {
+      \KwRet{}\;
     }
-    \EndIf{}
-    \State{$x_{mid} \gets 1 - m_i *p(i)$}
-\end{algorithmic}
+  }
+  $mid = QuickQuantile(p, x, \alpha = (1 - c)/m$\;
+  \If{$c > 0$}
+  {
+    Let $x_i \gets  \begin{cases}m_i \cdot p(i) & \text{for } 1 < i \leq mid,\dots \end{cases}$\;
+  }
+  \Else
+  {
+    Let $x_i \gets  \begin{cases}m_i \cdot  p(i) & \text{for } i \leq mid,\dots \end{cases}$\;
+  }
+  $x_{mid} \gets 1 - m_i *p(i)$\;
 \end{algorithm}
+
 
 \begin{lem}
   \cref{alg:maximum-weight-independent} returns a optimal solution \todo{optimal for what optimization?} to the maximum-weight-independent set for polymatroids.
@@ -533,32 +593,64 @@ This speed up is significant in the context of risk measures as they are often u
 
 \section{Proofs and Details for \cref{sec:var-linear}}
 
+% \begin{algorithm}
+% \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $x \in \Real^n$ with probability mass function $p \in \Delta^n$ and $f, b \in \Real$}}
+% \algrenewcommand\algorithmicensure{\textbf{Output: indices of partition $i, j \in \Real$}}
+% \caption{Hoare's partition scheme}\label{alg:partition}
+%   \begin{algorithmic}[1]
+%     \Require{}
+%     \Ensure{} 
+%     \State{$i \gets f + \lceil\frac{b-f}{2}\rceil$}
+%     \State{$\lambda \gets f$} % less than
+%     \State{$\xi \gets f$} % equal to
+%     \State{$\mu \gets b$} % greater than
+%     \While{$\xi \leq \mu$}
+%       \If{$x[\xi] < x[i]$}
+%         \State{swap $x[\xi]$ with $x[\lambda]$}
+%         \State{swap $p[\xi]$ with $p[\lambda]$}
+%         \State{$\lambda \gets \mu + 1$}
+%         \State{$\xi \gets \xi + 1$}
+%       \ElsIf{$x[\xi] > x[i]$}
+%         \State{$\mu \gets \mu - 1$}
+%       \Else{}
+%         \State{$\xi \gets \xi + 1$}
+%       \EndIf{}
+%     \EndWhile{}
+%     \State{\Return{($\lambda - 1$, $\mu$)} \Comment{last element less than the pivot, first element greater than the pivot}}
+%   \end{algorithmic}
+% \end{algorithm}
+
 \begin{algorithm}
-\algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $x \in \Real^n$ with probability mass function $p \in \Delta^n$ and $f, b \in \Real$}}
-\algrenewcommand\algorithmicensure{\textbf{Output: indices of partition $i, j \in \Real$}}
-\caption{Hoare's partition scheme}\label{alg:partition}
-  \begin{algorithmic}[1]
-    \Require{}
-    \Ensure{} 
-    \State{$i \gets f + \lceil\frac{b-f}{2}\rceil$}
-    \State{$\lambda \gets f$} % less than
-    \State{$\xi \gets f$} % equal to
-    \State{$\mu \gets b$} % greater than
-    \While{$\xi \leq \mu$}
-      \If{$x[\xi] < x[i]$}
-        \State{swap $x[\xi]$ with $x[\lambda]$}
-        \State{swap $p[\xi]$ with $p[\lambda]$}
-        \State{$\lambda \gets \mu + 1$}
-        \State{$\xi \gets \xi + 1$}
-      \ElsIf{$x[\xi] > x[i]$}
-        \State{$\mu \gets \mu - 1$}
-      \Else{}
-        \State{$\xi \gets \xi + 1$}
-      \EndIf{}
-    \EndWhile{}
-    \State{\Return{($\lambda - 1$, $\mu$)} \Comment{last element less than the pivot, first element greater than the pivot}}
-  \end{algorithmic}
+  \caption{Hoare's partition scheme}\label{alg:partition}
+
+  \Input{Random variable $x \in \Real^n$ with probability mass function $p \in \Delta^n$ and $f, b \in \Real$}
+  \Output{indices of partition $i, j \in \Real$}
+
+  $i \gets f + \lceil\frac{b-f}{2}\rceil$\;
+  $\lambda \gets f$\; \tcp{less than}
+  $\xi \gets f$\; \tcp{equal to}
+  $\mu \gets b$\; \tcp{greater than}
+  \While{$\xi \leq \mu$}
+  {
+    \If{$x[\xi] < x[i]$}
+    {
+      swap $x[\xi]$ with $x[\lambda]$\;
+      swap $p[\xi]$ with $p[\lambda]$\;
+      $\lambda \gets \mu + 1$\;
+      $\xi \gets \xi + 1$\;
+    }
+    \ElseIf{$x[\xi] > x[i]$}
+    {
+      $\mu \gets \mu - 1$\;
+    }
+    \Else
+    {
+      $\xi \gets \xi + 1$\;
+    }
+  }
+  \KwRet{($\lambda - 1$, $\mu$)}\; \tcp{last element less than the pivot, first element greater than the pivot}
 \end{algorithm}
+
 
 \section{Proofs and Details for \cref{sec:phi-divergence}}
 
@@ -699,48 +791,58 @@ Julia garbage collector, even when running synchronously.
 
 \subsection{Quick CVaR}
 
-\begin{algorithm}
-  %\floatname{algorithm}{Quick CVaR}
-  \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ with probability mass function p and $\alpha \in [0,1]$}}
-  \algrenewcommand\algorithmicensure{\textbf{Output: $CVaR_\alpha(\tilde{X})$}}
-  \caption{QCVaR}\label{alg:quick_cvar}
-  \begin{algorithmic}[1]
-    \Require{}
-    \Ensure{} 
-    \todo{Make absolutely sure that you tell the reader that we use 1 or 0 based indexing}
-    \State{$q^+_\alpha \gets \text{quick\_quantile}(x, p, \alpha)$}
-    \State{$val \gets 0$}
-    \State{$p_{left} \gets 1$}
-    \For{$i \in 0 \dots n$}
-      \State{$inc \gets \min(\frac{p[i]}{\alpha}, p_{left})$}
-      \State{$val += x[i] * inc$}
-      \State{$p_{left} -= inc$}
-      \If{$p_{left} \leq 0$}
-        \State{Break}
-      \EndIf{}
-    \EndFor{}
-    \State{\Return{$val$}}
-  \end{algorithmic}
-\end{algorithm}
+% \begin{algorithm}
+%   %\floatname{algorithm}{Quick CVaR}
+%   \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ with probability mass function p and $\alpha \in [0,1]$}}
+%   \algrenewcommand\algorithmicensure{\textbf{Output: $CVaR_\alpha(\tilde{X})$}}
+%   \caption{QCVaR}\label{alg:quick_cvar}
+%   \begin{algorithmic}[1]
+%     \Require{}
+%     \Ensure{} 
+%     \todo{Make absolutely sure that you tell the reader that we use 1 or 0 based indexing}
+%     \State{$q^+_\alpha \gets \text{quick\_quantile}(x, p, \alpha)$}
+%     \State{$val \gets 0$}
+%     \State{$p_{left} \gets 1$}
+%     \For{$i \in 0 \dots n$}
+%       \State{$inc \gets \min(\frac{p[i]}{\alpha}, p_{left})$}
+%       \State{$val += x[i] * inc$}
+%       \State{$p_{left} -= inc$}
+%       \If{$p_{left} \leq 0$}
+%         \State{Break}
+%       \EndIf{}
+%     \EndFor{}
+%     \State{\Return{$val$}}
+%   \end{algorithmic}
+% \end{algorithm}
 
 
 \section{Greedy Algorithm}
 
 \mm{Why would we need the weights to be non-negative?}
 
-\begin{algorithm} \label{alg:greedy-polymatroid}
-    \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
-    \algrenewcommand\algorithmicensure{\textbf{Output: }$\max \{f(S) : S\subseteq N\}$}
-  \caption{Greedy algorithm from Submodular Functions, Polymatroids, TDI}
- \begin{algorithmic}[1]
-    \Require{}
-    \Ensure{}
-    \State{Order the elements such that $c_1 \geq c_2 \cdots \geq c_n$.}
-    \State{Let $S_i := \{1, \dots, i\}$ and $S_0 := \emptyset$}
-    \State{Let $x_i :=  \begin{cases}f(S_i) - f(S_{i-1}) & \text{for } i = 1,\dots, r \\ 0 & \text{otherwise} \end{cases}$}
-\end{algorithmic}
-\end{algorithm}
+% \begin{algorithm} \label{alg:greedy-polymatroid}
+%     \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
+%     \algrenewcommand\algorithmicensure{\textbf{Output: }$\max \{f(S) : S\subseteq N\}$}
+%   \caption{Greedy algorithm from Submodular Functions, Polymatroids, TDI}
+%  \begin{algorithmic}[1]
+%     \Require{}
+%     \Ensure{}
+%     \State{Order the elements such that $c_1 \geq c_2 \cdots \geq c_n$.}
+%     \State{Let $S_i := \{1, \dots, i\}$ and $S_0 := \emptyset$}
+%     \State{Let $x_i :=  \begin{cases}f(S_i) - f(S_{i-1}) & \text{for } i = 1,\dots, r \\ 0 & \text{otherwise} \end{cases}$}
+% \end{algorithmic}
+% \end{algorithm}
 
+\begin{algorithm}
+    \caption{Greedy algorithm from Submodular Functions, Polymatroids, TDI}\label{alg:greedy-polymatroid}
+
+    \Input{Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$}
+    \Output{$\max \{f(S) : S\subseteq N\}$}
+
+    Order the elements such that $c_1 \geq c_2 \cdots \geq c_n$\;
+    Let $S_i := \{1, \dots, i\}$ and $S_0 := \emptyset$\;
+    Let $x_i :=  \begin{cases}f(S_i) - f(S_{i-1}) & \text{for } i = 1,\dots, r \\ 0 & \text{otherwise} \end{cases}$\;
+\end{algorithm}
 
 % Graveyard
 % \begin{algorithm}

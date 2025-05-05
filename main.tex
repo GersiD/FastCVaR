@@ -231,16 +231,16 @@ Our QVaR algorithm is described in \cref{alg:quick-quantile}. The algorithm work
 
 
 \begin{lemma} \label{lem:hoare-partition}
-Suppose that $i, \bm{x}, \bm{p} \gets \operatorname{partition}(\bm{x'}, \bm{p'}, f, b)$ for some $\bm{x}\in \Real^n, \bm{p}\in \Delta^n$ and $f, b\in \Nats, f < b$ is computed using  \cref{alg:partition}. Then $i \in [f, ]$:
-  \begin{enumerate}[nosep]
-  \item $j \le i \implies x'_j \le x_i$
-  \item $j > i \implies x_j > x_i$
-  \item $\exists l \ge i$ such that $ l \le j \le i \implies x_i = x_j $ and $ j < l \implies x_i > x_j $
-  \end{enumerate}
+Suppose that $s, t, \bm{x}, \bm{p} \gets \operatorname{partition}(\bm{x'}, \bm{p'}, i, f, b)$ for some $\bm{x}\in \Real^n, \bm{p}\in \Delta^n$ and $f, b\in \Nats, f < b$ is computed using \cref{alg:partition}. Then:
+\begin{align*}
+   j\in f{:}s &\quad\implies \quad x_j < x_i, \\
+   j \in (l+1){:}(g-1) &\quad\implies \quad x_j = x_i, \\
+   j \in g{:}b &\quad\implies \quad x_j > x_i.
+\end{align*}
   Moreover, the algorithm runs in $O(b - f)$ time.
 \end{lemma}
 \begin{proof}
-  \mm{TODO}
+  \mm{TODO: should follow directly from the invariants in the algorithm. The linear time follows since $g-e$ decreases by 1 in every iteration}
 \end{proof}
 
 The above conditions primarily state that each call to the partition scheme performs partial sorting such that all elements less than or equal to the pivot will be at a lower index, and elements greater than the pivot will be at a higher index. 
@@ -613,12 +613,12 @@ Now, suppose that \cref{alg:slow-quantile} terminates with value $q\opt$. Then, 
 \begin{algorithm}
   \caption{\texttt{partition}: Dutch national flag algorithm ~\cite[chapter 14]{Dijkstra1976}}
   \label{alg:partition}
-  \Input{Random variable $\bm{x} \in \Real^n$ with probability mass function $\bm{p} \in \Delta^n$, pivot $i$, and front and back indices $f, b \in \Real$}
-  \Output{indices $s$, $t$ and $\bm{x}$ and $\bm{p}$ such that $j \le s \implies x_j < x_i$}
+  \Input{Random variable $\bm{x} \in \Real^n$ with probability mass function $\bm{p} \in \Delta^n$, pivot $i\in \Nats$, and front and back indices $f, b \in \Nats$}
+  \Output{indices $s$, $t$ and $\bm{x}$ and $\bm{p}$ such that $j \in b{:}s \implies x_j < x_i$, and $j \in t{:}e \implies x_j > x_i$}
   % $i \gets f + \lceil\frac{b-f}{2}\rceil$ \tcp*{Pivot: Median-of-medians for $O(b-f)$ runtime}
-  $l \gets f$ \tcp*{less: $j\in [f,l) \implies x_j < x_i$}
-  $e \gets f$ \tcp*{equal: $j \in [l,e] \implies x_j = x_i$ }
-  $g \gets b$ \tcp*{greater:$j \in [g,b] \implies x_j > x_i$}
+  $l \gets f$ \tcp*{less: $j\in f{:}l \implies x_j < x_i$}
+  $e \gets f$ \tcp*{equal: $j \in l{:}e \implies x_j = x_i$ }
+  $g \gets b$ \tcp*{greater: $j \in g{:}b \implies x_j > x_i$}
   \While{$e \leq g$}
   {
     \If{$x_e < x_i$}
@@ -635,7 +635,7 @@ Now, suppose that \cref{alg:slow-quantile} terminates with value $q\opt$. Then, 
     }
     \lElse {$e \gets e + 1$}
   }
-  \KwRet{$(l-1, e-1, \bm{x}, \bm{p})$}\;
+  \KwRet{$(l-1, g+1, \bm{x}, \bm{p})$}\;
   %\tcp{last element less than the pivot, first element greater than the pivot}
 \end{algorithm}
 

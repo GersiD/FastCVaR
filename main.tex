@@ -236,57 +236,7 @@ Our QVaR algorithm is described in \cref{alg:quick-quantile}. The algorithm work
   \KwRet{$x^k_{b_k}$}\;    
 \end{algorithm}  
 
-% \begin{algorithm}
-%   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and $\alpha \in [0,1]$}}
-%   \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
-%   \caption{VaR: Canonical algorithm for VaR. $\mathds{1}(bool)$ denotes the indicator function.}\label{alg:slow-quantile}
 
-%   \begin{algorithmic}[1]
-%   \Require{} \Ensure{}
-%   \State{$x \gets \text{sort-decending}(x)$}
-%   \State{$a \gets 1$}
-%   \For{$i=1$ to $n$}
-%   \State{$a \gets a - \bm{p}_{\bm{x}_i}$}
-%     \If{$a \leq \alpha$}
-%       \State{\Return{$x_i$}}
-%     \EndIf{}
-%   \EndFor{}
-%   \end{algorithmic}
-% \end{algorithm}
-
-\begin{algorithm}
-\caption{VaR: Standard VaR algorithm}
-\label{alg:slow-quantile}
-\Input{vector $\bm{x}$, probability $\bm{p}$, and $\alpha \in [0,1)$}
-\Output{$\alpha$-quantile of $\tilde{X}$}
-Sort $\bm{x}$ indexes to get $\bm{k}\in \Nats^n$ such that $i > j \implies x_{k_i} > x_{k_j}, \; \forall i, j \in 1, \dots , n$\;
-$q_{n+1} \gets 0$ \;
-\For{$i=n, \dots , 1$} {
-    $q_i \gets q_{i+1} + p_{k_i}$
-    \tcp*{$q_i = \P{\tilde{x} \ge x_{k_i}}$ if $x_{k_i}$ unique}
-    \lIf{$q_i \ge 1-\alpha$} {\KwRet{$x_{k_i}$}}
-}
-\end{algorithm}
-
-\begin{proposition}
-For a random variable $\tilde{x} \in \mathbb{X}$ and $\alpha\in [0,1)$, \cref{alg:slow-quantile} returns $\var{\alpha}{\tilde{x}}$.
-\end{proposition}
-\begin{proof}
-First, we show by induction on $i$ from $n$ to $1$ that
-\begin{equation} \label{eq:proof-q-j}
-  q_j = \P{\tilde{x} \ge x_{k_i}},
-  \quad\text{where}\quad
-  j = \min \left\{ j = 1, \dots , i \mid x_{k_j} = x_{k_i} \right\}.
-\end{equation}
-The base case is immediate. The inductive case for $i-1$ from $i$ follows by algebraic manipulation from the fact that $x_{k_i}$ is sorted increasingly:
-\begin{align*}
-\P{\tilde{x} \ge x_{k_{i-1}}} 
- &= \P{\tilde{x} = x_{k_{i-1}}} + \P{\tilde{x} > x_{k_{i-1}}}
- = \P{\tilde{x} = x_{k_{i-1}}} + \P{\tilde{x} \ge x_{k_{i}}} \\
- &= \P{\tilde{x} = x_{k_{i-1}}} + q_i = \sum_{l=j}^{i-1} q_{k_j} + q_{k_i} = q_{k_{i-1}}.
-\end{align*}
-Now, suppose that \cref{alg:slow-quantile} terminates with value $q\opt$. Then, if the algorithm terminates in iteration $i\opt$ then from \eqref{eq:proof-q-j}, we have that $\P{\tilde{x} \ge q\opt} = q_{j\opt} \ge 1-\alpha$ where $j\opt$ is defined as in \eqref{eq:proof-q-j}. Therefore, $q\opt \le \var{\alpha}{\tilde{x}}$. To prove the converse inequality, suppose that $q\opt > \var{\alpha}{\tilde{x}}$, and therefore $\P{\tilde{x} \ge q\opt} < 1-\alpha$. Then, this a contradition since \eqref{eq:proof-q-j} combined with the termination criterion implies that $\P{\tilde{x} \ge q\opt} < 1-\alpha$.
-\end{proof}
 
 \begin{lemma} \label{lem:hoare-partition}
 The Hoare's partition scheme $i_k, x^k, p^k \gets \operatorname{partition}(x^{k-1}, p^{k-1}, f_{k-1}, b_{k-1})$ does the following:
@@ -624,6 +574,44 @@ This speed up is significant in the context of risk measures as they are often u
 %     \State{\Return{($\lambda - 1$, $\mu$)} \Comment{last element less than the pivot, first element greater than the pivot}}
 %   \end{algorithmic}
 % \end{algorithm}
+
+\subsection{Standar VaR Algorithm} \label{sec:stand-var-algor}
+
+\begin{algorithm}
+\caption{VaR: Standard VaR algorithm}
+\label{alg:slow-quantile}
+\Input{vector $\bm{x}$, probability $\bm{p}$, and $\alpha \in [0,1)$}
+\Output{$\alpha$-quantile of $\tilde{X}$}
+Sort $\bm{x}$ indexes to get $\bm{k}\in \Nats^n$ such that $i > j \implies x_{k_i} > x_{k_j}, \; \forall i, j \in 1, \dots , n$\;
+$q_{n+1} \gets 0$ \;
+\For{$i=n, \dots , 1$} {
+    $q_i \gets q_{i+1} + p_{k_i}$
+    \tcp*{$q_i = \P{\tilde{x} \ge x_{k_i}}$ if $x_{k_i}$ unique}
+    \lIf{$q_i \ge 1-\alpha$} {\KwRet{$x_{k_i}$}}
+}
+\end{algorithm}
+
+\begin{proposition}
+For a random variable $\tilde{x} \in \mathbb{X}$ and $\alpha\in [0,1)$, \cref{alg:slow-quantile} returns $\var{\alpha}{\tilde{x}}$.
+\end{proposition}
+\begin{proof}
+First, we show by induction on $i$ from $n$ to $1$ that
+\begin{equation} \label{eq:proof-q-j}
+  q_j = \P{\tilde{x} \ge x_{k_i}},
+  \quad\text{where}\quad
+  j = \min \left\{ j = 1, \dots , i \mid x_{k_j} = x_{k_i} \right\}.
+\end{equation}
+The base case is immediate. The inductive case for $i-1$ from $i$ follows by algebraic manipulation from the fact that $x_{k_i}$ is sorted increasingly:
+\begin{align*}
+\P{\tilde{x} \ge x_{k_{i-1}}} 
+ &= \P{\tilde{x} = x_{k_{i-1}}} + \P{\tilde{x} > x_{k_{i-1}}}
+ = \P{\tilde{x} = x_{k_{i-1}}} + \P{\tilde{x} \ge x_{k_{i}}} \\
+ &= \P{\tilde{x} = x_{k_{i-1}}} + q_i = \sum_{l=j}^{i-1} q_{k_j} + q_{k_i} = q_{k_{i-1}}.
+\end{align*}
+Now, suppose that \cref{alg:slow-quantile} terminates with value $q\opt$. Then, if the algorithm terminates in iteration $i\opt$ then from \eqref{eq:proof-q-j}, we have that $\P{\tilde{x} \ge q\opt} = q_{j\opt} \ge 1-\alpha$ where $j\opt$ is defined as in \eqref{eq:proof-q-j}. Therefore, $q\opt \le \var{\alpha}{\tilde{x}}$. To prove the converse inequality, suppose that $q\opt > \var{\alpha}{\tilde{x}}$, and therefore $\P{\tilde{x} \ge q\opt} < 1-\alpha$. Then, this a contradition since \eqref{eq:proof-q-j} combined with the termination criterion implies that $\P{\tilde{x} \ge q\opt} < 1-\alpha$.
+\end{proof}
+
+\subsection{Partition Algorithm}
 
 \begin{algorithm}
   \caption{Hoare's partition scheme}\label{alg:partition}

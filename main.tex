@@ -184,7 +184,8 @@ In the remainder of the paper, we first propose a linear-time algorithm for comp
 \end{table}
 
 \section{Computing VaR in Linear Time} \label{sec:var-linear}
-In this section, we develop a quick algorithm to compute the VaR of a random variable according to \todo{no hard code}definition 1. The algorithm is based on the well-known quickselect algorithm, and uses the Hoare partition scheme~\cite{}.
+
+In this section, we develop a quick algorithm to compute the VaR of a discrete random variable. The algorithm is extends the well-known quickselect algorithm to account to non-uniform weghts. We also take a special care to allow random variables $\tilde{x}$ with duplicate values such that $\tilde{x}(\omega_1) = \tilde{x}$
 
 \mm{How regular algorithms work for VaR, sorting based approach\cref{alg:slow_quantile}.}
 
@@ -477,11 +478,10 @@ Our first contribution is an algorithm for solving the minimum-weight Independen
 
   \If{$c > 0$}
   {
-    $x_1 = f(min(x_i))$\;
-    $temp_c = min(c, 1 - x_1)$\;
-    \If{$temp_c < c$}
+    $x_1 = f(\min_{i \in 1, \dots , N} x_i )$\;
+    \lIf{$ \min \left\{c, 1 - x_1\right\} < c$}
     {
-      \KwRet{}\;
+      \KwRet{ \mm{return what?}}
     }
   }
   $mid = QuickQuantile(p, x, \alpha = (1 - c)/m$\;

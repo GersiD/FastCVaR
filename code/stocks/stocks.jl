@@ -53,7 +53,7 @@ function run_one_experiment(x, p, α)
   TVaR!(tmpx, tmpp, α)
   qtvar_time = (time_ns() - start) * 1e-6
   start = time_ns()
-  expectation = sum(tmpx .* tmpp)
+  sum(tmpx .* tmpp)
   expectation_time = (time_ns() - start) * 1e-6
   local δ = abs(slow_cvar_result - fast_cvar_result)
   if δ >= 1e-6

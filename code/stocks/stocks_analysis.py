@@ -15,7 +15,7 @@ for col in df.columns:
         print(f"non-grouped{col}: mean = {mean}, std = {std}")
 
  #Calculate mean and standard deviation for each of the methods
-mean_std = df[['cvar', 'qcvar', 'var', 'qvar', 'tvar', 'qtvar']].agg(['mean', 'std'])
+mean_std = df[['cvar', 'qcvar', 'var', 'qvar', 'tvar', 'qtvar', 'expectation']].agg(['mean', 'std'])
 
 # Prepare the LaTeX table
 latex_table = r"""
@@ -27,7 +27,7 @@ Method & Mean (ms) & Std Dev (ms) \\
 """
 
 # Add rows with the mean and std-dev values for each method
-methods = ['CVaR', 'qCVaR', 'VaR', 'qVar', 'TVaR', 'qTVaR']
+methods = ['CVaR', 'qCVaR', 'VaR', 'qVar', 'TVaR', 'qTVaR', 'Expectation']
 for i, method in enumerate(methods):
     if i % 2 ==0:
         latex_table += "\\midrule \n"

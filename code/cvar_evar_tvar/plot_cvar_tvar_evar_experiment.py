@@ -38,3 +38,17 @@ plt.legend()
 plt.grid()
 plt.savefig('./cvar_evar_tvar/cvar_vs_qcvar_uniform.pdf')
 plt.show()
+plt.clf()
+
+# plot diffs
+csv_file = './cvar_evar_tvar/diffs_qEVaR_bound_uniform.csv'
+df = pd.read_csv(csv_file)
+#columns n,diff
+plt.plot(df['n'], df['diff'], label='QEVaR Bound - EVaR Bound') # pyright: ignore[reportArgumentType]
+plt.xlabel('Length of Random Variable (n)')
+plt.ylabel("Difference (units)")
+plt.legend()
+plt.grid()
+plt.savefig('./cvar_evar_tvar/diffs_qEVaR_bound_uniform.pdf')
+plt.show()
+plt.clf()

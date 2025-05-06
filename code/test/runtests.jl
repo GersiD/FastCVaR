@@ -208,21 +208,19 @@ end
   p1 = [0.2, 0.1, 0.1, 0.3, 0.3, 0.0]
   cvar = CVaR(x1, p1, 0.5).value
   qcvar = qCVaR!(x1, p1, 0.5).value
-  tvar = TVaR!(-x1, p1, 0.5)
+  tvar = TVaR!(x1, p1, sqrt(-2log(2) * log(0.5)))
   evar = EVaR(x1, p1, 0.5).value
   @test cvar >= evar >= tvar
   @test qcvar >= evar >= tvar
   for _ in range(1, 10)
     x = randn(10)
     p = rand(Float64, 10)
-    p = p / sum(p)
+    p /= sum(p)
     α = 0.5
     cvar = CVaR(x, p, α).value
     qcvar = qCVaR!(x, p, α).value
-    tvar = TVaR!(-x, p, sqrt(-2log(2) * log(α)))
+    tvar = TVaR!(x, p, sqrt(-2log(2) * log(α)))
     evar = EVaR(x, p, α).value
-    @show x
-    @show p
     @test cvar >= evar >= tvar
     @test qcvar >= evar >= tvar
   end

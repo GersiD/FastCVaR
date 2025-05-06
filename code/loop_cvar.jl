@@ -1,7 +1,7 @@
 using RiskMeasures
 
 function swap!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, i::Int, j::Int)
-  i == j && return # TODO: Test speedup I am curious
+  i == j && return # NOTE: Yes the speedup is worth it just from this one line 4ns faster
   vals[i], vals[j] = vals[j], vals[i]
   p[i], p[j] = p[j], p[i]
 end

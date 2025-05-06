@@ -53,7 +53,7 @@ def plot_means_and_cis(plotter: Plotter, col: str):
     unique_sizes = plotter.df['n'].unique()
     cis, means = plotter.CI[col]
     plt.plot(unique_sizes, means, label=plotter.col2Name[col], marker=plotter.col2Marker[col], color=plotter.col2Color[col]) # pyright: ignore[reportArgumentType]
-    plt.fill_between(unique_sizes, np.array(means) - np.array(cis), np.array(means) + np.array(cis), alpha=0.2)# pyright: ignore[reportArgumentType]
+    plt.fill_between(unique_sizes, np.array(means) - np.array(cis), np.array(means) + np.array(cis), alpha=0.2, color=plotter.col2Color[col])# pyright: ignore[reportArgumentType]
 
 def plot_one_slow_vs_fast(plotter: Plotter, slow: str, fast: str):
     """

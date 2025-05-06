@@ -138,7 +138,6 @@ def plot_cvar_div_qcvar(plotter: Plotter):
     plt.fill_between(unique_sizes, np.array(cvar_div_qcvar_means) - np.array(cvar_div_qcvar_cis), np.array(cvar_div_qcvar_means) + np.array(cvar_div_qcvar_cis), alpha=0.2)# pyright: ignore[reportArgumentType]
     plt.plot(unique_sizes, np.exp(model.predict(X)), label='y = {:.2f} * log(n)'.format(model.coef_[0]))# pyright: ignore[reportArgumentType]
     plt.xlabel('Length of Random Variable (n)')
-    plt.ylabel('Time (ms)')
     plt.legend()
     plt.savefig('./plots/cvar_div_qcvar.pdf')
     # plt.show()

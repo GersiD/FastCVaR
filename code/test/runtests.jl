@@ -78,7 +78,7 @@ using RobustMDPs
   @test VaR(x1, p1, 0.4).value ≈ 1
   @test VaR(x1, p1, 0.4).index ≈ 1
 
-  # x1 = [1, 1, 1] # TODO: The world is not yet read for something this controversial
+  # x1 = [1, 1, 1] # INFO: The world is not yet read for something this controversial
   # p1 = [0.0, 1.0, 0.0]
   # @test qql!(x1, p1, 0.5).value ≈ 1
   # @test VaR(x1, p1, 0.5).value ≈ 1
@@ -196,7 +196,7 @@ end
     @test worstcase_l1(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
     @test worstcase_l1_gurobi(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
   end
-  # x1 = [-1.0, -1.0, -1.0] # TODO: Maybe one day
+  # x1 = [-1.0, -1.0, -1.0] # INFO: Maybe one day
   # p1 = [0.0, 1.0, 0.0]
   # β = 0.2
   # @test worstcase_l1(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
@@ -238,5 +238,5 @@ end
 #   @test worstcase_l1_weighted_gurobi(x, probs, α, ones(5))[2] ≈ worstcase_l1_w(x, probs, ones(5), α)[2]
 #   w = abs.(rand(5))
 #   w = w / sum(w)
-#   @test worstcase_l1_weighted_gurobi(x, probs, α, w)[2] ≈ worstcase_l1_w(x, probs, w, α)[2] # TODO: write the real unit test use HIghs
+#   @test worstcase_l1_weighted_gurobi(x, probs, α, w)[2] ≈ worstcase_l1_w(x, probs, w, α)[2] 
 # end

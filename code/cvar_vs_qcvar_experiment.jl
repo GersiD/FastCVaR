@@ -80,16 +80,6 @@ function p_gen_func(dist)
 end
 
 # @threads :dynamic for i ∈ 1:len
-# TODO: add var and tvar speedup
-# TODO: Other domain? 
-#   -- nested risk?
-#   -- SA robust?
-#   -- Portfolio optimization?
-#   -- What case would fast cvar matter
-#   -- different distributions for p
-#     -- uniform
-#     -- sparse = pick log(n) random indices and set to 1 normalize
-# -- 6 plots for each of the tvar cvar var
 println("Starting experiments")
 # for dist in ["uniform", "sparse"]
 for dist in ["uniform", "sparse"]

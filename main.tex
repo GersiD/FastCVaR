@@ -67,7 +67,7 @@
 \maketitle
 
 \begin{abstract}
-Monetary risk measures have gained popularity in expressing decision-makers' preferences for risk aversion. Value-at-Risk (VaR) and Conditional-Value-at-Risk are very common risk measures. This paper proposes novel algorithms for computing these risk measures for discrete distributions in linear time. Our algorithms improve on existing algorithms---which must sort the random variable---by at least a logarithmic factor. Our algorithms adapt the quickselect algorithm and combine it with a general polymatroid representation of $\varphi$-divergence risk measures. The numerical results show that our new algorithms offer an order of magnitude speed up for large domains and a library implementation of the algorithms is available at \textcolor{green}{REDACTED}.     
+Monetary risk measures have gained popularity in expressing decision-makers' preferences for risk aversion. Value-at-Risk (VaR) and Conditional-Value-at-Risk are very common risk measures. This paper proposes novel algorithms for computing these risk measures for discrete distributions in linear time. Our algorithms improve existing algorithms, which must sort the random variable by at least a logarithmic factor. Our algorithms adapt the quickselect algorithm and combine it with a general polymatroid representation of $\varphi$-divergence risk measures. The numerical results show that our new algorithms offer an order of magnitude speedup for large domains, and a library implementation of the algorithms is available at \textcolor{green}{REDACTED}.     
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
@@ -472,19 +472,41 @@ The optimal solution will always be $f(S_i + 1) - f(S_{i})$, where $S_i$ is the 
   \]
 \end{lemma}
 \begin{proof}
-  Due to the set of constraints, we know that $f(\mathcal{O})$ must be $\leq \frac{\mathbb{P}[\mathcal{O}]}{\alpha}$ and $f(\mathcal{O})$ must be $\leq 1$. Furthermore, we can construct $q$ such that $q(\mathcal{O}) =\min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\} $ for any $\mathcal{O}$.
-  \todo{How can $q$ be constructed?, What does this mean proof wise? This statement seems out of place.}
-\item[Case 1]: $P(\mathcal{O}) \geq \alpha$. In this scenario, $Q(\mathcal{O})$ = 1 since $\frac{1}{\alpha} P(\mathcal{O}) > 1 $. Thus, every element in $\mathcal{O}$ should be scaled by $\frac{1}{P(\mathcal{O})}$ and all other elements should be set to 0 . Since  $P(\mathcal{O}) \geq \alpha$, we can imply the reciprocal $\frac{1}{P(\mathcal{O})} \leq \frac{1}{1-\alpha}$ is also true. \todo{wait where did the $1-\alpha$ come from?}
+  Due to the set of constraints, we know that $f(\mathcal{O})$ must be $\leq \frac{\mathbb{P}[\mathcal{O}]}{\alpha}$ and $f(\mathcal{O})$ must be $\leq 1$. Furthermore, as we show below, we can construct $q$ such that $q(\mathcal{O}) =\min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\} $ for any $\mathcal{O}$.
+  
+\item[Case 1]: $P(\mathcal{O}) \geq \alpha$. In this scenario, $Q(\mathcal{O})$ = 1 since $\frac{1}{\alpha} P(\mathcal{O}) > 1 $. Thus, every element in $\mathcal{O}$ should be scaled by $\frac{1}{P(\mathcal{O})}$ and all other elements should be set to 0 . Since  $P(\mathcal{O}) \geq \alpha$, we can imply the reciprocal $\frac{1}{P(\mathcal{O})} \leq \frac{1}{\alpha}$ is also true. 
 
-\item[Case 2]: $P(\mathcal{O}) < \alpha$. In this scenario, $Q(\mathcal{O}) \leq \frac{1}{1 - \alpha} \cdot  P(\mathcal{O}) < 1$ \todo{why}. Then any given $\mathcal{O}$, we can construct $Q(\mathcal{O}) = \frac{1}{\alpha} \cdot  P(\mathcal{O})$. 
+\item[Case 2]: $P(\mathcal{O}) < \alpha$. In this scenario, $Q(\mathcal{O}) \leq \frac{1}{\alpha} \cdot  P(\mathcal{O}) < 1$ \todo{why}. Then any given $\mathcal{O}$, we can construct $Q(\mathcal{O}) = \frac{1}{\alpha} \cdot  P(\mathcal{O})$. 
   This can be done by setting every element in $\mathcal{O}$ to $\frac{1}{\alpha} \cdot P(\omega)$ for all $\omega$ in $\Omega$ and $P(\omega) \cdot  d$ otherwise such that $\frac{1}{1 - \alpha} * P(\Omega) + d*P(B) = 1$, where $B$ contains all elements not in $\Omega$\todo{use complement notation}. Provided that $d \leq \frac{1}{\alpha}$, which is required for the constructed $Q$ to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{\alpha} \ge 1$. Since $P(\Omega) + P(B) = 1$,  $d \le 1$ in order for $\frac{1}{\alpha} \cdot  P(\Omega) + d\cdot P(B) = 1$ to hold. Since $1 \leq \frac{1}{\alpha}$, this implies $d \le \frac{1}{\alpha}$.
+  We have now shown that $Q(\Omega) \leq f(\mathcal{O}) = \min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\}$ and it is possible to construct $Q(\Omega)$ such that $Q(\Omega) = \min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\}$. Thus by Remark 4.90 in Follmer and Schied, $f(\mathcal{O}) = \min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\}$
 \end{proof}
-We have now shown that $Q(\Omega) \leq f(\mathcal{O}) = \min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\}$ and it is possible to construct $Q(\Omega)$ such that $Q(\Omega) = \min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\}$. Thus by Remark 4.90 in Follmer and Schied, $f(\mathcal{O}) = \min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\}$ \todo{it seems like the above statement should go in the proof}
 
 
 \subsection{TVaR}
-From previous work, we know that $D(p\|q) \leq \frac{1}{2 \log(2)} \, \|p - q\|_1^2$ \todo{cite prev work}. Thus, the coherent risk measure TVaR with the divergence constraint $\|p - q\|_1 \leq \sqrt{2 \log(2) *-\log(\alpha)}$ \todo{why} must be $\leq EVaR_\alpha[p]$ \mm{what is $p$ and why is the here?}. Submodular function is $Q(\omega) = \min\left\{\beta/2 + P(\omega), 1\right\}$ \todo{how do we know}.
 
+From previous work, we know that $D(p\|q) \leq \frac{1}{2 \log(2)} \, \|p - q\|_1^2$ \todo{cite prev work}. Thus, by algebraic manipulation it can be seen that the coherent risk measure TVaR with the divergence constraint $\|p - q\|_1 \leq \sqrt{2 \log(2) *-\log(\alpha)}$  must be $\leq EVaR_\alpha[p]$ \mm{what is $p$ and why is the here?}.
+\begin{lemma}
+  For $\mathcal{O} \subseteq \Omega$, define $f\colon 2^{\Omega} \to \Real_+$:
+  \[
+    f(\mathcal{O}) = \min\left\{\mathbb{P}[\mathcal{O}] + \frac{\beta}{2}, 1\right\}
+    .
+  \], where $\beta$ represent the divergence constraint.
+  Then \[
+  \tvar{\alpha }{\tilde{x} } = \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}.
+  \]
+\end{lemma}
+\begin{proof}
+  Due to the set of constraints, we know that $f(\mathcal{O})$ must be $\leq {\mathbb{P}[\mathcal{O}]} + \frac{\beta}{2}$ as if $f(\mathcal{O}) \geq \frac{\beta}{2} +  {\mathbb{P}[\mathcal{O}]} $ , then $f(\mathcal{\not\subset\mathcal{O}})$ must be $< \mathbb{P}[\mathcal{O}] - \frac{\beta}{2}$ in order for the sum constraint of the simplex to equal 1, thus violating the l1 Norm constraint. . Furthermore, as we show below, we can construct $q$ such that  for any $\mathcal{O}$,   \[
+    f(\mathcal{O}) = \min\left\{\mathbb{P}[\mathcal{O}] + \frac{\beta}{2}, 1\right\}
+    .
+  \].
+  
+\item[Case 1]: $P(\mathcal{O}) \geq frac{\beta}{2}$. In this scenario, we pick an element in $\mathcal{O}$ and add $1 - P(\mathcal{O})$ to it. We set all elements not in $\mathcal{O}$ to 0.
+
+\item[Case 2]: $P(\mathcal{O}) < \alpha$. In this scenario, $Q(\mathcal{O}) \leq \frac{1}{\alpha} \cdot  P(\mathcal{O}) < 1$ \todo{why}. Then any given $\mathcal{O}$, we can construct $Q(\mathcal{O}) = \frac{1}{\alpha} \cdot  P(\mathcal{O})$. 
+  This can be done by setting every element in $\mathcal{O}$ to $\frac{1}{\alpha} \cdot P(\omega)$ for all $\omega$ in $\Omega$ and $P(\omega) \cdot  d$ otherwise such that $\frac{1}{1 - \alpha} * P(\Omega) + d*P(B) = 1$, where $B$ contains all elements not in $\Omega$\todo{use complement notation}. Provided that $d \leq \frac{1}{\alpha}$, which is required for the constructed $Q$ to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{\alpha} \ge 1$. Since $P(\Omega) + P(B) = 1$,  $d \le 1$ in order for $\frac{1}{\alpha} \cdot  P(\Omega) + d\cdot P(B) = 1$ to hold. Since $1 \leq \frac{1}{\alpha}$, this implies $d \le \frac{1}{\alpha}$.
+  We have now shown that $Q(\Omega) \leq f(\mathcal{O}) = \min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\}$ and it is possible to construct $Q(\Omega)$ such that $Q(\Omega) = \min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\}$. Thus by Remark 4.90 in Follmer and Schied, $f(\mathcal{O}) = \min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\}$
+\end{proof}
 
 \section{Experiments}\label{sec:experiments}
 

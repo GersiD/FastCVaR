@@ -627,9 +627,9 @@ Now, suppose that \cref{alg:slow-quantile} terminates with value $q\opt$. Then, 
   \Input{Random variable $\bm{x} \in \Real^n$ with probability mass function $\bm{p} \in \Delta^n$, pivot $i\in \Nats$, and front and back indices $f, b \in \Nats$}
   \Output{indices $s$, $t$ and $\bm{x}$ and $\bm{p}$ such that $j \in b{:}s \implies x_j < x_i$, and $j \in t{:}e \implies x_j > x_i$}
   % $i \gets f + \lceil\frac{b-f}{2}\rceil$ \tcp*{Pivot: Median-of-medians for $O(b-f)$ runtime}
-  $l \gets f$ \tcp*{less: $j\in f{:}l \implies x_j < x_i$}
-  $e \gets f$ \tcp*{equal: $j \in l{:}e \implies x_j = x_i$ }
-  $g \gets b$ \tcp*{greater: $j \in g{:}b \implies x_j > x_i$}
+  $l \gets f$ \tcp*{invariant: less: $j\in f{:}(l-1) \implies x_j < x_i$}
+  $e \gets f$ \tcp*{invariant: equal: $j \in l{:}e \implies x_j = x_i$ }
+  $g \gets b$ \tcp*{invariant: greater: $j \in (g+1){:}b \implies x_j > x_i$}
   \While{$e \leq g$}
   {
     \If{$x_e < x_i$}
@@ -641,8 +641,8 @@ Now, suppose that \cref{alg:slow-quantile} terminates with value $q\opt$. Then, 
     }
     \ElseIf{$x_e > x_i$} {
       swap: $x_e\leftrightarrow x_g$ and $p_e \leftrightarrow p_g$\;
-      \tcp{the $x_j$ invariant holds here}
       $g \gets g - 1$\;
+      \tcp{the $x_j$ invariant holds here}
     }
     \lElse {$e \gets e + 1$}
   }

@@ -616,7 +616,7 @@ The base case is immediate. The inductive case for $i-1$ from $i$ follows by alg
  = \P{\tilde{x} = x_{k_{i-1}}} + \P{\tilde{x} \ge x_{k_{i}}} \\
  &= \P{\tilde{x} = x_{k_{i-1}}} + q_i = \sum_{l=j}^{i-1} q_{k_j} + q_{k_i} = q_{k_{i-1}}.
 \end{align*}
-Now, suppose that \cref{alg:slow-quantile} terminates with value $q\opt$. Then, if the algorithm terminates in iteration $i\opt$ then from \eqref{eq:proof-q-j}, we have that $\P{\tilde{x} \ge q\opt} = q_{j\opt} \ge 1-\alpha$ where $j\opt$ is defined as in \eqref{eq:proof-q-j}. Therefore, $q\opt \le \var{\alpha}{\tilde{x}}$. To prove the converse inequality, suppose that $q\opt > \var{\alpha}{\tilde{x}}$, and therefore $\P{\tilde{x} \ge q\opt} < 1-\alpha$. Then, this a contradition since \eqref{eq:proof-q-j} combined with the termination criterion implies that $\P{\tilde{x} \ge q\opt} < 1-\alpha$.
+Now, suppose that \cref{alg:slow-quantile} terminates with value $q\opt$. Then, if the algorithm terminates in iteration $i\opt$ then from \eqref{eq:proof-q-j}, we have that $\P{\tilde{x} \ge q\opt} = q_{j\opt} \ge 1-\alpha$ where $j\opt$ is defined as in \eqref{eq:proof-q-j}. Therefore, $q\opt \le \var{\alpha}{\tilde{x}}$. To prove the converse inequality, suppose that $q\opt > \var{\alpha}{\tilde{x}}$, and therefore $\P{\tilde{x} \ge q\opt} < 1-\alpha$. Then, this is a violation since \eqref{eq:proof-q-j} combined with the termination criterion implies that $\P{\tilde{x} \ge q\opt} < 1-\alpha$.
 \end{proof}
 
 \subsection{Partition Algorithm}

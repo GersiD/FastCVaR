@@ -278,7 +278,7 @@ During the first loop: Every element in $x$ has an index $i$ such that $ front \
  
 During the loop: \todo{why are there only 5 cases} There are five possible scenarios at each iteration:
  
-\item[Case 1]: At given iteration, pivot is selected such that $\alpha < t_k$ and $b_k$ is set to $i_k$ such that $b_k > f_k$. Assume there exists $\tau\opt $ such that $\tau\opt > x[i_k]$, and $x[\tau\opt]=\quant^+$. Then $P[x < x[\tau\opt]] \geq t_k > \alpha$, which means that $x[\tau\opt]$ is not feasible with \eqref{eq:var-definition}.
+\item[Case 1]: At given iteration, ivot is selected such that $\alpha_k < t_k$ and $b_k$ is set to $i_k$ such that $b_k > f_k$. Assume there exists $\tau\opt $ such that $\tau\opt > x[i_k]$, and $x[\tau\opt]=\quant^+$. Then $P[x < x[\tau\opt]] \geq t_k > \alpha$, which means that $x[\tau\opt]$ is not feasible with \eqref{eq:var-definition}.
 
 
 \item[Case 2]: At given iteration, pivot is selected such that $\alpha < t_k$ and $b_k$ is set to $i_k$ such that $b_k = f_k$. Assume there exists $\tau\opt $ such that $\tau\opt > x[i_k]$, and $x[\tau\opt]=\quant^+$. Then $P[x < x[\tau\opt]] \geq t_k > \alpha$, which means that $x[\tau\opt]$ is not feasible with \eqref{eq:var-definition}. The algorithm terminates after this iteration. \todo{how can we terminate if its not feasible?]}

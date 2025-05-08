@@ -35,7 +35,8 @@ function partition!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, f::
     end
     # @show lt, eq, gt
   end
-  return (lt=lt - 1, gt=gt)
+  @assert vals[gt] == pivot_val
+  return (lt=lt, gt=gt - 1)
 end
 
 
@@ -49,14 +50,13 @@ function qql!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, α::Real)
   i = 1
   j = length(vals)
   gt = 1
-  # @show i, j
   @inbounds while j - i >= 1
     ind, gt = partition!(vals, p, i, j)
-    tail::Float64 = sum(view(p, i:ind))
-    α ≤ tail ? begin
-      j = ind
+    tail::Float64 = sum(view(p, i:gt))
+    α < tail ? begin
+      j = gt
     end : begin
-      i = gt
+      i = gt + 1
       α -= tail
     end # Cut off half of the random variable
   end

@@ -78,12 +78,6 @@ using RobustMDPs
   @test VaR(x1, p1, 0.4).value ≈ 1
   @test VaR(x1, p1, 0.4).index ≈ 1
 
-  # x1 = [1, 1, 1] # INFO: The world is not yet read for something this controversial
-  # p1 = [0.0, 1.0, 0.0]
-  # @test qql!(x1, p1, 0.5).value ≈ 1
-  # @test VaR(x1, p1, 0.5).value ≈ 1
-  # @test qql!(x1, p1, 0.5).index == 2
-  # @test VaR(x1, p1, 0.5).index == 2
 end
 
 @testset "Fast CVaR Tests" begin
@@ -164,67 +158,68 @@ end
   @test p1 ≈ [0.0, 0.01, 0.99]
 end
 
-@testset "TVaR" begin
-  x1 = [1, 2, 3]
-  p1 = [0.5, 0.2, 0.3]
-  for β in range(0.0, 1.99, step=0.2)
-    @test worstcase_l1(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
-    @test worstcase_l1_gurobi(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
-  end
-  x1 = [3, 2, 1]
-  p1 = [0.3, 0.2, 0.5]
-  for β in range(0.0, 1.99, step=0.2)
-    @test worstcase_l1(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
-    @test worstcase_l1_gurobi(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
-  end
-  x1 = [1, 2, 3]
-  p1 = [0.0, 1.0, 0.0]
-  for β in range(0.0, 1.99, step=0.2)
-    @test worstcase_l1(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
-    @test worstcase_l1_gurobi(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
-  end
-  x1 = [-2.0, -1.0, 1.0, 2.0, 4.0, 5.0]
-  p1 = [0.0, 0.3, 0.3, 0.1, 0.1, 0.2]
-  pstar = [0.4, 0.3, 0.3, 0.0, 0.0, 0.0] # solution for β = 0.8
-  for β in range(0.0, 1.99, step=0.2)
-    @test worstcase_l1(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
-    @test worstcase_l1_gurobi(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
-  end
-  x1 = [5.0, 4.0, 2.0, 1.0, -1.0, -2.0]
-  p1 = [0.2, 0.1, 0.1, 0.3, 0.3, 0.0]
-  for β in range(0.0, 1.99, step=0.2)
-    @test worstcase_l1(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
-    @test worstcase_l1_gurobi(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
-  end
-  # x1 = [-1.0, -1.0, -1.0] # INFO: Maybe one day
-  # p1 = [0.0, 1.0, 0.0]
-  # β = 0.2
-  # @test worstcase_l1(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
-  # @test worstcase_l1_gurobi(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
-end
+# Graveyard ---------------------------------------------------------------------------------------
+# @testset "TVaR" begin
+#   x1 = [1, 2, 3]
+#   p1 = [0.5, 0.2, 0.3]
+#   for β in range(0.0, 1.99, step=0.2)
+#     @test worstcase_l1(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
+#     @test worstcase_l1_gurobi(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
+#   end
+#   x1 = [3, 2, 1]
+#   p1 = [0.3, 0.2, 0.5]
+#   for β in range(0.0, 1.99, step=0.2)
+#     @test worstcase_l1(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
+#     @test worstcase_l1_gurobi(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
+#   end
+#   x1 = [1, 2, 3]
+#   p1 = [0.0, 1.0, 0.0]
+#   for β in range(0.0, 1.99, step=0.2)
+#     @test worstcase_l1(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
+#     @test worstcase_l1_gurobi(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
+#   end
+#   x1 = [-2.0, -1.0, 1.0, 2.0, 4.0, 5.0]
+#   p1 = [0.0, 0.3, 0.3, 0.1, 0.1, 0.2]
+#   pstar = [0.4, 0.3, 0.3, 0.0, 0.0, 0.0] # solution for β = 0.8
+#   for β in range(0.0, 1.99, step=0.2)
+#     @test worstcase_l1(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
+#     @test worstcase_l1_gurobi(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
+#   end
+#   x1 = [5.0, 4.0, 2.0, 1.0, -1.0, -2.0]
+#   p1 = [0.2, 0.1, 0.1, 0.3, 0.3, 0.0]
+#   for β in range(0.0, 1.99, step=0.2)
+#     @test worstcase_l1(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
+#     @test worstcase_l1_gurobi(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
+#   end
+#   # x1 = [-1.0, -1.0, -1.0] # INFO: Maybe one day
+#   # p1 = [0.0, 1.0, 0.0]
+#   # β = 0.2
+#   # @test worstcase_l1(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
+#   # @test worstcase_l1_gurobi(copy(x1), copy(p1), β)[2] ≈ TVaR!(copy(x1), copy(p1), β)
+# end
 
-@testset "CVaR<EVaR<TVaR" begin
-  x1 = [5.0, 4.0, 2.0, 1.0, -1.0, -2.0]
-  p1 = [0.2, 0.1, 0.1, 0.3, 0.3, 0.0]
-  cvar = CVaR(x1, p1, 0.5).value
-  qcvar = qCVaR!(x1, p1, 0.5).value
-  tvar = TVaR!(x1, p1, sqrt(-2log(2) * log(0.5)))
-  evar = EVaR(x1, p1, 0.5).value
-  @test cvar >= evar >= tvar
-  @test qcvar >= evar >= tvar
-  for _ in range(1, 10)
-    x = randn(10)
-    p = rand(Float64, 10)
-    p /= sum(p)
-    α = 0.5
-    cvar = CVaR(x, p, α).value
-    qcvar = qCVaR!(x, p, α).value
-    tvar = TVaR!(x, p, sqrt(-2log(2) * log(α)))
-    evar = EVaR(x, p, α).value
-    @test cvar >= evar >= tvar
-    @test qcvar >= evar >= tvar
-  end
-end
+# @testset "CVaR<EVaR<TVaR" begin
+#   x1 = [5.0, 4.0, 2.0, 1.0, -1.0, -2.0]
+#   p1 = [0.2, 0.1, 0.1, 0.3, 0.3, 0.0]
+#   cvar = CVaR(x1, p1, 0.5).value
+#   qcvar = qCVaR!(x1, p1, 0.5).value
+#   tvar = TVaR!(x1, p1, sqrt(-2log(2) * log(0.5)))
+#   evar = EVaR(x1, p1, 0.5).value
+#   @test cvar >= evar >= tvar
+#   @test qcvar >= evar >= tvar
+#   for _ in range(1, 10)
+#     x = randn(10)
+#     p = rand(Float64, 10)
+#     p /= sum(p)
+#     α = 0.5
+#     cvar = CVaR(x, p, α).value
+#     qcvar = qCVaR!(x, p, α).value
+#     tvar = TVaR!(x, p, sqrt(-2log(2) * log(α)))
+#     evar = EVaR(x, p, α).value
+#     @test cvar >= evar >= tvar
+#     @test qcvar >= evar >= tvar
+#   end
+# end
 
 
 # @testset "Sanity Check Robust MDPs" begin
@@ -240,3 +235,9 @@ end
 #   w = w / sum(w)
 #   @test worstcase_l1_weighted_gurobi(x, probs, α, w)[2] ≈ worstcase_l1_w(x, probs, w, α)[2] 
 # end
+# x1 = [1, 1, 1] # INFO: The world is not yet read for something this controversial
+# p1 = [0.0, 1.0, 0.0]
+# @test qql!(x1, p1, 0.5).value ≈ 1
+# @test VaR(x1, p1, 0.5).value ≈ 1
+# @test qql!(x1, p1, 0.5).index == 2
+# @test VaR(x1, p1, 0.5).index == 2

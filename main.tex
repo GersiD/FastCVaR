@@ -204,14 +204,15 @@ Our QVaR algorithm is described in \cref{alg:quick-quantile}. The algorithm work
   \caption{QVaR: Linear-time algorithm for VaR}\label{alg:quick-quantile}
   \Input{vector $\bm{x}$, pmf $\bm{p}$ and $\alpha \in (0,1)$}
   \Output{$\alpha$-quantile of $\tilde{x}$}
-  $f_0 \gets 1$, $b_0 \gets n$, $\bm{x}^0 = \bm{x}$, $\bm{p}^0 = \bm{p}$, $k=1$, $\alpha_0 = \alpha$ \;
-  \While{$b_k - f_k \geq 1$} {
-     $i' \gets f + \lceil\frac{b-f}{2}\rceil$ \tcp*{Pivot: Median-of-medians for $O(b-f)$ runtime}
-      $\_, g_k, \bm{x}^k, \bm{p}^k \gets \operatorname{partition}(\bm{x}^{k-1}, \bm{p}^{k-1}, i', f_{k-1}, b_{k-1})$
+  $f_0 \gets 1$, $b_0 \gets n$, $\bm{x}^0 = \bm{x}$, $\bm{p}^0 = \bm{p}$, $\alpha_0 = \alpha$, $k=1$ \;
+  \While{$b_{k-1} - f_{k-1} \geq 1$} {
+     $i' \gets f_{k-1} + \lceil\frac{b_{k-1}-f_{k-1}}{2}\rceil$ \tcp*{Pivot: Median-of-medians for $O(b-f)$ runtime}
+     $\_, g_k, \bm{x}^k, \bm{p}^k \gets \operatorname{partition}(\bm{x}^{k-1}, \bm{p}^{k-1}, i', f_{k-1}, b_{k-1})$
     \tcp*{Alg.~\ref{alg:partition}, \cref{lem:hoare-partition}}
+    
     $t_k \gets \sum_{j=f_{k-1}}^{g_k} p^k_j$ \;
-    \lIf{$\alpha_k < t_k$} {$b_k \gets g_k$, $\alpha_k \gets \alpha_{k-1}$}
-    \lElse {$f_k \gets g_k + 1$, $\alpha_k \gets \alpha_{k-1} - t_k$}
+    \lIf{$\alpha_{k-1} < t_k$} {$f_k \gets f_{k-1}$, $b_k \gets g_k$, $\alpha_k \gets \alpha_{k-1}$}
+    \lElse {$f_k \gets g_k + 1$, $b_k \gets b_{k-1}$, $\alpha_k \gets \alpha_{k-1} - t_k$}
     $k \gets k + 1$\; 
   }
   \KwRet{$x^k_{b_k}$}\;    
@@ -222,7 +223,7 @@ Our QVaR algorithm is described in \cref{alg:quick-quantile}. The algorithm work
 Suppose that $(l, g, \bm{x}, \bm{p}) \gets \operatorname{partition}(\bm{x'}, \bm{p'}, i, f, b)$ for some $\bm{x}'\in \Real^n, \bm{p}'\in \Delta^n$ and $f, b\in \Nats, f < b$ is computed using \cref{alg:partition}. Then:
 \begin{align*}
    j\in f{:}(l-1) &\quad\implies \quad x_j < x_i', \\
-   j \in f{:}g &\quad\implies \quad x_j = x_i', \\
+   j \in l{:}g &\quad\implies \quad x_j = x_i', \\
    j \in (g+1){:}b &\quad\implies \quad x_j > x_i'.
 \end{align*}
 \mm{And state the fact that the new $p$ values correspond to the $x$ values.}  Moreover, the algorithm runs in $O(b - f)$ time.
@@ -278,17 +279,17 @@ During the first loop: Every element in $x$ has an index $i$ such that $ front \
  
 During the loop: \todo{why are there only 5 cases} There are five possible scenarios at each iteration:
  
-\item[Case 1]: $\alpha_k < t_k$ and $b_k$ set to $i_k$ such that $b_k > f_k$. Assume there exists $\tau\opt $ such that $\tau\opt > x[i_k]$, and $x[\tau\opt]=\quant^+$. Then $P[x < x[\tau\opt]] \geq t_k > \alpha$, which means that $x[\tau\opt]$ is not feasible with \eqref{eq:var-definition}.
+\item[Case 1]: $\alpha_k < t_k$ and $b_k$ set to $g_k$ such that $b_k > f_k$. Assume there exists $\tau\opt $ such that $\tau\opt > x[g_k]$, and $x[\tau\opt]=\quant^+$. Then $P[x < x[\tau\opt]] \geq t_k > \alpha$, which means that $x[\tau\opt]$ is not feasible with \eqref{eq:var-definition}.
 
 
-\item[Case 2]:  $\alpha_k < t_k$ and $b_k$ set to $i_k$, such that $b_k = f_k$. Assume there exists $\tau\opt $ such that $\tau\opt > x[i_k]$, and $x[\tau\opt]=\quant^+$. Then $P[x < x[\tau\opt]] \geq t_k > \alpha$, which means that $x[\tau\opt]$ is not feasible with \eqref{eq:var-definition}. The algorithm terminates after this iteration. \todo{how can we terminate if its not feasible?]}
+\item[Case 2]:  $\alpha_k < t_k$ and $b_k$ set to $g_k$, such that $b_k = f_k$. Assume there exists $\tau\opt $ such that $\tau\opt > x[g_k]$, and $x[\tau\opt]=\quant^+$. Then $P[x < x[\tau\opt]] \geq t_k > \alpha$, which means that $x[\tau\opt]$ is not feasible with \eqref{eq:var-definition}. The algorithm terminates after this iteration. \todo{how can we terminate if its not feasible?]}
 
-\item[Case 3]: $\alpha \geq t_k$, $f_k$ is set to $i_k + 1$ such that $f_k < b_k$. Assume there exists $\tau\opt $ such that $\tau\opt \leq x[i_k] $, and $x[\tau\opt]=\quant^+$. Let $\tau' = i_k$. $P[x < x[\tau']] \leq tail < \alpha$. If $x[\tau\opt] <  x[\tau']$ then $x[\tau\opt]$ can not be optimal by \eqref{eq:var-definition}. Thus, $\quant_{\alpha}^+(\tilde{x}) \geq x^f_{i_k} $ and $\quant_{\alpha}^+(\tilde{x}) \leq x^b_{i_k}$ and loop invariant is satisfied. 
+\item[Case 3]: $\alpha \geq t_k$, $f_k$ is set to $g_k + 1$ such that $f_k < b_k$. Assume there exists $\tau\opt $ such that $\tau\opt \leq x[g_k] $, and $x[\tau\opt]=\quant^+$. Let $\tau' = g_k$. $P[x < x[\tau']] \leq tail < \alpha$. If $x[\tau\opt] <  x[\tau']$ then $x[\tau\opt]$ can not be optimal by \eqref{eq:var-definition}. Thus, $\quant_{\alpha}^+(\tilde{x}) \geq x^f_{g_k} $ and $\quant_{\alpha}^+(\tilde{x}) \leq x^b_{g_k}$ and loop invariant is satisfied. 
  
 \item[Case 4]: $\alpha \geq t_k$. In this case \todo{why} assume $f_k$ is set to $ind + 1$ such that $f_k = b_k$. 
  All the elements are no longer in the range $[f_k, b_k]$ could not have been $\quant_{\alpha}^+(\tilde{x})$ (see Case 1 and Case 2), and $\quant_{\alpha}^+(\tilde{x})$ must exist in $x$ per Lemma~1 \mm{do NOT hardcode}. Thus, $\quant_{\alpha}^+(\tilde{x}) = b_k$ and loop invariant is satisfied. The algorithm terminates at this condition. 
 
-\item[Case 5]: Tail is selected such that $\alpha \geq t_k$. In this case assume that $f_k$ is set to $i_k + 1$ such that $f_k > b_k$. Thus $b_k = i_k$. From case 1, we know any $\tau\opt $ larger than $b_k$ is not feasible and since $b_k = i_k$, $P[x < x[b_k]] \leq \alpha$. Since all feasible elements are $\leq b_k$, $b_k$ is optimal by \eqref{eq:var-definition}. 
+\item[Case 5]: Tail is selected such that $\alpha \geq t_k$. In this case assume that $f_k$ is set to $g_k + 1$ such that $f_k > b_k$. Thus $b_k = g_k$. From case 1, we know any $\tau\opt $ larger than $b_k$ is not feasible and since $b_k = g_k$, $P[x < x[b_k]] \leq \alpha$. Since all feasible elements are $\leq b_k$, $b_k$ is optimal by \eqref{eq:var-definition}. 
   \todo{we should reference lines in the algorithm \cref{alg:quick-quantile} to make this proof easier to follow.}
  \end{proof}
 
@@ -626,7 +627,7 @@ Now, suppose that \cref{alg:slow-quantile} terminates with value $q\opt$. Then, 
   \caption{\texttt{partition}: Dutch national flag algorithm ~\cite[chapter 14]{Dijkstra1976}}
   \label{alg:partition}
   \Input{Random variable $\bm{x} \in \Real^n$ with probability mass function $\bm{p} \in \Delta^n$, pivot $i\in \Nats$, and front and back indices $f, b \in \Nats$}
-  \Output{indices $s$, $t$ and $\bm{x}$ and $\bm{p}$ such that $j \in b{:}s \implies x_j < x_i$, and $j \in t{:}e \implies x_j > x_i$}
+  \Output{indices $l$, $g$ and $\bm{x}$ and $\bm{p}$ such that $j \in b{:}(l-1) \implies x_j < x_i$, and $j \in (g+1){:}e \implies x_j > x_i$}
   % $i \gets f + \lceil\frac{b-f}{2}\rceil$ \tcp*{Pivot: Median-of-medians for $O(b-f)$ runtime}
   $l \gets f$ \tcp*{invariant: less: $j\in f{:}(l-1) \implies x_j < x_i$}
   $e \gets f$ \tcp*{invariant: equal: $j \in l{:}e \implies x_j = x_i$ }

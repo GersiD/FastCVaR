@@ -278,10 +278,10 @@ During the first loop: Every element in $x$ has an index $i$ such that $ front \
  
 During the loop: \todo{why are there only 5 cases} There are five possible scenarios at each iteration:
  
-\item[Case 1]: The tail is selected such that $\alpha < t_k$. In this case $b_k$ is set to $i_k$ such that $b_k > f_k$. Assume there exists $\tau\opt $ such that $\tau\opt > x[i_k]$, and $x[\tau\opt]=\quant^+$. Then $P[x < x[\tau\opt]] \geq t_k > \alpha$, which means that $x[\tau\opt]$ is not feasible with \eqref{eq:var-definition}.
+\item[Case 1]: At given iteration, pivot is selected such that $\alpha < t_k$ and $b_k$ is set to $i_k$ such that $b_k > f_k$. Assume there exists $\tau\opt $ such that $\tau\opt > x[i_k]$, and $x[\tau\opt]=\quant^+$. Then $P[x < x[\tau\opt]] \geq t_k > \alpha$, which means that $x[\tau\opt]$ is not feasible with \eqref{eq:var-definition}.
 
 
-\item[Case 2]: The tail is selected such that $\alpha < t_k$. In this case $b_k$ is set to $i_k$ such that $b_k = f_k$. Assume there exists $\tau\opt $ such that $\tau\opt > x[i_k]$, and $x[\tau\opt]=\quant^+$. Then $P[x < x[\tau\opt]] \geq t_k > \alpha$, which means that $x[\tau\opt]$ is not feasible with \eqref{eq:var-definition}. The algorithm terminates after this iteration. \todo{how can we terminate if its not feasible?]}
+\item[Case 2]: At given iteration, pivot is selected such that $\alpha < t_k$ and $b_k$ is set to $i_k$ such that $b_k = f_k$. Assume there exists $\tau\opt $ such that $\tau\opt > x[i_k]$, and $x[\tau\opt]=\quant^+$. Then $P[x < x[\tau\opt]] \geq t_k > \alpha$, which means that $x[\tau\opt]$ is not feasible with \eqref{eq:var-definition}. The algorithm terminates after this iteration. \todo{how can we terminate if its not feasible?]}
 
 \item[Case 3]: Tail is selected such that $\alpha \geq t_k$. In this case $f_k$ is set to $i_k + 1$ such that $f_k < b_k$. Assume there exists $\tau\opt $ such that $\tau\opt \leq x[i_k] $, and $x[\tau\opt]=\quant^+$. Let $\tau' = i_k$. $P[x < x[\tau']] \leq tail < \alpha$. If $x[\tau\opt] <  x[\tau']$ then $x[\tau\opt]$ can not be optimal by \eqref{eq:var-definition}. Thus, $\quant_{\alpha}^+(\tilde{x}) \geq x^f_{i_k} $ and $\quant_{\alpha}^+(\tilde{x}) \leq x^b_{i_k}$ and loop invariant is satisfied. 
  

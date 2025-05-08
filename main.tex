@@ -45,18 +45,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % THEOREMS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% \theoremstyle{plain}
-% \newtheorem{theorem}{Theorem}[section]
-% \newtheorem{proposition}[theorem]{Proposition}
-% \newtheorem{lemma}[theorem]{Lemma}
-% \newtheorem{corollary}[theorem]{Corollary}
-% \theoremstyle{definition}
-% \newtheorem{definition}[theorem]{Definition}
-% \newtheorem{assumption}[theorem]{Assumption}
-% \theoremstyle{remark}
-% \newtheorem{remark}{Remark}
-% \newtheorem{example}{Example}
-
 
 \title{No sort: Computing VaR and Coherent Comonotonic Risk Measures in Linear Time}% and $\varphi$-divergence Risk Measures}
 %\author{Palash Agrawal, Gersi Doko, Maeve Burwell, Marek Petrik}
@@ -218,7 +206,7 @@ Our QVaR algorithm is described in \cref{alg:quick-quantile}. The algorithm work
   \While{$b_k - f_k \geq 1$} {
      $i' \gets f + \lceil\frac{b-f}{2}\rceil$ \tcp*{Pivot: Median-of-medians for $O(b-f)$ runtime}
       $i_k, \_, \bm{x}^k, \bm{p}^k \gets \operatorname{partition}(\bm{x}^{k-1}, \bm{p}^{k-1}, i', f_{k-1}, b_{k-1})$
-    \tcp*{~\cref{alg:partition}, \cref{lem:hoare-partition}}
+    \tcp*{Alg.~\ref{alg:partition}, \cref{lem:hoare-partition}}
     $t_k \gets \sum_{j=f_{k-1}}^{i_k} p^k_j$ \;
     \lIf{$\alpha_k < t_k$} {$b_k \gets i_k$, $\alpha_k \gets \alpha_{k-1}$}
     \lElse {$f_k \gets i_k + 1$, $\alpha_k \gets \alpha_{k-1} - t_k$}
@@ -523,7 +511,7 @@ The results presented in this section are chiefly concerned with demonstrating o
 \begin{figure}
   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_uniform_linear.pdf}
   \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_uniform_log.pdf}
-  \caption{Left side presents a linear view on the data where both axes are in linear scale and the right side demonstrates the data in log scale. These results were generated using a \emph{uniform} random variable.}
+  \caption{Comparison of runtime of the algorithms for samples from a \emph{uniform} random variable with linear (left) and logarithmic (right) view.}
   \label{fig:all_uniform}
 \end{figure}
 
@@ -534,13 +522,13 @@ The results presented in this section are chiefly concerned with demonstrating o
 Method & Mean (ms) & Std Dev (ms) \\
 \midrule 
 CVaR & 0.3912 & 0.0382 \\ 
-\textbf{qCVaR} & \textbf{0.1426} & \textbf{0.0307} \\ 
+\textbf{QCVaR} & \textbf{0.1426} & \textbf{0.0307} \\ 
 \midrule 
 VaR & 0.3733 & 0.0321 \\ 
-\textbf{qVar} & \textbf{0.1199} & \textbf{0.0287} \\ 
+\textbf{QVar} & \textbf{0.1199} & \textbf{0.0287} \\ 
 \midrule 
 TVaR & 0.3993 & 0.0414 \\ 
-\textbf{qTVaR} & \textbf{0.1786} & \textbf{0.0356} \\ 
+\textbf{QTVaR} & \textbf{0.1786} & \textbf{0.0356} \\ 
 \midrule 
 Expectation & 0.0144 & 0.0124 \\ 
 

@@ -47,8 +47,8 @@ function qql!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, α::Real)
   elseif isone(α) # maximum (it is unbounded)
     return (value=typemax(eltype(p)), index=length(vals))
   end
-  i = 1
-  j = length(vals)
+  f = 1
+  b = length(vals)
   gt = 1
   @inbounds while j - i >= 1
     ind, gt = partition!(vals, p, i, j)
@@ -60,7 +60,7 @@ function qql!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, α::Real)
       α -= tail
     end # Cut off half of the random variable
   end
-  return (value=vals[i], index=i)
+  return (value=vals[f], index=f)
 end
 
 function qCVaR!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, α::Real)

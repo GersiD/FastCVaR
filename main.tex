@@ -622,29 +622,27 @@ Now, suppose that \cref{alg:slow-quantile} terminates with value $q\opt$. Then, 
 \subsection{Partition Algorithm}
 
 \mm{We should describe the intuition for the partition algorithm here somewhere}
-
+ 
 \begin{algorithm}
   \caption{\texttt{partition}: Dutch national flag algorithm ~\cite[chapter 14]{Dijkstra1976}}
   \label{alg:partition}
-  \Input{Random variable $\bm{x} \in \Real^n$ with probability mass function $\bm{p} \in \Delta^n$, pivot $i\in \Nats$, and front and back indices $f, b \in \Nats$}
-  \Output{indices $l$, $g$ and $\bm{x}$ and $\bm{p}$ such that $j \in b{:}(l-1) \implies x_j < x_i$, and $j \in (g+1){:}e \implies x_j > x_i$}
+  \Input{Random variable $\bm{x} \in \Real^n$ with probability mass function $\bm{p} \in \Delta^n$, pivot value $v\in \Real$, and front and back indices $f, b \in \Nats$}
+  \Output{indices $l$, $g$ and $\bm{x}$ and $\bm{p}$ such that $j \in b{:}(l-1) \implies x_j < v$, and $j \in (g+1){:}e \implies x_j > v$}
   % $i \gets f + \lceil\frac{b-f}{2}\rceil$ \tcp*{Pivot: Median-of-medians for $O(b-f)$ runtime}
-  $l \gets f$ \tcp*{invariant: less: $j\in f{:}(l-1) \implies x_j < x_i$}
-  $e \gets f$ \tcp*{invariant: equal: $j \in l{:}e \implies x_j = x_i$ }
-  $g \gets b$ \tcp*{invariant: greater: $j \in (g+1){:}b \implies x_j > x_i$}
+  $l \gets f$ \tcp*{invariant: less: $x_j < v, \, j\in f{:}(l-1)$}
+  $e \gets f$ \tcp*{invariant: equal: $x_j = v, \, j \in l{:}(e-1)$ }
+  $g \gets b$ \tcp*{invariant: greater: $x_j > v, \, j \in (g+1){:}b$}
   \While{$e \leq g$}
   {
-    \If{$x_e < x_i$}
-    {
+    \tcp{invariants hold here}
+    \If{$x_e < v$}{
       swap: $x_e \leftrightarrow x_l$ and $p_e \leftrightarrow p_l$\;
       $l \gets l + 1$ \;
-      \tcp{the $x_j$ invariant holds here}
       $e \gets e + 1$\;
     }
-    \ElseIf{$x_e > x_i$} {
+    \ElseIf{$x_e > v$}{
       swap: $x_e\leftrightarrow x_g$ and $p_e \leftrightarrow p_g$\;
       $g \gets g - 1$\;
-      \tcp{the $x_j$ invariant holds here}
     }
     \lElse {$e \gets e + 1$}
   }

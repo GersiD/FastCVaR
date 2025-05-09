@@ -15,9 +15,7 @@ Returns:
   x = [1,2,2,3]
   partition!(x, 2, 1, 4) # (2, 4)
 """
-function partition!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, f::Int, b::Int)
-  pivot_ind = f + Int(ceil((b - f) / 2))
-  pivot_val = vals[pivot_ind]
+function partition!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, pivot_val::Real, f::Int, b::Int)
   lt = f
   eq = f
   gt = b
@@ -49,23 +47,18 @@ function qql!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, α::Real)
   end
   f = 1
   b = length(vals)
-  gt = 1
-  @inbounds while b - f >= 1
-    l, g = partition!(vals, p, f, b)
-    tₖ = sum(view(p, f:l-1))
-    eₖ = sum(view(vals, l:g))
-    # α < tₖ ? begin
-    #   j = gt
-    # end : begin
-    #   i = gt + 1
-    #   α -= tₖ
-    # end # Cut off half of the random variable
-    if α < tₖ
+  @inbounds while b - f ≥ 1
+    pivot_ind = f + Int(ceil((b - f) / 2))
+    pivot_val = vals[pivot_ind]
+    l, g = partition!(vals, p, pivot_val, f, b)
+    t = sum(view(p, f:(l-1)))
+    e = sum(view(p, l:g))
+    if α < t
       b = l - 1
-    elseif tₖ + eₖ < α
+    elseif t + e ≤ α
       f = g + 1
-      α -= tₖ + eₖ
-    else # tₖ <= α < tₖ + eₖ
+      α -= t + e
+    else
       f = b = g
     end
   end

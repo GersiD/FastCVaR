@@ -12,6 +12,7 @@ using RobustMDPs
   @test VaR(x1, p1, 0.5).value ≈ 2
 
   x1 = Float64[3, 2, 1]
+  p1 = [1 / 3, 1 / 3, 1 / 3]
   @test qql!(x1, p1, 0.5).value ≈ 2
   @test VaR(x1, p1, 0.5).value ≈ 2
   x1 = [2.0, 1.0, 3.0]

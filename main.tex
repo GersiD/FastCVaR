@@ -331,10 +331,12 @@ During the first loop: Every element in $x$ has an index $i$ such that $ front \
  
 During the loop, there are 3 possible scenarios at each iteration:
  
-\item[Case 1]: $\alpha_{k-1} < t_k$. Assume there exists $j_k \geq l_k$ such that $x[j_k]=\quant^+$. Then $P[x < x[j_k]] \geq t_k > \alpha_{k - 1}$, which means that $x[j_k]$ is not feasible with \eqref{eq:var-definition}. Therefore, $\quant^+$ can not exist at any $x[j_k]$ such that $j_k\geq l_k$, and the loop invariant is thus satisfied.
+\item[Case 1]: $\alpha_{k-1} < t_k$. 
+Assume there exists $j_k \geq l_k$ such that $x[j_k]=\quant^+$. Then $P[x < x[j_k]] \geq t_k > \alpha_{k - 1}$, which means that $x[j_k]$ is not feasible with \eqref{eq:var-definition}. Therefore, $\quant^+$ can not exist at any $x[j_k]$ such that $j_k\geq l_k$, and the loop invariant is thus satisfied.
 
 
-\item[Case 2]:  $t_k + e_k \leq \alpha{k - 1}$. Assume there exists $j_k < g_k + 1$ such that $x[j_k]=\quant^+$. Then $P[x < x[j_k]] < P[x < x[g_k + 1]] \leq \alpha_{k - 1}$, which means that $x[j_k]$ is not optimal with \eqref{eq:var-definition}. Therefore, $\quant^+$ can not exist at any $x[j_k]$ such that $j_k < g_k + 1$, and the loop invariant is thus satisfied.
+\item[Case 2]:  $t_k + e_k \leq \alpha{k - 1}$. 
+Assume there exists $j_k < g_k + 1$ such that $x[j_k]=\quant^+$. Then $P[x < x[j_k]] < P[x < x[g_k + 1]] \leq \alpha_{k - 1}$, which means that $x[j_k]$ is not optimal with \eqref{eq:var-definition}. Therefore, $\quant^+$ can not exist at any $x[j_k]$ such that $j_k < g_k + 1$, and the loop invariant is thus satisfied.
 
 
 \item[Case 3]: $\alpha > t_k$, $f_k$ is set to $g_k$ such that $f_k < b_k$. Assume there exists $\tau\opt $ such that $\tau\opt < x[g_k] $, and $x[\tau\opt]=\quant^+$. Let $\tau' = g_k$. $P[x < x[\tau']] \leq tail < \alpha$. If $x[\tau\opt] <  x[\tau']$ then $x[\tau\opt]$ can not be optimal by \eqref{eq:var-definition}. Thus, $\quant_{\alpha}^+(\tilde{x}) \geq x^f_{g_k} $ and $\quant_{\alpha}^+(\tilde{x}) \leq x^b_{g_k}$ and loop invariant is satisfied. 

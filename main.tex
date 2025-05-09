@@ -55,7 +55,7 @@
 \maketitle
 
 \begin{abstract}
-Monetary risk measures have gained popularity in expressing decision-makers' preferences for risk aversion. Value-at-Risk (VaR) and Conditional-Value-at-Risk are very common risk measures. This paper proposes novel algorithms for computing these risk measures for discrete distributions in linear time. Our algorithms improve existing algorithms, which must sort the random variable by at least a logarithmic factor. Our algorithms adapt the quickselect algorithm and combine it with a general polymatroid representation of $\varphi$-divergence risk measures. The numerical results show that our new algorithms offer an order of magnitude speedup for large domains, and a library implementation of the algorithms is available at \textcolor{green}{REDACTED}.     
+Monetary risk measures have gained popularity in expressing decision-makers' preferences for risk aversion. Value-at-Risk (VaR) and Conditional-Value-at-Risk are very common risk measures. This paper proposes novel algorithms for computing these risk measures for discrete distributions in linear time. Our algorithms improve existing algorithms, which must sort the random variable by at least a logarithmic factor. Our algorithms adapt the QuickSelect algorithm and combine it with a general polymatroid representation of $\varphi$-divergence risk measures. The numerical results show that our new algorithms offer an order of magnitude speedup for large domains, and a library implementation of the algorithms is available at \textcolor{green}{REDACTED}.     
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
@@ -66,17 +66,17 @@ Monetary measures of risk generalize the expectation operator to be able to repr
 %However, in many applications such as robotics, finance, and autonomous systems, solutions must account for performance with respect to worst case scenarios rather than simply maximizing the mean. Therefore, it has become a common practice to optimize policies with respect to a risk measure~\cite{Follmer2016}, which focuses on the tails of the reward distribution rather than the expectation. 
 
 % what are we doing; our contributions
-This paper proposes new fast algorithms for computing risk measures of discrete random variables. First, we propose a new linear-time VaR evaluation algorithm. Our VaR algorithm, which we call \emph{quickquantile}, builds on the well-known ideas of quickselect but generalizes it to quantiles. The worst-case linear-time upper bound of \emph{quickquantile} matches the linear-time lower bound~\cite{}. Second, building on \emph{quickquantile} we propose a general algorithm for evaluating some $\varphi$-divergence risk measures~\cite{}, which include CVaR and Total-Value-at-Risk (TVaR)~\cite{}. The algorithm, which we call \emph{quickdivergence}, works by representing certain $\varphi$-divergence risk measures as a linear minimization over polymatroids. The linear worst-case runtime of \emph{quickdivergence} also matches the known lower bounds on the runtime~\cite{}. 
+This paper proposes new fast algorithms for computing risk measures of discrete random variables. First, we propose a new linear-time VaR evaluation algorithm. Our VaR algorithm, which we call \emph{QuickQuantile}, builds on the well-known ideas of QuickSelect but generalizes it to quantiles. The worst-case linear-time upper bound of \emph{QuickQuantile} matches the linear-time lower bound~\cite{}. Second, building on \emph{QuickQuantile} we propose a general algorithm for evaluating some $\varphi$-divergence risk measures~\cite{}, which include CVaR and Total-Value-at-Risk (TVaR)~\cite{}. The algorithm, which we call \emph{QuickDivergence}, works by representing certain $\varphi$-divergence risk measures as a linear minimization over polymatroids. The linear worst-case runtime of \emph{QuickDivergence} also matches the known lower bounds on the runtime~\cite{}. 
 
-There is limited prior work on fast algorithms for evaluating risk measures. The conventional VaR algorithm for a discrete random variable must sort its values before it can evaluate its risk. As a result, the sort's runtime, which requires $\Omega(n \log n)$ operations where $n$ is the number of the probability mass function~(pmf) entries, dominates the runtime complexity of VaR. To the best of our knowledge at the time of writing, no prior work has proposed or studied linear-time algorithms for any of the above risk measures.
+There is limited prior work on fast algorithms for evaluating risk measures. The conventional VaR algorithm for a discrete random variable must sort its values before it can evaluate its risk. As a result, the sort's runtime, which requires \todo{why use Omega rather than $\mathcal{O}$?} $\Omega(n \log n)$ operations where $n$ is the number of the probability mass function~(pmf) entries, dominates the runtime complexity of VaR. To the best of our knowledge at the time of writing, no prior work has proposed or studied linear-time algorithms for any of the above risk measures.
 
 Coherent risk measures, like CVaR and TVaR, can be evaluated by solving convex optimization problems~\cite{Follmer2016, rockefeller1996variational}. Although most of these optimization problems are tractable, their time complexity is too large to be practical for applications where they are most needed. Current practical implementations rely on specific properties of these optimization problems to compute the solution efficiently. For example, all existing CVaR algorithms must sort the values of the random variable to compute its value~\cite{}, as in the case for VaR. The $\Omega(n \log  n)$ time complexity of the sort dominates the time complexity and prevents linear time computation. In this paper, we circumvent the complexity of sorting by developing no-sort algorithms for these risk measures and others.
 
-Numerous efficient algorithms have been designed for structured optimization problems that are similar to CVaR and TVaR evaluations. Some example of such structured optimization problems are the projection onto the simplex~\cite{adam2019projectionscanonicalsimplexadditional, Wang2013Simplex}, projection on k-capped simplex~\cite{kcapped_ang}, linear optimization on the intersection of $L_p$ or $\varphi$-divergence balls and the probability simplex as arise in robust optimizations~\cite{}, optimization for $\varphi$-divergence risk measures~\cite{}, and on polytopes defined by submodular functions which are known as polymatroids~\cite{}. Many of these algorithms require sorting the input variables, which has $O(n \log  n)$ complexity. There has been mention of the possibility of linear time algorithms however, we could find neither work describing nor studying them. One exception is \cite{Condat2016}, which proposes a linear-time algorithm for computing the projection onto the simplex, which does not leverage quickselect. 
+Numerous efficient algorithms have been designed for structured optimization problems that are similar to CVaR and TVaR evaluations. Some example of such structured optimization problems are the projection onto the simplex~\cite{adam2019projectionscanonicalsimplexadditional, Wang2013Simplex}, projection on k-capped simplex~\cite{kcapped_ang}, linear optimization on the intersection of $L_p$ or $\varphi$-divergence balls and the probability simplex as arise in robust optimizations~\cite{}, optimization for $\varphi$-divergence risk measures~\cite{}, and on polytopes defined by submodular functions which are known as polymatroids~\cite{}. Many of these algorithms require sorting the input variables, which has $\mathcal{O}(n \log  n)$ complexity. There has been mention of the possibility of linear time algorithms however, we could find neither work describing nor studying them. One exception is \cite{Condat2016}, which proposes a linear-time algorithm for computing the projection onto the simplex, which does not leverage QuickSelect. 
 
 Our algorithms' time complexity improves on the state of the art by a logarithmic factor. Although this improvement may seem unimportant,  it is an acceleration that is practically meaningful without any serious drawbacks. Our algorithms are simple and easy to implement with little added complexity compared with the state-of-the-art. Our numerical results show that they can lead to an order of magnitude speed up for realistic large problems, a significant speed-up for moderately sized problems, and match the performance of existing algorithms for small problems.
 
-The remainder of the paper is organized as follows. \Cref{sec:preliminaries} describes the necessary background on risk measures, $\varphi$-divergence, and polymatroid optimization. Then, \Cref{sec:var-linear} describes \emph{quickquantile}, a new algorithm that computes VaR in linear time for a random variable defined by a pmf. Then, \cref{sec:phi-divergence} builds on the \emph{quickquantile} to develop \emph{quickdivergence}, an algorithm that evaluates certain $\varphi$-divergence risk measures in linear time. We evaluate the algorithms numerically on synthetic and realistic problems in \cref{sec:experiments}. A tested implementation of the algorithms in Julia is available at \textcolor{green}{REDACTED}.
+The remainder of the paper is organized as follows. \Cref{sec:preliminaries} describes the necessary background on risk measures, $\varphi$-divergence, and polymatroid optimization. Then, \Cref{sec:var-linear} describes \emph{QuickQuantile}, a new algorithm that computes VaR in linear time for a random variable defined by a pmf. Then, \cref{sec:phi-divergence} builds on the \emph{QuickQuantile} to develop \emph{QuickDivergence}, an algorithm that evaluates certain $\varphi$-divergence risk measures in linear time. We evaluate the algorithms numerically on synthetic and realistic problems in \cref{sec:experiments}. A tested implementation of the algorithms in Julia is available at \textcolor{green}{REDACTED}.
 
 
 % For coherent risk measures, it has been shown that computing these risk measures is equivalent to solving a robust optimization problem where a probability distribution must be selected to minimize the expectation of a random variable subject to a divergence constraint from a normal distribution. For certain risk measures that satistfy an additional property known as comonotinicity, it is known that this optimization problem can be casted as the maximum weighted independent set problem (MWIS) on a polymathic.
@@ -130,8 +130,8 @@ where $\bm{1}$ is a vector of ones. CVaR is usually continuously extended as $\c
   \ER_{\varphi,\beta}(\tilde{x}) := \inf \left\{\bm{q}\tr \bm{x} \mid H_{\varphi}(\bm{q} \| \bm{p}) \le \beta, \bm{q} \ll \bm{p} \right\},
   \quad
   H_\varphi(\bm{q} \| \bm{p}) := \sum_{i \in \Omega} p_i \cdot \varphi\left(\frac{q_i}{p_i}\right),
-\end{align} 
-where $H_{\varphi}$ is a $\varphi$-divergence~\cite{Bayraksan2015}, and $\bm{q} \ll \bm{p}$ indicates that $\bm{q} \in \Delta_n$ and $p_i =0 \implies q_i = 0, \forall  i = \in \Omega$ The function $\varphi$ is convex and satisfies that $\varphi(1)=0$. Note that all $\varphi$-divergence risk measures also have the following equivalent dual representation~\cite{Ahmadi-Javid2011,Ahmadi-Javid2017}: 
+\end{align} \todo{Do we want to explain Entropic Risk? Some may know the concept of a risk measure but not ER.}
+where $H_{\varphi}$ is a $\varphi$-divergence~\cite{Bayraksan2015}, $\bm{q} \ll \bm{p}$ indicates that $\bm{q} \in \Delta_n$, and $p_i =0 \implies q_i = 0$ $\forall  i \in \Omega$. The function $\varphi$ is convex and satisfies that $\varphi(1)=0$. Note that all $\varphi$-divergence risk measures also have the following equivalent dual representation~\cite{Ahmadi-Javid2011,Ahmadi-Javid2017}: 
 \begin{equation} \label{eq:fdiv-primal}
 \ER_{\varphi,\beta}(\tilde{x}) = \sup_{t,v \in \Real\,:\, t > 0}t \cdot \left(v - \E { \varphi\opt \left(- \frac{\tilde{x}}{t} + v + \beta \right)}\right) ,
 \end{equation} 
@@ -167,16 +167,18 @@ In the remainder of the paper, we first propose a linear-time algorithm for comp
 
 \section{Computing VaR in Linear Time} \label{sec:var-linear}
 
-In this section, we develop a quick algorithm to compute the VaR of a discrete random variable. The algorithm is extends the well-known quickselect algorithm to account to non-uniform weghts. We also take a special care to allow random variables $\tilde{x}$ with duplicate values such that $\tilde{x}(\omega_1) = \tilde{x}$
+In this section, we develop a quick algorithm to compute the VaR of a discrete random variable. The algorithm is extends the well-known QuickSelect algorithm to account to non-uniform weights. We also take a special care to allow random variables $\tilde{x}$ with duplicate values such that $\tilde{x}(\omega_1) = \tilde{x}$
 
 \mm{How regular algorithms work for VaR, sorting based approach\cref{alg:slow-quantile}.}
 
-\mm{algorithm describing the main idea and challenge. Tie this to quickselect and why this is not just a quick select algorithm.}
+\mm{algorithm describing the main idea and challenge. Tie this to QuickSelect and why this is not just a quick select algorithm.}
 
 
 %We first restate some well-known properties of the Hoare Partition scheme.
-Our QVaR algorithm is described in \cref{alg:quick-quantile}. The algorithm works as follows. \mm{refer to the actual variables and line numbers in the algorithm.} The algorithm picks a pivot and applies the partition to easily compute the probability of all outcomes smaller than or equal to that of the pivot. Then it determines whether the quantile can exist on the left side of the pivot or on the right side and shrinks the search space, parameterized by the variables $front$ and $back$, accordingly.
+Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorithm works as follows. \mm{refer to the actual variables and line numbers in the algorithm.} The algorithm picks a pivot and applies the partition to easily compute the probability of all outcomes smaller than or equal to that of the pivot. Then it determines whether the quantile can exist on the left side of the pivot or on the right side and shrinks the search space, parameterized by the variables $f$ and $b$ to represent the front and back indices respectively.
 \todo{for algorithms should we bold vectors to keep with notation?}
+\todo{Hear hear!}
+\todo{To note, if $b$ and $f$ are vectors, the time complexity syntax wouldn't make sense. Shouldn't it be $\mathcal{O}(|b|-|f|)$ instead?}
 % \begin{algorithm}
 %   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and $\alpha \in [0,1]$}}
 %   \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
@@ -272,6 +274,7 @@ Suppose that $(l, g, \bm{x}, \bm{p}) \gets \operatorname{partition}(\bm{x'}, \bm
    j \in (g+1){:}b &\quad\implies \quad x_j > x_i'.
 \end{align*}
 \mm{And state the fact that the new $p$ values correspond to the $x$ values.}  Moreover, the algorithm runs in $O(b - f)$ time.
+\todo{Refer to suggestions made on line 113}
 \end{lemma}
 \begin{proof}
   \mm{TODO: should follow directly from the invariants in the algorithm. The linear time follows since $g-e$ decreases by 1 in every iteration}
@@ -299,14 +302,18 @@ Suppose for the sake of contradiction that there is no $\omega\in \Omega $ such 
 \begin{enumerate}
 \item[Case 1] $\exists x_{i}, x_{i + 1} \in \tilde{x}(\Omega)$ such that $\quant^+_{\alpha}(\tilde{x}) \in (x_{i}, x_{i + 1})$.
 
-  Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})  $. Then, let $\tau' = \tau\opt  + \frac{1}{2}(x_{i+1} - \tau\opt)$. Because $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition}, $\P{ \tilde{x} < \tau' } =  \P{ \tilde{x} < \tau\opt  }\le \alpha$, $\tau\opt $ cannot be optimal.
+  Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})  $. \\
+  Then, let $\tau' = \tau\opt  + \frac{1}{2}(x_{i+1} - \tau\opt)$. Because $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition}, \\
+  $\P{ \tilde{x} < \tau' } =  \P{ \tilde{x} < \tau\opt  }\le \alpha$, $\tau\opt $ cannot be optimal.
 \item[Case 2] $\quant^+_{\alpha}(\tilde{x}) < \min \tilde{x}$ 
   
-  Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})  $. Then, let $\tau' = \tau\opt + \frac{1}{2}(x_{1} - \tau\opt)$. Because $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition}, $\P{ \tilde{x} < \tau' } =  \P{ \tilde{x} < \tau\opt  }\le \alpha$, $\tau\opt $ cannot be optimal.
+  Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})  $.\\
+  Then, let $\tau' = \tau\opt + \frac{1}{2}(x_{1} - \tau\opt)$. Because $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition},\\
+  $\P{ \tilde{x} < \tau' } =  \P{ \tilde{x} < \tau\opt  }\le \alpha$, $\tau\opt $ cannot be optimal.
 
 \item[Case 3]  $\quant^+_{\alpha}(\tilde{x}) > \max \tilde{x}$ 
 
-Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})$. Recall $\alpha \in [0,1$, $\P{\tilde{x} < \tau\opt} = 1 \leq \alpha < 1$.
+Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})$. Recall $\alpha \in [0,1)$, $\P{\tilde{x} < \tau\opt} = 1 \leq \alpha < 1$.
   
   % New Proof 2: Recall that $\alpha$ is less than 1 and  $\quant^+_{\alpha}(\tilde{x})$ is bounded for all admissible $\alpha$ values. Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})  $. Then, let $\tau' = \tau\opt + 1$. Because $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition}, $\P{ \tilde{x} < \tau' } =  \P{ \tilde{x} < \tau\opt  }\le \alpha$, $\tau\opt $ cannot be optimal.
 
@@ -324,7 +331,7 @@ During the first loop: Every element in $x$ has an index $i$ such that $ front \
  
 During the loop, there are 3 possible scenarios at each iteration:
  
-\item[Case 1]: $\alpha_{k-1} < t_k$. Assume there exists $j_k \geq l_k such that x[j_k]=\quant^+$. Then $P[x < x[j_k]] \geq t_k > \alpha_{k - 1}$, which means that $x[j_k]$ is not feasible with \eqref{eq:var-definition}. Therefore, $\quant^+$ can not exist at any $x[j_k]$ such that $j_k\geq l_k$, and the loop invariant is thus satisfied.
+\item[Case 1]: $\alpha_{k-1} < t_k$. Assume there exists $j_k \geq l_k$ such that $x[j_k]=\quant^+$. Then $P[x < x[j_k]] \geq t_k > \alpha_{k - 1}$, which means that $x[j_k]$ is not feasible with \eqref{eq:var-definition}. Therefore, $\quant^+$ can not exist at any $x[j_k]$ such that $j_k\geq l_k$, and the loop invariant is thus satisfied.
 
 
 \item[Case 2]:  $t_k + e_k \leq \alpha{k - 1}$. Assume there exists $j_k < g_k + 1$ such that $x[j_k]=\quant^+$. Then $P[x < x[j_k]] < P[x < x[g_k + 1]] \leq \alpha_{k - 1}$, which means that $x[j_k]$ is not optimal with \eqref{eq:var-definition}. Therefore, $\quant^+$ can not exist at any $x[j_k]$ such that $j_k < g_k + 1$, and the loop invariant is thus satisfied.
@@ -784,7 +791,7 @@ Code and results for these experiments as well as the implementations of all con
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.70\textwidth]{./code/plots/cvar_div_qcvar.pdf}
-  \caption{Linear regression fit of a logarithmic function to the ratio of the time taken to compute $\cvar{0.5}{\tilde{x}}$ by sorting (CVaR) and quickselect (QCVaR). \todo{dont like this graph, can we get rid of it?}}
+  \caption{Linear regression fit of a logarithmic function to the ratio of the time taken to compute $\cvar{0.5}{\tilde{x}}$ by sorting (CVaR) and QuickSelect (QCVaR). \todo{dont like this graph, can we get rid of it?}}
   \label{fig:cvar_div_qcvar}
 \end{figure}
 
@@ -819,7 +826,7 @@ The results obtained in \cref{tab:small_results} were generated using a similar 
 where instead of 10 trails per experiment, we used 50 trails per experiment. \cref{tab:small_results} shows the mean
 time in ms $\pm$ the 95\% confidence interval for each method.
 
-\cref{tab:small_results} shows that even for smaller settings our method is faster than the sorting based methods. The results are consistent with the theoretical complexity of the algorithms, which is $O(n \log n)$ for the sorting based methods and $O(n)$ for the quickselect based methods.
+\cref{tab:small_results} shows that even for smaller settings our method is faster than the sorting based methods. The results are consistent with the theoretical complexity of the algorithms, which is $O(n \log n)$ for the sorting based methods and $O(n)$ for the QuickSelect based methods.
 
 \subsection{Computer Specifications}
 

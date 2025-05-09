@@ -352,23 +352,28 @@ During the loop, there are 3 possible scenarios at each iteration:
 \section{Computing \texorpdfstring{$\varphi$}{phi}-divergence Risk Measures in Linear Time} \label{sec:phi-divergence}
 
 
-To compute $\varphi$-divergence risk measures we turn to polymatroids. We remind the reader that for a function $f \colon \mathcal{Q} \to \Real_+$ we say that $f$ is sub-modular if for each $\mathcal{A} \subseteq \mathcal{B} \subseteq \mathcal{E}$ we have $f(\mathcal{A}) \leq f(\mathcal{B})$, and for each $\mathcal{A}, \mathcal{B} \subseteq \mathcal{E}$ we have 
-\[
-f(\mathcal{A}) + f(\mathcal{B}) \geq f(\mathcal{A} \cup \mathcal{B}) + f(\mathcal{A} \cap \mathcal{B}).
-\]
+In this section, we propose new linear-time algorithms for computing $\varphi$-divergence risk measures. We approach this challenge by representing comonotonic coherent risk measures as linear optimization over a polymatroid. As we show, for certain polymatroids the optimization can be solved in linear time compared to the $O(n \log  n)$ runtime of standard sort-based greedy algorithms. 
+
+First, recall the standard definition of submodular functions and the related concept of polymatroid~\cite{Korte2012}.
 \begin{definition}
-  For a finite set $\mathcal{E}$, and a non-decreasing sub-modular function $f\colon 2^{\mathcal{E}} \to \Real_+$ we
-  define the polymatroid $\mathcal{Q}_f$ as
+A function $f \colon 2^{\mathcal{E}} \to \Real_+$ for a finite set finite set $\mathcal{E} = \left\{ 1, \dots , E \right\}$ is \emph{submodular} if
+\[
+  f(\mathcal{A}) + f(\mathcal{B}) \geq f(\mathcal{A} \cup \mathcal{B}) + f(\mathcal{A} \cap \mathcal{B}),
+  \quad
+  \forall \mathcal{A}, \mathcal{B} \subseteq \mathcal{E}.
+\]
+A \emph{polymatroid} $\mathcal{Q}_f$ for $f$ is a polytope defined as
   \[
-    \mathcal{Q}_f = \left\{ \bm{q} \in \Real_+^E  \mid  \sum_{e \in \mathcal{U}} \bm{q}(e) \leq f(\mathcal{U}), \;\; \forall \; \mathcal{U} \subseteq \mathcal{E} \right\}.
+    \mathcal{Q}_f = \left\{ \bm{q} \in \Real_+^E  \mid   \bm{q}(\mathcal{U}) \leq f(\mathcal{U}), \, \forall \,  \mathcal{U} \subseteq \mathcal{E} \right\},
   \]
+  where $q(\mathcal{U}) = \sum_{e \in \mathcal{U}} q(e)$.
 \end{definition}
 
-\todo{need to defend why we call this a polytope, its a polymatroid}
-This polytope is of special interest for computing risk measures, as we will see later on that all coherent and comonotonic risk measures can be computed by solving
-\begin{align}\label{eq:polytope}
-  \max_{\bm{q}\in \Real}\left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}
-\end{align}
+% marek: we already say this in the preliminaries section
+% This polytope is of special interest for computing risk measures, as we will see later on that all coherent and comonotonic risk measures can be computed by solving
+% \begin{align}\label{eq:polytope}
+%   \max_{\bm{q}\in \Real}\left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}
+% \end{align}
 
 \begin{theorem}[Corollary 4.95 in~\cite{Follmer2016}]
   For any coherent and comonotonic risk measure $\rho\colon \mathbb{X}\to \Real$, let $c:= \rho(\one_{\mathcal{A}})$ for each $\mathcal{A} \subseteq \Omega$. Then

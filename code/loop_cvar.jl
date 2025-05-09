@@ -36,7 +36,7 @@ function partition!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, f::
     # @show lt, eq, gt
   end
   @assert vals[gt] == pivot_val
-  return (lt=lt, gt=gt - 1)
+  return (lt=lt, gt=gt)
 end
 
 
@@ -47,20 +47,29 @@ function qql!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, α::Real)
   elseif isone(α) # maximum (it is unbounded)
     return (value=typemax(eltype(p)), index=length(vals))
   end
-  i = 1
-  j = length(vals)
+  f = 1
+  b = length(vals)
   gt = 1
-  @inbounds while j - i >= 1
-    ind, gt = partition!(vals, p, i, j)
-    tail::Float64 = sum(view(p, i:gt))
-    α < tail ? begin
-      j = gt
-    end : begin
-      i = gt + 1
-      α -= tail
-    end # Cut off half of the random variable
+  @inbounds while b - f >= 1
+    l, g = partition!(vals, p, f, b)
+    tₖ = sum(view(p, f:l-1))
+    eₖ = sum(view(vals, l:g))
+    # α < tₖ ? begin
+    #   j = gt
+    # end : begin
+    #   i = gt + 1
+    #   α -= tₖ
+    # end # Cut off half of the random variable
+    if α < tₖ
+      b = l - 1
+    elseif tₖ + eₖ < α
+      f = g + 1
+      α -= tₖ + eₖ
+    else # tₖ <= α < tₖ + eₖ
+      f = b = g
+    end
   end
-  return (value=vals[i], index=i)
+  return (value=vals[b], index=b)
 end
 
 function qCVaR!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, α::Real)

@@ -238,10 +238,10 @@ Our QVaR algorithm is described in \cref{alg:quick-quantile}. The algorithm work
     }
     \ElseIf{$t_k + e_k \le  \alpha_{k-1}$}
     {
-      \tcp{$\P{\tilde{x} \le v} < \alpha \implies \quant_{\alpha} > v$}
+      % \tcp{$\P{\tilde{x} \le v} < \alpha \implies \quant_{\alpha} > v$}
       \tcp{$\P{\tilde{x} \le v} \le \alpha
-        \implies \P{\tilde{x} > v} \le 1 - \alpha 
-        \implies \P{\tilde{x} \ge v+\epsilon} \le 1 - \alpha 
+        \implies \P{\tilde{x} > v} \ge 1 - \alpha 
+        \implies \P{\tilde{x} \ge v+\epsilon} \ge 1 - \alpha 
         \implies \quant_{\alpha}^+ > v$}
       $f_k \gets g_k$;~~~$b_k \gets g_k + 1$;~~~$\alpha_k \gets 0$\;
     }

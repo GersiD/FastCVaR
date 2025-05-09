@@ -341,7 +341,8 @@ Assume there exists $j_k < g_k + 1$ such that $x[j_k]=\quant^+$. Then $P[x < x[j
 
 \item[Case 3]: $\alpha > t_k$, $f_k$ is set to $g_k$ such that $f_k < b_k$. Assume there exists $\tau\opt $ such that $\tau\opt < x[g_k] $, and $x[\tau\opt]=\quant^+$. Let $\tau' = g_k$. $P[x < x[\tau']] \leq tail < \alpha$. If $x[\tau\opt] <  x[\tau']$ then $x[\tau\opt]$ can not be optimal by \eqref{eq:var-definition}. Thus, $\quant_{\alpha}^+(\tilde{x}) \geq x^f_{g_k} $ and $\quant_{\alpha}^+(\tilde{x}) \leq x^b_{g_k}$ and loop invariant is satisfied. 
  
-\item[Case 4]: $\alpha \geq t_k$. In this case \todo{why} assume $f_k$ is set to $ind + 1$ such that $f_k = b_k$. 
+\item[Case 4]: $\alpha \geq t_k$
+In this case \todo{why} assume $f_k$ is set to $ind + 1$ such that $f_k = b_k$. 
  All the elements are no longer in the range $[f_k, b_k]$ could not have been $\quant_{\alpha}^+(\tilde{x})$ (see Case 1 and Case 2), and $\quant_{\alpha}^+(\tilde{x})$ must exist in $x$ per Lemma~1 \mm{do NOT hardcode}. Thus, $\quant_{\alpha}^+(\tilde{x}) = b_k$ and loop invariant is satisfied. The algorithm terminates at this condition. 
 
 \item[Case 5]: Tail is selected such that $\alpha \geq t_k$. In this case assume that $f_k$ is set to $g_k + 1$ such that $f_k > b_k$. Thus $b_k = g_k$. From case 1, we know any $\tau\opt $ larger than $b_k$ is not feasible and since $b_k = g_k$, $P[x < x[b_k]] \leq \alpha$. Since all feasible elements are $\leq b_k$, $b_k$ is optimal by \eqref{eq:var-definition}. 

@@ -331,6 +331,7 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
  Loop Invariant: Before and after every iteration $\quant^+$ will remain in the array $x$ at an index $i$ such that $ f_k \leq i \leq b_k $.
 During the first loop: Every element in $x$ has an index $i$ such that $ front \leq i \leq back $, where $front=1$ and $back=n$. By Lemma 1, there exists an element with index $i$ such that $\quant^+ = x[i] $.
  
+\mm{the proof should use indexing consistent with the algorithm such as  $x_{j_k}$ rather than $x[j_k]$}
 During the loop, there are 3 possible scenarios at each iteration:
 \begin{enumerate}
 
@@ -402,9 +403,6 @@ where $\mathcal{Q}_c$ is a the polymatroid in \cref{def:polymatroid} for $c := \
 
 Conventional polymatroid optimization algorithms such as \cref{alg:greedy-polymatroid} solve \eqref{eq:polytope} using a greedy approach that requires sorting. We will show in \todo{reference section} that for a special class of submodular functions $f$, sorting is not necessary.
 
-\mm{TODO: Use VaR in the algorithm instead of redoing the work. }
-
-% \subsection{General Algorithm}
 Our first contribution is an algorithm for solving the minimum-weight Independent Set without sorting for polymatroids. We note that certain additional assumptions have to be satisfied in the submodular function as follows. Note that $i$ represents the index of the $i$th smallest element in the set and $f(S_i)$ represents the set of elements less than or equal to the $i$th smallest element. 
 
 \mm{this is motivated by the maximum independent set algorithm}
@@ -527,18 +525,20 @@ $c  +m *\sum_{i \subset (1, i )}p(i)) < 1  $, which results in $\sum_{i \subset 
 
 
 \begin{lemma}
-  For $\mathcal{O} \subseteq \Omega$, define $f\colon 2^{\Omega} \to \Real_+$:
-  \[
-    f(\mathcal{O}) = \min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\}
-    .
-  \]
-  Then \todo{something is wrong here where is the $\mathcal{O}$}
-  \[
-  \cvar{\alpha }{\tilde{x} } = \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}.
-  \]
+Let $f\colon 2^{\Omega} \to \Real_+$ be defined as
+\[
+  f(\mathcal{O})
+  :=
+  \min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\},
+\quad \forall \mathcal{O} \subseteq \Omega .
+\]
+Then $f$ is submodular and the polymatroid $\mathcal{Q}_f$ satisfies that
+\[
+\cvar{\alpha }{\tilde{x} } = \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}.
+\]
 \end{lemma}
 \begin{proof}
-  Due to the set of constraints, we know that $f(\mathcal{O})$ must be $\leq \frac{\mathbb{P}[\mathcal{O}]}{\alpha}$ and $f(\mathcal{O})$ must be $\leq 1$. Furthermore, as we show below, we can construct $q$ such that $q(\mathcal{O}) =\min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\} $ for any $\mathcal{O}$.
+We show below, we can construct $q$ such that $q(\mathcal{O}) =\min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\} $ for any $\mathcal{O}$. \mm{How does constructing such a $q$ help us?}
   
 \item[Case 1]: $P(\mathcal{O}) \geq \alpha$. In this scenario, $Q(\mathcal{O})$ = 1 since $\frac{1}{\alpha} P(\mathcal{O}) > 1 $. Thus, every element in $\mathcal{O}$ should be scaled by $\frac{1}{P(\mathcal{O})}$ and all other elements should be set to 0 . Since  $P(\mathcal{O}) \geq \alpha$, we can imply the reciprocal $\frac{1}{P(\mathcal{O})} \leq \frac{1}{\alpha}$ is also true. 
 

@@ -132,7 +132,7 @@ where $\bm{1}$ is a vector of ones. CVaR is usually continuously extended as $\c
   \quad
   H_\varphi(\bm{q} \| \bm{p}) := \sum_{i \in \Omega} p_i \cdot \varphi\left(\frac{q_i}{p_i}\right),
 \end{align} \todo{Do we want to explain Entropic Risk? Some may know the concept of a risk measure but not ER.}
-where $H_{\varphi}$ is a $\varphi$-divergence~\cite{Bayraksan2015}, $\bm{q} \ll \bm{p}$ indicates that $\bm{q} \in \Delta_n$, and $p_i =0 \implies q_i = 0$ $\forall  i \in \Omega$. The function $\varphi$ is convex and satisfies that $\varphi(1)=0$. Note that all $\varphi$-divergence risk measures also have the following equivalent dual representation~\cite{Ahmadi-Javid2011,Ahmadi-Javid2017}: 
+where $H_{\varphi}$ is a $\varphi$-divergence~\cite{Bayraksan2015}, $\bm{q} \ll \bm{p}$ indicates that $\bm{q} \in \Delta_n$, and $p_i =0 \implies q_i = 0$ $\forall  i \in \Omega$. The function $\varphi$ is convex and satisfies $\varphi(1)=0$. Note that all $\varphi$-divergence risk measures also have the following equivalent dual representation~\cite{Ahmadi-Javid2011,Ahmadi-Javid2017}: 
 \begin{equation} \label{eq:fdiv-primal}
 \ER_{\varphi,\beta}(\tilde{x}) = \sup_{t,v \in \Real\,:\, t > 0}t \cdot \left(v - \E { \varphi\opt \left(- \frac{\tilde{x}}{t} + v + \beta \right)}\right) ,
 \end{equation} 
@@ -301,18 +301,19 @@ Assume the random variable $ x $ has $ n $ unique values, such that $ x_1 < x_2 
 
 Suppose for the sake of contradiction that there is no $\omega\in \Omega $ such that $\quant^+_{\alpha}(\tilde{x}) = \tilde{x}(\omega)$. That may mean \todo{defend why this may mean only these cases}:
 \begin{enumerate}
-\item[Case 1] $\exists x_{i}, x_{i + 1} \in \tilde{x}(\Omega)$ such that $\quant^+_{\alpha}(\tilde{x}) \in (x_{i}, x_{i + 1})$.
+\item[Case 1]: $\exists x_{i}, x_{i + 1} \in \tilde{x}(\Omega)$ such that $\quant^+_{\alpha}(\tilde{x}) \in (x_{i}, x_{i + 1})$.
 
   Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})  $. \\
   Then, let $\tau' = \tau\opt  + \frac{1}{2}(x_{i+1} - \tau\opt)$. Because $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition}, \\
-  $\P{ \tilde{x} < \tau' } =  \P{ \tilde{x} < \tau\opt  }\le \alpha$, $\tau\opt $ cannot be optimal.
-\item[Case 2] $\quant^+_{\alpha}(\tilde{x}) < \min \tilde{x}$ 
+  $\P{ \tilde{x} < \tau' } =  \P{ \tilde{x} < \tau\opt  }\le \alpha$, 
+  therefore $\tau\opt $ cannot be optimal.
+\item[Case 2]: $\quant^+_{\alpha}(\tilde{x}) < \min \tilde{x}$ 
   
   Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})  $.\\
   Then, let $\tau' = \tau\opt + \frac{1}{2}(x_{1} - \tau\opt)$. Because $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition},\\
-  $\P{ \tilde{x} < \tau' } =  \P{ \tilde{x} < \tau\opt  }\le \alpha$, $\tau\opt $ cannot be optimal.
+  $\P{ \tilde{x} < \tau' } =  \P{ \tilde{x} < \tau\opt  }\le \alpha$, therefore $\tau\opt $ cannot be optimal.
 
-\item[Case 3]  $\quant^+_{\alpha}(\tilde{x}) > \max \tilde{x}$ 
+\item[Case 3]: $\quant^+_{\alpha}(\tilde{x}) > \max \tilde{x}$ 
 
 Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})$. Recall $\alpha \in [0,1)$, $\P{\tilde{x} < \tau\opt} = 1 \leq \alpha < 1$.
   
@@ -326,29 +327,29 @@ Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and the
   \Cref{alg:quick-quantile} computes $\quant^+$.
   \end{lemma}
 \begin{proof}
-  \todo{proof needs justification}
+ 
  Loop Invariant: Before and after every iteration $\quant^+$ will remain in the array $x$ at an index $i$ such that $ f_k \leq i \leq b_k $.
 During the first loop: Every element in $x$ has an index $i$ such that $ front \leq i \leq back $, where $front=1$ and $back=n$. By Lemma 1, there exists an element with index $i$ such that $\quant^+ = x[i] $.
  
 During the loop, there are 3 possible scenarios at each iteration:
- 
+\begin{enumerate}
+
 \item[Case 1]: $\alpha_{k-1} < t_k$ 
-Assume there exists $j_k \geq l_k$ such that $x[j_k]=\quant^+$. Then $P[x < x[j_k]] \geq t_k > \alpha_{k - 1}$, which means that $x[j_k]$ is not feasible with \eqref{eq:var-definition}. Therefore, $\quant^+$ can not exist at any $x[j_k]$ such that $j_k\geq l_k$, and the loop invariant is thus satisfied.
+
+ Assume there exists $j_k \geq l_k$ such that $x[j_k]=\quant^+$. Then $P[x < x[j_k]] \geq t_k > \alpha_{k - 1}$, which means that $x[j_k]$ is not feasible with \eqref{eq:var-definition}. Therefore, $\quant^+$ can not exist at any $x[j_k]$ such that $j_k\geq l_k$, and the loop invariant is thus satisfied.
 
 
-\item[Case 2]:  $t_k + e_k \leq \alpha{k - 1}$
-Assume there exists $j_k < g_k + 1$ such that $x[j_k]=\quant^+$. Then $P[x < x[j_k]] < P[x < x[g_k + 1]] \leq \alpha_{k - 1}$, which means that $x[j_k]$ is not optimal with \eqref{eq:var-definition}. Therefore, $\quant^+$ can not exist at any $x[j_k]$ such that $j_k < g_k + 1$, and the loop invariant is thus satisfied.
+\item[Case 2]:  $t_k + e_k \leq \alpha_{k - 1}$
+
+ Assume there exists $j_k < g_k + 1$ such that $x[j_k]=\quant^+$. Then $P[x < x[j_k]] < P[x < x[g_k + 1]] \leq \alpha_{k - 1}$, which means that $x[j_k]$ is not optimal with \eqref{eq:var-definition}. Therefore, $\quant^+$ can not exist at any $x[j_k]$ such that $j_k < g_k + 1$, and the loop invariant is thus satisfied.
 
 
-\item[Case 3]: $\alpha > t_k$, $f_k$ is set to $g_k$ such that $f_k < b_k$. Assume there exists $\tau\opt $ such that $\tau\opt < x[g_k] $, and $x[\tau\opt]=\quant^+$. Let $\tau' = g_k$. $P[x < x[\tau']] \leq tail < \alpha$. If $x[\tau\opt] <  x[\tau']$ then $x[\tau\opt]$ can not be optimal by \eqref{eq:var-definition}. Thus, $\quant_{\alpha}^+(\tilde{x}) \geq x^f_{g_k} $ and $\quant_{\alpha}^+(\tilde{x}) \leq x^b_{g_k}$ and loop invariant is satisfied. 
+\item[Case 3]: $\alpha_{k - 1} \geq t_k$ and $\alpha_{k-1} < t_k + e_k $. 
  
-\item[Case 4]: $\alpha \geq t_k$
-In this case \todo{why} assume $f_k$ is set to $ind + 1$ such that $f_k = b_k$. 
- All the elements are no longer in the range $[f_k, b_k]$ could not have been $\quant_{\alpha}^+(\tilde{x})$ (see Case 1 and Case 2), and $\quant_{\alpha}^+(\tilde{x})$ must exist in $x$ per Lemma~1 \mm{do NOT hardcode}. Thus, $\quant_{\alpha}^+(\tilde{x}) = b_k$ and loop invariant is satisfied. The algorithm terminates at this condition. 
+ Assume there exists $j_k $ such that $j_k < l_k $, and $x[j_k]=\quant^+$. Then $P[x < x[j_k]] < P[x < x[l_k]] = t_k \leq \alpha$. Therefore, we arrive at a contradiction as $x[j_k]$ be optimal by \eqref{eq:var-definition}. If we assume there exists $j_k $ such that $j_k > g_k $, and $x[j_k]=\quant^+$, then $P[x < x[j_k]] > t_k + e_k > \alpha_{k - 1}$, which means that $x[j_k]$ is not feasible with \eqref{eq:var-definition}.Therefore, $\quant^+$ can not exist at any $x[j_k]$ such that $j_k\geq l_k$, and the loop invariant is thus satisfied. Since all elements in the range$(i_k, g_k)$ are equal, $\quant^+$ must be equal to this value. Thus we can set both $f_k$ and $b_k$ to $g_k$ and terminate the algorithm, while noting that the loop invariant remains satisfied as the quantile exists at this index. 
 
-\item[Case 5]: Tail is selected such that $\alpha \geq t_k$. In this case assume that $f_k$ is set to $g_k + 1$ such that $f_k > b_k$. Thus $b_k = g_k$. From case 1, we know any $\tau\opt $ larger than $b_k$ is not feasible and since $b_k = g_k$, $P[x < x[b_k]] \leq \alpha$. Since all feasible elements are $\leq b_k$, $b_k$ is optimal by \eqref{eq:var-definition}. 
-  \todo{we should reference lines in the algorithm \cref{alg:quick-quantile} to make this proof easier to follow.}
- \end{proof}
+\end{enumerate}
+\end{proof}
 
 \begin{proposition}
 \Cref{alg:quick-quantile} runs in $\mathcal{O}(n)$ time if the median-of-medians algorithm is used to select the pivot. 
@@ -415,7 +416,7 @@ Our first contribution is an algorithm for solving the minimum-weight Independen
     \[
       g(x) :=
       \begin{cases}        
-        \min \left(c + m  \cdot x, 1 \right) &\text{if } x > 0 \\
+        \min \{c + m  \cdot x, 1\} &\text{if } x > 0 \\
         0 &\text{otherwise}.
       \end{cases}
     \]
@@ -482,7 +483,7 @@ Our first contribution is an algorithm for solving the minimum-weight Independen
   \caption{Linear-time Algorithm CVaR/TVaR}\label{alg:maximum-weight-independent}
 
   \Input{Finite $N = [1 \ldots n]$, $f\colon 2^N \to  \Real_+$ satisfying \cref{asm:submodular-function}}
-  \Output{$\max \{f(S) : S\subseteq N\}$}
+  \Output{$q_1, q_2, ... q_n$ such that $q$}
   \If{$c > 0$}
   {
     $x_1 = f(\min_{i \in 1, \dots , N} x_i )$\;
@@ -507,8 +508,15 @@ Our first contribution is an algorithm for solving the minimum-weight Independen
   \cref{alg:maximum-weight-independent} returns a optimal solution \todo{optimal for what optimization?} to the maximum-weight-independent set for polymatroids. 
 \end{lemma}
 \begin{proof}
-  
-The optimal solution will always be $f(S_i + 1) - f(S_{i})$, where $S_i$ is the set of all elements that have values $\leq i$.  For $f(S_{i+1}) \leq 1$ and $f(S_i) < 1$, $f(S_i + 1) - f(S_i) = c  +\sum_{i \subset (1, i + 1)}p(i + 1) - c  +\sum_{i \subset (1, i)}m_i *p(i) = m_{i + 1} *p(i + 1).$ For $f(S_{i+1} = 1$ and $f(S_i) < 1$, $f(S_i) - f(S_i-1) = 1 - c  +\sum_{i \subset (1, i )}m_i *p(i) = 1 - m_i *p(i).$ We know that element $i$ such that $f(S_{i+1} = 1$ and $f(S_i) < 1$ is the max $i$ such that $(c  +m *\sum_{i \subset (1, i )}p(i)) < 1  $, which equals the max $i$ such that $(\sum_{i \subset (1, i )}p(i)) < (1 - c)/m .$
+The optimal solution will always be $f(S_i + 1) - f(S_{i})$, where $S_i$ is the set of all elements that have values $\leq i$.  For $f(S_i+1) \leq 1$ and $f(S_i) < 1$,\\
+
+\todo{Is it $S_i+1$ or $S_{i+1}$ (and $S_{i-1}$ respectively?}\begin{align*}
+    f(S_i + 1) - f(S_i) &= c  +\sum_{i \subset (1, i + 1)}p(i + 1) - c  +\sum_{i \subset (1, i)}m_i *p(i)\\
+    &= m_{i + 1} *p(i + 1).
+\end{align*}
+
+For $f(S_i+1) = 1$ and $f(S_i) < 1$, $f(S_i) - f(S_i-1) = 1 - c  +\sum_{i \subset (1, i )}m_i *p(i) = 1 - m_i *p(i).$ We know that element $i$ such that $f(S_i+1) = 1$ and $f(S_i) < 1$ is the largest $i$ that yields\\
+$c  +m *\sum_{i \subset (1, i )}p(i)) < 1  $, which results in $\sum_{i \subset (1, i )}p(i) < (1 - c)/m .$
 \end{proof}
 
 \begin{lemma}
@@ -559,7 +567,7 @@ From previous work, we know that $D(p\|q) \leq \frac{1}{2 \log(2)} \, \|p - q\|_
     .
   \].
   
-\item[Case 1]: $P(\mathcal{O}) \geq frac{\beta}{2}$. In this scenario, we pick an element in $\mathcal{O}$ and add $1 - P(\mathcal{O})$ to it. We set all elements not in $\mathcal{O}$ to 0.
+\item[Case 1]: $P(\mathcal{O}) \geq \frac{\beta}{2}$. In this scenario, we pick an element in $\mathcal{O}$ and add $1 - P(\mathcal{O})$ to it. We set all elements not in $\mathcal{O}$ to 0.
 
 \item[Case 2]: $P(\mathcal{O}) < \alpha$. In this scenario, $Q(\mathcal{O}) \leq \frac{1}{\alpha} \cdot  P(\mathcal{O}) < 1$ \todo{why}. Then any given $\mathcal{O}$, we can construct $Q(\mathcal{O}) = \frac{1}{\alpha} \cdot  P(\mathcal{O})$. 
   This can be done by setting every element in $\mathcal{O}$ to $\frac{1}{\alpha} \cdot P(\omega)$ for all $\omega$ in $\Omega$ and $P(\omega) \cdot  d$ otherwise such that $\frac{1}{1 - \alpha} * P(\Omega) + d*P(B) = 1$, where $B$ contains all elements not in $\Omega$\todo{use complement notation}. Provided that $d \leq \frac{1}{\alpha}$, which is required for the constructed $Q$ to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{\alpha} \ge 1$. Since $P(\Omega) + P(B) = 1$,  $d \le 1$ in order for $\frac{1}{\alpha} \cdot  P(\Omega) + d\cdot P(B) = 1$ to hold. Since $1 \leq \frac{1}{\alpha}$, this implies $d \le \frac{1}{\alpha}$.
@@ -698,7 +706,7 @@ Now, suppose that \cref{alg:slow-quantile} terminates with value $q\opt$. Then, 
     $x_j < v, \, j\in f{:}(l-1), \quad x_j = v, \, j \in l{:}g, \quad x_j > v, \, j \in (g+1){:}b $}
   % $i \gets f + \lceil\frac{b-f}{2}\rceil$ \tcp*{Pivot: Median-of-medians for $O(b-f)$ runtime}
   $l \gets f$ \tcp*{invariant: less: $x_j < v, \, j\in f{:}(l-1)$}
-  $e \gets f$ \tcp*{invariant: equal: $x_j = v, \, j \in l{:}(e-1)$ }
+  $e \gets f$ \tcp*{invariant: equal: $x_j = v, \, j \in l{:}g$ }
   $g \gets b$ \tcp*{invariant: greater: $x_j > v, \, j \in (g+1){:}b$}
   \While{$e \leq g$}
   {

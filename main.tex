@@ -380,7 +380,7 @@ A \emph{polymatroid} $\mathcal{Q}_f$ for $f$ is a polytope defined as
   \[
     \mathcal{Q}_f := \left\{ \bm{q} \in \Real_+^E  \mid   \bm{q}(\mathcal{U}) \leq f(\mathcal{U}), \, \forall \,  \mathcal{U} \subseteq \mathcal{E} \right\},
   \]
-  where $q(\mathcal{U}) = \sum_{e \in \mathcal{U}} q(e)$.
+  where $q(\mathcal{U}) = \sum_{e \in \mathcal{U}} q(e)$ and $f(\mathcal{U})\rightarrow[0, 1]$. We note that $f(\mathcal{U})\rightarrow[0, 1]$ is not generally required for polymatroids, but is necessary in the context of risk measures.
 \end{definition}
 
 % marek: we already say this in the preliminaries section
@@ -393,25 +393,26 @@ Polymatroids are important for our purpose because many risk measures can be for
 \begin{proposition} \label{prop:coherent-polymatroid}
 Suppose that $\rho\colon \mathbb{X}\to \Real$ is a comonotonic coherent risk measure. Then   for each $\mathcal{A} \subseteq \Omega$ \mm{define comonotonic risk measures somewhere here}. Then
   \[
-   \rho[\tilde{x}] = \sup_{\bm{q}\in \mathcal{Q}_c} \bm{q}\tr  \bm{x},
+   \rho[\tilde{x}] = \min_{\bm{q}\in \mathcal{Q}_c} \bm{q}\tr  \bm{x},
   \]
   \mm{Should the polymatroid above be intersected with the probability simplex?}
-where $\mathcal{Q}_c$ is a the polymatroid in \cref{def:polymatroid} for $c := \rho(\one_{\mathcal{A}})$ \mm{I think that there should be some negations here.}
+  \palash{Good point. How Follmer and Schied address is by defining the polymatroid with the condition that f must be in the range [0, 1] which I have now added. From Prop 4.89 we replace the inf (or sup  if we negate x) with a min. Also according to follmer there should be negations like you mentioned which I added.  }
+where $\mathcal{Q}_c$ is the polymatroid in \cref{def:polymatroid} for $c := \rho(-\one_{\mathcal{A}})$ 
 \end{proposition}
 \begin{proof}
- The result is an immediate consequence of \cite[Corollary 4.95]{Follmer2016} and \mm{???}.
+ The result is an immediate consequence of \cite[Corollary 4.89]{Follmer2016}.
 \end{proof}
 
 \mm{The equality in \cref{prop:coherent-polymatroid}} becames an inequality for any coherent risk measure. We should probably adapt the statement and the theorem appropriately in order to help with the proofs for CVaR and TVaR.
 
-Conventional polymatroid optimization algorithms such as \cref{alg:greedy-polymatroid} solve \eqref{eq:polytope} using a greedy approach that requires sorting. We will show in \todo{reference section} that for a special class of submodular functions $f$, sorting is not necessary.
+Conventional polymatroid optimization algorithms for risk measures and the closely related maximum weighted independant set ( such as \cref{alg:greedy-polymatroid} ) solve \eqref{eq:polytope} using a greedy approach that requires sorting. We show in \todo{reference section} that for a special class of submodular functions $f$ as defined below, sorting is not necessary.
 
-Our first contribution is an algorithm for solving the minimum-weight Independent Set without sorting for polymatroids. We note that certain additional assumptions have to be satisfied in the submodular function as follows. Note that $i$ represents the index of the $i$th smallest element in the set and $f(S_i)$ represents the set of elements less than or equal to the $i$th smallest element. 
+
 
 \begin{assumption} \label{asm:submodular-function}
   % marek: Not needed; implied by the construction below
   % For $\mathcal{N} = \left\{ 1, \dots , N \right\}$, the function $f\colon 2^{\mathcal{N}} \to \Real_+$ $f(\emptyset) = 0$, $f(N) = 1$,
-A  \emph{submodular} function $f\colon 2^{\Omega} \to \Real_+$ satisfies \mm{give the property some name} if there there exists $g\colon [0,1] \to  [0,1]$ such that $f(\mathcal{O}) = g(\mathbb{P}[\mathcal{O}]), \forall \mathcal{O} \subseteq \Omega$ and for some $c,m\in \Real$:
+A \emph{submodular} function $f\colon 2^{\Omega} \to \Real_+$ satisfies \mm{give the property some name} if there there exists $g\colon [0,1] \to  [0,1]$ such that $f(\mathcal{O}) = g(\mathbb{P}[\mathcal{O}]), \forall \mathcal{O} \subseteq \Omega$ and for some $c,m\in \Real$:
     \[
       g(x) =
       \begin{cases}        
@@ -422,31 +423,37 @@ A  \emph{submodular} function $f\colon 2^{\Omega} \to \Real_+$ satisfies \mm{giv
 \end{assumption}
 
 \mm{the point 1. above is satisfied for any law-invariant comonotonic coherent risk measure. Follmer and Schied}
-
+We now describe an algorithm for optimizing over this class of submodular functions and prove it's optimality. 
 \begin{algorithm}
   \caption{Linear-time Algorithm for \mm{optimizing linear function on polymatroids}}\label{alg:maximum-weight-independent}
 
-  \Input{Finite $N = [1 \ldots n]$, $f\colon 2^N \to  \Real_+$ satisfying \cref{asm:submodular-function}}
-  \Output{$q_1, q_2, ... q_n$ such that $q$}
+  \Input{Finite $N = [1 \ldots n]$, $f\colon 2^N \to  \Real_+$ satisfying \cref{asm:submodular-function}, {vector $\bm{x}^0$, pmf $\bm{p}^0$}}
+  \Output{$q_1, q_2, ... q_n$}
+  
   \If{$c > 0$}
   {
-    $x_1 = f(\min_{i \in 1, \dots , N} x_i )$\;
-    \lIf{$ \min \left\{c, 1 - x_1\right\} < c$} {
-      \KwRet{ \mm{return what?}}
+    Swap $x_1, p_1$ with $x_j, p_j$ where $j = min_j(x_j)$
+    
+    $q_1 = f(p_1)$
+    
+    \If{$q_1 = 1$} {
+      \KwRet{$q_1 = 1, q_i = 0$ for $1 < i \leq n$}
     }
+   
   }
-  $m = \operatorname{QuickQuantile}(p, x, \alpha = (1 - c)/m) $\;
+  $mid = \operatorname{QuickQuantile}(p, x, \alpha = (1 - c)/m) $
+  
   \If{$c > 0$}
   {
-    Let $x_i \gets  \begin{cases}m_i \cdot p_i & \text{for } 1 < i \leq mid,\dots \end{cases}$\;
-    \mm{fix this}
+    Let $q_i \gets  \begin{cases}m_i \cdot p_i & \text{for } 1 < i < mid \end{cases}$\;
+    
   }
   \Else
   {
-    Let $x_i \gets  \begin{cases}m_i \cdot p_i & \text{for } i \leq mid,\dots \end{cases}$\;
-    \mm{fix the dots}
+    Let $q_i \gets  \begin{cases}m_i \cdot p_i & \text{for } i < mid \end{cases}$\;
+  
   }
-  $x_{m} \gets 1 - m_i p_i$\;
+  $q_{mid} \gets 1 - m_i p_i$\;
 \end{algorithm}
 
 
@@ -454,7 +461,7 @@ A  \emph{submodular} function $f\colon 2^{\Omega} \to \Real_+$ satisfies \mm{giv
   \cref{alg:maximum-weight-independent} returns a optimal solution \todo{optimal for what optimization?} to the maximum-weight-independent set \mm{we are not using the max-weight independent set problem, are we? The part that confuses me is ``independent''} for polymatroids. 
 \end{lemma}
 \begin{proof}
-The optimal solution will always be $f(S_i + 1) - f(S_{i})$, where $S_i$ is the set of all elements that have values $\leq i$.  For $f(S_i+1) \leq 1$ and $f(S_i) < 1$,\\
+The optimal solution will always be $f(S_i + 1) - f(S_{i})$, where $S_i$ is the set of all elements that have values $\leq i$ .  For $f(S_i+1) \leq 1$ and $f(S_i) < 1$,\\
 
 \todo{Is it $S_i+1$ or $S_{i+1}$ (and $S_{i-1}$ respectively?} \mm{Use $\mathcal{S}$ or $\mathcal{O}$?}
 \begin{align*}

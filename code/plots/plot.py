@@ -67,7 +67,7 @@ def plot_one_slow_vs_fast(plotter: Plotter, slow: str, fast: str):
     plot_means_and_cis(plotter, fast)
     plt.yscale('log')
     plt.xscale('log')
-    plt.xlabel('Length of Random Variable (n)')
+    plt.xlabel('Size of Probability Space (n)')
     plt.ylabel('Time (ms)')
     plt.legend()
     plt.grid()
@@ -76,7 +76,7 @@ def plot_one_slow_vs_fast(plotter: Plotter, slow: str, fast: str):
     plt.clf()
     plot_means_and_cis(plotter, slow)
     plot_means_and_cis(plotter, fast)
-    plt.xlabel('Length of Random Variable (n)')
+    plt.xlabel('Size of Probability Space (n)')
     plt.ylabel('Time (ms)')
     plt.legend()
     plt.grid()
@@ -96,7 +96,7 @@ def plot_all_slow_vs_fast(plotter: Plotter):
         plot_means_and_cis(plotter, fast)
     plt.yscale('log')
     plt.xscale('log')
-    plt.xlabel('Length of Random Variable (n)')
+    plt.xlabel('Size of Probability Space (n)')
     plt.ylabel('Time (ms)')
     plt.legend()
     plt.grid()
@@ -107,7 +107,7 @@ def plot_all_slow_vs_fast(plotter: Plotter):
         plot_means_and_cis(plotter, slow)
     for fast in plotter.fast_cols:
         plot_means_and_cis(plotter, fast)
-    plt.xlabel('Length of Random Variable (n)')
+    plt.xlabel('Size of Probability Space (n)')
     plt.ylabel('Time (ms)')
     plt.legend()
     plt.grid()
@@ -137,7 +137,7 @@ def plot_cvar_div_qcvar(plotter: Plotter):
     plt.plot(unique_sizes, np.array(cvar_div_qcvar_means), label='Time CVaR / Time QCVaR') # pyright: ignore[reportArgumentType]
     plt.fill_between(unique_sizes, np.array(cvar_div_qcvar_means) - np.array(cvar_div_qcvar_cis), np.array(cvar_div_qcvar_means) + np.array(cvar_div_qcvar_cis), alpha=0.2)# pyright: ignore[reportArgumentType]
     plt.plot(unique_sizes, np.exp(model.predict(X)), label='y = {:.2f} * log(n)'.format(model.coef_[0]))# pyright: ignore[reportArgumentType]
-    plt.xlabel('Length of Random Variable (n)')
+    plt.xlabel('Size of Probability Space (n)')
     plt.legend()
     plt.savefig('./plots/cvar_div_qcvar.pdf')
     # plt.show()

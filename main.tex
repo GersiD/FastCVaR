@@ -60,6 +60,7 @@ Monetary risk measures have gained popularity in expressing decision-makers' pre
 
 \section{Introduction}\label{sec:intro}
 
+\todo{citations}
 Monetary measures of risk generalize the expectation operator to be able to represent the risk aversion of decision makers in domains that range from robotics~\cite{} to finance~\cite{} to infrastructure maintenance~\cite{}. Value-at-Risk~(VaR) and Conditional-Value-at-Risk~(CVaR) are the most popular risk measures and have been making inroads in reinforcement learning, machine learning, and decision-making~\cite{Petrik2024}. Machine learning and reinforcement learning algorithms typically must compute the risk measures for discrete random variables. Fast algorithms for computing risk measures are necessary in several machine-learning settings~\cite{}. For example, when used as part of an optimization algorithm, the risk measure may need to be evaluated in every iteration of the algorithm and can represent a significant computational bottleneck~\cite{}. 
 
 
@@ -94,7 +95,7 @@ The remainder of the paper is organized as follows. \Cref{sec:preliminaries} des
 
 \section{Preliminaries: Monetary Risk Measures}\label{sec:preliminaries}
 
-In this work, we restrict our attention to random variables defined on finite probability spaces $(\Omega, 2^{\Omega}, \bm{p})$ where $\Omega := \left\{ 1, \dots , n \right\}$, $\bm{p} \in \Delta_n$, and $\Delta_n$ is the $n$-dimensional probability simplex. We use a tilde to indicate a random variable, such as $\tilde{x}\colon \Omega \to \Real$. The set of real-valued random variables is denoted by $\mathbb{X}$. Vectors are denoted with a lower-case bold font, such as $\bm{x} \in \Real^n$ and $\bm{x}_i, i = 1, \dots , n$ is the $i$-th element of the vector. We use $\tilde{x}$ and $\bm{x}$ interchangeably, such that $\bm{x}_i = \tilde{x}(i), i\in 1, \dots , n$. Sets are denoted with calligraphic letters. Finally, we use $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ to denote the extended real line. 
+In this work, we restrict our attention to random variables defined on finite probability spaces \todo{what do you mean by this?}$(\Omega, 2^{\Omega}, \bm{p})$ where $\Omega := \left\{ 1, \dots , n \right\}$, $\bm{p} \in \Delta_n$, and $\Delta_n$ is the $n$-dimensional probability simplex. We use a tilde to indicate a random variable, such as $\tilde{x}\colon \Omega \to \Real$. The set of real-valued random variables is denoted by $\mathbb{X}$. Vectors are denoted with a lower-case bold font, such as $\bm{x} \in \Real^n$ and $\bm{x}_i, i = 1, \dots , n$ is the $i$-th element of the vector. We use $\tilde{x}$ and $\bm{x}$ interchangeably, such that $\bm{x}_i = \tilde{x}(i), i\in 1, \dots , n$. Sets are denoted with calligraphic letters. Finally, we use $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ to denote the extended real line. 
 
 \emph{Monetary risk measures} $\rho\colon \mathbb{X} \to \bar{\Real}$ generalize the expectation operator to account for the uncertainty in the distribution of a real-valued random variable~\cite{Follmer2016}. In this paper, we assume that the risk measures are applied to random variables that represent rewards and that a higher risk value is preferable to a lower risk value. 
 

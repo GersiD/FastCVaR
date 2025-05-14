@@ -60,7 +60,7 @@ Monetary risk measures have gained popularity in expressing decision-makers' pre
 
 \section{Introduction}\label{sec:intro}
 
-Monetary measures of risk generalize the expectation operator to be able to represent the risk aversion of decision makers in domains that range from robotics~\cite{} to finance~\cite{} to infrastructure maintenance~\cite{}. Value-at-Risk~(VaR) and Conditional-Value-at-Risk~(CVaR) are the most popular risk measures and have been making inroads in reinforcement learning, machine learning, and decision-making~\cite{Petrik2024}. Machine learning and reinforcement learning algorithms typically must compute the risk measures for discrete random variables. Fast algorithms for computing risk measures are necessary in several machine-learning settings~\cite{}. For example, when used as a part of an optimization algorithm, the risk measure may need to be evaluated in every iteration of the algorithm and can represent a significant computational bottleneck~\cite{}. 
+Monetary measures of risk generalize the expectation operator to be able to represent the risk aversion of decision makers in domains that range from robotics~\cite{} to finance~\cite{} to infrastructure maintenance~\cite{}. Value-at-Risk~(VaR) and Conditional-Value-at-Risk~(CVaR) are the most popular risk measures and have been making inroads in reinforcement learning, machine learning, and decision-making~\cite{Petrik2024}. Machine learning and reinforcement learning algorithms typically must compute the risk measures for discrete random variables. Fast algorithms for computing risk measures are necessary in several machine-learning settings~\cite{}. For example, when used as part of an optimization algorithm, the risk measure may need to be evaluated in every iteration of the algorithm and can represent a significant computational bottleneck~\cite{}. 
 
 
 %However, in many applications such as robotics, finance, and autonomous systems, solutions must account for performance with respect to worst case scenarios rather than simply maximizing the mean. Therefore, it has become a common practice to optimize policies with respect to a risk measure~\cite{Follmer2016}, which focuses on the tails of the reward distribution rather than the expectation. 
@@ -68,7 +68,7 @@ Monetary measures of risk generalize the expectation operator to be able to repr
 % what are we doing; our contributions
 This paper proposes new fast algorithms for computing risk measures of discrete random variables. First, we propose a new linear-time VaR evaluation algorithm. Our VaR algorithm, which we call \emph{QuickQuantile}, builds on the well-known ideas of QuickSelect but generalizes it to quantiles. The worst-case linear-time upper bound of \emph{QuickQuantile} matches the linear-time lower bound~\cite{}. Second, building on \emph{QuickQuantile} we propose a general algorithm for evaluating some $\varphi$-divergence risk measures~\cite{}, which include CVaR and Total-Value-at-Risk (TVaR)~\cite{}. The algorithm, which we call \emph{QuickDivergence}, works by representing certain $\varphi$-divergence risk measures as a linear minimization over polymatroids. The linear worst-case runtime of \emph{QuickDivergence} also matches the known lower bounds on the runtime~\cite{}. 
 
-There is limited prior work on fast algorithms for evaluating risk measures. The conventional VaR algorithm for a discrete random variable must sort its values before it can evaluate its risk. As a result, the sort's runtime, which requires \todo{why use Omega rather than $\mathcal{O}$? marek: because we care about the lower bound on the complexity. Our algorithms are also $O(n \log n)$ or $O(n^2)$ for that matter.}  $\Omega(n \log n)$ operations where $n$ is the number of the probability mass function~(pmf) entries, dominates the runtime complexity of VaR. To the best of our knowledge at the time of writing, no prior work has proposed or studied linear-time algorithms for any of the above risk measures.
+There is limited prior work on fast algorithms for evaluating risk measures. The conventional VaR algorithm for a discrete random variable must sort its values before it can evaluate its risk. As a result, the sort's runtime, which requires   $\Omega(n \log n)$ operations where $n$ is the number of the probability mass function~(pmf) entries, dominates the runtime complexity of VaR. To the best of our knowledge at the time of writing, no prior work has proposed or studied linear-time algorithms for any of the above risk measures.
 
 Coherent risk measures, like CVaR and TVaR, can be evaluated by solving convex optimization problems~\cite{Follmer2016, rockefeller1996variational}. Although most of these optimization problems are tractable, their time complexity is too large to be practical for applications where they are most needed. Current practical implementations rely on specific properties of these optimization problems to compute the solution efficiently. For example, all existing CVaR algorithms must sort the values of the random variable to compute its value~\cite{}, as in the case for VaR. The $\Omega(n \log  n)$ time complexity of the sort dominates the time complexity and prevents linear time computation. In this paper, we circumvent the complexity of sorting by developing no-sort algorithms for these risk measures and others.
 
@@ -131,7 +131,7 @@ where $\bm{1}$ is a vector of ones. CVaR is usually continuously extended as $\c
   \ER_{\varphi,\beta}(\tilde{x}) := \inf \left\{\bm{q}\tr \bm{x} \mid H_{\varphi}(\bm{q} \| \bm{p}) \le \beta, \bm{q} \ll \bm{p} \right\},
   \quad
   H_\varphi(\bm{q} \| \bm{p}) := \sum_{i \in \Omega} p_i \cdot \varphi\left(\frac{q_i}{p_i}\right),
-\end{align} \todo{Do we want to explain Entropic Risk? Some may know the concept of a risk measure but not ER.}
+\end{align}
 where $H_{\varphi}$ is a $\varphi$-divergence~\cite{Bayraksan2015}, $\bm{q} \ll \bm{p}$ indicates that $\bm{q} \in \Delta_n$, and $p_i =0 \implies q_i = 0$ $\forall  i \in \Omega$. The function $\varphi$ is convex and satisfies $\varphi(1)=0$. Note that all $\varphi$-divergence risk measures also have the following equivalent dual representation~\cite{Ahmadi-Javid2011,Ahmadi-Javid2017}: 
 \begin{equation} \label{eq:fdiv-primal}
 \ER_{\varphi,\beta}(\tilde{x}) = \sup_{t,v \in \Real\,:\, t > 0}t \cdot \left(v - \E { \varphi\opt \left(- \frac{\tilde{x}}{t} + v + \beta \right)}\right) ,
@@ -167,10 +167,11 @@ In the remainder of the paper, we first propose a linear-time algorithm for comp
 \end{table}
 
 \section{Computing VaR in Linear Time} \label{sec:var-linear}
+Conventional algorithms for computing VaR such as A.1 in the appendix require sorting the different outcomes of the discrete random variable. This limits the computational complexity to $O(nlogn)$.
 
 In this section, we develop a quick algorithm to compute the VaR of a discrete random variable. The algorithm is extends the well-known QuickSelect algorithm to account to non-uniform weights. We also take a special care to allow random variables $\tilde{x}$ with duplicate values such that $\tilde{x}(\omega_1) = \tilde{x}$
 
-\mm{How regular algorithms work for VaR, sorting based approach\cref{alg:slow-quantile}.}
+
 
 \mm{algorithm describing the main idea and challenge. Tie this to QuickSelect and why this is not just a quick select algorithm.}
 

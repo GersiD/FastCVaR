@@ -174,7 +174,7 @@ In this section, we develop a quick algorithm to compute the VaR of a discrete r
 
 
 %We first restate some well-known properties of the Hoare Partition scheme.
-Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorithm works as follows. It first picks a pivot by taking the midde element between front and back and applies the partition scheme to easily compute the probability of all outcomes smaller than or equal to that of the pivot (Lines 1 - 5). Note that three partitions are create, one where the  Then it determines whether the quantile can exist on the left side of the pivot or on the right side and shrinks the search space, parameterized by the variables $f$ and $b$ to represent the front and back indices respectively.
+Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorithm works as follows. It first picks a pivot by taking the midde element between front and back and applies the partition scheme to easily compute the probability of all outcomes smaller than or equal to that of the pivot \todo{no hardcode}(Lines 1 - 5). Note that three partitions are create, one where the  Then it determines whether the quantile can exist on the left side of the pivot or on the right side and shrinks the search space, parameterized by the variables $f$ and $b$ to represent the front and back indices respectively.
 \todo{for algorithms should we bold vectors to keep with notation?}
 \todo{Hear hear!}
 \todo{To note, if $b$ and $f$ are vectors, the time complexity syntax wouldn't make sense. Shouldn't it be $\mathcal{O}(|b|-|f|)$ instead?}

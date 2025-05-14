@@ -761,12 +761,6 @@ Now, suppose that \cref{alg:slow-quantile} terminates with value $q\opt$. Then, 
   \label{fig:all_sparse}
 \end{figure}
 Code and results for these experiments as well as the implementations of all contained risk measures can be found at\todo{REDACTED}.
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.70\textwidth]{./code/plots/cvar_div_qcvar.pdf}
-  \caption{Linear regression fit of a logarithmic function to the ratio of the time taken to compute $\cvar{0.5}{\tilde{x}}$ by sorting (CVaR) and QuickSelect (QCVaR). \todo{dont like this graph, can we get rid of it?}}
-  \label{fig:cvar_div_qcvar}
-\end{figure}
 
 
 \begin{table} 
@@ -791,9 +785,11 @@ Space (n) &  &  &  &  &  &  &  \\
 \label{tab:small_results}
 \end{table}
 
+To assure the reader that our algorithm is indeed faster than the sorting based methods, we present the results of our experiments on small scale problems in \cref{tab:small_results}. 
 We test our algorithm on small scale problems where the difference in runtimes is not as significant,
 however these problems occur frequently in practice. \cref{tab:small_results} is consistent with the experimental
-results obtained in \cref{sec:experiments}, namely our no-sort methods outperform the sorting based methods in runtime.
+results obtained in \cref{sec:experiments}, namely our no-sort methods outperform the sorting based methods in runtime.'
+This assures that the algorithms developed here provide improvements in runtime for inputs of varying sizes.
 
 The results obtained in \cref{tab:small_results} were generated using a similar process to that of \cref{sec:experiments} 
 where instead of 10 trails per experiment, we used 50 trails per experiment. \cref{tab:small_results} shows the mean
@@ -1086,6 +1082,12 @@ Julia garbage collector, even when running synchronously.
 
 
 % Graveyard
+% \begin{figure}[htbp]
+%   \centering
+%   \includegraphics[width=0.70\textwidth]{./code/plots/cvar_div_qcvar.pdf}
+%   \caption{Linear regression fit of a logarithmic function to the ratio of the time taken to compute $\cvar{0.5}{\tilde{x}}$ by sorting (CVaR) and QuickSelect (QCVaR). \todo{dont like this graph, can we get rid of it?}}
+%   \label{fig:cvar_div_qcvar}
+% \end{figure}
 % \begin{algorithm}
 %   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and maximum divergence $\beta$}}
 %   \algrenewcommand\algorithmicensure{\textbf{Output: new distribution $q$}}

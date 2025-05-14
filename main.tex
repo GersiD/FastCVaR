@@ -174,7 +174,7 @@ In this section, we develop a quick algorithm to compute the VaR of a discrete r
 
 
 %We first restate some well-known properties of the Hoare Partition scheme.
-Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorithm works as follows. It first picks a pivot by taking the midde element between front and back and applies the partition scheme to easily compute the probability of all outcomes smaller than or equal to that of the pivot (\cref{pivot_comp} - \cref{partion_line}). Note that three partitions are create, one where the elements are all less than the pivot, another containing all elements equal to the pivot, and a third pivot containing all elements greater than the pivot. We refer to these partitions as the left, middle, and right partition from here on. QVar then determines whether the quantile can exist in the left, middle, or right pivot (Lines 8, 11, and 14) and adjusts the $f_k$ and $b_k$ respectively to reduce the search space to one of these partitions. We note that in the case the quantile is determined to exist in the middle partition, the algorithm can terminate since every value in the middle partition is the same. 
+Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorithm works as follows. It first picks a pivot by taking the midde element between front and back and applies the partition scheme to easily compute the probability of all outcomes smaller than or equal to that of the pivot (Lines \ref{pivot_comp} - \ref{line:partion_line}). Note that three partitions are create, one where the elements are all less than the pivot, another containing all elements equal to the pivot, and a third pivot containing all elements greater than the pivot. We refer to these partitions as the left, middle, and right partition from here on. QVar then determines whether the quantile can exist in the left, middle, or right pivot (Lines 8, 11, and 14) and adjusts the $f_k$ and $b_k$ respectively to reduce the search space to one of these partitions. We note that in the case the quantile is determined to exist in the middle partition, the algorithm can terminate since every value in the middle partition is the same. 
 \todo{for algorithms should we bold vectors to keep with notation?}
 \todo{Hear hear!}
 \todo{To note, if $b$ and $f$ are vectors, the time complexity syntax wouldn't make sense. Shouldn't it be $\mathcal{O}(|b|-|f|)$ instead?}
@@ -229,7 +229,7 @@ Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorit
     $v_k \gets x^{k-1}_{i_k}$ \tcp*{Pivot value}
     %Median-of-medians for $O(b-f)$ runtime}
      $l_k, g_k, \bm{x}^k, \bm{p}^k \gets \operatorname{partition}(\bm{x}^{k-1}, \bm{p}^{k-1}, v_k, f_{k-1}, b_{k-1})$
-    \tcp*{Alg.~\ref{alg:partition}, \cref{lem:hoare-partition}} \label{partion_line}    
+    \tcp*{Alg.~\ref{alg:partition}, \cref{lem:hoare-partition}} \label{line:partion_line}    
     $t_k \gets \sum_{j=f_{k-1}}^{l_k-1} p^k_j$  \tcp*{$\P{\tilde{x}^k < v_k}$}
     $e_k \gets \sum_{j = l_k}^{g_k} p^{k}_j $   \tcp*{$\P{\tilde{x}^k = v_k}$}
     \If{$\alpha_{k-1} < t_k$\label{determine_left}}

@@ -168,17 +168,13 @@ In the remainder of the paper, we first propose a linear-time algorithm for comp
 \end{table}
 
 \section{Computing VaR in Linear Time} \label{sec:var-linear}
-Conventional algorithms for computing VaR such as A.1 in the appendix require sorting the different outcomes of the discrete random variable. This limits the computational complexity to $O(nlogn)$.
 
-In this section, we develop a quick algorithm to compute the VaR of a discrete random variable. The algorithm is extends the well-known QuickSelect algorithm to account to non-uniform weights. We also take a special care to allow random variables $\tilde{x}$ with duplicate values such that $\tilde{x}(\omega_1) = \tilde{x}$
+In this section, we develop a quick algorithm to compute the VaR of a discrete random variable. The algorithm extends the well-known QuickSelect algorithm to account to non-uniform weights. We also take a special care to allow random variables $\tilde{x}$ with duplicate values such that $\tilde{x}(\omega_1) = \tilde{x}$. This allows us to compute VaR in expected linear time as opposed to conventional algorithms such as A.1 in the appendix.
 
-
-
-\mm{algorithm describing the main idea and challenge. Tie this to QuickSelect and why this is not just a quick select algorithm.}
 
 
 %We first restate some well-known properties of the Hoare Partition scheme.
-Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorithm works as follows. \mm{refer to the actual variables and line numbers in the algorithm.} The algorithm picks a pivot and applies the partition to easily compute the probability of all outcomes smaller than or equal to that of the pivot. Then it determines whether the quantile can exist on the left side of the pivot or on the right side and shrinks the search space, parameterized by the variables $f$ and $b$ to represent the front and back indices respectively.
+Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorithm works as follows. It first picks a pivot by taking the midde element between front and back and applies the partition scheme to easily compute the probability of all outcomes smaller than or equal to that of the pivot (Lines 1 - 5). Note that three partitions are create, one where the  Then it determines whether the quantile can exist on the left side of the pivot or on the right side and shrinks the search space, parameterized by the variables $f$ and $b$ to represent the front and back indices respectively.
 \todo{for algorithms should we bold vectors to keep with notation?}
 \todo{Hear hear!}
 \todo{To note, if $b$ and $f$ are vectors, the time complexity syntax wouldn't make sense. Shouldn't it be $\mathcal{O}(|b|-|f|)$ instead?}

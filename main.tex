@@ -174,10 +174,8 @@ In this section, we develop a quick algorithm to compute the VaR of a discrete r
 
 
 %We first restate some well-known properties of the Hoare Partition scheme.
-Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorithm works as follows. It first picks a pivot by taking the midde element between front and back and applies the partition scheme to easily compute the probability of all outcomes smaller than or equal to that of the pivot (Lines \ref{pivot_comp} - \ref{partion_line}). Note that three partitions are create, one where the elements are all less than the pivot, another containing all elements equal to the pivot, and a third pivot containing all elements greater than the pivot. We refer to these partitions as the left, middle, and right partition from here on. QVar then determines whether the quantile can exist in the left, middle, or right pivot \todo{hardcode} (Lines 8, 11, and 14) and adjusts the $f_k$ and $b_k$ respectively to reduce the search space to one of these partitions. We note that in the case the quantile is determined to exist in the middle partition, the algorithm can terminate since every value in the middle partition is the same. 
-\todo{for algorithms should we bold vectors to keep with notation?}
-\todo{Hear hear!}
-\todo{To note, if $b$ and $f$ are vectors, the time complexity syntax wouldn't make sense. Shouldn't it be $\mathcal{O}(|b|-|f|)$ instead?}
+Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorithm works as follows. It first picks a pivot by taking the midde element between front and back and applies the partition scheme to easily compute the probability of all outcomes smaller than or equal to that of the pivot (Lines \ref{pivot_comp} - \ref{partion_line}). Note that three partitions are create, one where the elements are all less than the pivot, another containing all elements equal to the pivot, and a third pivot containing all elements greater than the pivot. We refer to these partitions as the left, middle, and right partition from here on. QVar then determines whether the quantile can exist in the left, middle, or right pivot (lines \ref{determine_left}, \ref{determine_right}, and \ref{determine_middle} ) and adjusts the $f_k$ and $b_k$ respectively to reduce the search space to one of these partitions. We note that in the case the quantile is determined to exist in the middle partition, the algorithm can terminate since every value in the middle partition is the same. In the case of $\alpha^0 = 0$, we handle this separately and simply find the minimum element. 
+
 % \begin{algorithm}
 %   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and $\alpha \in [0,1]$}}
 %   \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
@@ -200,7 +198,7 @@ Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorit
 %   \end{algorithmic}
 % \end{algorithm}
 
-\mm{mention that we need to handle $\alpha = 0, 1$ separately}
+
 % \begin{algorithm}
 %   \caption{QVaR: Linear-time algorithm for VaR}\label{alg:quick-quantile}
 %   \Input{vector $\bm{x}$, pmf $\bm{p}$ and $\alpha \in (0,1)$}
@@ -241,7 +239,7 @@ Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorit
       $f_k \gets f_{k-1}$;~~~$b_k \gets l_k-1$\;
       $\alpha_k \gets \alpha_{k-1}$\;
     }
-    \ElseIf{$t_k + e_k \le  \alpha_{k-1} \label{determine_left}$} 
+    \ElseIf{$t_k + e_k \le  \alpha_{k-1} \label{determine_right}$} 
     {
       % \tcp{$\P{\tilde{x}^k \le v_k} < \alpha_{k-1} \implies \quant_{\alpha_{k-1}} > v_k$}
       \tcp{$\P{\tilde{x}^k \le v_k} \le \alpha_{k-1}
@@ -273,7 +271,7 @@ Suppose that $(l, g, \bm{x}, \bm{p}) \gets \operatorname{partition}(\bm{x'}, \bm
    j \in (g+1){:}b &\quad\implies \quad x_j > x_i'.
 \end{align*}
 \mm{And state the fact that the new $p$ values correspond to the $x$ values.}  Moreover, the algorithm runs in $O(b - f)$ time.
-\todo{Refer to suggestions made on line 113}
+
 \end{lemma}
 \begin{proof}
   \mm{TODO: should follow directly from the invariants in the algorithm. The linear time follows since $g-e$ decreases by 1 in every iteration}
@@ -287,17 +285,17 @@ Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite
 \end{lemma}
 \begin{proof}
 
-  \mm{define feasible}
-  \todo{fix this proof to not assume unique values}
+
+ 
 Recall the definition:
  \[
   \quant_{\alpha}^+(\tilde{x})
   \;:=\;
     \max\; \left\{\tau \in \bar{\Real} \mid \P{ \tilde{x} < \tau } \le \alpha\right\}, 
  \] 
-Assume the random variable $ x $ has $ n $ unique values, such that $ x_1 < x_2 < \cdots < x_n $.  We can assume this without loss of generality because VaR is law invariant~\cite{Follmer2016}.  
+Assume the random variable $ x $ has $ n $ unique values, such that $ x_1 < x_2 < \cdots < x_n $.  We can assume this without loss of generality because VaR is law invariant~\cite{Follmer2016}. For the sake of the proof, any given $\tau$ is feasible if $P[{\tilde{x}<\tau]} \leq \alpha$. We note that if $\tau$ is not feasible, it cannot equal $\quant^+_{\alpha}(\tilde{x})$ \eqref{eq:var-definition}. 
 
-Suppose for the sake of contradiction that there is no $\omega\in \Omega $ such that $\quant^+_{\alpha}(\tilde{x}) = \tilde{x}(\omega)$. That may mean \todo{defend why this may mean only these cases}:
+Suppose for the sake of contradiction that there is no $\omega\in \Omega $ such that $\quant^+_{\alpha}(\tilde{x}) = \tilde{x}(\omega)$. That may mean:
 \begin{enumerate}
 \item[Case 1]: $\exists x_{i}, x_{i + 1} \in \tilde{x}(\Omega)$ such that $\quant^+_{\alpha}(\tilde{x}) \in (x_{i}, x_{i + 1})$.
 
@@ -313,12 +311,14 @@ Suppose for the sake of contradiction that there is no $\omega\in \Omega $ such 
 
 \item[Case 3]: $\quant^+_{\alpha}(\tilde{x}) > \max \tilde{x}$ 
 
-Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})$. Recall $\alpha \in [0,1)$, $\P{\tilde{x} < \tau\opt} = 1 \leq \alpha < 1$.
+Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})$. Recall $\alpha \in [0,1)$, $\P{\tilde{x} < \tau\opt} = 1 \leq \alpha < 1$. Since $\alpha$ must be $< 1$, a contradiction exists here.
+\end{enumerate}
+We note that for a random variable with non-unique values, we can equivalently represent it as a random variable with unique values where the probability of a value that was repeated multiple times is the sum of all probabilities for each instance of that given value. Then we can apply this lemma to show that $\quant^+_{\alpha}(\tilde{x})$ must be equal to one of the outcomes of the original random variable. 
   
   % New Proof 2: Recall that $\alpha$ is less than 1 and  $\quant^+_{\alpha}(\tilde{x})$ is bounded for all admissible $\alpha$ values. Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})  $. Then, let $\tau' = \tau\opt + 1$. Because $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition}, $\P{ \tilde{x} < \tau' } =  \P{ \tilde{x} < \tau\opt  }\le \alpha$, $\tau\opt $ cannot be optimal.
 
   % Old Proof: Then $ P[x < \quant_{\alpha}^+(\tilde{x})] $ is greater than or equal to $ P[x < x_{n}] $. Remember that $\alpha$ must be less than 1 and $\quant_{\alpha}^+(\tilde{x})$ is bounded for all $\alpha$ less than 1 and greater than or equal to 0, therefore $ P[x < \quant_{\alpha}^+(\tilde{x})] $ is less than 1. Then, there must exist $ y $ in the range $ [\quant_{\alpha}^+(\tilde{x}), \infty) $ such that $ P[x = y] > 0 $ . This is impossible by definition. 
-\end{enumerate}
+
 \end{proof}
 
 \begin{lemma}
@@ -389,28 +389,28 @@ A \emph{polymatroid} $\mathcal{Q}_f$ for $f$ is a polytope defined as
 
 Polymatroids are important for our purpose because many risk measures can be formulated as linear optimization over polymatroids.  
 \begin{proposition} \label{prop:coherent-polymatroid}
-Suppose that $\rho\colon \mathbb{X}\to \Real$ is a comonotonic coherent risk measure. Then   for each $\mathcal{A} \subseteq \Omega$ \mm{define comonotonic risk measures somewhere here}. Then
+Suppose that $\rho\colon \mathbb{X}\to \Real$ is a comonotonic coherent risk measure (defined as $\rho$ such that $\rho(X) +  \rho(Y)= \rho(X + Y)$. Then
   \[
    \rho[\tilde{x}] = \min_{\bm{q}\in \mathcal{Q}_c} \bm{q}\tr  \bm{x},
-  \]
+  \]\label{comontonic optimization}
   \mm{Should the polymatroid above be intersected with the probability simplex?}
   \palash{Good point. How Follmer and Schied address is by defining the polymatroid with the condition that f must be in the range [0, 1] which I have now added. From Prop 4.89 we replace the inf (or sup  if we negate x) with a min. Also according to follmer there should be negations like you mentioned which I added.  }
-where $\mathcal{Q}_c$ is the polymatroid in \cref{def:polymatroid} for $c := \rho(-\one_{\mathcal{A}})$ 
+where $\mathcal{Q}_c$ is the polymatroid in \cref{def:polymatroid} for $c := \rho(-\one_{\mathcal{A}})$ for each $\mathcal{A} \subseteq \Omega$. 
 \end{proposition}
 \begin{proof}
  The result is an immediate consequence of \cite[Corollary 4.89]{Follmer2016}.
 \end{proof}
 
-\mm{The equality in \cref{prop:coherent-polymatroid}} becames an inequality for any coherent risk measure. We should probably adapt the statement and the theorem appropriately in order to help with the proofs for CVaR and TVaR.
+The equality in \cref{prop:coherent-polymatroid} becomes an inequality for any coherent risk measure. We should probably adapt the statement and the theorem appropriately in order to help with the proofs for CVaR and TVaR.
 
-Conventional polymatroid optimization algorithms for risk measures and the closely related maximum weighted independant set ( such as \cref{alg:greedy-polymatroid} ) solve \eqref{eq:polytope} using a greedy approach that requires sorting. We show in \todo{reference section} that for a special class of submodular functions $f$ as defined below, sorting is not necessary.
+Conventional polymatroid optimization algorithms for risk measures and the closely related maximum weighted independent set (such as \cref{alg:greedy-polymatroid} in the appendix) solve the optimization problem in \cref{prop:coherent-polymatroid} using a greedy approach that requires sorting. We now show that for a special class of submodular functions $f$ as defined below, sorting is not necessary.
 
 
 
 \begin{assumption} \label{asm:submodular-function}
   % marek: Not needed; implied by the construction below
   % For $\mathcal{N} = \left\{ 1, \dots , N \right\}$, the function $f\colon 2^{\mathcal{N}} \to \Real_+$ $f(\emptyset) = 0$, $f(N) = 1$,
-A \emph{submodular} function $f\colon 2^{\Omega} \to \Real_+$ satisfies \mm{give the property some name} if there there exists $g\colon [0,1] \to  [0,1]$ such that $f(\mathcal{O}) = g(\mathbb{P}[\mathcal{O}]), \forall \mathcal{O} \subseteq \Omega$ and for some $c,m\in \Real$:
+A \emph{submodular} function $f\colon 2^{\Omega} \to \Real_+$ satisfies what we call Element-Wise-Separability (EWS) if there exists $g\colon [0,1] \to  [0,1]$ such that $f(\mathcal{O}) = g(\mathbb{P}[\mathcal{O}]), \forall \mathcal{O} \subseteq \Omega$ and for some $c,m\in \Real$:
     \[
       g(x) =
       \begin{cases}        
@@ -420,8 +420,8 @@ A \emph{submodular} function $f\colon 2^{\Omega} \to \Real_+$ satisfies \mm{give
     \]
 \end{assumption}
 
-\mm{the point 1. above is satisfied for any law-invariant comonotonic coherent risk measure. Follmer and Schied}
-We now describe an algorithm for optimizing over this class of submodular functions and prove it's optimality. 
+ The first statement in the assumption above is satisfied for any law-invariant comonotonic coherent risk measure \cite{Follmer2016}
+We now describe an algorithm for optimizing over polymatroids with this class of submodular function.
 \begin{algorithm}
   \caption{Linear-time Algorithm for \mm{optimizing linear function on polymatroids}}\label{alg:maximum-weight-independent}
 
@@ -439,45 +439,55 @@ We now describe an algorithm for optimizing over this class of submodular functi
     }
    
   }
-  $mid = \operatorname{QuickQuantile}(p, x, \alpha = (1 - c)/m) $
+  $midval = \operatorname{QuickQuantile}(p, x, \alpha = (1 - c)/m) $
+  
+  Set $mid$ to smallest  $i$ such that $x_i = midval$
   
   \If{$c > 0$}
   {
-    Let $q_i \gets  \begin{cases}m_i \cdot p_i & \text{for } 1 < i < mid \end{cases}$\;
+    Let $q_i \gets  \begin{cases}m \cdot p_i & \text{for } 1 < i < mid \end{cases}$\;
     
   }
   \Else
   {
-    Let $q_i \gets  \begin{cases}m_i \cdot p_i & \text{for } i < mid \end{cases}$\;
+    Let $q_i \gets  \begin{cases}m \cdot p_i & \text{for } i < mid \end{cases}$\;
   
   }
-  $q_{mid} \gets 1 - m_i p_i$\;
+  $sum = \sum_iq_i$
+  
+  $q_{mid} \gets 1 - sum$\;
+  Let $q_i \gets 0 \text{ for } i > mid$
+  
 \end{algorithm}
 
+We now prove the optimality of the algorithm and it's expected linear time complexity. The proof of optimality is obtained by showing that every value we compute for $q$ is equivalent to what would be obtained by following the computational procedure defined in \cite[Remark 4.86]{Follmer2016}, which is proven to be optimal. The proof of the time complexity follows from the expected linear time complexity, and the fact that remaining operations can trivally be computed in linear time, and thus have no impact on the complexity.
+
 
 \begin{lemma}
-  \cref{alg:maximum-weight-independent} returns a optimal solution \todo{optimal for what optimization?} to the maximum-weight-independent set \mm{we are not using the max-weight independent set problem, are we? The part that confuses me is ``independent''} for polymatroids. 
+  \cref{alg:maximum-weight-independent} returns a optimal solution to optimization problem defined in \cref{comontonic optimization}. 
 \end{lemma}
 \begin{proof}
-The optimal solution will always be $f(S_i + 1) - f(S_{i})$, where $S_i$ is the set of all elements that have values $\leq i$ .  For $f(S_i+1) \leq 1$ and $f(S_i) < 1$,\\
+The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal{O}_{i})$ \cite[Remark 4.86]{Follmer2016}, where $\mathcal{O}_i$ is the set of all elements that have values $\leq i$ .  For $f(\mathcal{O}_i+1) \leq 1$ and $f(\mathcal{O}_i) < 1$,\\
 
-\todo{Is it $S_i+1$ or $S_{i+1}$ (and $S_{i-1}$ respectively?} \mm{Use $\mathcal{S}$ or $\mathcal{O}$?}
+
 \begin{align*}
-    f(S_i + 1) - f(S_i) &= c  +\sum_{i \subset (1, i + 1)}p(i + 1) - c  +\sum_{i \subset (1, i)}m_i *p(i)\\
-    &= m_{i + 1} *p(i + 1).
+    f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_i) &= c  +\sum_{i \subset (1, i + 1)}p_{i} - c  +\sum_{i \subset (1, i)}m *p(i)\\
+    &= m *p(i + 1).
 \end{align*}
 
-For $f(S_i+1) = 1$ and $f(S_i) < 1$, $f(S_i) - f(S_i-1) = 1 - c  +\sum_{i \subset (1, i )}m_i *p(i) = 1 - m_i *p(i).$ We know that element $i$ such that $f(S_i+1) = 1$ and $f(S_i) < 1$ is the largest $i$ that yields\\
-$c  +m *\sum_{i \subset (1, i )}p(i)) < 1  $, which results in $\sum_{i \subset (1, i )}p(i) < (1 - c)/m .$
+For $i$ such that $f(\mathcal{O}_{i + 1}) = 1$ where $ (c  +\sum_{i \subset (1, i + 1)}m*p_{i}) > 1$ and $f(\mathcal{O}) \leq 1$, $f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_{i}) = 1 - c  +\sum_{i \subset (1, i )}m *p_i$. We know that such $i$ is the largest $i$ that satisfies
+$c  + m *\sum_{i \subset (1, i )}p_i \leq 1  $, which after algebraic manipulation results in the maximum $i$ such that $\sum_{i \subset (1, i )}p_i \leq (1 - c)/m $. We can thus see from \eqref{eq:var-definition} that VaR with $\alpha = (1 - c)/m$ will return the value at $x_{i + 1}$, which is calculated as $midval$ in the algorithm with $i + 1 = mid$. Thus, it follows that $q_{mid} = 1 - c  +\sum_{i \subset (1, i )}m *p_i$, where from the previous paragraph it follows that $ c  +\sum_{i \subset (1, i )}m *p_i = \sum_iq_i$. For all other $i > mid$, we note that $f(\mathcal{O}_{i}) - f(\mathcal{O}_{i - 1}) = 1 - 1 = 0$, and thus $q_i = 0$.
 \end{proof}
-
 \begin{lemma}
-\cref{alg:maximum-weight-independent} run with expected complexity $\mathcal{O}(N * f(i))$ for all $i$ in set $S$.
+\cref{alg:maximum-weight-independent} run with expected complexity $\mathcal{O}(N)$.
 \end{lemma}
 
 \subsection{CVaR}
+We now prove the submodular function for CVaR and show that it satisfies ElementWiseSeperability as defined above. Therefore we can provably compute CVaR in expected linear time.
 
-\begin{lemma}
+\begin{proposition}
+    
+
 Let $f\colon 2^{\Omega} \to \Real_+$ be defined as
 \[
   f(\mathcal{O})
@@ -485,11 +495,12 @@ Let $f\colon 2^{\Omega} \to \Real_+$ be defined as
   \min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\},
 \quad \forall \mathcal{O} \subseteq \Omega .
 \]
-Then $f$ is submodular and the polymatroid $\mathcal{Q}_f$ satisfies that
+Then $f$ is submodular and the polymatroid $\mathcal{Q}_f$ satisfies
 \[
 \cvar{\alpha }{\tilde{x} } = \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}.
 \]
-\end{lemma}
+$f$ will also satisfy ElementWiseSeparabaility with $m = 1/\alpha$ and $c = 0$ 
+\end{proposition}
 \begin{proof}
 \mm{I suggest structuring the proof separately for $\cvar{\alpha }{\tilde{x} } \le  \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}$ and $\cvar{\alpha }{\tilde{x} } \ge \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}.$. I believe that the first inequality follows directly from the construction where $f(\mathcal{O}) = - \cvar{\alpha}{\tilde{1}_{\mathcal{O}}}$. I am not sure about the signs here. What comes below is the proof of the second inequality.}
   

@@ -328,15 +328,14 @@ We note that for a random variable with non-unique values, we can equivalently r
  
  Loop Invariant: Before and after every iteration $\quant^+$ will remain in the array $x$ at an index $i$ such that $ f_k \leq i \leq b_k $.
 During the first loop: Every element in $x$ has an index $i$ such that $ front \leq i \leq back $, where $front=1$ and $back=n$. By Lemma 1, there exists an element with index $i$ such that $\quant^+ = x[i] $.
- 
-\mm{the proof should use indexing consistent with the algorithm such as  $x_{j_k}$ rather than $x[j_k]$}
+
 \mm{this proof is much better!}
 During the loop, there are 3 possible scenarios at each iteration:
 \begin{enumerate}
 
 \item[Case 1]: $\alpha_{k-1} < t_k$ 
 \mm{make sure to use notation consistent with the remainder of the paper $\P{\dots }$, ...}
- Assume there exists $j_k \geq l_k$ such that $x[j_k]=\quant^+$. Then $P[x < x[j_k]] \geq t_k > \alpha_{k - 1}$, which means that $x[j_k]$ is not feasible with \eqref{eq:var-definition}. Therefore, $\quant^+$ can not exist at any $x[j_k]$ such that $j_k\geq l_k$, and the loop invariant is thus satisfied.
+ Assume there exists $j_k \geq l_k$ such that $x[j=\quant^+$. Then $P[x < x[j_k]] \geq t_k > \alpha_{k - 1}$, which means that $x[j_k]$ is not feasible with \eqref{eq:var-definition}. Therefore, $\quant^+$ can not exist at any $x[j_k]$ such that $j_k\geq l_k$, and the loop invariant is thus satisfied.
 
 
 \item[Case 2]:  $t_k + e_k \leq \alpha_{k - 1}$

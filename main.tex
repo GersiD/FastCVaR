@@ -95,7 +95,7 @@ The remainder of the paper is organized as follows. \Cref{sec:preliminaries} des
 
 \section{Preliminaries}\label{sec:preliminaries}
 
-In this work, we restrict our attention to random variables defined on finite probability spaces $(\Omega, 2^{\Omega}, \bm{p})$ where $\Omega := \left\{ 1, \dots , n \right\}$, $\bm{p} \in \Delta_n$, and $\Delta_n$ is the $n$-dimensional probability simplex. We use a tilde to indicate a random variable, such as $\tilde{x}\colon \Omega \to \Real$. The set of real-valued random variables is denoted by $\mathbb{X}$. Vectors are denoted with a lower-case bold font, such as $\bm{x} \in \Real^n$ and indexed as $\bm{x}_i \text{ for } i = 1, \dots , n$. We use $\tilde{x}$ and $\bm{x}$ interchangeably, such that $\bm{x}_\omega = \tilde{x}(\omega) \text{ for }  \omega \in \Omega$. Sets are denoted with calligraphic letters. Finally, we use $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ to denote the extended real line. 
+In this work, we restrict our attention to random variables defined on finite probability spaces \todo{what do you mean by this}$(\Omega, 2^{\Omega}, \bm{p})$ where $\Omega := \left\{ 1, \dots , n \right\}$, $\bm{p} \in \Delta_n$, and $\Delta_n$ is the $n$-dimensional probability simplex. We use a tilde to indicate a random variable, such as $\tilde{x}\colon \Omega \to \Real$. The set of real-valued random variables is denoted by $\mathbb{X}$. Vectors are denoted with a lower-case bold font, such as $\bm{x} \in \Real^n$ and indexed as $\bm{x}_i \text{ for } i = 1, \dots , n$. We use $\tilde{x}$ and $\bm{x}$ interchangeably, such that $\bm{x}_\omega = \tilde{x}(\omega) \text{ for }  \omega \in \Omega$. Sets are denoted with calligraphic letters. Finally, we use $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ to denote the extended real line. 
 
 \emph{Monetary risk measures} $\rho\colon \mathbb{X} \to \bar{\Real}$ generalize the expectation operator to account for different notions of uncertainty in the distribution of a random variable~\cite{Follmer2016}. In this paper, we assume that the risk measures are applied to random variables that represent rewards and that a higher risk value is preferable to a lower risk value. 
 
@@ -174,7 +174,7 @@ In this section, we develop a quick algorithm to compute the VaR of a discrete r
 
 
 %We first restate some well-known properties of the Hoare Partition scheme.
-Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorithm works as follows. It first picks a pivot by taking the midde element between front and back and applies the partition scheme to easily compute the probability of all outcomes smaller than or equal to that of the pivot (Lines \ref{pivot_comp} - \ref{partion_line}). Note that three partitions are create, one where the elements are all less than the pivot, another containing all elements equal to the pivot, and a third pivot containing all elements greater than the pivot. We refer to these partitions as the left, middle, and right partition from here on. QVar then determines whether the quantile can exist in the left, middle, or right pivot (lines \ref{determine_left}, \ref{determine_right}, and \ref{determine_middle} ) and adjusts the $f_k$ and $b_k$ respectively to reduce the search space to one of these partitions. We note that in the case the quantile is determined to exist in the middle partition, the algorithm can terminate since every value in the middle partition is the same. In the case of $\alpha^0 = 0$, we handle this separately and simply find the minimum element. 
+Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorithm works as follows. It first picks a pivot by taking the middle element between front and back and applies the partition scheme to easily compute the probability of all outcomes smaller than or equal to that of the pivot (Lines \ref{pivot_comp} - \ref{partion_line}). Note that three partitions are create, one where the elements are all less than the pivot, another containing all elements equal to the pivot, and a third pivot containing all elements greater than the pivot. We refer to these partitions as the left, middle, and right partition from here on. QVaR then determines whether the quantile can exist in the left, middle, or right pivot (lines \ref{determine_left}, \ref{determine_right}, and \ref{determine_middle} ) and adjusts the $f_k$ and $b_k$ respectively to reduce the search space to one of these partitions. We note that in the case the quantile is determined to exist in the middle partition, the algorithm can terminate since every value in the middle partition is the same. In the case of $\alpha^0 = 0$, we handle this separately and simply find the minimum element. 
 
 % \begin{algorithm}
 %   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and $\alpha \in [0,1]$}}
@@ -277,7 +277,7 @@ Suppose that $(l, g, \bm{x}, \bm{p}) \gets \operatorname{partition}(\bm{x'}, \bm
   \mm{TODO: should follow directly from the invariants in the algorithm. The linear time follows since $g-e$ decreases by 1 in every iteration}
 \end{proof}
 
-The above conditions primarily state that each call to the partition scheme performs partial sorting such that all elements less than or equal to the pivot will be at a lower index, and elements greater than the pivot will be at a higher index. 
+The above conditions primarily state that each call to the partition scheme performs partial sorting such that all elements less than or equal to the pivot will be at a lower index \todo{same variable names as in the algorithm}, and elements greater than the pivot will be at a higher index\todo{ditto}. 
 
 In order to prove that the algorithm is optimal, we first show that $\quant_{\alpha}^-(\tilde{x})$ is an element in the array. 
 \begin{lemma}
@@ -296,6 +296,7 @@ Recall the definition:
 Assume the random variable $ x $ has $ n $ unique values, such that $ x_1 < x_2 < \cdots < x_n $.  We can assume this without loss of generality because VaR is law invariant~\cite{Follmer2016}. For the sake of the proof, any given $\tau$ is feasible if $P[{\tilde{x}<\tau]} \leq \alpha$. We note that if $\tau$ is not feasible, it cannot equal $\quant^+_{\alpha}(\tilde{x})$ \eqref{eq:var-definition}. 
 
 Suppose for the sake of contradiction that there is no $\omega\in \Omega $ such that $\quant^+_{\alpha}(\tilde{x}) = \tilde{x}(\omega)$. That may mean:
+\todo{why?}
 \begin{enumerate}
 \item[Case 1]: $\exists x_{i}, x_{i + 1} \in \tilde{x}(\Omega)$ such that $\quant^+_{\alpha}(\tilde{x}) \in (x_{i}, x_{i + 1})$.
 
@@ -327,7 +328,7 @@ We note that for a random variable with non-unique values, we can equivalently r
 \begin{proof}
  
  Loop Invariant: Before and after every iteration $\quant^+$ will remain in the array $x$ at an index $i$ such that $ f_k \leq i \leq b_k $.
-During the first loop: Every element in $x$ has an index $i$ such that $ front \leq i \leq back $, where $front=1$ and $back=n$. By Lemma 1, there exists an element with index $i$ such that $\quant^+ = x[i] $. \todo{consistent indexing $f_k$ vs $x[i]$}
+During the first loop: Every element in $x$ has an index $i$ such that $ front \leq i \leq back $, where $front=1$ and $back=n$. By Lemma 1, there exists an element with index $i$ such that \todo{$\alpha$}$\quant^+ = x[i] $. \todo{consistent indexing $f_k$ vs $x[i]$}
 
 
 During the loop, there are 3 possible scenarios at each iteration:
@@ -388,7 +389,7 @@ A \emph{polymatroid} $\mathcal{Q}_f$ for $f$ is a polytope defined as
 
 Polymatroids are important for our purpose because many risk measures can be formulated as linear optimization over polymatroids.  
 \begin{proposition} \label{prop:coherent-polymatroid}
-Suppose that $\rho\colon \mathbb{X}\to \Real$ is a comonotonic coherent risk measure (defined as $\rho$ such that $\rho(X) +  \rho(Y)= \rho(X + Y)$. Then
+Suppose that $\rho\colon \mathbb{X}\to \Real$ is a comonotonic coherent risk measure (defined as $\rho$ such that $\rho(X) +  \rho(Y)= \rho(X + Y)$)\todo{this is not the def of comonotonicity, this is the def of subadditivity}. Then
   \[
    \rho[\tilde{x}] = \min_{\bm{q}\in \mathcal{Q}_c} \bm{q}\tr  \bm{x},
   \]\label{comontonic optimization}
@@ -409,7 +410,7 @@ Conventional polymatroid optimization algorithms for risk measures and the close
 \begin{assumption} \label{asm:submodular-function}
   % marek: Not needed; implied by the construction below
   % For $\mathcal{N} = \left\{ 1, \dots , N \right\}$, the function $f\colon 2^{\mathcal{N}} \to \Real_+$ $f(\emptyset) = 0$, $f(N) = 1$,
-A \emph{submodular} function $f\colon 2^{\Omega} \to \Real_+$ satisfies what we call Element-Wise-Separability (EWS) if there exists $g\colon [0,1] \to  [0,1]$ such that $f(\mathcal{O}) = g(\mathbb{P}[\mathcal{O}]), \forall \mathcal{O} \subseteq \Omega$ and for some $c,m\in \Real$:
+A \emph{submodular} function $f\colon 2^{\Omega} \to \Real_+$ satisfies what we call Element-Wise-Separability (EWS) if there exists $g\colon [0,1] \to  [0,1]$ such that $f(\mathcal{O}) = g(\mathbb{P}[\mathcal{O}]), \forall \mathcal{O} \subseteq \Omega$ and for some $c,m, \text{in }   \mathbb{R}_{\geq 0}$:
     \[
       g(x) =
       \begin{cases}        
@@ -418,7 +419,12 @@ A \emph{submodular} function $f\colon 2^{\Omega} \to \Real_+$ satisfies what we 
       \end{cases}, \quad \forall x\in [0,1]
     \]
 \end{assumption}
-
+\begin{corollary}
+Any EWS function is guaranteed to be submodular for all admissible $c, m$.   
+\end{corollary}
+\begin{proof}
+ We first note that left component of the $min$ in $g(x) > 0$ is $c + m  \cdot x$, which is submodular as it is the sum of a linear and constant function. The right side of the $min$ is 1, a constant function and is thus also submodular. Since $c + m  \cdot x - 1$ is a monotone function, $g(x)$ is submodular for $x > 0$. We can also show that the construction $g(x)$ forcing it to equal 0 for $x = 0$ (or equivalently $f(\emptyset) = 0$ does not violate the submodularity of the function. For any nonempty set $S$ and a given element $z$ not in $S$, $f(S\cup z) - f(S) \leq \mathbb{P}[z] \leq f(z) - f(\emptyset) = c + \mathbb{P}[z]$.
+\end{proof}
  The first statement in the assumption above is satisfied for any law-invariant comonotonic coherent risk measure \cite{Follmer2016}
 We now describe an algorithm for optimizing over polymatroids with this class of submodular function.
 \begin{algorithm}
@@ -482,7 +488,7 @@ $c  + m *\sum_{i \subset (1, i )}p_i \leq 1  $, which after algebraic manipulati
 \end{lemma}
 
 \subsection{CVaR}
-We now prove the submodular function for CVaR and show that it satisfies ElementWiseSeperability as defined above. Therefore we can provably compute CVaR in expected linear time.
+We now prove the submodular function for CVaR and show that it satisfies Element-Wise-Seperability as defined above. Therefore we can provably compute CVaR in expected linear time.
 
 \begin{proposition}
     
@@ -498,24 +504,29 @@ Then $f$ is submodular and the polymatroid $\mathcal{Q}_f$ satisfies
 \[
 \cvar{\alpha }{\tilde{x} } = \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}.
 \]
-$f$ will also satisfy ElementWiseSeparabaility with $m = 1/\alpha$ and $c = 0$ 
+$f$ will also satisfy Element-Wise-Separabaility\todo{what} with $m = 1/\alpha$ and $c = 0$ 
 \end{proposition}
 \begin{proof}
 \mm{I suggest structuring the proof separately for $\cvar{\alpha }{\tilde{x} } \le  \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}$ and $\cvar{\alpha }{\tilde{x} } \ge \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}.$. I believe that the first inequality follows directly from the construction where $f(\mathcal{O}) = - \cvar{\alpha}{\tilde{1}_{\mathcal{O}}}$. I am not sure about the signs here. What comes below is the proof of the second inequality.}
-  
-We show below, we can construct $q$ such that $q(\mathcal{O}) =\min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\} $ for any $\mathcal{O}$. \mm{How does constructing such a $q$ help us?}
-  
+Note: From here on, we will use ' to denote the complement of a set.
+
+We first show that we can for all $q$ such that $\cvar{\alpha }{\tilde{x} } \le  \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}$. This directly follows from the directly from definition 2 of CVaR where we see that $q \leq ((1/\alpha)\cdot p)$ 
+(this is defined element wise) and all elements of $q$ must sum to 1.  
+
+We also show below, we can construct $q$ such that $q(\mathcal{O}) =\min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\} $ for any $\mathcal{O}$. 
 \item[Case 1]: $P(\mathcal{O}) \geq \alpha$. In this scenario, $Q(\mathcal{O})$ = 1 since $\frac{1}{\alpha} P(\mathcal{O}) > 1 $. Thus, every element in $\mathcal{O}$ should be scaled by $\frac{1}{P(\mathcal{O})}$ and all other elements should be set to 0 . Since  $P(\mathcal{O}) \geq \alpha$, we can imply the reciprocal $\frac{1}{P(\mathcal{O})} \leq \frac{1}{\alpha}$ is also true. 
 
-\item[Case 2]: $P(\mathcal{O}) < \alpha$. In this scenario, $Q(\mathcal{O}) \leq \frac{1}{\alpha} \cdot  P(\mathcal{O}) < 1$ \todo{why}. Then any given $\mathcal{O}$, we can construct $Q(\mathcal{O}) = \frac{1}{\alpha} \cdot  P(\mathcal{O})$. 
-  This can be done by setting every element in $\mathcal{O}$ to $\frac{1}{\alpha} \cdot P(\omega)$ for all $\omega$ in $\Omega$ and $P(\omega) \cdot  d$ otherwise such that $\frac{1}{1 - \alpha} * P(\Omega) + d*P(B) = 1$, where $B$ contains all elements not in $\Omega$\todo{use complement notation}. Provided that $d \leq \frac{1}{\alpha}$, which is required for the constructed $Q$ to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{\alpha} \ge 1$. Since $P(\Omega) + P(B) = 1$,  $d \le 1$ in order for $\frac{1}{\alpha} \cdot  P(\Omega) + d\cdot P(B) = 1$ to hold. Since $1 \leq \frac{1}{\alpha}$, this implies $d \le \frac{1}{\alpha}$.
+\item[Case 2]: $P(\mathcal{O}) < \alpha$. In this scenario, $Q(\mathcal{O}) \leq \frac{1}{\alpha} \cdot  P(\mathcal{O}) < 1$ . Then any given $\mathcal{O}$, we can construct $Q(\mathcal{O}) = \frac{1}{\alpha} \cdot  P(\mathcal{O})$. 
+  This can be done by setting every element in $\mathcal{O}$ to $\frac{1}{\alpha} \cdot P(\omega)$ for all $\omega$ in $\Omega$ and $P(\omega) \cdot  d$ otherwise such that $\frac{1}{1 - \alpha} \cdot P(\Omega) + d \cdot P(\Omega') = 1$, where $B$ contains all elements not in $\Omega$\todo{use complement notation}. Provided that $d \leq \frac{1}{\alpha}$, which is required for the constructed $Q$ to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{\alpha} \ge 1$. Since $P(\Omega) + P(\Omega') = 1$,  $d \leq 1$ in order for $\frac{1}{\alpha} \cdot  P(\Omega) + d\cdot P(\Omega') = 1$ to hold. Since $1 \leq \frac{1}{\alpha}$, this implies $d \le \frac{1}{\alpha}$.
+  
+  
   We have now shown that $Q(\Omega) \leq f(\mathcal{O}) = \min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\}$ and it is possible to construct $Q(\Omega)$ such that $Q(\Omega) = \min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\}$. Thus by Remark 4.90 in Follmer and Schied, $f(\mathcal{O}) = \min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\}$
 \end{proof}
 
 
 \subsection{TVaR}
 We remind the reader that in this work we define TVaR as the $\varphi$-divergence risk that uses the L1 norm divergence. This may not seem very interpretable, however we can show that we can set the divergence constraint, or $\beta$, such that it can be a provable lower bound for a given EVaR with $\alpha$ value between 0 and 1.
-From previous work \cite{}, we know that $D(p\|q) \leq \frac{1}{2 \log(2)} \, \|p - q\|_1^2$ \cite{Iyengar2005}. Thus, by algebraic manipulation it can be seen that the coherent risk measure TVaR with the divergence constraint $\|p - q\|_1 \leq \sqrt{2 \log(2) *-\log(\alpha)}$  must be $\leq EVaR_\alpha[\tilde{x}]$. 
+From previous work \todo{cite}\cite{}, we know that $D(p\|q) \leq \frac{1}{2 \log(2)} \, \|p - q\|_1^2$ \cite{Iyengar2005}. Thus, by algebraic manipulation it can be seen that the coherent risk measure TVaR with the divergence constraint $\|p - q\|_1 \leq \sqrt{2 \log(2) *-\log(\alpha)}$  must be $\leq EVaR_\alpha[\tilde{x}]$. 
 
 We now prove the submodular function for TVaR and show that it also satisfies ElementWiseSeperability as defined above.
 \begin{proposition}
@@ -532,12 +543,12 @@ We now prove the submodular function for TVaR and show that it also satisfies El
   $f$ will also satisfy ElementWiseSeparabaility with $m = 0$ and $c = \beta/2$ 
 \end{proposition}
 \begin{proof}
-  \mm{the first sentence is not needed}Due to the set of constraints, we know that $f(\mathcal{O})$ must be $\leq {\mathbb{P}[\mathcal{O}]} + \frac{\beta}{2}$ as if $f(\mathcal{O}) \geq \frac{\beta}{2} +  {\mathbb{P}[\mathcal{O}]} $ , then $f(\mathcal{\not\subset\mathcal{O}})$ must be $< \mathbb{P}[\mathcal{O}] - \frac{\beta}{2}$ in order for the sum constraint of the simplex to equal 1, thus violating the l1 Norm constraint.
+  \mm{the first sentence is not needed}Due to the set of constraints, we know that $q$ must be $\leq {\mathbb{P}[\mathcal{O}]} + \frac{\beta}{2}$ as if $f(\mathcal{O}) \geq \frac{\beta}{2} +  {\mathbb{P}[\mathcal{O}]} $ , then $f(\mathcal{\not\subset\mathcal{O}})$\todo{what does this mean?} must be $< \mathbb{P}[\mathcal{O}] - \frac{\beta}{2}$ in order for the sum constraint of the simplex to equal 1, thus violating the l1 Norm constraint.
 
 \mm{should have the same structure as the proof for CVaR proving the two inequalities}
   
-  Furthermore, as we show below, we can construct $q$ such that  for any $\mathcal{O}$,   \[
-    f(\mathcal{O}) = \min\left\{\mathbb{P}[\mathcal{O}] + \frac{\beta}{2}, 1\right\}
+  Furthermore, as we show below, we can construct $q$ such that  for any $\mathcal{O}$,   
+  \[f(\mathcal{O}) = \min\left\{\mathbb{P}[\mathcal{O}] + \frac{\beta}{2}, 1\right\}
     .
   \].
   

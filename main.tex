@@ -518,8 +518,10 @@ We show below, we can construct $q$ such that $q(\mathcal{O}) =\min\left\{\frac{
 We remind the reader that in this work we define TVaR as the $\varphi$-divergence risk that uses the L1 norm divergence. This may not seem very interpretable, however we can show that we can set the divergence constraint, or $\beta$, such that it can be a provable lower bound for a given EVaR with $\alpha$ value between 0 and 1.
 From previous work \cite{}, we know that $D(p\|q) \leq \frac{1}{2 \log(2)} \, \|p - q\|_1^2$ \cite{Iyengar2005}. Thus, by algebraic manipulation it can be seen that the coherent risk measure TVaR with the divergence constraint $\|p - q\|_1 \leq \sqrt{2 \log(2) *-\log(\alpha)}$  must be $\leq EVaR_\alpha[\tilde{x}]$. 
 
-We now prove the submodular function for TVaR and show that 
-\begin{lemma}
+We now prove the submodular function for TVaR and show that it also satisfies ElementWiseSeperability as defined above.
+\begin{proposition}
+    
+
   For $\mathcal{O} \subseteq \Omega$, define $f\colon 2^{\Omega} \to \Real_+$:
   \[
     f(\mathcal{O}) = \min\left\{\mathbb{P}[\mathcal{O}] + \frac{\beta}{2}, 1\right\}
@@ -528,7 +530,8 @@ We now prove the submodular function for TVaR and show that
   Then \[
   \tvar{\alpha }{\tilde{x} } = \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}.
   \]
-\end{lemma}
+  $f$ will also satisfy ElementWiseSeparabaility with $m = 0$ and $c = \beta/2$ 
+\end{proposition}
 \begin{proof}
   \mm{the first sentence is not needed}Due to the set of constraints, we know that $f(\mathcal{O})$ must be $\leq {\mathbb{P}[\mathcal{O}]} + \frac{\beta}{2}$ as if $f(\mathcal{O}) \geq \frac{\beta}{2} +  {\mathbb{P}[\mathcal{O}]} $ , then $f(\mathcal{\not\subset\mathcal{O}})$ must be $< \mathbb{P}[\mathcal{O}] - \frac{\beta}{2}$ in order for the sum constraint of the simplex to equal 1, thus violating the l1 Norm constraint.
 

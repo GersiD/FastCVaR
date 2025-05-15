@@ -515,7 +515,7 @@ We show below, we can construct $q$ such that $q(\mathcal{O}) =\min\left\{\frac{
 
 
 \subsection{TVaR}
-We remind the reader that in this work we define TVaR as the $\varphi$-divergence risk that uses the L1 norm divergence. This may not seem very interpretable, however we can show that 
+We remind the reader that in this work we define TVaR as the $\varphi$-divergence risk that uses the L1 norm divergence. This may not seem very interpretable, however we can show that we can set the divergence constraint, or $\beta$, such that it can be a provable lower bound for a given EVaR with 
 From previous work \cite{}, we know that $D(p\|q) \leq \frac{1}{2 \log(2)} \, \|p - q\|_1^2$ \todo{cite prev work}. Thus, by algebraic manipulation it can be seen that the coherent risk measure TVaR with the divergence constraint $\|p - q\|_1 \leq \sqrt{2 \log(2) *-\log(\alpha)}$  must be $\leq EVaR_\alpha[p]$ \mm{what is $p$ and why is the here?}.
 \begin{lemma}
   For $\mathcal{O} \subseteq \Omega$, define $f\colon 2^{\Omega} \to \Real_+$:

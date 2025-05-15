@@ -389,7 +389,7 @@ A \emph{polymatroid} $\mathcal{Q}_f$ for $f$ is a polytope defined as
 
 Polymatroids are important for our purpose because many risk measures can be formulated as linear optimization over polymatroids.  
 \begin{proposition} \label{prop:coherent-polymatroid}
-Suppose that $\rho\colon \mathbb{X}\to \Real$ is a comonotonic coherent risk measure (defined as $\rho$ such that $\rho(X) +  \rho(Y)= \rho(X + Y)$)\todo{this is not the def of comonotonicity, this is the def of subadditivity}. Then
+Suppose that $\rho\colon \mathbb{X}\to \Real$ is a comonotonic coherent risk measure (defined as $\rho$ such that $\rho(X) +  \rho(Y)= \rho(X + Y)$)\todo{this is not the def of comonotonicity, this is the def of linearity}. Then
   \[
    \rho[\tilde{x}] = \min_{\bm{q}\in \mathcal{Q}_c} \bm{q}\tr  \bm{x},
   \]\label{comontonic optimization}
@@ -398,7 +398,8 @@ Suppose that $\rho\colon \mathbb{X}\to \Real$ is a comonotonic coherent risk mea
 where $\mathcal{Q}_c$ is the polymatroid in \cref{def:polymatroid} for $c := \rho(-\one_{\mathcal{A}})$ for each $\mathcal{A} \subseteq \Omega$. 
 \end{proposition}
 \begin{proof}
- The result is an immediate consequence of \cite[Corollary 4.89]{Follmer2016}.
+  The result is an immediate consequence of \cite[Corollary 4.89]{Follmer2016}\todo{this does not follow immediately,
+  lets include the proof}.
 \end{proof}
 
 The equality in \cref{prop:coherent-polymatroid} becomes an inequality for any coherent risk measure. We should probably adapt the statement and the theorem appropriately in order to help with the proofs for CVaR and TVaR.

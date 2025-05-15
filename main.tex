@@ -107,7 +107,7 @@ In this work, we restrict our attention to random variables defined on finite pr
     \max\; \left\{\tau \in \bar{\Real} \mid \P{\tilde{x} < \tau}  \le \alpha\right\} =
     \max\; \left\{\tau \in \bar{\Real} \mid \P{\tilde{x} \ge  \tau}  \ge 1 - \alpha\right\}
 \end{equation}
-The maximum in~\eqref{eq:var-definition} exists because $\tau \mapsto \mathbb{P}[\tilde{x} < \tau]$ is a lower semi-continuous function . It is easy to see that $\varo_0[\tilde{x}] = \ess \inf [\tilde{x}]$, and typically the risk measure is extended as $\varo_{1}[ \tilde{x} ] = \infty$, we adopt this extension. The \emph{quantile} $\quant_{\alpha}$ for $\tilde{x}$ is defined as the set
+The maximum in~\eqref{eq:var-definition} exists because $\tau \mapsto \mathbb{P}[\tilde{x} < \tau]$ is a lower semi-continuous function \todo{what about the second max?}. It is easy to see that $\varo_0[\tilde{x}] = \ess \inf [\tilde{x}]$, and typically the risk measure is extended as $\varo_{1}[ \tilde{x} ] = \infty$, we adopt this extension. The \emph{quantile} $\quant_{\alpha}$ for $\tilde{x}$ is defined as the set
 \[
   \quant_{\alpha}[\tilde{x}] := \left\{ z\in \Real \mid  \P{ \tilde{x} \le z } \ge \alpha , \P{ \tilde{x} \ge z } \ge 1-\alpha  \right\},
   \quad

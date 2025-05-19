@@ -421,9 +421,9 @@ A \emph{submodular} function $f\colon 2^{\Omega} \to \Real_+$ satisfies what we 
     \]
 \end{assumption}
 \todo{a corollary usually follows directly from a theorem, what theorem does this follow from?}
-\begin{corollary}
+\begin{proposition}
   Any EWS function is guaranteed to be submodular for all admissible\todo{what does admissible mean?}$c, m$.   
-\end{corollary}
+\end{proposition}
 \begin{proof}
   We first note that left component of the $min$\todo{what min?} in $g(x) > 0$ is $c + m  \cdot x$, which is submodular as it is the sum of a linear and constant function. The right side of the $min$\todo{what min} is 1, a constant function and is thus also submodular. Since $c + m  \cdot x - 1$ is a monotone function, $g(x)$ is submodular for $x > 0$\todo{how do we know this?}. We can also show that the construction $g(x)$ forcing it to equal 0 for $x = 0$ (or equivalently $f(\emptyset) = 0$ does not violate the submodularity of the function\todo{how would you show this?}. For any nonempty set $S$ and a given element $z$ not in $S$, $f(S\cup z) - f(S) \leq \mathbb{P}[z] \text{\todo{wait z is not a random variable?}} \leq f(z) - f(\emptyset) = c + \mathbb{P}[z]$.
 \end{proof}

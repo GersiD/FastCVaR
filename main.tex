@@ -284,7 +284,7 @@ Moreover, the algorithm runs in $O(b - f)$ time.
   At each iteration of the loop that starts on line \ref{line:partition-while} of \cref{alg:partition}
   there are 3 possible branches determined by the conditional logic. $x_{e_k} < v$, $x_{e_k} > v$ and $x_{e_k} = v$. Since $v, x_{e_k} \in \Real$ one of these branches must be executed for each iterate $k$.
 
-  Each time the $x_{e_k} < v$ or $x_{e_k} > v$ branches are executed conditions \ref{line:hoare-less-than} and \ref{line:hoare-greater-than} either become or remain true respectively. Notice also that $e_k$ is incremented alongside $l_k$ to maintain $e_k - l_k = e_{k+1} - l_{k+1}$ as is necessary for condition \ref{line:hoare-equal-to}.
+  Each time the $x_{e_k} < v$ or $x_{e_k} > v$ branches are executed conditions \ref{line:hoare-less-than} and \ref{line:hoare-greater-than} remain true respectively since in each case we are swapping neccecary elements to preserve each condition. Notice also that $e_k$ is incremented alongside $l_k$ to maintain $e_k - l_k = e_{k+1} - l_{k+1}$ as is necessary for condition \ref{line:hoare-equal-to}.
 
   When $x_{e_k} = v$, $e_k$ is incremented, since $e_0 = l_0$ this creates a difference between $e_{k+1}$ and $l_{k+1}$, the algorithm terminates when $g_t = e_t$, $g_t - l_t = e_t - l_t > 0$ therefore \ref{line:hoare-equal-to} holds at termination.   
 

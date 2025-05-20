@@ -363,27 +363,27 @@ During the loop, there are 3 possible scenarios at each iteration:
 \begin{enumerate}
 
 \item[Case 1]: $\alpha_{k-1} < t_k$ 
-\mm{make sure to use notation consistent with the remainder of the paper $\P{\dots }$, ...}
- Assume there exists $j_k \geq l_k$ such that $x_{j_k}=\quant^+$. Then $P[x < x_{j_k}] \geq t_k > \alpha_{k - 1}$, which means that $x_{j_k}$ is not feasible with \eqref{eq:var-definition}. Therefore, $\quant^+$ can not exist at any $x_{j_k}$ such that $j_k\geq l_k$, and the loop invariant is thus satisfied.
+ Assume there exists $j_k \geq l_k$ such that $x_{j_k}=\quant^+$. Then $\P{x < x_{j_k}} \geq t_k > \alpha_{k - 1}$, which means that $x_{j_k}$ is not feasible with \eqref{eq:var-definition}. Therefore, $\quant^+$ can not exist at any $x_{j_k}$ such that $j_k\geq l_k$, and the loop invariant is thus satisfied.
 
 
 \item[Case 2]:  $t_k + e_k \leq \alpha_{k - 1}$
 
- Assume there exists $j_k < g_k + 1$ such that $x[j_k]=\quant^+$. Then $P[x < x[j_k]] < P[x < x[g_k + 1]] \leq \alpha_{k - 1}$, which means that $x[j_k]$ is not optimal with \eqref{eq:var-definition}. Therefore, $\quant^+$ can not exist at any $x[j_k]$ such that $j_k < g_k + 1$, and the loop invariant is thus satisfied.
+  Assume there exists $j_k < g_k + 1$ such that $x_{j_k}]=\quant^+$. Then $\P{x < x[j_k]} < \P{x < x[g_k + 1]} \leq \alpha_{k - 1}$, which means that $x_{j_k}$ is not optimal with \eqref{eq:var-definition}. Therefore, $\quant^+$ can not exist at any $x_{j_k}$ such that $j_k < g_k + 1$, and the loop invariant is thus satisfied.
 
 
 \item[Case 3]: $\alpha_{k - 1} \geq t_k$ and $\alpha_{k-1} < t_k + e_k $. 
  
- Assume there exists $j_k $ such that $j_k < l_k $, and $x[j_k]=\quant^+$. Then $P[x < x[j_k]] < P[x < x[l_k]] = t_k \leq \alpha$. Therefore, we arrive at a contradiction as $x[j_k]$ be optimal by \eqref{eq:var-definition}. If we assume there exists $j_k $ such that $j_k > g_k $, and $x[j_k]=\quant^+$, then $P[x < x[j_k]] > t_k + e_k > \alpha_{k - 1}$, which means that $x[j_k]$ is not feasible with \eqref{eq:var-definition}.Therefore, $\quant^+$ can not exist at any $x[j_k]$ such that $j_k\geq l_k$, and the loop invariant is thus satisfied. Since all elements in the range$(i_k, g_k)$ are equal, $\quant^+$ must be equal to this value. Thus we can set both $f_k$ and $b_k$ to $g_k$ and terminate the algorithm, while noting that the loop invariant remains satisfied as the quantile exists at this index. 
+ Assume there exists $j_k $ such that $j_k < l_k $, and $x_{j_k}=\quant^+$. Then $\P{x < x_{j_k}} < \P{x < x_{l_k}} = t_k \leq \alpha$. Therefore, we arrive at a contradiction as $x_{j_k}$ be optimal by \eqref{eq:var-definition}. If we assume there exists $j_k $ such that $j_k > g_k $, and $x_{j_k}=\quant^+$, then $\P{x < x_{j_k}} > t_k + e_k > \alpha_{k - 1}$, which means that $x_{j_k}$ is not feasible with \eqref{eq:var-definition}.Therefore, $\quant^+$ can not exist at any $x_{j_k}$ such that $j_k\geq l_k$, and the loop invariant is thus satisfied. Since all elements in the range$(i_k, g_k)$ are equal, $\quant^+$ must be equal to this value. Thus we can set both $f_k$ and $b_k$ to $g_k$ and terminate the algorithm, while noting that the loop invariant remains satisfied as the quantile exists at this index. 
 
 \end{enumerate}
 \end{proof}
 
 \begin{proposition}
-\Cref{alg:quick-quantile} runs in $\mathcal{O}(n)$ time if the median-of-medians algorithm is used to select the pivot. 
+\Cref{alg:quick-quantile} runs in $\mathcal{O}(n)$ time if the median-of-medians algorithm is used to select the pivot.
+\todo{lets workshopt this next meeting}
 \end{proposition}
 \begin{proof}
- . Since line 4 \mm{do NOT hardcode, you can use labels and cref to reference lines} will at most take as many steps as a single call to the partition function, and the remaining lines in each iteration of the while loop take constant time, the overall complexity remains unchanged. 
+  \todo{Lets discuss how to prove this.}
 \end{proof}
 
 
@@ -406,7 +406,7 @@ A \emph{polymatroid} $\mathcal{Q}_f$ for $f$ is a polytope defined as
   \[
     \mathcal{Q}_f := \left\{ \bm{q} \in \Real_+^E  \mid   \bm{q}(\mathcal{U}) \leq f(\mathcal{U}), \, \forall \,  \mathcal{U} \subseteq \mathcal{E} \right\},
   \]
-  where $q(\mathcal{U}) = \sum_{e \in \mathcal{U}} q(e)$ and $f(\mathcal{U})\rightarrow[0, 1]$. We note that $f(\mathcal{U})\rightarrow[0, 1]$ is not generally required for polymatroids, but is necessary in the context of risk measures.
+  where $q(\mathcal{U}) = \sum_{e \in \mathcal{U}} q(e)$ and $f(\mathcal{U})\rightarrow[0, 1]$. We note that $f(\mathcal{U})\rightarrow[0, 1]$ is not generally required for polymatroids, but is necessary in the context of probability distributions.
 \end{definition}
 
 % marek: we already say this in the preliminaries section
@@ -426,8 +426,7 @@ Suppose that $\rho\colon \mathbb{X}\to \Real$ is a comonotonic coherent risk mea
 where $\mathcal{Q}_c$ is the polymatroid in \cref{def:polymatroid} for $c := \rho(-\one_{\mathcal{A}})$ for each $\mathcal{A} \subseteq \Omega$. 
 \end{proposition}
 \begin{proof}
-  The result is an immediate consequence of \cite[Corollary 4.89]{Follmer2016}\todo{this does not follow immediately,
-  lets include the proof}.
+  The result is an immediate consequence of \cite[Corollary 4.89]{Follmer2016}
 \end{proof}
 
 The equality in \cref{prop:coherent-polymatroid} becomes an inequality for any coherent risk measure. We should probably adapt the statement and the theorem appropriately in order to help with the proofs for CVaR and TVaR.

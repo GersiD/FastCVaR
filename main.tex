@@ -286,9 +286,9 @@ Moreover, the algorithm runs in $O(b - f)$ time.
 
   Each time the $x_{e_k} < v$ or $x_{e_k} > v$ branches are executed conditions \ref{line:hoare-less-than} and \ref{line:hoare-greater-than} either become or remain true respectively. Notice also that $e_k$ is incremented alongside $l_k$ to maintain $e_k - l_k = e_{k+1} - l_{k+1}$ as is necessary for condition \ref{line:hoare-equal-to}.
 
-  When $x_{e_k} = v$ $e_k$ is incremented, since $e_k = l_k$ at initialization this creates a difference between $e_k$ and $l_k$, when the algorithm terminates when $g_k = e_k$ $g_k - l_k = e_k - l_k > 0$ therefore \ref{line:hoare-equal-to} holds at termination.   
+  When $x_{e_k} = v$, $e_k$ is incremented, since $e_0 = l_0$ this creates a difference between $e_{k+1}$ and $l_{k+1}$, the algorithm terminates when $g_t = e_t$, $g_t - l_t = e_t - l_t > 0$ therefore \ref{line:hoare-equal-to} holds at termination.   
 
-  Condition \ref{line:hoare-correspond} remains true for each mutation that may occur as both the $x$ values and $p$ values are swapped at the same indices.
+  Condition \ref{line:hoare-correspond} remains true for each mutation that may occur as both the $x$ values and $p$ values are swapped at the same indices, see lines \ref{line:swap1} and \ref{line:swap2}.
   
   \subsubsection*{Termination} 
   During the loop on line \ref{line:partition-while} there are 3 possible paths of execution determined by the conditional logic $x_{e_k} < v$, $x_{e_k} > v$ and $x_{e_k} = v$. Each of these paths of execution decreases $g_k - e_k$ by 1. This occurs on lines \ref{line:partition-e-1-1} and \ref{line:partition-e-1-2} by increasing $e_k$ by 1 and keeping $g_k$ the same. Or on line \ref{line:parition-g-1} by decreasing $g_k$ by 1 and keeping $e_k$ the same.
@@ -723,12 +723,12 @@ Now, suppose that \cref{alg:slow-quantile} terminates with value $q\opt$. Then, 
   \label{line:partition-while}
     \tcp{invariants hold here}
     \If{$x_{e_k} < v$}{
-      swap: $x_{e_k} \leftrightarrow x_{l_k}$ and $p_{e_k} \leftrightarrow p_{l_k}$\;
+      swap: $x_{e_k} \leftrightarrow x_{l_k}$ and $p_{e_k} \leftrightarrow p_{l_k}$\; \label{line:swap1}
       $l_{k+1} \gets l_k + 1$ \;
       $e_{k+1} \gets e_k + 1$\; \label{line:partition-e-1-1}
     }
     \ElseIf{$x_{e_k} > v$}{
-      swap: $x_{e_k}\leftrightarrow x_{g_k}$ and $p_{e_k} \leftrightarrow p_{g_k}$\;
+      swap: $x_{e_k}\leftrightarrow x_{g_k}$ and $p_{e_k} \leftrightarrow p_{g_k}$\; \label{line:swap2}
       $g_{k+1} \gets g_{k} - 1$\; \label{line:parition-g-1}
     }
     \lElse {$e_{k+1} \gets e_{k} + 1$} \label{line:partition-e-1-2}

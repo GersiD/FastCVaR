@@ -293,7 +293,7 @@ Moreover, the algorithm runs in $O(b - f)$ time.
   \subsubsection*{Termination} 
   During the loop on line \ref{line:partition-while} there are 3 possible paths of execution determined by the conditional logic $x_{e_k} < v$, $x_{e_k} > v$ and $x_{e_k} = v$. Each of these paths of execution decreases $g_k - e_k$ by 1. This occurs on lines \ref{line:partition-e-1-1} and \ref{line:partition-e-1-2} by increasing $e_k$ by 1 and keeping $g_k$ the same. Or on line \ref{line:parition-g-1} by decreasing $g_k$ by 1 and keeping $e_k$ the same.
   
-  $g_0 - e_0$ is positive since $f<b$ by assumption. $g_k-e_k$ decreases by 1 at each iteration. The function returns when $g_k - e_k = 0$, therefore this algorithm completes in $O(b-f)$ time. 
+  $g_0 - e_0$ is positive since $f<b$ by assumption. $g_k-e_k$ decreases by 1 at each iteration. The function returns when $g_t - e_t = 0$, therefore this algorithm completes in $O(b-f)$ time. 
 \end{proof}
 
 The above conditions primarily state that each call to the partition scheme performs partial sorting such that all elements less than or equal to the pivot will be at a lower index \todo{same variable names as in the algorithm}, and elements greater than the pivot will be at a higher index\todo{ditto}. 

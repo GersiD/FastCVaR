@@ -300,46 +300,53 @@ The above conditions primarily state that each call to the partition scheme perf
 
 In order to prove that the algorithm is optimal, we first show that $\quant_{\alpha}^-(\tilde{x})$ is an element in the array. 
 \begin{lemma}
-Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite $\Omega$. Then, there exist $\omega_1, \omega_2\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_1)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_2)$ for each $\alpha\in (0,1)$.
+Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite $\Omega$. Then, there exist $\omega_+, \omega_-\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_+)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_-)$ for each $\alpha\in (0,1)$.
 \end{lemma}
 \begin{proof}
 
 
  
 Recall the definition:
- \begin{align}
+ \begin{align} \label{eq:var-definition-close}
   \quant_{\alpha}^+(\tilde{x})
   \;:=\;
-    \max\; \left\{\tau \in \bar{\Real} \mid \P{ \tilde{x} < \tau } \le \alpha\right\},\\
-   \mathcal{T}(\tau) = \{ \omega \in \Omega \mid \P{\tilde{x}(\omega) < \tau} \leq \alpha \} \\
-     \max\; \left\{\tau \in \bar{\Real} \mid \P{ \tilde{x} < \tau } \le \alpha\right\},
+    \max\; \left\{\tau \in \Real \mid \P{ \tilde{x} < \tau } \le \alpha\right\},
  \end{align}
-Assume the random variable $ x $ has $ n $ unique values, such that $ x_1 < x_2 < \cdots < x_n $.  We can assume this without loss of generality because VaR is law invariant~\cite{Follmer2016}. For the sake of the proof, any given $\tau$ is feasible if $P[{\tilde{x}<\tau]} \leq \alpha$. We note that if $\tau$ is not feasible, it cannot equal $\quant^+_{\alpha}(\tilde{x})$ \eqref{eq:var-definition}. 
+% Assume the random variable $ x $ has $ n $ unique values, such that $ x_1 < x_2 < \cdots < x_n $.  We can assume this without loss of generality because VaR is law invariant~\cite{Follmer2016}. For the sake of the proof, any given $\tau$ is feasible if $P[{\tilde{x}<\tau]} \leq \alpha$. We note that if $\tau$ is not feasible, it cannot equal $\quant^+_{\alpha}(\tilde{x})$ \eqref{eq:var-definition}. 
 
-Suppose for the sake of contradiction that there is no $\omega\in \Omega $ such that $\quant^+_{\alpha}(\tilde{x}) = \tilde{x}(\omega)$. That may mean:
-\todo{why?}
+Let $x(\omega_1) \leq x(\omega_2) \leq \dots \leq x(\omega_n)$ wlog. Suppose for the sake of contradiction that there is no $\omega\in \Omega $ such that $\quant^+_{\alpha}(\tilde{x}) = \tilde{x}(\omega)$. Then since $\quant^+_{\alpha}(\tilde{x}), x(\omega) \in \Real$ and $\Omega$ is finite, there are only 3 cases to consider.
+
 \begin{enumerate}
-\item[Case 1]: $\exists x_{i}, x_{i + 1} \in \tilde{x}(\Omega)$ such that $\quant^+_{\alpha}(\tilde{x}) \in (x_{i}, x_{i + 1})$.
+\item[Case 1]: $\quant^+_{\alpha}(\tilde{x}) \in (x(\omega_i), x(\omega_{i + 1}))$.
 
-  Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})  $. \\
-  Then, let $\tau' = \tau\opt  + \frac{1}{2}(x_{i+1} - \tau\opt)$. Because $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition}, \\
-  $\P{ \tilde{x} < \tau' } =  \P{ \tilde{x} < \tau\opt  }\le \alpha$, 
-  therefore $\tau\opt $ cannot be optimal.
-\item[Case 2]: $\quant^+_{\alpha}(\tilde{x}) < \min \tilde{x}$ 
+  Let $\quant^+_{\alpha}(\tilde{x}) = \tau\opt \in \Real$ which is allegedly optimal in \eqref{eq:var-definition-close}. \\
+  Consider $\tau' = x(\omega_{i+1})$. Notice $\P{\tilde{x} < \tau'} \le \alpha$ since there are no $\omega \in (\omega_i, \omega_{i+1}) \subset \Omega$.\\
+  $\P{ \tilde{x} < \tau\opt  } \le \P{\tilde{x} < \tau'} \le \alpha$ by construction.\\
+  $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition-close}, therefore $\tau\opt $ cannot be optimal.
+\item[Case 2]: $\quant^+_{\alpha}(\tilde{x}) < x(\omega_1)$ 
   
-  Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})  $.\\
-  Then, let $\tau' = \tau\opt + \frac{1}{2}(x_{1} - \tau\opt)$. Because $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition},\\
-  $\P{ \tilde{x} < \tau' } =  \P{ \tilde{x} < \tau\opt  }\le \alpha$, therefore $\tau\opt $ cannot be optimal.
+  Let $\quant^+_{\alpha}(\tilde{x}) = \tau\opt \in \Real$ which is allegedly optimal in \eqref{eq:var-definition-close}. \\
+  Consider $\tau' = x(\omega_1)$. Notice $\P{\tilde{x} < \tau'} = \P{\tilde{x} < \tau\opt} = 0$ by definition of $\omega_1$.\\
+  $\P{ \tilde{x} < \tau'  } = \P{\tidle{x} < \tau\opt} \le \alpha$ by construction.\\
+  $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition-close}, therefore $\tau\opt $ cannot be optimal.
 
-\item[Case 3]: $\quant^+_{\alpha}(\tilde{x}) > \max \tilde{x}$ 
+\item[Case 3]: $\quant^+_{\alpha}(\tilde{x}) > x(\omega_n)$ 
 
-Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})$. Recall $\alpha \in [0,1)$, $\P{\tilde{x} < \tau\opt} = 1 \leq \alpha < 1$. Since $\alpha$ must be $< 1$, a contradiction exists here.
+  Let $\quant^+_{\alpha}(\tilde{x}) = \tau\opt \in \Real$ which is allegedly optimal in \eqref{eq:var-definition-close}. \\
+  Notice $\P{\tilde{x} < \tau\opt} = 1$ by definition of $\omega_n$.\\
+  However $\alpha \in (0,1)$, therefore $\tau\opt $ cannot be optimal.\\
+  Consider $\tau' = x(\omega_n)$. Notice $\P{\tilde{x} < \tau'} = 1 - \P{\omega_n} \le \P{\tilde{x} < \tau\opt} = 1$ by definition of $\omega_n$.\\
+  In the case $\P{\omega_n} > 0$ for $\alpha \in (0,1)$ $\P{ \tilde{x} < \tau'  } < 1 \le \alpha$. Therefore $\tau'$ is feasible in \eqref{eq:var-definition-close}.\\
+  And by construction there is no other $\tau \in \Real$ such that $\P{ \tilde{x} < \tau } \le \alpha$ and $\tau > \tau'$.\\
+  When $\P{\omega_n} = 0$ $\P{ \tilde{x} < \tau'  } = 1 > \alpha$. Therefore $\tau'$ is not feasible and one of the other $\omega_i \in \Omega$ must be chosen.
+
+
 \end{enumerate}
-We note that for a random variable with non-unique values, we can equivalently represent it as a random variable with unique values where the probability of a value that was repeated multiple times is the sum of all probabilities for each instance of that given value. Then we can apply this lemma to show that $\quant^+_{\alpha}(\tilde{x})$ must be equal to one of the outcomes of the original random variable. 
+% We note that for a random variable with non-unique values, we can equivalently represent it as a random variable with unique values where the probability of a value that was repeated multiple times is the sum of all probabilities for each instance of that given value. Then we can apply this lemma to show that $\quant^+_{\alpha}(\tilde{x})$ must be equal to one of the outcomes of the original random variable. 
   
   % New Proof 2: Recall that $\alpha$ is less than 1 and  $\quant^+_{\alpha}(\tilde{x})$ is bounded for all admissible $\alpha$ values. Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})  $. Then, let $\tau' = \tau\opt + 1$. Because $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition}, $\P{ \tilde{x} < \tau' } =  \P{ \tilde{x} < \tau\opt  }\le \alpha$, $\tau\opt $ cannot be optimal.
 
-  % Old Proof: Then $ P[x < \quant_{\alpha}^+(\tilde{x})] $ is greater than or equal to $ P[x < x_{n}] $. Remember that $\alpha$ must be less than 1 and $\quant_{\alpha}^+(\tilde{x})$ is bounded for all $\alpha$ less than 1 and greater than or equal to 0, therefore $ P[x < \quant_{\alpha}^+(\tilde{x})] $ is less than 1. Then, there must exist $ y $ in the range $ [\quant_{\alpha}^+(\tilde{x}), \infty) $ such that $ P[x = y] > 0 $ . This is impossible by definition. 
+  % Old Proof: Then $ P[x < \quant_{\alpha}^+(\tilde{x})] $ is greater than or equal to $ P[x < x_{n}] $. Remember that $\alpha$ must be less than 1 and $\quant_{\alpha}^+(\tilde{x})$ is bounded for all $\alpha$ less than 1 and greater than or equal to 0, therefore $ P[x < \quant_{\alpha}^+(\tilde{x})] $ is less than 1. Then, there must exist $ y $ in the range $ [\quant_{\alpha}^+(\tilde{x}), \infty $ such that $ P[x = y] > 0 $ . This is impossible by definition. 
 
 \end{proof}
 

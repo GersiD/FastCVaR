@@ -223,14 +223,14 @@ Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorit
   \Output{$\alpha$-quantile of $\tilde{x}$}
   $f_0 \gets 1$;~~~~$b_0 \gets n$;~~~~$k=1$ \;
   \While{$b_{k-1} > f_{k-1}$} {
-    $i_k \gets f_{k-1} + \lceil\frac{b_{k-1}-f_{k-1}}{2}\rceil$ \label{pivot_comp} \tcp*{Pivot index}
+    $i_k \gets f_{k-1} + \lceil\frac{b_{k-1}-f_{k-1}}{2}\rceil$ \label{line:pivot_comp} \tcp*{Pivot index}
     $v_k \gets x^{k-1}_{i_k}$ \tcp*{Pivot value}
     %Median-of-medians for $O(b-f)$ runtime}
      $l_k, g_k, \bm{x}^k, \bm{p}^k \gets \operatorname{partition}(\bm{x}^{k-1}, \bm{p}^{k-1}, v_k, f_{k-1}, b_{k-1})$
-    \tcp*{Alg.~\ref{alg:partition}, \cref{lem:hoare-partition}} \label{partion_line}    
+    \tcp*{Alg.~\ref{alg:partition}, \cref{lem:hoare-partition}} \label{line:partion_line}    
     $t_k \gets \sum_{j=f_{k-1}}^{l_k-1} p^k_j$  \tcp*{$\P{\tilde{x}^k < v_k}$}
     $e_k \gets \sum_{j = l_k}^{g_k} p^{k}_j $   \tcp*{$\P{\tilde{x}^k = v_k}$}
-    \If{$\alpha_{k-1} < t_k$\label{determine_left}}
+    \If{$\alpha_{k-1} < t_k$\label{line:determine_left}}
     {
       \tcp{$\alpha_{k-1} < \P{ \tilde{x}^k < v_k }
         \implies \alpha_{k-1}< 1 - \P{ \tilde{x}^k \ge v_k}$}
@@ -263,38 +263,6 @@ Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorit
 \end{algorithm}  
 
 
-\begin{lemma} \label{lem:hoare-partition}
-Suppose that for $\bm{x}'\in \Real^n$, $\bm{p}'\in \Delta^n$ and $f, b\in \Nats$ such that $f < b$ $(l, g, \bm{x}, \bm{p}) \gets \operatorname{partition}(\bm{x'}, \bm{p'}, i, f, b)$ is computed using \cref{alg:partition}. Then:
-\begin{align}
-   j \in f{:}(l-1) &\quad\implies \quad x_j < x_i', \label{line:hoare-less-than}\\
-   j \in l{:}g &\quad\implies \quad x_j = x_i', \label{line:hoare-equal-to}\\
-   j \in (g+1){:}b &\quad\implies \quad x_j > x_i' \label{line:hoare-greater-than}\\
-   \forall \; j, j' \in [1\dots n]&\quad x_j = x'_{j'} \iff p_j = p'_{j'} \label{line:hoare-correspond}
-\end{align}
-Moreover, the algorithm runs in $O(b - f)$ time.
-
-\end{lemma}
-\begin{proof}  
-  \subsubsection*{Initialization} 
-
-  At initialization, for $k=0$, conditions \ref{line:hoare-less-than} and \ref{line:hoare-greater-than} are true but vacuous as the ranges are empty, we use the notation $a:b$ to mean $\{a, a+1, \dots, b\}$ which is empty when $a > b$. Condition \ref{line:hoare-equal-to} may be false as certainly not all entries between $l$ and $g$ are equal to $x'_i$. Condition \ref{line:hoare-correspond} remains true as we have mutated neither $x$ nor $p$.
-  
-  \subsubsection*{Maintenance} 
-
-  At each iteration of the loop that starts on line \ref{line:partition-while} of \cref{alg:partition}
-  there are 3 possible branches determined by the conditional logic. $x_{e_k} < v$, $x_{e_k} > v$ and $x_{e_k} = v$. Since $v, x_{e_k} \in \Real$ one of these branches must be executed for each iterate $k$.
-
-  Each time the $x_{e_k} < v$ or $x_{e_k} > v$ branches are executed conditions \ref{line:hoare-less-than} and \ref{line:hoare-greater-than} remain true respectively since in each case we are swapping neccecary elements to preserve each condition. Notice also that $e_k$ is incremented alongside $l_k$ to maintain $e_k - l_k = e_{k+1} - l_{k+1}$ as is necessary for condition \ref{line:hoare-equal-to}.
-
-  When $x_{e_k} = v$, $e_k$ is incremented, since $e_0 = l_0$ this creates a difference between $e_{k+1}$ and $l_{k+1}$, the algorithm terminates when $g_t = e_t$, $g_t - l_t = e_t - l_t > 0$ therefore \ref{line:hoare-equal-to} holds at termination.   
-
-  Condition \ref{line:hoare-correspond} remains true for each mutation that may occur as both the $x$ values and $p$ values are swapped at the same indices, see lines \ref{line:swap1} and \ref{line:swap2}.
-  
-  \subsubsection*{Termination} 
-  During the loop on line \ref{line:partition-while} there are 3 possible paths of execution determined by the conditional logic $x_{e_k} < v$, $x_{e_k} > v$ and $x_{e_k} = v$. Each of these paths of execution decreases $g_k - e_k$ by 1. This occurs on lines \ref{line:partition-e-1-1} and \ref{line:partition-e-1-2} by increasing $e_k$ by 1 and keeping $g_k$ the same. Or on line \ref{line:parition-g-1} by decreasing $g_k$ by 1 and keeping $e_k$ the same.
-  
-  $g_0 - e_0 = b - f$ is positive since $f<b$ by assumption. $g_k-e_k$ decreases by 1 at each iteration, and each iteration requires constant time to complete. The function returns when $g_t - e_t = 0$, therefore this algorithm completes in $O(b-f)$ time. 
-\end{proof}
 
 The above conditions primarily state that each call to the partition scheme performs partial sorting such that all elements less than or equal to the pivot will be at a lower index \todo{same variable names as in the algorithm}, and elements greater than the pivot will be at a higher index\todo{ditto}. 
 
@@ -314,31 +282,40 @@ Recall the definition:
  \end{align}
 % Assume the random variable $ x $ has $ n $ unique values, such that $ x_1 < x_2 < \cdots < x_n $.  We can assume this without loss of generality because VaR is law invariant~\cite{Follmer2016}. For the sake of the proof, any given $\tau$ is feasible if $P[{\tilde{x}<\tau]} \leq \alpha$. We note that if $\tau$ is not feasible, it cannot equal $\quant^+_{\alpha}(\tilde{x})$ \eqref{eq:var-definition}. 
 
-Let $x(\omega_1) \leq x(\omega_2) \leq \dots \leq x(\omega_n)$ wlog. Suppose for the sake of contradiction that there is no $\omega\in \Omega $ such that $\quant^+_{\alpha}(\tilde{x}) = \tilde{x}(\omega)$. Then since $\quant^+_{\alpha}(\tilde{x}), x(\omega) \in \Real$ and $\Omega$ is finite, there are only 3 cases to consider.
+Let $x(\omega_1) \leq x(\omega_2) \leq \dots \leq x(\omega_n)$ without loss of generality. Suppose for the sake of contradiction that there is no $\omega\in \Omega $ such that $\quant^+_{\alpha}(\tilde{x}) = \tilde{x}(\omega)$. Then since $\quant^+_{\alpha}(\tilde{x}), x(\omega) \in \Real$ and $\Omega$ is finite, there are only 3 cases to consider.
 
 \begin{enumerate}
-\item[Case 1]: $\quant^+_{\alpha}(\tilde{x}) \in (x(\omega_i), x(\omega_{i + 1}))$.
-
-  Let $\quant^+_{\alpha}(\tilde{x}) = \tau\opt \in \Real$ which is allegedly optimal in \eqref{eq:var-definition-close}. \\
-  Consider $\tau' = x(\omega_{i+1})$. Notice $\P{\tilde{x} < \tau'} \le \alpha$ since there are no $\omega \in (\omega_i, \omega_{i+1}) \subset \Omega$.\\
-  $\P{ \tilde{x} < \tau\opt  } \le \P{\tilde{x} < \tau'} \le \alpha$ by construction.\\
-  $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition-close}, therefore $\tau\opt $ cannot be optimal.
+\item[Case 1]: $\quant^+_{\alpha}(\tilde{x}) = \tau\opt \in (x(\omega_i), x(\omega_{i + 1}))$.
+Since there are no $\omega\in \Omega$ such that $x(\omega) \in  [\tau\opt , x(\omega_{i+1}))$:
+  \[
+    \P{\tilde{x} < x(\omega_{i+1})} = \P{\tilde{x} <\tau\opt}} \le \alpha.
+  \]
+Therefore, $x(\omega_{i+1}) > \tau\opt$ is feasible in \eqref{eq:var-definition-close} contradicting the optimality of $\tau\opt$.
+  % % Let $\quant^+_{\alpha}(\tilde{x}) = \tau\opt \in \Real$ which is optimal in \eqref{eq:var-definition-close}. \\
+  % Consider $\tau' = x(\omega_{i+1})$. Notice $\P{\tilde{x} < \tau'} \le \alpha$ \\
+  % $\P{ \tilde{x} < \tau\opt  } \le \P{\tilde{x} < \tau'} \le \alpha$ by construction.\\
+  % $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition-close}, therefore $\tau\opt $ cannot be optimal.
 \item[Case 2]: $\quant^+_{\alpha}(\tilde{x}) < x(\omega_1)$ 
   
-  Let $\quant^+_{\alpha}(\tilde{x}) = \tau\opt \in \Real$ which is allegedly optimal in \eqref{eq:var-definition-close}. \\
+  Let $\quant^+_{\alpha}(\tilde{x}) = \tau\opt \in \Real$ which is optimal in \eqref{eq:var-definition-close}. \\
   Consider $\tau' = x(\omega_1)$. Notice $\P{\tilde{x} < \tau'} = \P{\tilde{x} < \tau\opt} = 0$ by definition of $\omega_1$.\\
   $\P{ \tilde{x} < \tau'  } = \P{\tilde{x} < \tau\opt} \le \alpha$ by construction.\\
   $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition-close}, therefore $\tau\opt $ cannot be optimal.
 
-\item[Case 3]: $\quant^+_{\alpha}(\tilde{x}) > x(\omega_n)$ 
-
-  Let $\quant^+_{\alpha}(\tilde{x}) = \tau\opt \in \Real$ which is allegedly optimal in \eqref{eq:var-definition-close}. \\
-  Notice $\P{\tilde{x} < \tau\opt} = 1$ by definition of $\omega_n$.\\
-  However $\alpha \in (0,1)$, therefore $\tau\opt $ cannot be optimal.\\
-  Consider $\tau' = x(\omega_n)$. Notice $\P{\tilde{x} < \tau'} = 1 - \P{\omega_n} \le \P{\tilde{x} < \tau\opt} = 1$ by definition of $\omega_n$.\\
-  In the case $\P{\omega_n} > 0$ for $\alpha \in (0,1)$ $\P{ \tilde{x} < \tau'  } < 1 \le \alpha$. Therefore $\tau'$ is feasible in \eqref{eq:var-definition-close}.\\
-  And by construction there is no other $\tau \in \Real$ such that $\P{ \tilde{x} < \tau } \le \alpha$ and $\tau > \tau'$.\\
-  When $\P{\omega_n} = 0$ $\P{ \tilde{x} < \tau'  } = 1 > \alpha$. Therefore $\tau'$ is not feasible and one of the other $\omega_i \in \Omega \backslash{\omega_n}$ must be chosen.
+\item[Case 3]: $\quant^+_{\alpha}(\tilde{x}) = \tau\opt > x(\omega_n)$.
+  For all $\tau \ge \tau\opt$
+  \[
+    \P{\tilde{x} < \tau } \ge  \P{\tilde{x} < \tau\opt } = 1 > \alpha.
+  \]
+  Therefore, $\tau\opt$ cannot be optimal in \eqref{eq:var-definition-close} since $\alpha < 1$. %, which contradicts the hypothesis.
+  
+  % Let $\quant^+_{\alpha}(\tilde{x}) = \tau\opt \in \Real$ which is allegedly optimal in \eqref{eq:var-definition-close}. \\
+  % Notice $\P{\tilde{x} < \tau\opt} = 1$ by definition of $\omega_n$.\\
+  % However $\alpha \in (0,1)$, therefore $\tau\opt $ cannot be optimal.\\
+  % Consider $\tau' = x(\omega_n)$. Notice $\P{\tilde{x} < \tau'} = 1 - \P{\omega_n} \le \P{\tilde{x} < \tau\opt} = 1$ by definition of $\omega_n$.\\
+  % In the case $\P{\omega_n} > 0$ for $\alpha \in (0,1)$ $\P{ \tilde{x} < \tau'  } < 1 \le \alpha$. Therefore $\tau'$ is feasible in \eqref{eq:var-definition-close}.\\
+  % And by construction there is no other $\tau \in \Real$ such that $\P{ \tilde{x} < \tau } \le \alpha$ and $\tau > \tau'$.\\
+  % When $\P{\omega_n} = 0$ $\P{ \tilde{x} < \tau'  } = 1 > \alpha$. Therefore $\tau'$ is not feasible and one of the other $\omega_i \in \Omega \backslash{\omega_n}$ must be chosen.
 
 
 \end{enumerate}
@@ -749,6 +726,32 @@ Now, suppose that \cref{alg:slow-quantile} terminates with value $q\opt$. Then, 
 \end{algorithm}
 
 
+\begin{lemma} \label{lem:hoare-partition}
+Suppose that for $\bm{x}'\in \Real^n$, $\bm{p}'\in \Delta^n$ and $f, b\in \Nats$ such that $f < b$ $(l, g, \bm{x}, \bm{p}) \gets \operatorname{partition}(\bm{x'}, \bm{p'}, i, f, b)$ is computed using \cref{alg:partition}. Then:
+\begin{align}
+   j \in f{:}(l-1) &\quad\implies \quad x_j < x_i', \label{eq:hoare-less-than}\\
+   j \in l{:}g &\quad\implies \quad x_j = x_i', \label{eq:hoare-equal-to}\\
+   j \in (g+1){:}b &\quad\implies \quad x_j > x_i' \label{eq:hoare-greater-than}\\
+   \forall \; j, j' \in [1\dots n]&\quad x_j = x'_{j'} \iff p_j = p'_{j'} \label{eq:hoare-correspond}
+\end{align}
+Moreover, the algorithm runs in $O(b - f)$ time.
+
+\end{lemma}
+\begin{proof}  
+\emph{Initialization}. At initialization, for $k=0$, conditions \eqref{eq:hoare-less-than} and \eqref{eq:hoare-greater-than} are true but vacuous as the ranges are empty, we use the notation $a:b$ to mean $\{a, a+1, \dots, b\}$ which is empty when $a > b$. Condition \eqref{eq:hoare-equal-to} may be false as certainly not all entries between $l$ and $g$ are equal to $x'_i$. Condition \eqref{eq:hoare-correspond} remains true as we have mutated neither $x$ nor $p$.
+  
+\emph{Maintenance}. At each iteration of the loop that starts on \cref{line:partition-while} of \cref{alg:partition} there are 3 possible branches determined by the conditional logic. $x_{e_k} < v$, $x_{e_k} > v$ and $x_{e_k} = v$. Since $v, x_{e_k} \in \Real$ one of these branches must be executed for each iterate $k$.
+
+  Each time the $x_{e_k} < v$ or $x_{e_k} > v$ branches are executed conditions \eqref{eq:hoare-less-than} and \eqref{eq:hoare-greater-than} remain true respectively since in each case we are swapping neccecary elements to preserve each condition. Notice also that $e_k$ is incremented alongside $l_k$ to maintain $e_k - l_k = e_{k+1} - l_{k+1}$ as is necessary for condition \eqref{eq:hoare-equal-to}.
+
+  When $x_{e_k} = v$, $e_k$ is incremented, since $e_0 = l_0$ this creates a difference between $e_{k+1}$ and $l_{k+1}$, the algorithm terminates when $g_t = e_t$, $g_t - l_t = e_t - l_t > 0$ therefore \eqref{eq:hoare-equal-to} holds at termination.   
+
+  Condition \eqref{eq:hoare-correspond} remains true for each mutation that may occur as both the $x$ values and $p$ values are swapped at the same indices, see lines \eqref{eq:swap1} and \eqref{eq:swap2}.
+  
+  \emph{Termination}. During the loop on \cref{line:partition-while} there are 3 possible paths of execution determined by the conditional logic $x_{e_k} < v$, $x_{e_k} > v$ and $x_{e_k} = v$. Each of these paths of execution decreases $g_k - e_k$ by 1. This occurs on lines \eqref{eq:partition-e-1-1} and \eqref{eq:partition-e-1-2} by increasing $e_k$ by 1 and keeping $g_k$ the same. Or on line \eqref{eq:parition-g-1} by decreasing $g_k$ by 1 and keeping $e_k$ the same.
+  
+  $g_0 - e_0 = b - f$ is positive since $f<b$ by assumption. $g_k-e_k$ decreases by 1 at each iteration, and each iteration requires constant time to complete. The function returns when $g_t - e_t = 0$, therefore this algorithm completes in $O(b-f)$ time. 
+\end{proof}
 \section{Proofs and Details for \cref{sec:phi-divergence}}
 
 

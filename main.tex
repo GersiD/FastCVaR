@@ -307,7 +307,7 @@ Therefore, $x(\omega_{i+1}) > \tau\opt$ is feasible in \eqref{eq:var-definition-
   \[
     \P{\tilde{x} < \tau } \ge  \P{\tilde{x} < \tau\opt } = 1 > \alpha.
   \]
-  Therefore, $\tau\opt$ cannot be optimal in \eqref{eq:var-definition-close} since $\alpha < 1$. %, which contradicts the hypothesis.
+  Therefore, $\tau\opt$ cannot be optimal in~\eqref{eq:var-definition-close} since $\alpha < 1$. %, which contradicts the hypothesis.
   
   % Let $\quant^+_{\alpha}(\tilde{x}) = \tau\opt \in \Real$ which is allegedly optimal in \eqref{eq:var-definition-close}. \\
   % Notice $\P{\tilde{x} < \tau\opt} = 1$ by definition of $\omega_n$.\\
@@ -701,9 +701,9 @@ Now, suppose that \cref{alg:slow-quantile} terminates with value $q\opt$. Then, 
     $x_j < v, \, j\in f{:}(l-1), \quad x_j = v, \, j \in l{:}g, \quad x_j > v, \, j \in (g+1){:}b $}
   % $i \gets f + \lceil\frac{b-f}{2}\rceil$ \tcp*{Pivot: Median-of-medians for $O(b-f)$ runtime}
   $l_0 \gets f$ \tcp*{invariant: less: $x_j < v, \, j\in f{:}(l-1)$}
-  $e_0 \gets f$ \tcp*{invariant: equal: $x_j = v, \, j \in l{:}g$ }
+  $e_0 \gets f$ \tcp*{invariant: equal: $x_j = v, \, j \in l{:}(e-1)$ }
   $g_0 \gets b$ \tcp*{invariant: greater: $x_j > v, \, j \in (g+1){:}b$}
-  $k \gets 0$
+  $k \gets 0$ \;
   
   \While{$e_k \leq g_k$}
   {
@@ -731,14 +731,20 @@ Suppose that for $\bm{x}'\in \Real^n$, $\bm{p}'\in \Delta^n$ and $f, b\in \Nats$
 \begin{align}
    j \in f{:}(l-1) &\quad\implies \quad x_j < x_i', \label{eq:hoare-less-than}\\
    j \in l{:}g &\quad\implies \quad x_j = x_i', \label{eq:hoare-equal-to}\\
-   j \in (g+1){:}b &\quad\implies \quad x_j > x_i' \label{eq:hoare-greater-than}\\
-   \forall \; j, j' \in [1\dots n]&\quad x_j = x'_{j'} \iff p_j = p'_{j'} \label{eq:hoare-correspond}
+   j \in (g+1){:}b &\quad\implies \quad x_j > x_i', \label{eq:hoare-greater-than}\\
+   \forall \; j, j' \in [1\dots n]&\quad x_j = x'_{j'} \iff p_j = p'_{j'}. \label{eq:hoare-correspond}
 \end{align}
 Moreover, the algorithm runs in $O(b - f)$ time.
-
 \end{lemma}
-\begin{proof}  
-\emph{Initialization}. At initialization, for $k=0$, conditions \eqref{eq:hoare-less-than} and \eqref{eq:hoare-greater-than} are true but vacuous as the ranges are empty, we use the notation $a:b$ to mean $\{a, a+1, \dots, b\}$ which is empty when $a > b$. Condition \eqref{eq:hoare-equal-to} may be false as certainly not all entries between $l$ and $g$ are equal to $x'_i$. Condition \eqref{eq:hoare-correspond} remains true as we have mutated neither $x$ nor $p$.
+\begin{proof}
+Let $v$ be an input to \cref{alg:partition} and consider the following invariants.
+\begin{align}
+\label{eq:ho-inv-less}   x_j &< v, & j\in f_k{:}(l_k-1), \\
+\label{eq:ho-inv-equal}  x_j &= v, & j \in l_k{:}(e_k-1), \\
+\label{eq:ho-inv-more}   x_j &> v, & j \in (g_k+1){:}b_k.
+\end{align}
+  
+\emph{Initialization}. For $k=0$, conditions \eqref{eq:ho-inv-less}, \eqref{eq:ho-inv-equal}, \eqref{eq:ho-inv-more} are true because the intervals are empty. 
   
 \emph{Maintenance}. At each iteration of the loop that starts on \cref{line:partition-while} of \cref{alg:partition} there are 3 possible branches determined by the conditional logic. $x_{e_k} < v$, $x_{e_k} > v$ and $x_{e_k} = v$. Since $v, x_{e_k} \in \Real$ one of these branches must be executed for each iterate $k$.
 

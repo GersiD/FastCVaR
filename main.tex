@@ -429,17 +429,17 @@ A \emph{submodular} function $f\colon 2^{\Omega} \to \Real_+$ satisfies what we 
 \end{proposition}
 \begin{proof}
  % We first note that left component of the $min$\todo{what min?} in $g(x) > 0$ is $c + m  \cdot x$, which is submodular as it is the sum of a linear and constant function. The right side of the $min$\todo{what min} is 1, a constant function and is thus also submodular. Since $c + m  \cdot x - 1$ is a monotone function, $g(x)$ is submodular for $x > 0$\todo{how do we know this?}. We can also show that the construction $g(x)$ forcing it to equal 0 for $x = 0$ (or equivalently $f(\emptyset) = 0$ does not violate the submodularity of the function\todo{how would you show this?}. For any nonempty set $S$ and a given element $z$ not in $S$, $f(S\cup z) - f(S) \leq \mathbb{P}[z] \text{\todo{wait z is not a random variable?}} \leq f(z) - f(\emptyset) = c + \mathbb{P}[z]$.
-We first recall the definition of submodularity:
-$f(X \cup x) - f(X) \geq f(Y \cup x) - f(Y)$, where $X$ and $Y$ are subsets such that $X \cup Y$. We show that an EWS function will always satisfy this condition.
 
-Case 1: $X = \emptyset$
-If $f(Y) < 1$ and $f(Y \cup x) - f(Y) < 1$,  $f(Y \cup x) - f(Y) = m*p(x) < c + m*p(x) = f(X \cup x) - f(X)$. 
-If $f(Y) < 1$ and $f(Y \cup x) - f(Y) = 1$,  $f(Y \cup x) - f(Y) < m*p(x)$. If $f(X \cup x) - f(X) < 1$, then  $f(X \cup x) - f(X) = c + m*p(x)$, else   $f(X \cup x) - f(X) = 1$.   
-If $f(Y) = 1$ and $f(Y \cup x) - f(Y) = 1$,  $f(Y \cup x) - f(Y) = 0 < c + m*p(x)$. 
-Case 2: $f(X) > 0$ and $f(X) < 1$ , therefore $f(X \cup x) - f(X) = c + m*p(x)$
-If $f(Y) < 1$ and $f(Y \cup x) - f(Y) < 1$,  $f(Y \cup x) - f(Y) = m*p(x) < c + m*p(x)$. 
-If $f(Y) < 1$ and $f(Y \cup x) - f(Y) = 1$,  $f(Y \cup x) - f(Y) > m*p(x) < c + m*p(x)$. 
-If $f(Y) = 1$ and $f(Y \cup x) - f(Y) = 1$,  $f(Y \cup x) - f(Y) = 0 < c + m*p(x)$. 
+We first note Theroem 4.5.1 in \todo{CITE} states that if $g$ is concave, $f$ is submodular. 
+
+%Case 1: $X = \emptyset$
+%If $f(Y) < 1$ and $f(Y \cup x) - f(Y) < 1$,  $f(Y \cup x) - f(Y) = %m*p(x) < c + m*p(x) = f(X \cup x) - f(X)$. 
+%If $f(Y) < 1$ and $f(Y \cup x) - f(Y) = 1$,  $f(Y \cup x) - f(Y) < m*p(x)$. If $f(X \cup x) - f(X) < 1$, then  $f(X \cup x) - f(X) = c + m*p(x)$, else   $f(X \cup x) - f(X) = 1$.   
+%If $f(Y) = 1$ and $f(Y \cup x) - f(Y) = 1$,  $f(Y \cup x) - f(Y) = 0 < c + m*p(x)$. 
+%Case 2: $f(X) > 0$ and $f(X) < 1$ , therefore $f(X \cup x) - f(X) = c + m*p(x)$
+%If $f(Y) < 1$ and $f(Y \cup x) - f(Y) < 1$,  $f(Y \cup x) - f(Y) = m*p(x) < c + m*p(x)$. 
+%If $f(Y) < 1$ and $f(Y \cup x) - f(Y) = 1$,  $f(Y \cup x) - f(Y) > m*p(x) < c + m*p(x)$. 
+%If $f(Y) = 1$ and $f(Y \cup x) - f(Y) = 1$,  $f(Y \cup x) - f(Y) = 0 < c + m*p(x)$. 
 \end{proof}
 The first statement in the assumption above is satisfied for any law-invariant comonotonic coherent risk measure \cite{Follmer2016}. We now describe an algorithm for optimizing over polymatroids with this class of submodular function.
 \begin{algorithm}

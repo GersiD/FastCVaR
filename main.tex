@@ -267,45 +267,9 @@ Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorit
 The above conditions primarily state that each call to the partition scheme performs partial sorting such that all elements less than or equal to the pivot will be at a lower index \todo{same variable names as in the algorithm}, and elements greater than the pivot will be at a higher index\todo{ditto}. 
 
 In order to prove that the algorithm is optimal, we first show that $\quant_{\alpha}^-(\tilde{x})$ is an element in the array. 
-\begin{lemma}
+\begin{lemma}\label{lem:quantile-in-finite-omega}
 Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite $\Omega$. Then, there exist $\omega_+, \omega_-\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_+)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_-)$ for each $\alpha\in (0,1)$.
 \end{lemma}
-\begin{proof}
-
-
- 
-Recall the definition:
- \begin{align} \label{eq:var-definition-close}
-  \quant_{\alpha}^+(\tilde{x})
-  \;:=\;
-    \max\; \left\{\tau \in \Real \mid \P{ \tilde{x} < \tau } \le \alpha\right\},
- \end{align}
-
-Let $x[\omega_1] \leq x[\omega_2] \leq \dots \leq x[\omega_n]$ without loss of generality. Suppose for the sake of contradiction that there is no $\omega\in \Omega $ such that $\quant^+_{\alpha}(\tilde{x}) = \tilde{x}[\omega]$. Then since $\quant^+_{\alpha}(\tilde{x}), x[\omega] \in \Real$ and $\Omega$ is finite, there are only 3 cases to consider.
-
-\begin{enumerate}
-\item[Case 1]: $\quant^+_{\alpha}(\tilde{x}) = \tau\opt \in (x[\omega_i], x[\omega_{i + 1}])$.
-Since there are no $\omega\in \Omega$ such that $x[\omega] \in  [\tau\opt , x[\omega_{i+1}])$:
-
-  \[
-    \P{\tilde{x} < x[\omega_{i+1}]} = \P{\tilde{x} <\tau\opt} \le \alpha.
-  \]
-Therefore, $x[\omega_{i+1}] > \tau\opt$ is feasible in \eqref{eq:var-definition-close} contradicting the optimality of $\tau\opt$.
-\item[Case 2]: $\quant^+_{\alpha}(\tilde{x}) = \tau\opt < x[\omega_1]$. Since there is no $\omega\in \Omega$ such that $x[\omega] \in (-\infty, x[\omega_1])$:
-  \[
-    \P{\tilde{x} < x[\omega_{1}]} = \P{\tilde{x} <\tau\opt} = 0 \le \alpha.
-  \]
-  Therefore, $x[\omega_1] > \tau\opt$ is feasible in \eqref{eq:var-definition-close} contradicting the optimality of $\tau\opt$.
-
-\item[Case 3]: $\quant^+_{\alpha}(\tilde{x}) = \tau\opt > x[\omega_n]$.
-  For all $\tau \ge \tau\opt$
-  \[
-    \P{\tilde{x} < \tau } \ge  \P{\tilde{x} < \tau\opt } = 1 > \alpha.
-  \]
-  Therefore, $\tau\opt$ cannot be optimal in~\eqref{eq:var-definition-close} since $\alpha < 1$. %, which contradicts the hypothesis.
-  
-\end{enumerate}
-\end{proof}
 
 \begin{lemma}
   \Cref{alg:quick-quantile} computes $\quant^+$.
@@ -354,7 +318,8 @@ In this section, we propose new linear-time algorithms for computing $\varphi$-d
 First, recall the standard definition of submodular functions and the related concept of polymatroid~\cite{Korte2012}.
 \begin{definition} \label{def:polymatroid}
 A function $f \colon 2^{\mathcal{E}} \to \Real_+$ for a finite set finite set $\mathcal{E} = \left\{ 1, \dots , E \right\}$ is \emph{submodular} if
-\[
+\todo{what is $\mathcal{\Omega'}$?}
+\[ 
   f(\mathcal{A}) + f(\mathcal{\Omega'}) \geq f(\mathcal{A} \cup \mathcal{\Omega'}) + f(\mathcal{A} \cap \mathcal{\Omega'}),
   \quad
   \forall \mathcal{A}, \mathcal{\Omega'} \subseteq \mathcal{E}.
@@ -374,7 +339,7 @@ A \emph{polymatroid} $\mathcal{Q}_f$ for $f$ is a polytope defined as
 
 Polymatroids are important for our purpose because many risk measures can be formulated as linear optimization over polymatroids.  
 \begin{proposition} \label{prop:coherent-polymatroid}
-Suppose that $\rho\colon \mathbb{X}\to \Real$ is a comonotonic coherent risk measure (defined as $\rho$ such that $\rho(X) +  \rho(Y)= \rho(X + Y)$). Then
+  Suppose that $\rho\colon \mathbb{X}\to \Real$ is a comonotonic coherent risk measure (defined as $\rho$ such that $\rho(X) +  \rho(Y)= \rho(X + Y)$ \todo{this is not the def of comonotonic, this is linear}). Then
   \[
    \rho[\tilde{x}] = \min_{\bm{q}\in \mathcal{Q}_c} \bm{q}\tr  \bm{x},
   \]\label{comontonic optimization}
@@ -637,6 +602,44 @@ This speed up is significant in the context of risk measures as they are often u
 %     \State{\Return{($\lambda - 1$, $\mu$)} \Comment{last element less than the pivot, first element greater than the pivot}}
 %   \end{algorithmic}
 % \end{algorithm}
+%
+
+\subsection{Proof of \cref{lem:quantile-in-finite-omega}}
+\begin{proof}
+Recall the definition:
+ \begin{align} \label{eq:var-definition-close}
+  \quant_{\alpha}^+(\tilde{x})
+  \;:=\;
+    \max\; \left\{\tau \in \Real \mid \P{ \tilde{x} < \tau } \le \alpha\right\},
+ \end{align}
+
+Let $x[\omega_1] \leq x[\omega_2] \leq \dots \leq x[\omega_n]$ without loss of generality. Suppose for the sake of contradiction that there is no $\omega\in \Omega $ such that $\quant^+_{\alpha}(\tilde{x}) = \tilde{x}[\omega]$. Then since $\quant^+_{\alpha}(\tilde{x}), x[\omega] \in \Real$ and $\Omega$ is finite, there are only 3 cases to consider.
+
+\begin{enumerate}
+\item[Case 1]: $\quant^+_{\alpha}(\tilde{x}) = \tau\opt \in (x[\omega_i], x[\omega_{i + 1}])$.
+Since there are no $\omega\in \Omega$ such that $x[\omega] \in  [\tau\opt , x[\omega_{i+1}])$:
+
+  \[
+    \P{\tilde{x} < x[\omega_{i+1}]} = \P{\tilde{x} <\tau\opt} \le \alpha.
+  \]
+Therefore, $x[\omega_{i+1}] > \tau\opt$ is feasible in \eqref{eq:var-definition-close} contradicting the optimality of $\tau\opt$.
+\item[Case 2]: $\quant^+_{\alpha}(\tilde{x}) = \tau\opt < x[\omega_1]$. Since there is no $\omega\in \Omega$ such that $x[\omega] \in (-\infty, x[\omega_1])$:
+  \[
+    \P{\tilde{x} < x[\omega_{1}]} = \P{\tilde{x} <\tau\opt} = 0 \le \alpha.
+  \]
+  Therefore, $x[\omega_1] > \tau\opt$ is feasible in \eqref{eq:var-definition-close} contradicting the optimality of $\tau\opt$.
+
+\item[Case 3]: $\quant^+_{\alpha}(\tilde{x}) = \tau\opt > x[\omega_n]$.
+  For all $\tau \ge \tau\opt$
+  \[
+    \P{\tilde{x} < \tau } \ge  \P{\tilde{x} < \tau\opt } = 1 > \alpha.
+  \]
+  Therefore, $\tau\opt$ cannot be optimal in~\eqref{eq:var-definition-close} since $\alpha < 1$. %, which contradicts the hypothesis.
+  
+\end{enumerate}
+By similar reasopning one can show that $\quant_{\alpha}^-(\tilde{x})$ is also in the set of values of $\tilde{x}$, i.e. there exists $\omega\in \Omega$ such that $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}[\omega]$.
+\end{proof}
+
 
 \subsection{Standard VaR Algorithm} \label{sec:stand-var-algor}
 

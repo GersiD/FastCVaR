@@ -61,7 +61,7 @@ Monetary risk measures have gained popularity in expressing decision-makers' pre
 \section{Introduction}\label{sec:intro}
 
 \todo{citations}
-Monetary measures of risk generalize the expectation operator to be able to represent the risk aversion of decision makers in domains that range from robotics~\cite{akella2024risk} \cite{majumdar2020should}\cite{benrabah2024review} to finance~\cite{Follmer2016} to infrastructure maintenance~\cite{}. Value-at-Risk~(VaR) and Conditional-Value-at-Risk~(CVaR) are the most popular risk measures and have made inroads in reinforcement learning, machine learning, and decision making~\cite{Petrik2024}. Machine learning and reinforcement learning algorithms typically must compute the risk measures for discrete random variables. Fast algorithms for computing risk measures are necessary in several machine-learning settings~\cite{}. For example, when used as part of an optimization algorithm, the risk measure may need to be evaluated in every iteration of the algorithm and can represent a significant computational bottleneck~\cite{Ho2021}. 
+Monetary measures of risk generalize the expectation operator to be able to represent the risk aversion of decision makers in domains that range from robotics~\cite{akella2024risk,majumdar2020should,benrabah2024review} to finance~\cite{Follmer2016} to infrastructure maintenance~\cite{}. Value-at-Risk~(VaR) and Conditional-Value-at-Risk~(CVaR) are the most popular risk measures and have made inroads in reinforcement learning, machine learning, and decision making~\cite{Petrik2024}. Machine learning and reinforcement learning algorithms typically must compute the risk measures for discrete random variables. Fast algorithms for computing risk measures are necessary in several machine-learning settings~\cite{}. For example, when used as part of an optimization algorithm, the risk measure may need to be evaluated in every iteration of the algorithm and can represent a significant computational bottleneck~\cite{Ho2021}. 
 
 
 %However, in many applications such as robotics, finance, and autonomous systems, solutions must account for performance with respect to worst case scenarios rather than simply maximizing the mean. Therefore, it has become a common practice to optimize policies with respect to a risk measure~\cite{Follmer2016}, which focuses on the tails of the reward distribution rather than the expectation. 
@@ -95,7 +95,7 @@ The remainder of the paper is organized as follows. \Cref{sec:preliminaries} des
 
 \section{Preliminaries}\label{sec:preliminaries}
 
-In this work, we restrict our attention to random variables defined on finite probability spaces \todo{what do you mean by this}$(\Omega, 2^{\Omega}, \bm{p})$ where $\Omega := \left\{ 1, \dots , n \right\}$, $\bm{p} \in \Delta_n$, and $\Delta_n$ is the $n$-dimensional probability simplex. We use a tilde to indicate a random variable, such as $\tilde{x}\colon \Omega \to \Real$. The set of real-valued random variables is denoted by $\mathbb{X}$. Vectors are denoted with a lower-case bold font, such as $\bm{x} \in \Real^n$ and indexed as $\bm{x}_i \text{ for } i = 1, \dots , n$. We use $\tilde{x}$ and $\bm{x}$ interchangeably, such that $\bm{x}_\omega = \tilde{x}(\omega) \text{ for }  \omega \in \Omega$. Sets are denoted with calligraphic letters. Finally, we use $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ to denote the extended real line. 
+In this work, we restrict our attention to random variables defined on finite probability spaces $(\Omega, 2^{\Omega}, \bm{p})$ where $\Omega := \left\{ 1, \dots , n \right\}$, $\bm{p} \in \Delta_n$, and $\Delta_n$ is the $n$-dimensional probability simplex. We use a tilde to indicate a random variable, such as $\tilde{x}\colon \Omega \to \Real$. The set of real-valued random variables is denoted by $\mathbb{X}$. Vectors are denoted with a lower-case bold font, such as $\bm{x} \in \Real^n$ and indexed as $\bm{x}_i \text{ for } i = 1, \dots , n$. We use $\tilde{x}$ and $\bm{x}$ interchangeably, such that $\bm{x}_\omega = \tilde{x}(\omega) \text{ for }  \omega \in \Omega$. Sets are denoted with calligraphic letters. Finally, we use $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ to denote the extended real line. 
 
 \emph{Monetary risk measures} $\rho\colon \mathbb{X} \to \bar{\Real}$ generalize the expectation operator to account for different notions of uncertainty in the distribution of a random variable~\cite{Follmer2016}. In this paper, we assume that the risk measures are applied to random variables that represent rewards and that a higher risk value is preferable to a lower risk value. 
 
@@ -169,12 +169,12 @@ In the remainder of the paper, we first propose a linear-time algorithm for comp
 
 \section{Computing VaR in Linear Time} \label{sec:var-linear}
 
-In this section, we develop a quick algorithm to compute the VaR of a discrete random variable. The algorithm extends the well-known QuickSelect algorithm to account to non-uniform weights. We also take a special care to allow random variables $\tilde{x}$ with duplicate values such that $\tilde{x}(\omega_1) = \tilde{x}$. This allows us to compute VaR in expected linear time as opposed to conventional algorithms such as A.1 in the appendix.
+In this section, we develop a quick algorithm to compute the VaR of a discrete random variable. The algorithm extends the well-known QuickSelect algorithm to account to non-uniform weights. We also take a special care to allow random variables $\tilde{x}$ with duplicate values such that $\tilde{x}(\omega_i) = \tilde{x}(\omega_j)$. This allows us to compute VaR in expected linear time as opposed to conventional algorithms such as A.1 in the appendix.
 
 
 
 %We first restate some well-known properties of the Hoare Partition scheme.
-Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorithm works as follows. It first picks a pivot by taking the middle element between front and back and applies the partition scheme to easily compute the probability of all outcomes smaller than or equal to that of the pivot (Lines \ref{pivot_comp} - \ref{partion_line}). Note that three partitions are create, one where the elements are all less than the pivot, another containing all elements equal to the pivot, and a third pivot containing all elements greater than the pivot. We refer to these partitions as the left, middle, and right partition from here on. QVaR then determines whether the quantile can exist in the left, middle, or right pivot (lines \ref{determine_left}, \ref{determine_right}, and \ref{determine_middle} ) and adjusts the $f_k$ and $b_k$ respectively to reduce the search space to one of these partitions. We note that in the case the quantile is determined to exist in the middle partition, the algorithm can terminate since every value in the middle partition is the same. In the case of $\alpha^0 = 0$, we handle this separately and simply find the minimum element. 
+Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorithm works as follows. It first picks a pivot by taking the middle element between front and back and applies the partition scheme to easily compute the probability of all outcomes smaller than or equal to that of the pivot (Lines \ref{line:pivot_comp} - \ref{line:partion_line}). Note that three partitions are create, one where the elements are all less than the pivot, another containing all elements equal to the pivot, and a third pivot containing all elements greater than the pivot. We refer to these partitions as the left, middle, and right partition from here on. QVaR then determines whether the quantile can exist in the left, middle, or right pivot (lines \ref{line:determine_left}, \ref{line:determine_right}, and \ref{determine_middle} ) and adjusts the $f_k$ and $b_k$ respectively to reduce the search space to one of these partitions. We note that in the case the quantile is determined to exist in the middle partition, the algorithm can terminate since every value in the middle partition is the same. In the case of $\alpha^0 = 0$, we handle this separately and simply find the minimum element. 
 
 % \begin{algorithm}
 %   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and $\alpha \in [0,1]$}}
@@ -239,7 +239,7 @@ Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorit
       $f_k \gets f_{k-1}$;~~~$b_k \gets l_k-1$\;
       $\alpha_k \gets \alpha_{k-1}$\;
     }
-    \ElseIf{$t_k + e_k \le  \alpha_{k-1} \label{determine_right}$} 
+    \ElseIf{$t_k + e_k \le  \alpha_{k-1} \label{line:determine_right}$} 
     {
       % \tcp{$\P{\tilde{x}^k \le v_k} < \alpha_{k-1} \implies \quant_{\alpha_{k-1}} > v_k$}
       \tcp{$\P{\tilde{x}^k \le v_k} \le \alpha_{k-1}
@@ -280,7 +280,6 @@ Recall the definition:
   \;:=\;
     \max\; \left\{\tau \in \Real \mid \P{ \tilde{x} < \tau } \le \alpha\right\},
  \end{align}
-% Assume the random variable $ x $ has $ n $ unique values, such that $ x_1 < x_2 < \cdots < x_n $.  We can assume this without loss of generality because VaR is law invariant~\cite{Follmer2016}. For the sake of the proof, any given $\tau$ is feasible if $P[{\tilde{x}<\tau]} \leq \alpha$. We note that if $\tau$ is not feasible, it cannot equal $\quant^+_{\alpha}(\tilde{x})$ \eqref{eq:var-definition}. 
 
 Let $x[\omega_1] \leq x[\omega_2] \leq \dots \leq x[\omega_n]$ without loss of generality. Suppose for the sake of contradiction that there is no $\omega\in \Omega $ such that $\quant^+_{\alpha}(\tilde{x}) = \tilde{x}[\omega]$. Then since $\quant^+_{\alpha}(\tilde{x}), x[\omega] \in \Real$ and $\Omega$ is finite, there are only 3 cases to consider.
 
@@ -292,16 +291,11 @@ Since there are no $\omega\in \Omega$ such that $x[\omega] \in  [\tau\opt , x[\o
     \P{\tilde{x} < x[\omega_{i+1}]} = \P{\tilde{x} <\tau\opt} \le \alpha.
   \]
 Therefore, $x[\omega_{i+1}] > \tau\opt$ is feasible in \eqref{eq:var-definition-close} contradicting the optimality of $\tau\opt$.
-  % % Let $\quant^+_{\alpha}(\tilde{x}) = \tau\opt \in \Real$ which is optimal in \eqref{eq:var-definition-close}. \\
-  % Consider $\tau' = x(\omega_{i+1})$. Notice $\P{\tilde{x} < \tau'} \le \alpha$ \\
-  % $\P{ \tilde{x} < \tau\opt  } \le \P{\tilde{x} < \tau'} \le \alpha$ by construction.\\
-  % $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition-close}, therefore $\tau\opt $ cannot be optimal.
-\item[Case 2]: $\quant^+_{\alpha}(\tilde{x}) < x[\omega_1]$ 
-  
-  Let $\quant^+_{\alpha}(\tilde{x}) = \tau\opt \in \Real$ which is optimal in \eqref{eq:var-definition-close}. \\
-  Consider $\tau' = x[\omega_1]$. Notice $\P{\tilde{x} < \tau'} = \P{\tilde{x} < \tau\opt} = 0$ by definition of $\omega_1$.\\
-  $\P{ \tilde{x} < \tau'  } = \P{\tilde{x} < \tau\opt} \le \alpha$ by construction.\\
-  $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition-close}, therefore $\tau\opt $ cannot be optimal.
+\item[Case 2]: $\quant^+_{\alpha}(\tilde{x}) = \tau\opt < x[\omega_1]$. Since there is no $\omega\in \Omega$ such that $x[\omega] \in (-\infty, x[\omega_1])$:
+  \[
+    \P{\tilde{x} < x[\omega_{1}]} = \P{\tilde{x} <\tau\opt} = 0 \le \alpha.
+  \]
+  Therefore, $x[\omega_1] > \tau\opt$ is feasible in \eqref{eq:var-definition-close} contradicting the optimality of $\tau\opt$.
 
 \item[Case 3]: $\quant^+_{\alpha}(\tilde{x}) = \tau\opt > x[\omega_n]$.
   For all $\tau \ge \tau\opt$
@@ -310,22 +304,7 @@ Therefore, $x[\omega_{i+1}] > \tau\opt$ is feasible in \eqref{eq:var-definition-
   \]
   Therefore, $\tau\opt$ cannot be optimal in~\eqref{eq:var-definition-close} since $\alpha < 1$. %, which contradicts the hypothesis.
   
-  % Let $\quant^+_{\alpha}(\tilde{x}) = \tau\opt \in \Real$ which is allegedly optimal in \eqref{eq:var-definition-close}. \\
-  % Notice $\P{\tilde{x} < \tau\opt} = 1$ by definition of $\omega_n$.\\
-  % However $\alpha \in (0,1)$, therefore $\tau\opt $ cannot be optimal.\\
-  % Consider $\tau' = x(\omega_n)$. Notice $\P{\tilde{x} < \tau'} = 1 - \P{\omega_n} \le \P{\tilde{x} < \tau\opt} = 1$ by definition of $\omega_n$.\\
-  % In the case $\P{\omega_n} > 0$ for $\alpha \in (0,1)$ $\P{ \tilde{x} < \tau'  } < 1 \le \alpha$. Therefore $\tau'$ is feasible in \eqref{eq:var-definition-close}.\\
-  % And by construction there is no other $\tau \in \Real$ such that $\P{ \tilde{x} < \tau } \le \alpha$ and $\tau > \tau'$.\\
-  % When $\P{\omega_n} = 0$ $\P{ \tilde{x} < \tau'  } = 1 > \alpha$. Therefore $\tau'$ is not feasible and one of the other $\omega_i \in \Omega \backslash{\omega_n}$ must be chosen.
-
-
 \end{enumerate}
-% We note that for a random variable with non-unique values, we can equivalently represent it as a random variable with unique values where the probability of a value that was repeated multiple times is the sum of all probabilities for each instance of that given value. Then we can apply this lemma to show that $\quant^+_{\alpha}(\tilde{x})$ must be equal to one of the outcomes of the original random variable. 
-  
-  % New Proof 2: Recall that $\alpha$ is less than 1 and  $\quant^+_{\alpha}(\tilde{x})$ is bounded for all admissible $\alpha$ values. Let $\tau\opt $ is optimal in \eqref{eq:var-definition} (max definition) and therefore $\tau\opt  = \quant^+_{\alpha}(\tilde{x})  $. Then, let $\tau' = \tau\opt + 1$. Because $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition}, $\P{ \tilde{x} < \tau' } =  \P{ \tilde{x} < \tau\opt  }\le \alpha$, $\tau\opt $ cannot be optimal.
-
-  % Old Proof: Then $ P[x < \quant_{\alpha}^+(\tilde{x})] $ is greater than or equal to $ P[x < x_{n}] $. Remember that $\alpha$ must be less than 1 and $\quant_{\alpha}^+(\tilde{x})$ is bounded for all $\alpha$ less than 1 and greater than or equal to 0, therefore $ P[x < \quant_{\alpha}^+(\tilde{x})] $ is less than 1. Then, there must exist $ y $ in the range $ [\quant_{\alpha}^+(\tilde{x}), \infty $ such that $ P[x = y] > 0 $ . This is impossible by definition. 
-
 \end{proof}
 
 \begin{lemma}
@@ -952,217 +931,6 @@ Julia garbage collector, even when running synchronously.
     Let $x_i :=  \begin{cases}f(S_i) - f(S_{i-1}) & \text{for } i = 1,\dots, r \\ 0 & \text{otherwise} \end{cases}$\;
 \end{algorithm}
 
-\section*{NeurIPS Paper Checklist}
-
-%%% BEGIN INSTRUCTIONS %%%
-
-\textcolor{blue}{IMPORTANT}, please:
-\begin{itemize}
-    \item {\bf Delete this instruction block, but keep the section heading ``NeurIPS Paper Checklist"},
-    \item  {\bf Keep the checklist subsection headings, questions/answers and guidelines below.}
-    \item {\bf Do not modify the questions and only use the provided macros for your answers}.
-\end{itemize} 
-
-%%% END INSTRUCTIONS %%%
-
-
-\begin{enumerate}
-
-\item {\bf Claims}
-    \item[] Question: Do the main claims made in the abstract and introduction accurately reflect the paper's contributions and scope?
-    \item[] Answer: \answerYes{
-      } % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: \cref{sec:var-linear} describes the linear time VaR agorithm which is a central contribution
-      of our work, and \cref{sec:experiments} demonstrates empirical results that support the claims made in the introduction.
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that the abstract and introduction do not include the claims made in the paper.
-        \item The abstract and/or introduction should clearly state the claims made, including the contributions made in the paper and important assumptions and limitations. A No or NA answer to this question will not be perceived well by the reviewers. 
-        \item The claims made should match theoretical and experimental results, and reflect how much the results can be expected to generalize to other settings. 
-        \item It is fine to include aspirational goals as motivation as long as it is clear that these goals are not attained by the paper. 
-    \end{itemize}
-
-\item {\bf Limitations}
-    \item[] Question: Does the paper discuss the limitations of the work performed by the authors?
-    \item[] Answer: \answerTODO{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: \justificationTODO{}
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that the paper has no limitation while the answer No means that the paper has limitations, but those are not discussed in the paper. 
-        \item The authors are encouraged to create a separate "Limitations" section in their paper.
-        \item The paper should point out any strong assumptions and how robust the results are to violations of these assumptions (e.g., independence assumptions, noiseless settings, model well-specification, asymptotic approximations only holding locally). The authors should reflect on how these assumptions might be violated in practice and what the implications would be.
-        \item The authors should reflect on the scope of the claims made, e.g., if the approach was only tested on a few datasets or with a few runs. In general, empirical results often depend on implicit assumptions, which should be articulated.
-        \item The authors should reflect on the factors that influence the performance of the approach. For example, a facial recognition algorithm may perform poorly when image resolution is low or images are taken in low lighting. Or a speech-to-text system might not be used reliably to provide closed captions for online lectures because it fails to handle technical jargon.
-        \item The authors should discuss the computational efficiency of the proposed algorithms and how they scale with dataset size.
-        \item If applicable, the authors should discuss possible limitations of their approach to address problems of privacy and fairness.
-        \item While the authors might fear that complete honesty about limitations might be used by reviewers as grounds for rejection, a worse outcome might be that reviewers discover limitations that aren't acknowledged in the paper. The authors should use their best judgment and recognize that individual actions in favor of transparency play an important role in developing norms that preserve the integrity of the community. Reviewers will be specifically instructed to not penalize honesty concerning limitations.
-    \end{itemize}
-
-\item {\bf Theory assumptions and proofs}
-    \item[] Question: For each theoretical result, does the paper provide the full set of assumptions and a complete (and correct) proof?
-    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: Each of our algorithms have proofs accompanying them, and the assumptions are clearly stated in the paper. The proofs can be found in the apppendix.
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that the paper does not include theoretical results. 
-        \item All the theorems, formulas, and proofs in the paper should be numbered and cross-referenced.
-        \item All assumptions should be clearly stated or referenced in the statement of any theorems.
-        \item The proofs can either appear in the main paper or the supplemental material, but if they appear in the supplemental material, the authors are encouraged to provide a short proof sketch to provide intuition. 
-        \item Inversely, any informal proof provided in the core of the paper should be complemented by formal proofs provided in appendix or supplemental material.
-        \item Theorems and Lemmas that the proof relies upon should be properly referenced. 
-    \end{itemize}
-
-    \item {\bf Experimental result reproducibility}
-    \item[] Question: Does the paper fully disclose all the information needed to reproduce the main experimental results of the paper to the extent that it affects the main claims and/or conclusions of the paper (regardless of whether the code and data are provided or not)?
-    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: Our experimental design and implementation details are given in \cref{sec:experiments} and \cref{sec:appendix_experiments}. The code will also be available after the review process.
-    \item[] Guidelines:
-    \begin{itemize}
-        \item If the paper includes experiments, a No answer to this question will not be perceived well by the reviewers: Making the paper reproducible is important, regardless of whether the code and data are provided or not.
-        \item If the contribution is a dataset and/or model, the authors should describe the steps taken to make their results reproducible or verifiable. 
-        \item Depending on the contribution, reproducibility can be accomplished in various ways. For example, if the contribution is a novel architecture, describing the architecture fully might suffice, or if the contribution is a specific model and empirical evaluation, it may be necessary to either make it possible for others to replicate the model with the same dataset, or provide access to the model. In general. releasing code and data is often one good way to accomplish this, but reproducibility can also be provided via detailed instructions for how to replicate the results, access to a hosted model (e.g., in the case of a large language model), releasing of a model checkpoint, or other means that are appropriate to the research performed.
-        \item While NeurIPS does not require releasing code, the conference does require all submissions to provide some reasonable avenue for reproducibility, which may depend on the nature of the contribution. For example
-        \begin{enumerate}
-            \item If the contribution is primarily a new algorithm, the paper should make it clear how to reproduce that algorithm.
-            \item If the contribution is primarily a new model architecture, the paper should describe the architecture clearly and fully.
-            \item If the contribution is a new model (e.g., a large language model), then there should either be a way to access this model for reproducing the results or a way to reproduce the model (e.g., with an open-source dataset or instructions for how to construct the dataset).
-            \item We recognize that reproducibility may be tricky in some cases, in which case authors are welcome to describe the particular way they provide for reproducibility. In the case of closed-source models, it may be that access to the model is limited in some way (e.g., to registered users), but it should be possible for other researchers to have some path to reproducing or verifying the results.
-        \end{enumerate}
-    \end{itemize}
-
-
-\item {\bf Open access to data and code}
-    \item[] Question: Does the paper provide open access to the data and code, with sufficient instructions to faithfully reproduce the main experimental results, as described in supplemental material?
-    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: Code will be released via GitHub after the review process.
-    \item[] Guidelines:
-    \begin{itemize}
-        \item Please see the NeurIPS code and data submission guidelines (\url{https://nips.cc/public/guides/CodeSubmissionPolicy}) for more details.
-        \item The instructions should contain the exact command and environment needed to run to reproduce the results. See the NeurIPS code and data submission guidelines (\url{https://nips.cc/public/guides/CodeSubmissionPolicy}) for more details.
-        \item The authors should provide instructions on data access and preparation, including how to access the raw data, preprocessed data, intermediate data, and generated data, etc.
-        \item The authors should provide scripts to reproduce all experimental results for the new proposed method and baselines. If only a subset of experiments are reproducible, they should state which ones are omitted from the script and why.
-        \item At submission time, to preserve anonymity, the authors should release anonymized versions (if applicable).
-        \item Providing as much information as possible in supplemental material (appended to the paper) is recommended, but including URLs to data and code is permitted.
-    \end{itemize}
-
-
-\item {\bf Experimental setting/details}
-    \item[] Question: Does the paper specify all the training and test details (e.g., data splits, hyperparameters, how they were chosen, type of optimizer, etc.) necessary to understand the results?
-    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: Where neccecary we disclose our random variable and risk parameters in \cref{sec:experiments} and \cref{sec:appendix_experiments}
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The experimental setting should be presented in the core of the paper to a level of detail that is necessary to appreciate the results and make sense of them.
-        \item The full details can be provided either with the code, in appendix, or as supplemental material.
-    \end{itemize}
-
-\item {\bf Experiment statistical significance}
-    \item[] Question: Does the paper report error bars suitably and correctly defined or other appropriate information about the statistical significance of the experiments?
-    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: As explained in \cref{sec:experiments} we run our experiments for 10 trials and report the mean and 95\% confidence interval of the results. We assume that runtimes on a machine are normally distributed.
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The authors should answer "Yes" if the results are accompanied by error bars, confidence intervals, or statistical significance tests, at least for the experiments that support the main claims of the paper.
-        \item The factors of variability that the error bars are capturing should be clearly stated (for example, train/test split, initialization, random drawing of some parameter, or overall run with given experimental conditions).
-        \item The method for calculating the error bars should be explained (closed form formula, call to a library function, bootstrap, etc.)
-        \item The assumptions made should be given (e.g., Normally distributed errors).
-        \item It should be clear whether the error bar is the standard deviation or the standard error of the mean.
-        \item It is OK to report 1-sigma error bars, but one should state it. The authors should preferably report a 2-sigma error bar than state that they have a 96\% CI, if the hypothesis of Normality of errors is not verified.
-        \item For asymmetric distributions, the authors should be careful not to show in tables or figures symmetric error bars that would yield results that are out of range (e.g. negative error rates).
-        \item If error bars are reported in tables or plots, The authors should explain in the text how they were calculated and reference the corresponding figures or tables in the text.
-    \end{itemize}
-
-\item {\bf Experiments compute resources}
-    \item[] Question: For each experiment, does the paper provide sufficient information on the computer resources (type of compute workers, memory, time of execution) needed to reproduce the experiments?
-    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: See \cref{sec:appendix_experiments}.
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The paper should indicate the type of compute workers CPU or GPU, internal cluster, or cloud provider, including relevant memory and storage.
-        \item The paper should provide the amount of compute required for each of the individual experimental runs as well as estimate the total compute. 
-        \item The paper should disclose whether the full research project required more compute than the experiments reported in the paper (e.g., preliminary or failed experiments that didn't make it into the paper). 
-    \end{itemize}
-    
-\item {\bf Code of ethics}
-    \item[] Question: Does the research conducted in the paper conform, in every respect, with the NeurIPS Code of Ethics \url{https://neurips.cc/public/EthicsGuidelines}?
-    \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: The authors of this work have reviewed the NeurIPS Code of Ethics and confirm that the research conducted in this paper conforms with it.
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that the authors have not reviewed the NeurIPS Code of Ethics.
-        \item If the authors answer No, they should explain the special circumstances that require a deviation from the Code of Ethics.
-        \item The authors should make sure to preserve anonymity (e.g., if there is a special consideration due to laws or regulations in their jurisdiction).
-    \end{itemize}
-
-
-\item {\bf Broader impacts}
-    \item[] Question: Does the paper discuss both potential positive societal impacts and negative societal impacts of the work performed?
-    \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: There is little to no societal impact of our work. The authors do not have reason to believe that the work performed has any propensity for negative societal impact.
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that there is no societal impact of the work performed.
-        \item If the authors answer NA or No, they should explain why their work has no societal impact or why the paper does not address societal impact.
-    \end{itemize}
-    
-\item {\bf Safeguards}
-    \item[] Question: Does the paper describe safeguards that have been put in place for responsible release of data or models that have a high risk for misuse (e.g., pretrained language models, image generators, or scraped datasets)?
-    \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: Our work does not involve any data or models that have a high risk for misuse.
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that the paper poses no such risks.
-    \end{itemize}
-
-\item {\bf Licenses for existing assets}
-    \item[] Question: Are the creators or original owners of assets (e.g., code, data, models), used in the paper, properly credited and are the license and terms of use explicitly mentioned and properly respected?
-    \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: We do not use any existing assets. 
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that the paper does not use existing assets.
-    \end{itemize}
-
-\item {\bf New assets}
-    \item[] Question: Are new assets introduced in the paper well documented and is the documentation provided alongside the assets?
-    \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: We do not release new assets.
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that the paper does not release new assets.
-    \end{itemize}
-
-\item {\bf Crowdsourcing and research with human subjects}
-    \item[] Question: For crowdsourcing experiments and research with human subjects, does the paper include the full text of instructions given to participants and screenshots, if applicable, as well as details about compensation (if any)? 
-    \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: Our work does not involve crowdsourcing nor research with human subjects.
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that the paper does not involve crowdsourcing nor research with human subjects.
-    \end{itemize}
-
-\item {\bf Institutional review board (IRB) approvals or equivalent for research with human subjects}
-    \item[] Question: Does the paper describe potential risks incurred by study participants, whether such risks were disclosed to the subjects, and whether Institutional Review Board (IRB) approvals (or an equivalent approval/review based on the requirements of your country or institution) were obtained?
-    \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: Our work does not involve crowdsourcing nor research with human subjects.
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that the paper does not involve crowdsourcing nor research with human subjects.
-    \end{itemize}
-
-\item {\bf Declaration of LLM usage}
-    \item[] Question: Does the paper describe the usage of LLMs if it is an important, original, or non-standard component of the core methods in this research? Note that if the LLM is used only for writing, editing, or formatting purposes and does not impact the core methodology, scientific rigorousness, or originality of the research, declaration is not required.
-    %this research? 
-    \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
-    \item[] Justification: We do not discuss nor is our core contribution contingent on LLMs.
-    \item[] Guidelines:
-    \begin{itemize}
-        \item The answer NA means that the core method development in this research does not involve LLMs as any important, original, or non-standard components.
-    \end{itemize}
-
-\end{enumerate}
-
-
 % Graveyard
 % \begin{figure}[htbp]
 %   \centering
@@ -1364,6 +1132,215 @@ Julia garbage collector, even when running synchronously.
 
 %   \end{algorithmic}
 % \end{algorithm}
+% \section*{NeurIPS Paper Checklist}
+%
+% %%% BEGIN INSTRUCTIONS %%%
+%
+% \textcolor{blue}{IMPORTANT}, please:
+% \begin{itemize}
+%     \item {\bf Delete this instruction block, but keep the section heading ``NeurIPS Paper Checklist"},
+%     \item  {\bf Keep the checklist subsection headings, questions/answers and guidelines below.}
+%     \item {\bf Do not modify the questions and only use the provided macros for your answers}.
+% \end{itemize} 
+%
+% %%% END INSTRUCTIONS %%%
+%
+%
+% \begin{enumerate}
+%
+% \item {\bf Claims}
+%     \item[] Question: Do the main claims made in the abstract and introduction accurately reflect the paper's contributions and scope?
+%     \item[] Answer: \answerYes{
+%       } % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+%     \item[] Justification: \cref{sec:var-linear} describes the linear time VaR agorithm which is a central contribution
+%       of our work, and \cref{sec:experiments} demonstrates empirical results that support the claims made in the introduction.
+%     \item[] Guidelines:
+%     \begin{itemize}
+%         \item The answer NA means that the abstract and introduction do not include the claims made in the paper.
+%         \item The abstract and/or introduction should clearly state the claims made, including the contributions made in the paper and important assumptions and limitations. A No or NA answer to this question will not be perceived well by the reviewers. 
+%         \item The claims made should match theoretical and experimental results, and reflect how much the results can be expected to generalize to other settings. 
+%         \item It is fine to include aspirational goals as motivation as long as it is clear that these goals are not attained by the paper. 
+%     \end{itemize}
+%
+% \item {\bf Limitations}
+%     \item[] Question: Does the paper discuss the limitations of the work performed by the authors?
+%     \item[] Answer: \answerTODO{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+%     \item[] Justification: \justificationTODO{}
+%     \item[] Guidelines:
+%     \begin{itemize}
+%         \item The answer NA means that the paper has no limitation while the answer No means that the paper has limitations, but those are not discussed in the paper. 
+%         \item The authors are encouraged to create a separate "Limitations" section in their paper.
+%         \item The paper should point out any strong assumptions and how robust the results are to violations of these assumptions (e.g., independence assumptions, noiseless settings, model well-specification, asymptotic approximations only holding locally). The authors should reflect on how these assumptions might be violated in practice and what the implications would be.
+%         \item The authors should reflect on the scope of the claims made, e.g., if the approach was only tested on a few datasets or with a few runs. In general, empirical results often depend on implicit assumptions, which should be articulated.
+%         \item The authors should reflect on the factors that influence the performance of the approach. For example, a facial recognition algorithm may perform poorly when image resolution is low or images are taken in low lighting. Or a speech-to-text system might not be used reliably to provide closed captions for online lectures because it fails to handle technical jargon.
+%         \item The authors should discuss the computational efficiency of the proposed algorithms and how they scale with dataset size.
+%         \item If applicable, the authors should discuss possible limitations of their approach to address problems of privacy and fairness.
+%         \item While the authors might fear that complete honesty about limitations might be used by reviewers as grounds for rejection, a worse outcome might be that reviewers discover limitations that aren't acknowledged in the paper. The authors should use their best judgment and recognize that individual actions in favor of transparency play an important role in developing norms that preserve the integrity of the community. Reviewers will be specifically instructed to not penalize honesty concerning limitations.
+%     \end{itemize}
+%
+% \item {\bf Theory assumptions and proofs}
+%     \item[] Question: For each theoretical result, does the paper provide the full set of assumptions and a complete (and correct) proof?
+%     \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+%     \item[] Justification: Each of our algorithms have proofs accompanying them, and the assumptions are clearly stated in the paper. The proofs can be found in the apppendix.
+%     \item[] Guidelines:
+%     \begin{itemize}
+%         \item The answer NA means that the paper does not include theoretical results. 
+%         \item All the theorems, formulas, and proofs in the paper should be numbered and cross-referenced.
+%         \item All assumptions should be clearly stated or referenced in the statement of any theorems.
+%         \item The proofs can either appear in the main paper or the supplemental material, but if they appear in the supplemental material, the authors are encouraged to provide a short proof sketch to provide intuition. 
+%         \item Inversely, any informal proof provided in the core of the paper should be complemented by formal proofs provided in appendix or supplemental material.
+%         \item Theorems and Lemmas that the proof relies upon should be properly referenced. 
+%     \end{itemize}
+%
+%     \item {\bf Experimental result reproducibility}
+%     \item[] Question: Does the paper fully disclose all the information needed to reproduce the main experimental results of the paper to the extent that it affects the main claims and/or conclusions of the paper (regardless of whether the code and data are provided or not)?
+%     \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+%     \item[] Justification: Our experimental design and implementation details are given in \cref{sec:experiments} and \cref{sec:appendix_experiments}. The code will also be available after the review process.
+%     \item[] Guidelines:
+%     \begin{itemize}
+%         \item If the paper includes experiments, a No answer to this question will not be perceived well by the reviewers: Making the paper reproducible is important, regardless of whether the code and data are provided or not.
+%         \item If the contribution is a dataset and/or model, the authors should describe the steps taken to make their results reproducible or verifiable. 
+%         \item Depending on the contribution, reproducibility can be accomplished in various ways. For example, if the contribution is a novel architecture, describing the architecture fully might suffice, or if the contribution is a specific model and empirical evaluation, it may be necessary to either make it possible for others to replicate the model with the same dataset, or provide access to the model. In general. releasing code and data is often one good way to accomplish this, but reproducibility can also be provided via detailed instructions for how to replicate the results, access to a hosted model (e.g., in the case of a large language model), releasing of a model checkpoint, or other means that are appropriate to the research performed.
+%         \item While NeurIPS does not require releasing code, the conference does require all submissions to provide some reasonable avenue for reproducibility, which may depend on the nature of the contribution. For example
+%         \begin{enumerate}
+%             \item If the contribution is primarily a new algorithm, the paper should make it clear how to reproduce that algorithm.
+%             \item If the contribution is primarily a new model architecture, the paper should describe the architecture clearly and fully.
+%             \item If the contribution is a new model (e.g., a large language model), then there should either be a way to access this model for reproducing the results or a way to reproduce the model (e.g., with an open-source dataset or instructions for how to construct the dataset).
+%             \item We recognize that reproducibility may be tricky in some cases, in which case authors are welcome to describe the particular way they provide for reproducibility. In the case of closed-source models, it may be that access to the model is limited in some way (e.g., to registered users), but it should be possible for other researchers to have some path to reproducing or verifying the results.
+%         \end{enumerate}
+%     \end{itemize}
+%
+%
+% \item {\bf Open access to data and code}
+%     \item[] Question: Does the paper provide open access to the data and code, with sufficient instructions to faithfully reproduce the main experimental results, as described in supplemental material?
+%     \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+%     \item[] Justification: Code will be released via GitHub after the review process.
+%     \item[] Guidelines:
+%     \begin{itemize}
+%         \item Please see the NeurIPS code and data submission guidelines (\url{https://nips.cc/public/guides/CodeSubmissionPolicy}) for more details.
+%         \item The instructions should contain the exact command and environment needed to run to reproduce the results. See the NeurIPS code and data submission guidelines (\url{https://nips.cc/public/guides/CodeSubmissionPolicy}) for more details.
+%         \item The authors should provide instructions on data access and preparation, including how to access the raw data, preprocessed data, intermediate data, and generated data, etc.
+%         \item The authors should provide scripts to reproduce all experimental results for the new proposed method and baselines. If only a subset of experiments are reproducible, they should state which ones are omitted from the script and why.
+%         \item At submission time, to preserve anonymity, the authors should release anonymized versions (if applicable).
+%         \item Providing as much information as possible in supplemental material (appended to the paper) is recommended, but including URLs to data and code is permitted.
+%     \end{itemize}
+%
+%
+% \item {\bf Experimental setting/details}
+%     \item[] Question: Does the paper specify all the training and test details (e.g., data splits, hyperparameters, how they were chosen, type of optimizer, etc.) necessary to understand the results?
+%     \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+%     \item[] Justification: Where neccecary we disclose our random variable and risk parameters in \cref{sec:experiments} and \cref{sec:appendix_experiments}
+%     \item[] Guidelines:
+%     \begin{itemize}
+%         \item The experimental setting should be presented in the core of the paper to a level of detail that is necessary to appreciate the results and make sense of them.
+%         \item The full details can be provided either with the code, in appendix, or as supplemental material.
+%     \end{itemize}
+%
+% \item {\bf Experiment statistical significance}
+%     \item[] Question: Does the paper report error bars suitably and correctly defined or other appropriate information about the statistical significance of the experiments?
+%     \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+%     \item[] Justification: As explained in \cref{sec:experiments} we run our experiments for 10 trials and report the mean and 95\% confidence interval of the results. We assume that runtimes on a machine are normally distributed.
+%     \item[] Guidelines:
+%     \begin{itemize}
+%         \item The authors should answer "Yes" if the results are accompanied by error bars, confidence intervals, or statistical significance tests, at least for the experiments that support the main claims of the paper.
+%         \item The factors of variability that the error bars are capturing should be clearly stated (for example, train/test split, initialization, random drawing of some parameter, or overall run with given experimental conditions).
+%         \item The method for calculating the error bars should be explained (closed form formula, call to a library function, bootstrap, etc.)
+%         \item The assumptions made should be given (e.g., Normally distributed errors).
+%         \item It should be clear whether the error bar is the standard deviation or the standard error of the mean.
+%         \item It is OK to report 1-sigma error bars, but one should state it. The authors should preferably report a 2-sigma error bar than state that they have a 96\% CI, if the hypothesis of Normality of errors is not verified.
+%         \item For asymmetric distributions, the authors should be careful not to show in tables or figures symmetric error bars that would yield results that are out of range (e.g. negative error rates).
+%         \item If error bars are reported in tables or plots, The authors should explain in the text how they were calculated and reference the corresponding figures or tables in the text.
+%     \end{itemize}
+%
+% \item {\bf Experiments compute resources}
+%     \item[] Question: For each experiment, does the paper provide sufficient information on the computer resources (type of compute workers, memory, time of execution) needed to reproduce the experiments?
+%     \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+%     \item[] Justification: See \cref{sec:appendix_experiments}.
+%     \item[] Guidelines:
+%     \begin{itemize}
+%         \item The paper should indicate the type of compute workers CPU or GPU, internal cluster, or cloud provider, including relevant memory and storage.
+%         \item The paper should provide the amount of compute required for each of the individual experimental runs as well as estimate the total compute. 
+%         \item The paper should disclose whether the full research project required more compute than the experiments reported in the paper (e.g., preliminary or failed experiments that didn't make it into the paper). 
+%     \end{itemize}
+%     
+% \item {\bf Code of ethics}
+%     \item[] Question: Does the research conducted in the paper conform, in every respect, with the NeurIPS Code of Ethics \url{https://neurips.cc/public/EthicsGuidelines}?
+%     \item[] Answer: \answerYes{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+%     \item[] Justification: The authors of this work have reviewed the NeurIPS Code of Ethics and confirm that the research conducted in this paper conforms with it.
+%     \item[] Guidelines:
+%     \begin{itemize}
+%         \item The answer NA means that the authors have not reviewed the NeurIPS Code of Ethics.
+%         \item If the authors answer No, they should explain the special circumstances that require a deviation from the Code of Ethics.
+%         \item The authors should make sure to preserve anonymity (e.g., if there is a special consideration due to laws or regulations in their jurisdiction).
+%     \end{itemize}
+%
+%
+% \item {\bf Broader impacts}
+%     \item[] Question: Does the paper discuss both potential positive societal impacts and negative societal impacts of the work performed?
+%     \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+%     \item[] Justification: There is little to no societal impact of our work. The authors do not have reason to believe that the work performed has any propensity for negative societal impact.
+%     \item[] Guidelines:
+%     \begin{itemize}
+%         \item The answer NA means that there is no societal impact of the work performed.
+%         \item If the authors answer NA or No, they should explain why their work has no societal impact or why the paper does not address societal impact.
+%     \end{itemize}
+%     
+% \item {\bf Safeguards}
+%     \item[] Question: Does the paper describe safeguards that have been put in place for responsible release of data or models that have a high risk for misuse (e.g., pretrained language models, image generators, or scraped datasets)?
+%     \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+%     \item[] Justification: Our work does not involve any data or models that have a high risk for misuse.
+%     \item[] Guidelines:
+%     \begin{itemize}
+%         \item The answer NA means that the paper poses no such risks.
+%     \end{itemize}
+%
+% \item {\bf Licenses for existing assets}
+%     \item[] Question: Are the creators or original owners of assets (e.g., code, data, models), used in the paper, properly credited and are the license and terms of use explicitly mentioned and properly respected?
+%     \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+%     \item[] Justification: We do not use any existing assets. 
+%     \item[] Guidelines:
+%     \begin{itemize}
+%         \item The answer NA means that the paper does not use existing assets.
+%     \end{itemize}
+%
+% \item {\bf New assets}
+%     \item[] Question: Are new assets introduced in the paper well documented and is the documentation provided alongside the assets?
+%     \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+%     \item[] Justification: We do not release new assets.
+%     \item[] Guidelines:
+%     \begin{itemize}
+%         \item The answer NA means that the paper does not release new assets.
+%     \end{itemize}
+%
+% \item {\bf Crowdsourcing and research with human subjects}
+%     \item[] Question: For crowdsourcing experiments and research with human subjects, does the paper include the full text of instructions given to participants and screenshots, if applicable, as well as details about compensation (if any)? 
+%     \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+%     \item[] Justification: Our work does not involve crowdsourcing nor research with human subjects.
+%     \item[] Guidelines:
+%     \begin{itemize}
+%         \item The answer NA means that the paper does not involve crowdsourcing nor research with human subjects.
+%     \end{itemize}
+%
+% \item {\bf Institutional review board (IRB) approvals or equivalent for research with human subjects}
+%     \item[] Question: Does the paper describe potential risks incurred by study participants, whether such risks were disclosed to the subjects, and whether Institutional Review Board (IRB) approvals (or an equivalent approval/review based on the requirements of your country or institution) were obtained?
+%     \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+%     \item[] Justification: Our work does not involve crowdsourcing nor research with human subjects.
+%     \item[] Guidelines:
+%     \begin{itemize}
+%         \item The answer NA means that the paper does not involve crowdsourcing nor research with human subjects.
+%     \end{itemize}
+%
+% \item {\bf Declaration of LLM usage}
+%     \item[] Question: Does the paper describe the usage of LLMs if it is an important, original, or non-standard component of the core methods in this research? Note that if the LLM is used only for writing, editing, or formatting purposes and does not impact the core methodology, scientific rigorousness, or originality of the research, declaration is not required.
+%     %this research? 
+%     \item[] Answer: \answerNA{} % Replace by \answerYes{}, \answerNo{}, or \answerNA{}.
+%     \item[] Justification: We do not discuss nor is our core contribution contingent on LLMs.
+%     \item[] Guidelines:
+%     \begin{itemize}
+%         \item The answer NA means that the core method development in this research does not involve LLMs as any important, original, or non-standard components.
+%     \end{itemize}
+%
+% \end{enumerate}
 
 \end{document}
 

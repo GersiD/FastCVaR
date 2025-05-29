@@ -99,38 +99,8 @@ The first maximum in~\eqref{eq:var-definition} exists because $\tau \mapsto \P{\
 \]
 The lower and upper bounds of the quantile set are denoted by $\quant^+_{\alpha}[\tilde{x}] := \max \quant_{\alpha}[\tilde{x}] = \var{\alpha }{\tilde{x}}$ and $\quant^-_{\alpha}[\tilde{x}] := \min \quant_{\alpha}[\tilde{x}]$.
 
-Second, we consider \emph{$\varphi$-divergence risk measures} $\ER_{\alpha}$, which include several common monetary risk measures~\cite{Ahmadi-Javid2017}. A general divergence risk measure $\ER_{\varphi}\colon \mathbb{X} \to  \bar{\Real}$  is defined for a closed convex function $\varphi\colon \bar{\Real} \to \bar{\Real}$ and $\beta\in \Real_+$ as
-\begin{align} \label{eq:fdiv-primal}
-  \ER_{\varphi}(\tilde{x})
-  &:= \inf \left\{\bm{q}\tr \bm{x} \mid \bm{q}\in \Delta_n, H_{\varphi}(\bm{q} \| \bm{p}) \le \beta, \bm{q} \ll \bm{p} \right\} \\
-  \label{eq:fdiv-dual}
-  &= \sup \left\{  t \cdot v - t\cdot \E { \varphi\opt \left(- \frac{\tilde{x}}{t} + v + \beta \right)} \mid  t,v \in \Real, \, t > 0 \right\}.
-\end{align}
-The notation $\bm{q} \ll \bm{p}$ means that that $\bm{q}$ is absolutely continuous with respect to $\bm{p}$ $p_i =0 \implies q_i = 0, \forall  i \in \Omega$. Here, $H_{\varphi}$ is a $\varphi$-divergence~\cite{Bayraksan2015}:
-\[
-  H_\varphi(\bm{q} \| \bm{p}) := \sum_{\omega \in \Omega} p_{\omega} \cdot \varphi\left(\frac{q_{\omega}}{p_{\omega}}\right),
-\]
-The function $\varphi$ is convex and satisfies $\varphi(1)=0$. \mm{need to address the division by 0}
-
-as shown in \cref{tab:divergences}.
-
-Finally, it is important to note that $\varphi$-divergence risk measures are coherent, which means they are convex and positively homogeneous. Any coherent risk measure $\rho\colon \mathbb{X}\to \bar{\Real}$ satisfies for some closed convex non-empty set $\mathcal{Q} \subseteq \Delta^n$ that~\citep[Prop. 2.84]{Follmer2016} 
-We also consider \emph{Conditional-Value-at-Risk}~(CVaR), a common risk measure, which is defined for a random variable $\tilde{x} \in \mathbb{X}$ and risk level $\alpha \in (0,1]$ as~\cite{Follmer2016}
-\begin{equation} \label{eq:primal_cvar}
-    \cvaro_\alpha(\tilde{x})
-  := \max_{z \in \Real} \left(z - \alpha^{-1} \bm{p}\tr[z \cdot \bm{1} -\bm{x}]_+\right) 
-  = \min \left\{\bm{q}\tr \bm{x} \mid \bm{q} \leq \alpha^{-1} \bm{p},\, \bm{q}\in \Delta_n \right\},
-    %&= \min \left\{  \Ex{\bm{\xi}}{ \tilde{x}  } \mid
-  %\bm{\xi} \leq \frac{1}{\alpha} p, \bm{\xi} \in \Delta^n \right\} \\
-  %&= \max \left\{ z - \frac{1}{\alpha} \Ex{\bm{p}}{z-\bm{x}}_+ \mid z \in \Real\right\} \\
-\end{equation}
-where $\bm{1}$ is a vector of ones. CVaR is usually continuously extended as $\cvaro_0[\tilde{x}] = \ess\inf[\tilde{x}]$.
-
-In the remainder of the paper, we first propose a linear-time algorithm for computing VaR then we build on it to propose a linear time algorithm for certain $\varphi$-divergence risk measures. 
-
-
 \begin{table}
-    \caption{Parameters for selected $\varphi$-divergence risk measures.}
+    \caption{Parameters for selected $\varphi$-divergence risk measures for $\alpha\in (0,1)$.}
     \centering
     \label{tab:divergences}
     \begin{tabular}{l|c|c|c}
@@ -139,7 +109,7 @@ In the remainder of the paper, we first propose a linear-time algorithm for comp
          \midrule        
          $\mathbb{E}$           & $\begin{cases} 0 &\text{if } y = 1 \\ \infty & \text{otherwise}  \end{cases}$ & $x$ & $0$  \\
       \midrule
-      $\cvaro_{\alpha}$     & $\begin{cases} 0 &\text{if } y \in [0, \frac{1}{\alpha}] \\ \infty & \text{otherwise}  \end{cases}$ & $\max \left\{ 0, \frac{x}{\alpha} \right\} $& $0$ \\
+      $\cvaro_{\alpha}$     & $\begin{cases} 0 &\text{if } y \in [0, \frac{1}{\alpha}] \\ \infty & \text{otherwise}  \end{cases}$ & $\frac{1}{\alpha} \cdot \max \left\{ 0,  x \right\} $& $0$ \\
       \midrule
       $\evaro_{\alpha}$     & $\begin{cases} y \log y &\text{if } y > 0 \\ 0 &\text{if } y =  0 \\  \infty &\text{if } y < 0 \end{cases}$ & $\exp{ x - 1 }$ & $\log \frac{1}{\alpha}$ \\
       \midrule
@@ -147,6 +117,50 @@ In the remainder of the paper, we first propose a linear-time algorithm for comp
          \bottomrule
     \end{tabular}
 \end{table}
+
+
+Second, we consider \emph{$\varphi$-divergence risk measures}, which include several common monetary risk measures~\cite{Ahmadi-Javid2017}. A divergence risk measure $\ER_{\varphi, \beta }\colon \mathbb{X} \to  \bar{\Real}$  is defined for a closed convex function $\varphi\colon \bar{\Real} \to \bar{\Real}$ and $\beta\in \Real_+$ as
+\begin{align} \label{eq:fdiv-primal}
+  \ER_{\varphi, \beta}[ \tilde{x} ]
+  &:= \inf \left\{\bm{q}\tr \bm{x} \mid \bm{q}\in \Delta_n, H_{\varphi}(\bm{q} \| \bm{p}) \le \beta
+    %, \bm{q} \ll \bm{p}
+    \right\} \\
+  \label{eq:fdiv-dual}
+  &= \sup \left\{  t \cdot v - t\cdot \E { \varphi\opt \left(- \frac{\tilde{x}}{t} + v + \beta \right)} \mid  t,v \in \Real, \, t > 0 \right\}.
+\end{align}
+% The notation $\bm{q} \ll \bm{p}$ indicates that $\bm{q}$ is absolutely continuous with respect to $\bm{p}$: $p_{\omega} =0 \implies q_{\omega} = 0, \forall  \omega \in \Omega$.
+The function $H_{\varphi}$ in~\eqref{eq:fdiv-primal} is a $\varphi$-divergence measure defined as~\cite{Bayraksan2015}
+\[
+  H_\varphi(\bm{q} \| \bm{p}) := \sum_{\omega \in \Omega} p_{\omega} \cdot \varphi\left(\frac{q_{\omega}}{p_{\omega}}\right),
+\]
+and we adopt the common convention that $1 / 0 = \infty$ and $0 \cdot \infty = 0$~\cite{rockefeller1996variational}. Note that the absolute continuity restriction is not needed for finite probability spaces. 
+The function $\varphi$ is convex and satisfies $\varphi(1)=0$. 
+
+
+as shown in \cref{tab:divergences}.
+
+
+\begin{proposition}
+\[
+  \cvar{\alpha}{\tilde{x}}
+  \ge
+  \evar{\alpha}{\tilde{x}}
+  \ge
+  \tvar{\alpha}{\tilde{x}}.
+\]
+\end{proposition}
+
+
+Finally, it is important to note that $\varphi$-divergence risk measures are coherent, which means they are convex and positively homogeneous. Any coherent risk measure $\rho\colon \mathbb{X}\to \bar{\Real}$ satisfies for some closed convex non-empty set $\mathcal{Q} \subseteq \Delta^n$ that~\citep[Prop. 2.84]{Follmer2016} 
+We also consider \emph{Conditional-Value-at-Risk}~(CVaR), a common risk measure, which is defined for a random variable $\tilde{x} \in \mathbb{X}$ and risk level $\alpha \in (0,1]$ as~\cite{Follmer2016}
+\begin{equation} \label{eq:primal_cvar}
+    \cvaro_\alpha(\tilde{x})
+  := \max_{z \in \Real} \left(z - \frac{1}{\alpha} \cdot \E{[z -\bm{x}]_+}\right) 
+  % = \min \left\{\bm{q}\tr \bm{x} \mid \bm{q} \leq \alpha^{-1} \bm{p},\, \bm{q}\in \Delta_n \right\},
+\end{equation}
+where $\bm{1}$ is a vector of ones. CVaR is usually continuously extended as $\cvaro_0[\tilde{x}] = \ess\inf[\tilde{x}]$.
+
+In the remainder of the paper, we first propose a linear-time algorithm for computing VaR then we build on it to propose a linear time algorithm for certain $\varphi$-divergence risk measures. 
 
 \section{Computing VaR in Linear Time} \label{sec:var-linear}
 

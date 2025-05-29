@@ -266,7 +266,7 @@ Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorit
 
 The above conditions primarily state that each call to the partition scheme performs partial sorting such that all elements less than or equal to the pivot will be at a lower index \todo{same variable names as in the algorithm}, and elements greater than the pivot will be at a higher index\todo{ditto}. 
 
-In order to prove that the algorithm is optimal, we first show that $\quant_{\alpha}^-(\tilde{x})$ is an element in the array. 
+In order to prove that the algorithm is optimal, we first show that $\quant_{\alpha}^+(\tilde{x})$ is an element in the array. 
 \begin{lemma}\label{lem:quantile-in-finite-omega}
 Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite $\Omega$. Then, there exist $\omega_+, \omega_-\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_+)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_-)$ for each $\alpha\in (0,1)$.
 \end{lemma}

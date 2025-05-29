@@ -275,10 +275,8 @@ Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite
   \Cref{alg:quick-quantile} computes $\quant^+$.
   \end{lemma}
 \begin{proof}
- 
  Loop Invariant: Before and after every iteration $\quant^+$ will remain in the array $x$ at an index $i$ such that $ f_k \leq i \leq b_k $.
 During the first loop: Every element in $x$ has an index $i$ such that $ front \leq i \leq back $, where $front=1$ and $back=n$. By Lemma 1, there exists an element with index $i$ such that \todo{$\alpha$}$\quant^+ = x[i] $. \todo{consistent indexing $f_k$ vs $x[i]$}
-
 
 During the loop, there are 3 possible scenarios at each iteration:
 \begin{enumerate}
@@ -286,11 +284,9 @@ During the loop, there are 3 possible scenarios at each iteration:
 \item[Case 1]: $\alpha_{k-1} < t_k$ 
  Assume there exists $j_k \geq l_k$ such that $x_{j_k}=\quant^+$. Then $\P{x < x_{j_k}} \geq t_k > \alpha_{k - 1}$, which means that $x_{j_k}$ is not feasible with \eqref{eq:var-definition}. Therefore, $\quant^+$ can not exist at any $x_{j_k}$ such that $j_k\geq l_k$, and the loop invariant is thus satisfied.
 
-
 \item[Case 2]:  $t_k + e_k \leq \alpha_{k - 1}$
 
   Assume there exists $j_k < g_k + 1$ such that $x_{j_k}]=\quant^+$. Then $\P{x < x[j_k]} < \P{x < x[g_k + 1]} \leq \alpha_{k - 1}$, which means that $x_{j_k}$ is not optimal with \eqref{eq:var-definition}. Therefore, $\quant^+$ can not exist at any $x_{j_k}$ such that $j_k < g_k + 1$, and the loop invariant is thus satisfied.
-
 
 \item[Case 3]: $\alpha_{k - 1} \geq t_k$ and $\alpha_{k-1} < t_k + e_k $. 
  
@@ -734,17 +730,21 @@ Let $v$ be an input to \cref{alg:partition} and consider the following invariant
   
 \emph{Initialization}. For $k=0$, conditions \eqref{eq:ho-inv-less}, \eqref{eq:ho-inv-equal}, \eqref{eq:ho-inv-more} are true because the intervals are empty. 
   
-\emph{Maintenance}. At each iteration of the loop that starts on \cref{line:partition-while} of \cref{alg:partition} there are 3 possible branches determined by the conditional logic. $x_{e_k} < v$, $x_{e_k} > v$ and $x_{e_k} = v$. Since $v, x_{e_k} \in \Real$ one of these branches must be executed for each iterate $k$.
+\emph{Maintenance}. At each iteration of the loop that starts on line \ref{line:partition-while} of \cref{alg:partition} there are 3 possible branches determined by the conditional logic. $x_{e_k} < v$, $x_{e_k} > v$ and $x_{e_k} = v$. Since $v, x_{e_k} \in \Real$ one of these branches must be executed for each iterate $k$.
 
-  Each time the $x_{e_k} < v$ or $x_{e_k} > v$ branches are executed conditions \eqref{eq:hoare-less-than} and \eqref{eq:hoare-greater-than} remain true respectively since in each case we are swapping neccecary elements to preserve each condition. Notice also that $e_k$ is incremented alongside $l_k$ to maintain $e_k - l_k = e_{k+1} - l_{k+1}$ as is necessary for condition \eqref{eq:hoare-equal-to}.
+  Each time the $x_{e_k} < v$ or $x_{e_k} > v$ branches are executed conditions \eqref{eq:ho-inv-less} and \eqref{eq:ho-inv-more} remain true respectively since in each case we are swapping neccecary elements to preserve each condition. Notice also that $e_k$ is incremented alongside $l_k$ to maintain $e_k - l_k = e_{k+1} - l_{k+1}$ as is necessary for condition \eqref{eq:ho-inv-equal}.
 
-  When $x_{e_k} = v$, $e_k$ is incremented, since $e_0 = l_0$ this creates a difference between $e_{k+1}$ and $l_{k+1}$, the algorithm terminates when $g_t = e_t$, $g_t - l_t = e_t - l_t > 0$ therefore \eqref{eq:hoare-equal-to} holds at termination.   
+  When $x_{e_k} = v$, $e_k$ is incremented, since $e_0 = l_0$ this creates a difference between $e_{k+1}$ and $l_{k+1}$, the algorithm terminates when $g_t = e_t$, $g_t - l_t = e_t - l_t > 0$ therefore \eqref{eq:ho-inv-equal} remains true.   
 
-  Condition \eqref{eq:hoare-correspond} remains true for each mutation that may occur as both the $x$ values and $p$ values are swapped at the same indices, see lines \eqref{eq:swap1} and \eqref{eq:swap2}.
+  Condition \eqref{eq:hoare-correspond} remains true for each mutation that may occur as both the $x$ values and $p$ values are swapped at the same indices, see lines \ref{line:swap1} and \ref{line:swap2}.
   
-  \emph{Termination}. During the loop on \cref{line:partition-while} there are 3 possible paths of execution determined by the conditional logic $x_{e_k} < v$, $x_{e_k} > v$ and $x_{e_k} = v$. Each of these paths of execution decreases $g_k - e_k$ by 1. This occurs on lines \eqref{eq:partition-e-1-1} and \eqref{eq:partition-e-1-2} by increasing $e_k$ by 1 and keeping $g_k$ the same. Or on line \eqref{eq:parition-g-1} by decreasing $g_k$ by 1 and keeping $e_k$ the same.
+  \emph{Termination}. During the loop on line \ref{line:partition-while} there are 3 possible paths of execution determined by the conditional logic $x_{e_k} < v$, $x_{e_k} > v$ and $x_{e_k} = v$. Each of these paths of execution decreases $g_k - e_k$ by 1. This occurs on lines \ref{line:partition-e-1-1} and \ref{line:partition-e-1-2} by increasing $e_k$ by 1 and keeping $g_k$ the same. Or on line \ref{line:parition-g-1} by decreasing $g_k$ by 1 and keeping $e_k$ the same.
   
   $g_0 - e_0 = b - f$ is positive since $f<b$ by assumption. $g_k-e_k$ decreases by 1 at each iteration, and each iteration requires constant time to complete. The function returns when $g_t - e_t = 0$, therefore this algorithm completes in $O(b-f)$ time. 
+
+  Notice on the last iteration $g_{t} = e_{t}$, therefore by the same reasoning as above $g_{t+1} - e_{t+1} = -1$ and 
+  condition \eqref{eq:ho-inv-equal} holds for $g_{t+1} = e_{t+1} - 1$.
+  
 \end{proof}
 \section{Proofs and Details for \cref{sec:phi-divergence}}
 

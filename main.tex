@@ -346,9 +346,9 @@ A \emph{submodular} function $f\colon 2^{\Omega} \to \Real_+$ satisfies what we 
     \]
 \end{assumption}
 \begin{proposition}
-  Any EWS function is guaranteed to be submodular.   
+  All EWS functions are submodular.   
 \end{proposition}
-\begin{proof}
+\begin{proof} \gersi{clean this up}
  % We first note that left component of the $min$\todo{what min?} in $g(x) > 0$ is $c + m  \cdot x$, which is submodular as it is the sum of a linear and constant function. The right side of the $min$\todo{what min} is 1, a constant function and is thus also submodular. Since $c + m  \cdot x - 1$ is a monotone function, $g(x)$ is submodular for $x > 0$\todo{how do we know this?}. We can also show that the construction $g(x)$ forcing it to equal 0 for $x = 0$ (or equivalently $f(\emptyset) = 0$ does not violate the submodularity of the function\todo{how would you show this?}. For any nonempty set $S$ and a given element $z$ not in $S$, $f(S\cup z) - f(S) \leq \P{z] \text{\todo{wait z is not a random variable?}} \leq f(z) - f(\emptyset) = c + \P{z]$.
 
 We first note Theorem 4.5.1 in \todo{CITE} states that if $g$ is concave, $f$ is submodular. 
@@ -414,7 +414,7 @@ We now prove the optimality of the algorithm and it's expected linear time compl
   \cref{alg:maximum-weight-independent} returns a optimal solution to optimization problem defined in \cref{comontonic optimization}. 
 \end{lemma}
 \begin{proof}
-The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal{O}_{i})$ \cite[Remark 4.86]{Follmer2016}, where $\mathcal{O}_i$ is the set of all elements that have values $\leq i$ .  For $f(\mathcal{O}_{i+1}) \leq 1$ and $f(\mathcal{O}_i) < 1$ \todo{I'm assuming what was intended was $\mathcal{O}_{i+1}$},\\
+The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal{O}_{i})$ \cite[Remark 4.86]{Follmer2016}, where $\mathcal{O}_i$ is the set of all elements that have values $\leq i$ .  For $f(\mathcal{O}_{i+1}) \leq 1$ and $f(\mathcal{O}_i) < 1$
 
 
 \begin{align*}

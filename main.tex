@@ -61,7 +61,7 @@ Monetary risk measures have gained popularity in expressing decision-makers' pre
 \section{Introduction}\label{sec:intro}
 
 \todo{citations}
-Monetary measures of risk generalize the expectation operator to be able to represent the risk aversion of decision makers in domains that range from robotics~\cite{} to finance~\cite{} to infrastructure maintenance~\cite{}. Value-at-Risk~(VaR) and Conditional-Value-at-Risk~(CVaR) are the most popular risk measures and have been making inroads in reinforcement learning, machine learning, and decision-making~\cite{Petrik2024}. Machine learning and reinforcement learning algorithms typically must compute the risk measures for discrete random variables. Fast algorithms for computing risk measures are necessary in several machine-learning settings~\cite{}. For example, when used as part of an optimization algorithm, the risk measure may need to be evaluated in every iteration of the algorithm and can represent a significant computational bottleneck~\cite{}. 
+Monetary measures of risk generalize the expectation operator to be able to represent the risk aversion of decision makers in domains that range from robotics~\cite{akella2024risk} \cite{majumdar2020should}\cite{benrabah2024review} to finance~\cite{Follmer2016} to infrastructure maintenance~\cite{}. Value-at-Risk~(VaR) and Conditional-Value-at-Risk~(CVaR) are the most popular risk measures and have made inroads in reinforcement learning, machine learning, and decision making~\cite{Petrik2024}. Machine learning and reinforcement learning algorithms typically must compute the risk measures for discrete random variables. Fast algorithms for computing risk measures are necessary in several machine-learning settings~\cite{}. For example, when used as part of an optimization algorithm, the risk measure may need to be evaluated in every iteration of the algorithm and can represent a significant computational bottleneck~\cite{Ho2021}. 
 
 
 %However, in many applications such as robotics, finance, and autonomous systems, solutions must account for performance with respect to worst case scenarios rather than simply maximizing the mean. Therefore, it has become a common practice to optimize policies with respect to a risk measure~\cite{Follmer2016}, which focuses on the tails of the reward distribution rather than the expectation. 
@@ -73,7 +73,7 @@ There is limited prior work on fast algorithms for evaluating risk measures. The
 
 Coherent risk measures, like CVaR and TVaR, can be evaluated by solving convex optimization problems~\cite{Follmer2016, rockefeller1996variational}. Although most of these optimization problems are tractable, their time complexity is too large to be practical for applications where they are most needed. Current practical implementations rely on specific properties of these optimization problems to compute the solution efficiently. For example, all existing CVaR algorithms must sort the values of the random variable to compute its value~\cite{}, as in the case for VaR. The $\Omega(n \log  n)$ time complexity of the sort dominates the time complexity and prevents linear time computation. In this paper, we circumvent the complexity of sorting by developing no-sort algorithms for these risk measures and others.
 
-Numerous efficient algorithms have been designed for structured optimization problems that are similar to CVaR and TVaR evaluations. Some example of such structured optimization problems are the projection onto the simplex~\cite{adam2019projectionscanonicalsimplexadditional, Wang2013Simplex}, projection on k-capped simplex~\cite{kcapped_ang}, linear optimization on the intersection of $L_p$ or $\varphi$-divergence balls and the probability simplex as arise in robust optimizations~\cite{}, optimization for $\varphi$-divergence risk measures~\cite{}, and on polytopes defined by submodular functions which are known as polymatroids~\cite{}. Many of these algorithms require sorting the input variables, which has $\mathcal{O}(n \log  n)$ complexity. There has been mention of the possibility of linear time algorithms however, we could find neither work describing nor studying them. One exception is \cite{Condat2016}, which proposes a linear-time algorithm for computing the projection onto the simplex, which does not leverage QuickSelect. 
+Numerous efficient algorithms have been designed for structured optimization problems that are similar to CVaR and TVaR evaluations. Some example of such structured optimization problems are the projection onto the simplex~\cite{adam2019projectionscanonicalsimplexadditional, Wang2013Simplex}, projection on k-capped simplex~\cite{kcapped_ang}, linear optimization on the intersection of $L_p$ or $\varphi$-divergence balls and the probability simplex as arise in robust optimizations~\cite{}, optimization for $\varphi$-divergence risk measures~\cite{}, and on polytopes defined by submodular functions which are known as polymatroids~\cite{}. Many of these algorithms require sorting the input variables, which has $O(n \log  n)$ complexity. There has been mention of the possibility of linear time algorithms however, we could find neither work describing nor studying them. One exception is \cite{Condat2016}, which proposes a linear-time algorithm for computing the projection onto the simplex, which does not leverage QuickSelect. 
 
 Our algorithms' time complexity improves on the state of the art by a logarithmic factor. Although this improvement may seem unimportant,  it is an acceleration that is practically meaningful without any serious drawbacks. Our algorithms are simple and easy to implement with little added complexity compared with the state-of-the-art. Our numerical results show that they can lead to an order of magnitude speed up for realistic large problems, a significant speed-up for moderately sized problems, and match the performance of existing algorithms for small problems.
 
@@ -107,7 +107,7 @@ In this work, we restrict our attention to random variables defined on finite pr
     \max\; \left\{\tau \in \bar{\Real} \mid \P{\tilde{x} < \tau}  \le \alpha\right\} =
     \max\; \left\{\tau \in \bar{\Real} \mid \P{\tilde{x} \ge  \tau}  \ge 1 - \alpha\right\}
 \end{equation}
-The first maximum in~\eqref{eq:var-definition} exists because $\tau \mapsto \mathbb{P}[\tilde{x} < \tau]$ is a lower semi-continuous function, the second follows by algebraic manipulation. It is easy to see that $\varo_0[\tilde{x}] = \ess \inf [\tilde{x}]$, and typically the risk measure is extended as $\varo_{1}[ \tilde{x} ] = \infty$, we adopt this extension. The \emph{quantile} $\quant_{\alpha}$ for $\tilde{x}$ is defined as the set
+The first maximum in~\eqref{eq:var-definition} exists because $\tau \mapsto \P{\tilde{x} < \tau}$ is a lower semi-continuous function, the second follows by algebraic manipulation. It is easy to see that $\varo_0[\tilde{x}] = \ess \inf [\tilde{x}]$, and typically the risk measure is extended as $\varo_{1}[ \tilde{x} ] = \infty$, we adopt this extension. The \emph{quantile} $\quant_{\alpha}$ for $\tilde{x}$ is defined as the set
 \[
   \quant_{\alpha}[\tilde{x}] := \left\{ z\in \Real \mid  \P{ \tilde{x} \le z } \ge \alpha , \P{ \tilde{x} \ge z } \ge 1-\alpha  \right\},
   \quad
@@ -282,27 +282,28 @@ Recall the definition:
  \end{align}
 % Assume the random variable $ x $ has $ n $ unique values, such that $ x_1 < x_2 < \cdots < x_n $.  We can assume this without loss of generality because VaR is law invariant~\cite{Follmer2016}. For the sake of the proof, any given $\tau$ is feasible if $P[{\tilde{x}<\tau]} \leq \alpha$. We note that if $\tau$ is not feasible, it cannot equal $\quant^+_{\alpha}(\tilde{x})$ \eqref{eq:var-definition}. 
 
-Let $x(\omega_1) \leq x(\omega_2) \leq \dots \leq x(\omega_n)$ without loss of generality. Suppose for the sake of contradiction that there is no $\omega\in \Omega $ such that $\quant^+_{\alpha}(\tilde{x}) = \tilde{x}(\omega)$. Then since $\quant^+_{\alpha}(\tilde{x}), x(\omega) \in \Real$ and $\Omega$ is finite, there are only 3 cases to consider.
+Let $x[\omega_1] \leq x[\omega_2] \leq \dots \leq x[\omega_n]$ without loss of generality. Suppose for the sake of contradiction that there is no $\omega\in \Omega $ such that $\quant^+_{\alpha}(\tilde{x}) = \tilde{x}[\omega]$. Then since $\quant^+_{\alpha}(\tilde{x}), x[\omega] \in \Real$ and $\Omega$ is finite, there are only 3 cases to consider.
 
 \begin{enumerate}
-\item[Case 1]: $\quant^+_{\alpha}(\tilde{x}) = \tau\opt \in (x(\omega_i), x(\omega_{i + 1}))$.
-Since there are no $\omega\in \Omega$ such that $x(\omega) \in  [\tau\opt , x(\omega_{i+1}))$:
+\item[Case 1]: $\quant^+_{\alpha}(\tilde{x}) = \tau\opt \in (x[\omega_i], x[\omega_{i + 1}])$.
+Since there are no $\omega\in \Omega$ such that $x[\omega] \in  [\tau\opt , x[\omega_{i+1}])$:
+
   \[
-    \P{\tilde{x} < x(\omega_{i+1})} = \P{\tilde{x} <\tau\opt}} \le \alpha.
+    \P{\tilde{x} < x[\omega_{i+1}]} = \P{\tilde{x} <\tau\opt} \le \alpha.
   \]
-Therefore, $x(\omega_{i+1}) > \tau\opt$ is feasible in \eqref{eq:var-definition-close} contradicting the optimality of $\tau\opt$.
+Therefore, $x[\omega_{i+1}] > \tau\opt$ is feasible in \eqref{eq:var-definition-close} contradicting the optimality of $\tau\opt$.
   % % Let $\quant^+_{\alpha}(\tilde{x}) = \tau\opt \in \Real$ which is optimal in \eqref{eq:var-definition-close}. \\
   % Consider $\tau' = x(\omega_{i+1})$. Notice $\P{\tilde{x} < \tau'} \le \alpha$ \\
   % $\P{ \tilde{x} < \tau\opt  } \le \P{\tilde{x} < \tau'} \le \alpha$ by construction.\\
   % $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition-close}, therefore $\tau\opt $ cannot be optimal.
-\item[Case 2]: $\quant^+_{\alpha}(\tilde{x}) < x(\omega_1)$ 
+\item[Case 2]: $\quant^+_{\alpha}(\tilde{x}) < x[\omega_1]$ 
   
   Let $\quant^+_{\alpha}(\tilde{x}) = \tau\opt \in \Real$ which is optimal in \eqref{eq:var-definition-close}. \\
-  Consider $\tau' = x(\omega_1)$. Notice $\P{\tilde{x} < \tau'} = \P{\tilde{x} < \tau\opt} = 0$ by definition of $\omega_1$.\\
+  Consider $\tau' = x[\omega_1]$. Notice $\P{\tilde{x} < \tau'} = \P{\tilde{x} < \tau\opt} = 0$ by definition of $\omega_1$.\\
   $\P{ \tilde{x} < \tau'  } = \P{\tilde{x} < \tau\opt} \le \alpha$ by construction.\\
   $\tau' > \tau\opt $ and $\tau'$ is feasible in \eqref{eq:var-definition-close}, therefore $\tau\opt $ cannot be optimal.
 
-\item[Case 3]: $\quant^+_{\alpha}(\tilde{x}) = \tau\opt > x(\omega_n)$.
+\item[Case 3]: $\quant^+_{\alpha}(\tilde{x}) = \tau\opt > x[\omega_n]$.
   For all $\tau \ge \tau\opt$
   \[
     \P{\tilde{x} < \tau } \ge  \P{\tilde{x} < \tau\opt } = 1 > \alpha.
@@ -356,7 +357,7 @@ During the loop, there are 3 possible scenarios at each iteration:
 \end{proof}
 
 \begin{proposition}
-\Cref{alg:quick-quantile} runs in $\mathcal{O}(n)$ time if the median-of-medians algorithm is used to select the pivot.
+\Cref{alg:quick-quantile} runs in $O(n)$ time if the median-of-medians algorithm is used to select the pivot.
 \todo{lets workshopt this next meeting}
 \end{proposition}
 \begin{proof}
@@ -375,9 +376,9 @@ First, recall the standard definition of submodular functions and the related co
 \begin{definition} \label{def:polymatroid}
 A function $f \colon 2^{\mathcal{E}} \to \Real_+$ for a finite set finite set $\mathcal{E} = \left\{ 1, \dots , E \right\}$ is \emph{submodular} if
 \[
-  f(\mathcal{A}) + f(\mathcal{B}) \geq f(\mathcal{A} \cup \mathcal{B}) + f(\mathcal{A} \cap \mathcal{B}),
+  f(\mathcal{A}) + f(\mathcal{\Omega'}) \geq f(\mathcal{A} \cup \mathcal{\Omega'}) + f(\mathcal{A} \cap \mathcal{\Omega'}),
   \quad
-  \forall \mathcal{A}, \mathcal{B} \subseteq \mathcal{E}.
+  \forall \mathcal{A}, \mathcal{\Omega'} \subseteq \mathcal{E}.
 \]
 A \emph{polymatroid} $\mathcal{Q}_f$ for $f$ is a polytope defined as
   \[
@@ -394,12 +395,11 @@ A \emph{polymatroid} $\mathcal{Q}_f$ for $f$ is a polytope defined as
 
 Polymatroids are important for our purpose because many risk measures can be formulated as linear optimization over polymatroids.  
 \begin{proposition} \label{prop:coherent-polymatroid}
-Suppose that $\rho\colon \mathbb{X}\to \Real$ is a comonotonic coherent risk measure (defined as $\rho$ such that $\rho(X) +  \rho(Y)= \rho(X + Y)$)\todo{this is not the def of comonotonicity, this is the def of linearity}. Then
+Suppose that $\rho\colon \mathbb{X}\to \Real$ is a comonotonic coherent risk measure (defined as $\rho$ such that $\rho(X) +  \rho(Y)= \rho(X + Y)$). Then
   \[
    \rho[\tilde{x}] = \min_{\bm{q}\in \mathcal{Q}_c} \bm{q}\tr  \bm{x},
   \]\label{comontonic optimization}
-  \mm{Should the polymatroid above be intersected with the probability simplex?}
-  \palash{Good point. How Follmer and Schied address is by defining the polymatroid with the condition that f must be in the range [0, 1] which I have now added. From Prop 4.89 we replace the inf (or sup  if we negate x) with a min. Also according to follmer there should be negations like you mentioned which I added.  }
+ 
 where $\mathcal{Q}_c$ is the polymatroid in \cref{def:polymatroid} for $c := \rho(-\one_{\mathcal{A}})$ for each $\mathcal{A} \subseteq \Omega$. 
 \end{proposition}
 \begin{proof}
@@ -415,7 +415,7 @@ Conventional polymatroid optimization algorithms for risk measures and the close
 \begin{assumption} \label{asm:submodular-function}
   % marek: Not needed; implied by the construction below
   % For $\mathcal{N} = \left\{ 1, \dots , N \right\}$, the function $f\colon 2^{\mathcal{N}} \to \Real_+$ $f(\emptyset) = 0$, $f(N) = 1$,
-A \emph{submodular} function $f\colon 2^{\Omega} \to \Real_+$ satisfies what we call Element-Wise-Separability (EWS) if there exists $g\colon [0,1] \to  [0,1]$ such that $f(\mathcal{O}) = g(\mathbb{P}[\mathcal{O}]), \forall \mathcal{O} \subseteq \Omega$ and for some $c,m, \text{in }   \mathbb{R}_{+}$:
+A \emph{submodular} function $f\colon 2^{\Omega} \to \Real_+$ satisfies what we call Element-Wise-Separability (EWS) if there exists $g\colon [0,1] \to  [0,1]$ such that $f(\mathcal{O}) = g(\P {\mathcal{O}}, \forall \mathcal{O} \subseteq \Omega$ and for some $c, m \text{ in }   \mathbb{R}_{+}$:
     \[
       g(x) =
       \begin{cases}        
@@ -425,12 +425,18 @@ A \emph{submodular} function $f\colon 2^{\Omega} \to \Real_+$ satisfies what we 
     \]
 \end{assumption}
 \begin{proposition}
-  Any EWS function is guaranteed to be submodular for all admissible\todo{what does admissible mean?}$c, m$.   
+  Any EWS function is guaranteed to be submodular.   
 \end{proposition}
 \begin{proof}
- % We first note that left component of the $min$\todo{what min?} in $g(x) > 0$ is $c + m  \cdot x$, which is submodular as it is the sum of a linear and constant function. The right side of the $min$\todo{what min} is 1, a constant function and is thus also submodular. Since $c + m  \cdot x - 1$ is a monotone function, $g(x)$ is submodular for $x > 0$\todo{how do we know this?}. We can also show that the construction $g(x)$ forcing it to equal 0 for $x = 0$ (or equivalently $f(\emptyset) = 0$ does not violate the submodularity of the function\todo{how would you show this?}. For any nonempty set $S$ and a given element $z$ not in $S$, $f(S\cup z) - f(S) \leq \mathbb{P}[z] \text{\todo{wait z is not a random variable?}} \leq f(z) - f(\emptyset) = c + \mathbb{P}[z]$.
+ % We first note that left component of the $min$\todo{what min?} in $g(x) > 0$ is $c + m  \cdot x$, which is submodular as it is the sum of a linear and constant function. The right side of the $min$\todo{what min} is 1, a constant function and is thus also submodular. Since $c + m  \cdot x - 1$ is a monotone function, $g(x)$ is submodular for $x > 0$\todo{how do we know this?}. We can also show that the construction $g(x)$ forcing it to equal 0 for $x = 0$ (or equivalently $f(\emptyset) = 0$ does not violate the submodularity of the function\todo{how would you show this?}. For any nonempty set $S$ and a given element $z$ not in $S$, $f(S\cup z) - f(S) \leq \P{z] \text{\todo{wait z is not a random variable?}} \leq f(z) - f(\emptyset) = c + \P{z]$.
 
-We first note Theroem 4.5.1 in \todo{CITE} states that if $g$ is concave, $f$ is submodular. 
+We first note Theorem 4.5.1 in \todo{CITE} states that if $g$ is concave, $f$ is submodular. 
+
+We note on the interval $x > 0$, there exists some $n < 1$ such that $g(n) = 1$. On this interval, $g(x) = mx + c$ , which is twice differentiable such that the $g''(x) = 0$, which implies $g$ is concave. On the interval such that $x > n$, where $g(x) = 1$, $g''(x) = 0$, implying concavity.
+
+If we have value $a$ and $b$ such that $a = 0$ and thus $g(a) = 0$, we note that $(1 - z)g(a) + zg(b) = z*g(b) = min(z*c + z*m*b, z)$ where $z$ is some value between 0 and 1, will always be $\leq g(z*b + (1 - z)*a) = g(z * b) = min(c + z *m * b, 1)$. Thus, $g$ is concave on the interval $[0, b]$ where $b$ is some value $> 0$.
+
+Thus $g$ is concave, and the proof concludes.
 
 %Case 1: $X = \emptyset$
 %If $f(Y) < 1$ and $f(Y \cup x) - f(Y) < 1$,  $f(Y \cup x) - f(Y) = %m*p(x) < c + m*p(x) = f(X \cup x) - f(X)$. 
@@ -487,7 +493,7 @@ We now prove the optimality of the algorithm and it's expected linear time compl
   \cref{alg:maximum-weight-independent} returns a optimal solution to optimization problem defined in \cref{comontonic optimization}. 
 \end{lemma}
 \begin{proof}
-The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal{O}_{i})$ \cite[Remark 4.86]{Follmer2016}, where $\mathcal{O}_i$ is the set of all elements that have values $\leq i$ .  For $f(\mathcal{O}_i+1) \leq 1$ and $f(\mathcal{O}_i) < 1$,\\
+The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal{O}_{i})$ \cite[Remark 4.86]{Follmer2016}, where $\mathcal{O}_i$ is the set of all elements that have values $\leq i$ .  For $f(\mathcal{O}_{i+1}) \leq 1$ and $f(\mathcal{O}_i) < 1$ \todo{I'm assuming what was intended was $\mathcal{O}_{i+1}$},\\
 
 
 \begin{align*}
@@ -499,7 +505,7 @@ For $i$ such that $f(\mathcal{O}_{i + 1}) = 1$ where $ (c  +\sum_{i \subset (1, 
 $c  + m *\sum_{i \subset (1, i )}p_i \leq 1  $, which after algebraic manipulation results in the maximum $i$ such that $\sum_{i \subset (1, i )}p_i \leq (1 - c)/m $. We can thus see from \eqref{eq:var-definition} that VaR with $\alpha = (1 - c)/m$ will return the value at $x_{i + 1}$, which is calculated as $midval$ in the algorithm with $i + 1 = mid$. Thus, it follows that $q_{mid} = 1 - c  +\sum_{i \subset (1, i )}m *p_i$, where from the previous paragraph it follows that $ c  +\sum_{i \subset (1, i )}m *p_i = \sum_iq_i$. For all other $i > mid$, we note that $f(\mathcal{O}_{i}) - f(\mathcal{O}_{i - 1}) = 1 - 1 = 0$, and thus $q_i = 0$.
 \end{proof}
 \begin{lemma}
-\cref{alg:maximum-weight-independent} run with expected complexity $\mathcal{O}(N)$.
+\cref{alg:maximum-weight-independent} run with expected complexity $O(N)$.
 \end{lemma}
 
 \subsection{CVaR}
@@ -512,7 +518,7 @@ Let $f\colon 2^{\Omega} \to \Real_+$ be defined as
 \[
   f(\mathcal{O})
   :=
-  \min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\},
+  \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\},
 \quad \forall \mathcal{O} \subseteq \Omega .
 \]
 Then $f$ is submodular and the polymatroid $\mathcal{Q}_f$ satisfies
@@ -528,14 +534,14 @@ Note: From here on, we will use ' to denote the complement of a set.
 We first show that we can for all $q$ such that $\cvar{\alpha }{\tilde{x} } \le  \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}$. This directly follows from the directly from definition 2 of CVaR where we see that $q \leq ((1/\alpha)\cdot p)$ 
 (this is defined element wise) and all elements of $q$ must sum to 1.  
 
-We also show below, we can construct $q$ such that $q(\mathcal{O}) =\min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\} $ for any $\mathcal{O}$. 
-\item[Case 1]: $P(\mathcal{O}) \geq \alpha$. In this scenario, $Q(\mathcal{O})$ = 1 since $\frac{1}{\alpha} P(\mathcal{O}) > 1 $. Thus, every element in $\mathcal{O}$ should be scaled by $\frac{1}{P(\mathcal{O})}$ and all other elements should be set to 0 . Since  $P(\mathcal{O}) \geq \alpha$, we can imply the reciprocal $\frac{1}{P(\mathcal{O})} \leq \frac{1}{\alpha}$ is also true. 
+We also show below, we can construct $q$ such that $q(\mathcal{O}) =\min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\} $ for any $\mathcal{O}$. 
+\item[Case 1]: $\P{\mathcal{O}} \geq \alpha$. In this scenario, $Q(\mathcal{O})$ = 1 since $\frac{1}{\alpha}\cdot \P{\mathcal{O}} > 1 $. Thus, every element in $\mathcal{O}$ should be scaled by $\frac{1}{\P{\mathcal{O}}}$ and all other elements should be set to 0 . Since  $\P{\mathcal{O}} \geq \alpha$, we can imply the reciprocal $\frac{1}{\P{\mathcal{O}}} \leq \frac{1}{\alpha}$ is also true given $\P{\mathcal{O}} \geq \alpha > 0$. 
 
-\item[Case 2]: $P(\mathcal{O}) < \alpha$. In this scenario, $Q(\mathcal{O}) \leq \frac{1}{\alpha} \cdot  P(\mathcal{O}) < 1$ . Then any given $\mathcal{O}$, we can construct $Q(\mathcal{O}) = \frac{1}{\alpha} \cdot  P(\mathcal{O})$. 
-  This can be done by setting every element in $\mathcal{O}$ to $\frac{1}{\alpha} \cdot P(\omega)$ for all $\omega$ in $\Omega$ and $P(\omega) \cdot  d$ otherwise such that $\frac{1}{1 - \alpha} \cdot P(\Omega) + d \cdot P(\Omega') = 1$, where $B$ contains all elements not in $\Omega$\todo{use complement notation}. Provided that $d \leq \frac{1}{\alpha}$, which is required for the constructed $Q$ to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{\alpha} \ge 1$. Since $P(\Omega) + P(\Omega') = 1$,  $d \leq 1$ in order for $\frac{1}{\alpha} \cdot  P(\Omega) + d\cdot P(\Omega') = 1$ to hold. Since $1 \leq \frac{1}{\alpha}$, this implies $d \le \frac{1}{\alpha}$.
+\item[Case 2]: $\P{\mathcal{O}} < \alpha$. In this scenario, $Q(\mathcal{O}) \leq \frac{1}{\alpha} \cdot  \P{\mathcal{O}} < 1$ . Then any given $\mathcal{O}$, we can construct $Q(\mathcal{O}) = \frac{1}{\alpha} \cdot  \P{\mathcal{O}}$. 
+  This can be done by setting every element in $\mathcal{O}$ to $\frac{1}{\alpha} \cdot \P{\omega}$ for all $\omega$ in $\Omega$ and $\P{\omega} \cdot  d$ otherwise such that $\frac{1}{1 - \alpha} \cdot \P{\Omega} + d \cdot \P{\Omega'} = 1$, where $\Omega'$ contains all elements not in $\Omega$. Provided that $d \leq \frac{1}{\alpha}$, which is required for the constructed $Q$ to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{\alpha} \ge 1$. Since $\P{\Omega} + \P{\Omega'} = 1$,  $d \leq 1$ in order for $\frac{1}{\alpha} \cdot  \P{\Omega} + d\cdot\P{\Omega'} = 1$ to hold. Since $1 \leq \frac{1}{\alpha}$, this implies $d \le \frac{1}{\alpha}$.
   
   
-  We have now shown that $Q(\Omega) \leq f(\mathcal{O}) = \min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\}$ and it is possible to construct $Q(\Omega)$ such that $Q(\Omega) = \min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\}$. Thus by Remark 4.90 in Follmer and Schied, $f(\mathcal{O}) = \min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\}$
+  We have now shown that $Q(\Omega) \leq f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$ and it is possible to construct $Q(\Omega)$ such that $Q(\Omega) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$. Thus by Remark 4.90 in Follmer and Schied, $f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$
 \end{proof}
 
 
@@ -549,7 +555,7 @@ We now prove the submodular function for TVaR and show that it also satisfies El
 
   For $\mathcal{O} \subseteq \Omega$, define $f\colon 2^{\Omega} \to \Real_+$:
   \[
-    f(\mathcal{O}) = \min\left\{\mathbb{P}[\mathcal{O}] + \frac{\beta}{2}, 1\right\}
+    f(\mathcal{O}) = \min\left\{\P{\mathcal{O}} + \frac{\beta}{2}, 1\right\}
     .
   \], where $\beta$ represent the divergence constraint.
   Then \[
@@ -558,20 +564,20 @@ We now prove the submodular function for TVaR and show that it also satisfies El
   $f$ will also satisfy ElementWiseSeparabaility with $m = 0$ and $c = \beta/2$ 
 \end{proposition}
 \begin{proof}
-  \mm{the first sentence is not needed}Due to the set of constraints, we know that $q$ must be $\leq {\mathbb{P}[\mathcal{O}]} + \frac{\beta}{2}$ as if $f(\mathcal{O}) \geq \frac{\beta}{2} +  {\mathbb{P}[\mathcal{O}]} $ , then $f(\mathcal{\not\subset\mathcal{O}})$\todo{what does this mean?} must be $< \mathbb{P}[\mathcal{O}] - \frac{\beta}{2}$ in order for the sum constraint of the simplex to equal 1, thus violating the l1 Norm constraint.
+  \mm{the first sentence is not needed}Due to the set of constraints, we know that $q$ must be $\leq {\P{\mathcal{O}}} + \frac{\beta}{2}$ as if $f(\mathcal{O}) \geq \frac{\beta}{2} +  \P{\mathcal{O}}$ , then $f(\mathcal{\not\subset\mathcal{O}})$\todo{what does this mean?} must be $< \P{\mathcal{O}} - \frac{\beta}{2}$ in order for the sum constraint of the simplex to equal 1, thus violating the l1 Norm constraint.
 
 \mm{should have the same structure as the proof for CVaR proving the two inequalities}
   
   Furthermore, as we show below, we can construct $q$ such that  for any $\mathcal{O}$,   
-  \[f(\mathcal{O}) = \min\left\{\mathbb{P}[\mathcal{O}] + \frac{\beta}{2}, 1\right\}
+  \[f(\mathcal{O}) = \min\left\{\P{\mathcal{O}} + \frac{\beta}{2}, 1\right\}
     .
   \].
   
-\item[Case 1]: $P(\mathcal{O}) \geq \frac{\beta}{2}$. In this scenario, we pick an element in $\mathcal{O}$ and add $1 - P(\mathcal{O})$ to it. We set all elements not in $\mathcal{O}$ to 0.
+\item[Case 1]: $\P{\mathcal{O}} \geq \frac{\beta}{2}$. In this scenario, we pick an element in $\mathcal{O}$ and add $1 - \P{\mathcal{O}}$ to it. We set all elements not in $\mathcal{O}$ to 0.
 
-\item[Case 2]: $P(\mathcal{O}) < \alpha$. In this scenario, $Q(\mathcal{O}) \leq \frac{1}{\alpha} \cdot  P(\mathcal{O}) < 1$ \todo{why}. Then any given $\mathcal{O}$, we can construct $Q(\mathcal{O}) = \frac{1}{\alpha} \cdot  P(\mathcal{O})$. 
-  This can be done by setting every element in $\mathcal{O}$ to $\frac{1}{\alpha} \cdot P(\omega)$ for all $\omega$ in $\Omega$ and $P(\omega) \cdot  d$ otherwise such that $\frac{1}{1 - \alpha} * P(\Omega) + d*P(B) = 1$, where $B$ contains all elements not in $\Omega$\todo{use complement notation}. Provided that $d \leq \frac{1}{\alpha}$, which is required for the constructed $Q$ to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{\alpha} \ge 1$. Since $P(\Omega) + P(B) = 1$,  $d \le 1$ in order for $\frac{1}{\alpha} \cdot  P(\Omega) + d\cdot P(B) = 1$ to hold. Since $1 \leq \frac{1}{\alpha}$, this implies $d \le \frac{1}{\alpha}$.
-  We have now shown that $Q(\Omega) \leq f(\mathcal{O}) = \min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\}$ and it is possible to construct $Q(\Omega)$ such that $Q(\Omega) = \min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\}$. Thus by Remark 4.90 in Follmer and Schied, $f(\mathcal{O}) = \min\left\{\frac{\mathbb{P}[\mathcal{O}]}{\alpha}, 1\right\}$
+\item[Case 2]: $\P{\mathcal{O}} < \alpha$. Referring to~\citep[Prop. 4.7], in this scenario, $Q(\mathcal{O}) \leq \frac{1}{\alpha} \cdot  \P{\mathcal{O}} < 1$. Then any given $\mathcal{O}$, we can construct $Q(\mathcal{O}) = \frac{1}{\alpha} \cdot  \P(\mathcal{O})$. 
+  This can be done by setting every element in $\mathcal{O}$ to $\frac{1}{\alpha} \cdot \P{\omega}$ for all $\omega$ in $\Omega$ and $\P{\omega} \cdot  d$ otherwise such that $\frac{1}{1 - \alpha} * \P{\Omega} + d * \P{\Omega'} = 1$, where $\Omega'$ contains all elements not in $\Omega$\todo{use complement notation}. Provided that $d \leq \frac{1}{\alpha}$, which is required for the constructed $Q$ to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{\alpha} \ge 1$. Since $\P{\Omega} + \P{\Omega'} = 1$,  $d \le 1$ in order for $\frac{1}{\alpha} \cdot  \P{\Omega} + d\cdot \P{\Omega'} = 1$ to hold. Since $1 \leq \frac{1}{\alpha}$, this implies $d \le \frac{1}{\alpha}$.
+  We have now shown that $Q(\Omega) \leq f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$ and it is possible to construct $Q(\Omega)$ such that $Q(\Omega) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$. Thus by Remark 4.90 in Follmer and Schied, $f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$
 \end{proof}
 
 \section{Experiments}\label{sec:experiments}

@@ -119,7 +119,8 @@ The lower and upper bounds of the quantile set are denoted by $\quant^+_{\alpha}
 \end{table}
 
 
-Second, we consider \emph{$\varphi$-divergence risk measures}, which include several common monetary risk measures~\cite{Ahmadi-Javid2017}. A divergence risk measure $\ER_{\varphi, \beta }\colon \mathbb{X} \to  \bar{\Real}$  is defined for a closed convex function $\varphi\colon \bar{\Real} \to \bar{\Real}$ and $\beta\in \Real_+$ as
+\mm{Why phi needs to be non-negative? Where do we use the fact that the minimum is 0? Also, the Ahmadi-javid paper does not restate all the requirements from the OCE paper.}
+Second, we consider \emph{$\varphi$-divergence risk measures}, which include several common monetary risk measures~\cite{Ahmadi-Javid2017}. A divergence risk measure $\ER_{\varphi, \beta }\colon \mathbb{X} \to  \bar{\Real}$  is defined for a closed, convex non-negative function $\varphi\colon \bar{\Real} \to \bar{\Real}$ that satisfies $\varphi(1) = 0$ and $$, and $\beta\in \Real_+$ as
 \begin{align} \label{eq:fdiv-primal}
   \ER_{\varphi, \beta}[ \tilde{x} ]
   &:= \inf \left\{\bm{q}\tr \bm{x} \mid \bm{q}\in \Delta_n, H_{\varphi}(\bm{q} \| \bm{p}) \le \beta

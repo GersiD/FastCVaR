@@ -260,7 +260,7 @@ Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorit
 
 
 
-The above conditions primarily state that each call to the partition scheme performs partial sorting such that all elements less than or equal to the pivot will be at a lower index \todo{same variable names as in the algorithm}, and elements greater than the pivot will be at a higher index\todo{ditto}. 
+The above conditions primarily state that each call to the partition scheme performs a partial sorting such that all elements $\leq v_k$ will have an index $< i_k$ , and elements greater than the pivot will have an index $> i_k$.
 
 In order to prove that the algorithm is optimal, we first show that $\quant_{\alpha}^+(\tilde{x})$ is an element in the array. 
 \begin{lemma}\label{lem:quantile-in-finite-omega}
@@ -310,11 +310,11 @@ In this section, we propose new linear-time algorithms for computing $\varphi$-d
 First, recall the standard definition of submodular functions and the related concept of polymatroid~\cite{Korte2012}.
 \begin{definition} \label{def:polymatroid}
 A function $f \colon 2^{\mathcal{E}} \to \Real_+$ for a finite set finite set $\mathcal{E} = \left\{ 1, \dots , E \right\}$ is \emph{submodular} if
-\todo{what is $\mathcal{\Omega'}$?}
+
 \[ 
-  f(\mathcal{A}) + f(\mathcal{\Omega'}) \geq f(\mathcal{A} \cup \mathcal{\Omega'}) + f(\mathcal{A} \cap \mathcal{\Omega'}),
+  f(\mathcal{A}) + f(\mathcal{B}) \geq f(\mathcal{A} \cup \mathcal{\mathcal{B}}) + f(\mathcal{A} \cap \mathcal{B}),
   \quad
-  \forall \mathcal{A}, \mathcal{\Omega'} \subseteq \mathcal{E}.
+  \forall \mathcal{A}, \mathcal{B} \subseteq \mathcal{E}.
 \]
 A \emph{polymatroid} $\mathcal{Q}_f$ for $f$ is a polytope defined as
   \[
@@ -331,7 +331,7 @@ A \emph{polymatroid} $\mathcal{Q}_f$ for $f$ is a polytope defined as
 
 Polymatroids are important for our purpose because many risk measures can be formulated as linear optimization over polymatroids.  
 \begin{proposition} \label{prop:coherent-polymatroid}
-  Suppose that $\rho\colon \mathbb{X}\to \Real$ is a comonotonic coherent risk measure (defined as $\rho$ such that $\rho(X) +  \rho(Y)= \rho(X + Y)$ \todo{this is not the def of comonotonic, this is linear}). Then
+  Suppose that $\rho\colon \mathbb{X}\to \Real$ is a comonotonic coherent risk measure (defined as $\rho$ such that $\rho(X) +  \rho(Y)= \rho(X + Y)$ when $X$ and $Y$ are comonotone). Then
   \[
    \rho[\tilde{x}] = \min_{\bm{q}\in \mathcal{Q}_c} \bm{q}\tr  \bm{x},
   \]\label{comontonic optimization}
@@ -364,9 +364,9 @@ A \emph{submodular} function $f\colon 2^{\Omega} \to \Real_+$ satisfies what we 
   All EWS functions are submodular.   
 \end{proposition}
 \begin{proof} \gersi{clean this up}
- % We first note that left component of the $min$\todo{what min?} in $g(x) > 0$ is $c + m  \cdot x$, which is submodular as it is the sum of a linear and constant function. The right side of the $min$\todo{what min} is 1, a constant function and is thus also submodular. Since $c + m  \cdot x - 1$ is a monotone function, $g(x)$ is submodular for $x > 0$\todo{how do we know this?}. We can also show that the construction $g(x)$ forcing it to equal 0 for $x = 0$ (or equivalently $f(\emptyset) = 0$ does not violate the submodularity of the function\todo{how would you show this?}. For any nonempty set $S$ and a given element $z$ not in $S$, $f(S\cup z) - f(S) \leq \P{z] \text{\todo{wait z is not a random variable?}} \leq f(z) - f(\emptyset) = c + \P{z]$.
 
-We first note Theorem 4.5.1 in \todo{CITE} states that if $g$ is concave, $f$ is submodular. 
+
+We first note Theorem 4.5.1 in \cite{Bilmes18} states that if $g$ is concave, $f$ is submodular. 
 
 We note on the interval $x > 0$, there exists some $n < 1$ such that $g(n) = 1$. On this interval, $g(x) = mx + c$ , which is twice differentiable such that the $g''(x) = 0$, which implies $g$ is concave. On the interval such that $x > n$, where $g(x) = 1$, $g''(x) = 0$, implying concavity.
 

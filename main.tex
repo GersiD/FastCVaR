@@ -120,7 +120,8 @@ The lower and upper bounds of the quantile set are denoted by $\quant^+_{\alpha}
 
 
 \mm{Why phi needs to be non-negative? Where do we use the fact that the minimum is 0? Also, the Ahmadi-javid paper does not restate all the requirements from the OCE paper.}
-Second, we consider \emph{$\varphi$-divergence risk measures}, which include several common monetary risk measures~\cite{Ahmadi-Javid2017}. A divergence risk measure $\ER_{\varphi, \beta }\colon \mathbb{X} \to  \bar{\Real}$  is defined for a closed, convex non-negative function $\varphi\colon \bar{\Real} \to \bar{\Real}$ that satisfies $\varphi(1) = 0$ and $\beta\in \Real_+$ as
+\palash{removed the non negative condition. All other conditions are directly from the ahmadi-javid EVAR paper - previously we are citing a different ahmad-javid paper which I fixed now }
+Second, we consider \emph{$\varphi$-divergence risk measures}, which include several common monetary risk measures~\cite{Ahmadi-Javid2012}. A divergence risk measure $\ER_{\varphi, \beta }\colon \mathbb{X} \to  \bar{\Real}$  is defined for a closed, convex function $\varphi\colon \bar{\Real} \to \bar{\Real}$ that satisfies $\varphi(1) = 0$ and $\beta\in \Real_+$ as
 \begin{align} \label{eq:fdiv-primal}
   \ER_{\varphi, \beta}[ \tilde{x} ]
   &:= \inf \left\{\bm{q}\tr \bm{x} \mid \bm{q}\in \Delta_n, H_{\varphi}(\bm{q} \| \bm{p}) \le \beta
@@ -152,7 +153,7 @@ as shown in \cref{tab:divergences}.
 \end{proposition}
 
 
-Finally, it is important to note that $\varphi$-divergence risk measures are coherent, which means they are convex and positively homogeneous. Any coherent risk measure $\rho\colon \mathbb{X}\to \bar{\Real}$ satisfies for some closed convex non-empty set $\mathcal{Q} \subseteq \Delta^n$ that~\citep[Prop. 2.84]{Follmer2016} 
+Finally, it is important to note that $\varphi$-divergence risk measures are coherent, which means they are convex and positively homogeneous. Any coherent risk measure $\rho\colon \mathbb{X}\to \bar{\Real}$ satisfies for some closed convex non-empty set $\mathcal{Q} \subseteq \Delta^n$ that \todo{add the condition here}~\citep[Prop. 2.84]{Follmer2016}. 
 We also consider \emph{Conditional-Value-at-Risk}~(CVaR), a common risk measure, which is defined for a random variable $\tilde{x} \in \mathbb{X}$ and risk level $\alpha \in (0,1]$ as~\cite{Follmer2016}
 \begin{equation} \label{eq:primal_cvar}
     \cvaro_\alpha(\tilde{x})
@@ -292,11 +293,13 @@ During the loop, there are 3 possible scenarios at each iteration:
 \end{proof}
 
 \begin{proposition}
-\Cref{alg:quick-quantile} runs in $O(n)$ time if the median-of-medians algorithm is used to select the pivot.
-\todo{lets workshopt this next meeting}
+\label{TIMECOMPLEXITY}
+\Cref{alg:quick-quantile} runs in expected $O(n)$ time with random pivot selection.
 \end{proposition}
 \begin{proof}
-  \todo{Lets discuss how to prove this.}
+  We first note that at any given iteration, any steps after the partition scheme are bounded by the number of steps required to perform the partition scheme. Therefore, we can reduce the computation complexity analysis to a standard quickselect algorithm such as \cite{Yorgey19} as these algorithms also have computational complexity determined by the sum of all calls to the partition function. 
+
+  We note that standard quickselect algorithms have 2 partitions - one for elements less than the pivot and one for elements greater than or equal to the pivot \cite{Yorgey19}. The proof for time complexity relies on the fact that on average the array is split into pieces of $1/4$th or $3/4$th of the array at the previous iteration, where the array is defined by the indexes $f$ and $b$. In our case, there are 3 partitions, however if the partition that contains elements equal to the pivot is selected the algorithm immedieately terminates regardless of the size of partitions. If we assume that only the "less than" or "greater than" partition is selected, this provides a suitable upper bound on the expected complexity. In such a case, we can assume on average the array is split into at most $1/4$th and $3/4$th of the original array (less if there are multiple elements equal to the pivot). Thus we can then apply the argument from Theroem 3 \cite{Yorgey19} and show expected linear time complexity.
 \end{proof}
 
 
@@ -443,6 +446,9 @@ $c  + m *\sum_{i \subset (1, i )}p_i \leq 1  $, which after algebraic manipulati
 \begin{lemma}
 \cref{alg:maximum-weight-independent} run with expected complexity $O(N)$.
 \end{lemma}
+\begin{proof}
+The quick quantile call runs in expected linear time complexity as shown in \cref{TIMECOMPLEXITY}. After the call to QuickQuantile, the noumber of operations is bounded by the number of elements in the input array and is thus linear time as well. 
+\end{proof}
 
 \subsection{CVaR}
 We now prove the submodular function for CVaR and show that it satisfies Element-Wise-Seperability as defined above. Therefore we can provably compute CVaR in expected linear time.
@@ -461,14 +467,14 @@ Then $f$ is submodular and the polymatroid $\mathcal{Q}_f$ satisfies
 \[
 \cvar{\alpha }{\tilde{x} } = \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}.
 \]
-$f$ will also satisfy Element-Wise-Separabaility\todo{what} with $m = 1/\alpha$ and $c = 0$ 
+$f$ will also satisfy Element-Wise-Separabaility with $m = 1/\alpha$ and $c = 0$ 
 \end{proposition}
 \begin{proof}
-\mm{I suggest structuring the proof separately for $\cvar{\alpha }{\tilde{x} } \le  \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}$ and $\cvar{\alpha }{\tilde{x} } \ge \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}.$. I believe that the first inequality follows directly from the construction where $f(\mathcal{O}) = - \cvar{\alpha}{\tilde{1}_{\mathcal{O}}}$. I am not sure about the signs here. What comes below is the proof of the second inequality.}
+
 Note: From here on, we will use ' to denote the complement of a set.
 
 We first show that we can for all $q$ such that $\cvar{\alpha }{\tilde{x} } \le  \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}$. This directly follows from the directly from definition 2 of CVaR where we see that $q \leq ((1/\alpha)\cdot p)$ 
-(this is defined element wise) and all elements of $q$ must sum to 1.  
+and all elements of $q$ must sum to 1.  
 
 We also show below, we can construct $q$ such that $q(\mathcal{O}) =\min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\} $ for any $\mathcal{O}$. 
 \item[Case 1]: $\P{\mathcal{O}} \geq \alpha$. In this scenario, $Q(\mathcal{O})$ = 1 since $\frac{1}{\alpha}\cdot \P{\mathcal{O}} > 1 $. Thus, every element in $\mathcal{O}$ should be scaled by $\frac{1}{\P{\mathcal{O}}}$ and all other elements should be set to 0 . Since  $\P{\mathcal{O}} \geq \alpha$, we can imply the reciprocal $\frac{1}{\P{\mathcal{O}}} \leq \frac{1}{\alpha}$ is also true given $\P{\mathcal{O}} \geq \alpha > 0$. 
@@ -477,7 +483,7 @@ We also show below, we can construct $q$ such that $q(\mathcal{O}) =\min\left\{\
   This can be done by setting every element in $\mathcal{O}$ to $\frac{1}{\alpha} \cdot \P{\omega}$ for all $\omega$ in $\Omega$ and $\P{\omega} \cdot  d$ otherwise such that $\frac{1}{1 - \alpha} \cdot \P{\Omega} + d \cdot \P{\Omega'} = 1$, where $\Omega'$ contains all elements not in $\Omega$. Provided that $d \leq \frac{1}{\alpha}$, which is required for the constructed $Q$ to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{\alpha} \ge 1$. Since $\P{\Omega} + \P{\Omega'} = 1$,  $d \leq 1$ in order for $\frac{1}{\alpha} \cdot  \P{\Omega} + d\cdot\P{\Omega'} = 1$ to hold. Since $1 \leq \frac{1}{\alpha}$, this implies $d \le \frac{1}{\alpha}$.
   
   
-  We have now shown that $Q(\Omega) \leq f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$ and it is possible to construct $Q(\Omega)$ such that $Q(\Omega) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$. Thus by Remark 4.90 in Follmer and Schied, $f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$
+  We have now shown that $Q(\Omega) \leq f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$ and it is possible to construct $Q(\Omega)$ such that $Q(\Omega) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$. Thus by Remark 4.90 in \cite{Follmer2016}, $f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$
 \end{proof}
 
 
@@ -492,18 +498,18 @@ We now prove the submodular function for TVaR and show that it also satisfies El
   For $\mathcal{O} \subseteq \Omega$, define $f\colon 2^{\Omega} \to \Real_+$:
   \[
     f(\mathcal{O}) = \min\left\{\P{\mathcal{O}} + \frac{\beta}{2}, 1\right\}.
-  \], where $\beta$ represent the divergence constraint.
+  \] if $\mathcal{O} \neq \emptyset$, and 0 otherwise, where $\beta$ represent the divergence constraint.
   Then \[
   \tvar{\alpha }{\tilde{x} } = \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}.
   \]
-  $f$ will also satisfy ElementWiseSeparabaility with $m = 0$ and $c = \beta/2$ 
+  $f$ will also satisfy ElementWiseSeparabaility with $m = 1$ and $c = \beta/2$ 
 \end{proposition}
 \begin{proof}
-  \mm{the first sentence is not needed}Due to the set of constraints, we know that $q$ must be $\leq {\P{\mathcal{O}}} + \frac{\beta}{2}$ as if $f(\mathcal{O}) \geq \frac{\beta}{2} +  \P{\mathcal{O}}$ , then $f(\mathcal{O'})$ must be $< \P{\mathcal{O}} - \frac{\beta}{2}$ in order for the sum constraint of the simplex to equal 1, thus violating the l1 Norm constraint.
-
-
+  \mm{the first sentence is not needed}
+  We first note that $\mathcal{O} = \emptyset$, then $Q(\mathcal{O}) = 0$, 
+  Due to the set of constraints, we know that for all $ \mathcal{O} \text{ such that } \mathcal{O} \neq \emptyset,  q$ must be such that $Q({\mathcal{O}}) \leq {\P{\mathcal{O}}} + \frac{\beta}{2}$ as if $Q(\mathcal{O}) \geq \frac{\beta}{2} +  \P{\mathcal{O}}$ , then $Q(\mathcal{O'})$ must be $< \P{\mathcal{O}} - \frac{\beta}{2}$ in order for the sum constraint of the simplex to equal 1, thus violating the l1 Norm constraint.
   
-  Furthermore, as we show below, we can construct $q$ such that  for any $\mathcal{O}$,   
+  Furthermore, as we show below, we can construct $q$ such that  for any $\mathcal{O} \neq \emptyset$,   
   \[f(\mathcal{O}) = \min\left\{\P{\mathcal{O}} + \frac{\beta}{2}, 1\right\}
     .
   \].
@@ -512,7 +518,7 @@ We now prove the submodular function for TVaR and show that it also satisfies El
 
 \item[Case 2]: $\P{\mathcal{O}} + \frac{\beta}{2}< 1$. In this scenario, we pick an element in $\mathcal{O}$ and add $\frac{\beta}{2}$ to it. We set all elements not in $\mathcal{O}$ to 0.
 
-
+We have now shown that $Q(\Omega) \leq f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$ and it is possible to construct $Q(\Omega)$ such that $Q(\Omega) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$. Thus by Remark 4.90 in \cite{Follmer2016}, $f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$
 \end{proof}
 
 \section{Experiments}\label{sec:experiments}

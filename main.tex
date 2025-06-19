@@ -335,45 +335,38 @@ A \emph{polymatroid} $\mathcal{Q}_f$ for $f$ is a polytope defined as
 Polymatroids are important for our purpose because many risk measures can be formulated as linear optimization over polymatroids.  
 \begin{proposition} \label{prop:coherent-polymatroid}
   Suppose that $\rho\colon \mathbb{X}\to \Real$ is a comonotonic coherent risk measure (defined as $\rho$ such that $\rho(X) +  \rho(Y)= \rho(X + Y)$ when $X$ and $Y$ are comonotone). Then
-  \[
+\begin{equation}\label{eq:comontonic-optimization}
    \rho[\tilde{x}] = \min_{\bm{q}\in \mathcal{Q}_c} \bm{q}\tr  \bm{x},
-  \]\label{comontonic optimization}
- 
+\end{equation}
 where $\mathcal{Q}_c$ is the polymatroid in \cref{def:polymatroid} for $c := \rho(-\one_{\mathcal{A}})$ for each $\mathcal{A} \subseteq \Omega$. 
 \end{proposition}
 \begin{proof}
   The result is an immediate consequence of \cite[Corollary 4.89]{Follmer2016}
 \end{proof}
 
-The equality in \cref{prop:coherent-polymatroid} becomes an inequality for any coherent risk measure. We should probably adapt the statement and the theorem appropriately in order to help with the proofs for CVaR and TVaR.
-
 Conventional polymatroid optimization algorithms for risk measures and the closely related maximum weighted independent set (such as \cref{alg:greedy-polymatroid} in the appendix) solve the optimization problem in \cref{prop:coherent-polymatroid} using a greedy approach that requires sorting. We now show that for a special class of submodular functions $f$ as defined below, sorting is not necessary.
-
-
 
 \begin{assumption} \label{asm:submodular-function}
   % marek: Not needed; implied by the construction below
   % For $\mathcal{N} = \left\{ 1, \dots , N \right\}$, the function $f\colon 2^{\mathcal{N}} \to \Real_+$ $f(\emptyset) = 0$, $f(N) = 1$,
-A \emph{submodular} function $f\colon 2^{\Omega} \to \Real_+$ satisfies what we call Element-Wise-Separability (EWS) if there exists $g\colon [0,1] \to  [0,1]$ such that $f(\mathcal{O}) = g(\P {\mathcal{O}}, \forall \mathcal{O} \subseteq \Omega$ and for some $c, m \text{ in }   \mathbb{R}_{+}$:
-    \[
-      g(x) =
-      \begin{cases}        
-        \min \{c + m  \cdot x, 1\} &\text{if } x > 0 \\
-        0 &\text{otherwise}.
-      \end{cases}, \quad \forall x\in [0,1]
-    \]
+A \emph{submodular} function $f\colon 2^{\Omega} \to \Real_+$ is \emph{Element-Wise-Separable}~(EWS) if there exists $g\colon [0,1] \to  [0,1]$ such that $f(\mathcal{O}) = g(\P {\mathcal{O}}), \forall \mathcal{O} \subseteq \Omega$ and for some $c, m \text{ in }   \mathbb{R}_{+}$:
+\[
+    g(x) =
+    \begin{cases}        
+    \min \{c + m  \cdot x, 1\} &\text{if } x > 0 \\
+    0 &\text{otherwise}.
+    \end{cases}, \quad \forall x\in [0,1]
+\]
 \end{assumption}
 \begin{proposition}
-  All EWS functions are submodular.   
+If $f\colon 2^{\Omega} \to  \Real_+$ is EWS then it is submodular.   
 \end{proposition}
 \begin{proof} \gersi{clean this up}
+We first note Theorem~4.5.1 in~\cite{Bilmes18} states that if $g$ is concave \mm{what $g$?}, $f$ is submodular. 
 
+\mm{Not clear what is happening. Concavity follows directly because it is a minimum of two linear/concave functions.} We note on the interval $x > 0$, there exists some $n < 1$ such that $g(n) = 1$. On this interval, $g(x) = mx + c$ , which is twice differentiable such that the $g''(x) = 0$, which implies $g$ is concave. On the interval such that $x > n$, where $g(x) = 1$, $g''(x) = 0$, implying concavity.
 
-We first note Theorem 4.5.1 in \cite{Bilmes18} states that if $g$ is concave, $f$ is submodular. 
-
-We note on the interval $x > 0$, there exists some $n < 1$ such that $g(n) = 1$. On this interval, $g(x) = mx + c$ , which is twice differentiable such that the $g''(x) = 0$, which implies $g$ is concave. On the interval such that $x > n$, where $g(x) = 1$, $g''(x) = 0$, implying concavity.
-
-If we have value $a$ and $b$ such that $a = 0$ and thus $g(a) = 0$, we note that $(1 - z)g(a) + zg(b) = z*g(b) = min(z*c + z*m*b, z)$ where $z$ is some value between 0 and 1, will always be $\leq g(z*b + (1 - z)*a) = g(z * b) = min(c + z *m * b, 1)$. Thus, $g$ is concave on the interval $[0, b]$ where $b$ is some value $> 0$.
+\mm{What is happening here?} If we have value $a$ and $b$ such that $a = 0$ and thus $g(a) = 0$, we note that $(1 - z)g(a) + zg(b) = z*g(b) = min(z*c + z*m*b, z)$ where $z$ is some value between 0 and 1, will always be $\leq g(z*b + (1 - z)*a) = g(z * b) = min(c + z *m * b, 1)$. Thus, $g$ is concave on the interval $[0, b]$ where $b$ is some value $> 0$.
 
 Thus $g$ is concave, and the proof concludes.
 
@@ -386,9 +379,10 @@ Thus $g$ is concave, and the proof concludes.
 %If $f(Y) < 1$ and $f(Y \cup x) - f(Y) = 1$,  $f(Y \cup x) - f(Y) > m*p(x) < c + m*p(x)$. 
 %If $f(Y) = 1$ and $f(Y \cup x) - f(Y) = 1$,  $f(Y \cup x) - f(Y) = 0 < c + m*p(x)$. 
 \end{proof}
-The first statement in the assumption above is satisfied for any law-invariant comonotonic coherent risk measure \cite{Follmer2016}. We now describe an algorithm for optimizing over polymatroids with this class of submodular function.
+
+The first statement in the assumption above \mm{Whis assumptions? The reference should be unambiguous. Which statement?} is satisfied for any law-invariant comonotonic coherent risk measure \cite{Follmer2016}. \mm{A new paragraph} We now describe an algorithm for optimizing over polymatroids with this class of submodular function.
 \begin{algorithm}
-  \caption{Linear-time Algorithm for \mm{optimizing linear function on polymatroids}}\label{alg:maximum-weight-independent}
+  \caption{Linear-time Algorithm for \mm{optimizing linear function on polymatroids} \mm{Should look like Algorithm 3.1}}\label{alg:maximum-weight-independent}
 
   \Input{Finite $N = [1 \ldots n]$, $f\colon 2^N \to  \Real_+$ satisfying \cref{asm:submodular-function}, {vector $\bm{x}^0$, pmf $\bm{p}^0$}}
   \Output{$q_1, q_2, ... q_n$}
@@ -422,15 +416,14 @@ The first statement in the assumption above is satisfied for any law-invariant c
   
   $q_{mid} \gets 1 - sum$\;
   Let $q_i \gets 0 \text{ for } i > mid$
-  
 \end{algorithm}
 
 We now prove the optimality of the algorithm and it's expected linear time complexity. The proof of optimality is obtained by showing that every value we compute for $q$ is equivalent to what would be obtained by following the computational procedure defined in \cite[Remark 4.86]{Follmer2016}, which is proven to be optimal. The proof of the time complexity follows from the expected linear time complexity, and the fact that remaining operations can trivally be computed in linear time, and thus have no impact on the complexity.
 
 
-\begin{lemma}
+\begin{proposition}
   \cref{alg:maximum-weight-independent} returns a optimal solution to optimization problem defined in \cref{comontonic optimization}. 
-\end{lemma}
+\end{proposition}
 \begin{proof}
 The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal{O}_{i})$ \cite[Remark 4.86]{Follmer2016}, where $\mathcal{O}_i$ is the set of all elements that have values $\leq i$ .  For $f(\mathcal{O}_{i+1}) \leq 1$ and $f(\mathcal{O}_i) < 1$
 
@@ -443,9 +436,10 @@ The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal
 For $i$ such that $f(\mathcal{O}_{i + 1}) = 1$ where $ (c  +\sum_{i \subset (1, i + 1)}m*p_{i}) > 1$ and $f(\mathcal{O}) \leq 1$, $f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_{i}) = 1 - c  +\sum_{i \subset (1, i )}m *p_i$. We know that such $i$ is the largest $i$ that satisfies
 $c  + m *\sum_{i \subset (1, i )}p_i \leq 1  $, which after algebraic manipulation results in the maximum $i$ such that $\sum_{i \subset (1, i )}p_i \leq (1 - c)/m $. We can thus see from \eqref{eq:var-definition} that VaR with $\alpha = (1 - c)/m$ will return the value at $x_{i + 1}$, which is calculated as $midval$ in the algorithm with $i + 1 = mid$. Thus, it follows that $q_{mid} = 1 - c  +\sum_{i \subset (1, i )}m *p_i$, where from the previous paragraph it follows that $ c  +\sum_{i \subset (1, i )}m *p_i = \sum_iq_i$. For all other $i > mid$, we note that $f(\mathcal{O}_{i}) - f(\mathcal{O}_{i - 1}) = 1 - 1 = 0$, and thus $q_i = 0$.
 \end{proof}
-\begin{lemma}
+
+\begin{proposition}
 \cref{alg:maximum-weight-independent} run with expected complexity $O(N)$.
-\end{lemma}
+\end{proposition}
 \begin{proof}
 The quick quantile call runs in expected linear time complexity as shown in \cref{TIMECOMPLEXITY}. After the call to QuickQuantile, the noumber of operations is bounded by the number of elements in the input array and is thus linear time as well. 
 \end{proof}
@@ -471,7 +465,7 @@ $f$ will also satisfy Element-Wise-Separabaility with $m = 1/\alpha$ and $c = 0$
 \end{proposition}
 \begin{proof}
 
-Note: From here on, we will use ' to denote the complement of a set.
+Note: From here on, we will use $'$ to denote the complement of a set.
 
 We first show that we can for all $q$ such that $\cvar{\alpha }{\tilde{x} } \le  \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}$. This directly follows from the directly from definition 2 of CVaR where we see that $q \leq ((1/\alpha)\cdot p)$ 
 and all elements of $q$ must sum to 1.  

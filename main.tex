@@ -361,12 +361,12 @@ A \emph{submodular} function $f\colon 2^{\Omega} \to \Real_+$ is \emph{Element-W
 \begin{proposition}
 If $f\colon 2^{\Omega} \to  \Real_+$ is EWS then it is submodular.   
 \end{proposition}
-\begin{proof} \gersi{clean this up}
-We first note Theorem~4.5.1 in~\cite{Bilmes18} states that if $g$ is concave \mm{what $g$?}, $f$ is submodular. 
+\begin{proof} 
+We first note Theorem~4.5.1 in~\cite{Bilmes18} (proof provided in Appendix) states that if $g(x)$ as defined in \cref{asm:submodular-function} is concave , $f$ is submodular. 
 
-\mm{Not clear what is happening. Concavity follows directly because it is a minimum of two linear/concave functions.} We note on the interval $x > 0$, there exists some $n < 1$ such that $g(n) = 1$. On this interval, $g(x) = mx + c$ , which is twice differentiable such that the $g''(x) = 0$, which implies $g$ is concave. On the interval such that $x > n$, where $g(x) = 1$, $g''(x) = 0$, implying concavity.
+ We first prove concavity for g on the interval $(0, 1]$, where $0$ is not included. We note on the interval $x > 0$, there exists some $n < 1$ such that $g(n) = 1$.  The function $mx + c$  is twice differentiable such that the $g''(x) = 0$, which implies concavity. The constant function $1$ has a second derivate of $0$, also implying concavity. Since the minimum of two concave functions is also concave and $g(x)$ on this interval is the minimum of these two functions, it follows $g(x)$ must also be concave on this interval.
 
-\mm{What is happening here?} If we have value $a$ and $b$ such that $a = 0$ and thus $g(a) = 0$, we note that $(1 - z)g(a) + zg(b) = z*g(b) = min(z*c + z*m*b, z)$ where $z$ is some value between 0 and 1, will always be $\leq g(z*b + (1 - z)*a) = g(z * b) = min(c + z *m * b, 1)$. Thus, $g$ is concave on the interval $[0, b]$ where $b$ is some value $> 0$.
+We first prove concavity for g on the interval $[0, 1]$, where $0$ is not included. If we have value $a$ and $b$ such that $a = 0$ and thus $g(a) = 0$, we note that $(1 - z)g(a) + zg(b) = z*g(b) = min(z*c + z*m*b, z)$ where $z$ is some value between 0 and 1, will always be $\leq g(z*b + (1 - z)*a) = g(z * b) = min(c + z *m * b, 1)$. Thus, $g$ is concave on the interval $[0, b]$ where $b$ is some value $> 0$.
 
 Thus $g$ is concave, and the proof concludes.
 
@@ -380,9 +380,11 @@ Thus $g$ is concave, and the proof concludes.
 %If $f(Y) = 1$ and $f(Y \cup x) - f(Y) = 1$,  $f(Y \cup x) - f(Y) = 0 < c + m*p(x)$. 
 \end{proof}
 
-The first statement in the assumption above \mm{Whis assumptions? The reference should be unambiguous. Which statement?} is satisfied for any law-invariant comonotonic coherent risk measure \cite{Follmer2016}. \mm{A new paragraph} We now describe an algorithm for optimizing over polymatroids with this class of submodular function.
+The statement in assumption \cref{asm:submodular-function} that $f(\mathcal{O}) = g(\P {\mathcal{O}}), \forall \mathcal{O} \subseteq \Omega$ is satisfied for any law-invariant comonotonic coherent risk measure \cite{Follmer2016}. 
+
+We now describe an algorithm for optimizing over polymatroids with this class of submodular function. We then show that both CVaR and TVaR can be computed by solving this optimization problem for a particular EWS function.
 \begin{algorithm}
-  \caption{Linear-time Algorithm for \mm{optimizing linear function on polymatroids} \mm{Should look like Algorithm 3.1}}\label{alg:maximum-weight-independent}
+  \caption{Linear-time Algorithm for \mm{optimizing linear function on polymatroids} }\label{alg:maximum-weight-independent}
 
   \Input{Finite $N = [1 \ldots n]$, $f\colon 2^N \to  \Real_+$ satisfying \cref{asm:submodular-function}, {vector $\bm{x}^0$, pmf $\bm{p}^0$}}
   \Output{$q_1, q_2, ... q_n$}
@@ -398,24 +400,24 @@ The first statement in the assumption above \mm{Whis assumptions? The reference 
     }
    
   }
-  $midval = \operatorname{QuickQuantile}(p, x, \alpha = (1 - c)/m) $
+  $v = \operatorname{QuickQuantile}(p, x, \alpha = (1 - c)/m) $
   
-  Set $mid$ to smallest  $i$ such that $x_i = midval$
+  Set $z$ to smallest  $i$ such that $x_i = v$
   
   \If{$c > 0$}
   {
-    $q_i \gets m \cdot p_i$ for $1 < i < mid$;
+    $q_i \gets m \cdot p_i$ for $1 < i < z$;
     
   }
   \Else
   {
-    $q_i \gets m \cdot p_i$ for $i < mid$
+    $q_i \gets m \cdot p_i$ for $i < z$
   
   }
-  $sum = \sum_iq_i$
+  $s = \sum_iq_i$
   
-  $q_{mid} \gets 1 - sum$\;
-  Let $q_i \gets 0 \text{ for } i > mid$
+  $q_{mid} \gets 1 - s$\;
+  Let $q_i \gets 0 \text{ for } i > z$
 \end{algorithm}
 
 We now prove the optimality of the algorithm and it's expected linear time complexity. The proof of optimality is obtained by showing that every value we compute for $q$ is equivalent to what would be obtained by following the computational procedure defined in \cite[Remark 4.86]{Follmer2016}, which is proven to be optimal. The proof of the time complexity follows from the expected linear time complexity, and the fact that remaining operations can trivally be computed in linear time, and thus have no impact on the complexity.
@@ -742,6 +744,23 @@ Let $v$ be an input to \cref{alg:partition} and consider the following invariant
   
 \end{proof}
 \section{Proofs and Details for \cref{sec:phi-divergence}}
+\begin{lemma}
+This lemma is Theorem 4.5.1 from \cite{Bilmes18}: Given a ground set $V$. The following two are equivalent:
+\begin{enumerate}
+    \item For all modular functions $m : 2^V \rightarrow \mathbb{R}_+$, the function $f : 2^V \rightarrow \mathbb{R}$ defined as
+    \[
+    f(A) = g(m(A))
+    \]
+    is submodular.
+    \item $g : \mathbb{R}_+ \rightarrow \mathbb{R}$ is concave.
+\end{enumerate}
+
+\end{lemma}
+
+\begin{proof}
+Note the proof is not the same provided in \cite{Bilmes18}, but we feel this proof is easier to easier. It is well known that concave functions are subadditive - that is for any concave function $g$ and two values $y$ and $z$, $g(y) + g(z) \geq g(y + z)$. Given $A \subseteq B \subseteq E $, it follows $0 \leq a = m(A) \leq b = m(B)$. Therefore it follows that $f(A) + f(B) = g(a) + g(b) \geq g(a + b) = f(A \cup B)$. Thus it follows from the definition of sub-modularity that $f$ is submodular.
+
+\end{proof}
 
 
 % \section{No-sort Polymatroid}

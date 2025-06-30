@@ -60,14 +60,14 @@ Monetary risk measures have gained popularity in expressing decision-makers' pre
 
 \section{Introduction}\label{sec:intro}
 
-\todo{citations}
-Monetary measures of risk generalize the expectation operator to be able to represent the risk aversion of decision makers in domains that range from robotics~\cite{akella2024risk,majumdar2020should,benrabah2024review} to finance~\cite{Follmer2016} to infrastructure maintenance~\cite{}. Value-at-Risk~(VaR) and Conditional-Value-at-Risk~(CVaR) are the most popular risk measures and have made inroads in reinforcement learning, machine learning, and decision making~\cite{Petrik2024}. Machine learning and reinforcement learning algorithms typically must compute the risk measures for discrete random variables. Fast algorithms for computing risk measures are necessary in several machine-learning settings~\cite{}. For example, when used as part of an optimization algorithm, the risk measure may need to be evaluated in every iteration of the algorithm and can represent a significant computational bottleneck~\cite{Ho2021}. 
+\todo{Palash: All statements that remain uncited were not written by me and thus I do not what publications are intended to be referenced. I am searching the literature to see what citations may have been intended, but if whoever wrote these could point me to the right literature this would be appreciated.}
+Monetary measures of risk generalize the expectation operator to be able to represent the risk aversion of decision makers in domains that range from robotics~\cite{akella2024risk,majumdar2020should,benrabah2024review} to finance~\cite{Follmer2016} to infrastructure maintenance~\cite{}. Value-at-Risk~(VaR) and Conditional-Value-at-Risk~(CVaR) are the most popular risk measures and have made inroads in reinforcement learning, machine learning, and decision making~\cite{Petrik2024}. Machine learning and reinforcement learning algorithms typically must compute the risk measures for discrete random variables. Fast algorithms for computing risk measures are necessary in several machine-learning settings~\cite{Ho2021}. For example, when used as part of an optimization algorithm, the risk measure may need to be evaluated in every iteration of the algorithm and can represent a significant computational bottleneck~\cite{Ho2021}. 
 
 
 %However, in many applications such as robotics, finance, and autonomous systems, solutions must account for performance with respect to worst case scenarios rather than simply maximizing the mean. Therefore, it has become a common practice to optimize policies with respect to a risk measure~\cite{Follmer2016}, which focuses on the tails of the reward distribution rather than the expectation. 
 
 % what are we doing; our contributions
-This paper proposes new fast algorithms for computing risk measures of discrete random variables. First, we propose a new linear-time VaR evaluation algorithm. Our VaR algorithm, which we call \emph{QuickQuantile}, builds on the well-known ideas of QuickSelect but generalizes it to quantiles. The worst-case linear-time upper bound of \emph{QuickQuantile} matches the linear-time lower bound~\cite{}. Second, building on \emph{QuickQuantile} we propose a general algorithm for evaluating some $\varphi$-divergence risk measures~\cite{}, which include CVaR and the $\varphi$-divergence which uses the unweighted L1 norm as the divergence - which we will henceforth refer to as (TVaR)~\cite{}. The algorithm, which we call \emph{QuickDivergence}, works by representing certain $\varphi$-divergence risk measures as a linear minimization over polymatroids. The linear worst-case runtime of \emph{QuickDivergence} also matches the known lower bounds on the runtime~\cite{}. 
+This paper proposes new fast algorithms for computing risk measures of discrete random variables. First, we propose a new linear-time VaR evaluation algorithm. Our VaR algorithm, which we call \emph{QuickQuantile}, builds on the well-known ideas of QuickSelect but generalizes it to quantiles. The worst-case linear-time upper bound of \emph{QuickQuantile} matches the linear-time lower bound~\cite{}. Second, building on \emph{QuickQuantile} we propose a general algorithm for evaluating some $\varphi$-divergence risk measures~\cite{Ahmadi-Javid2012}, which include CVaR and the $\varphi$-divergence which uses the unweighted L1 norm as the divergence - which we will henceforth refer to as (TVaR)~\cite{Kruse2021}. The algorithm, which we call \emph{QuickDivergence}, works by representing certain $\varphi$-divergence risk measures as a linear minimization over polymatroids. The linear worst-case runtime of \emph{QuickDivergence} also matches the known lower bounds on the runtime~\cite{}. 
 
 There is limited prior work on fast algorithms for evaluating risk measures. The conventional VaR algorithm for a discrete random variable must sort its values before it can evaluate its risk. As a result, the sort's runtime, which requires   $\Omega(n \log n)$ operations where $n$ is the number of the probability mass function~(pmf) entries, dominates the runtime complexity of VaR. To the best of our knowledge at the time of writing, no prior work has proposed or studied linear-time algorithms for any of the above risk measures.
 
@@ -118,10 +118,10 @@ The lower and upper bounds of the quantile set are denoted by $\quant^+_{\alpha}
     \end{tabular}
 \end{table}
 
-
+\todo{can we remove this discussion?}
 \mm{Why phi needs to be non-negative? Where do we use the fact that the minimum is 0? Also, the Ahmadi-javid paper does not restate all the requirements from the OCE paper.}
 \palash{removed the non negative condition. All other conditions are directly from the ahmadi-javid EVAR paper - previously we are citing a different ahmad-javid paper which I fixed now }
-Second, we consider \emph{$\varphi$-divergence risk measures}, which include several common monetary risk measures~\cite{Ahmadi-Javid2012}. A divergence risk measure $\ER_{\varphi, \beta }\colon \mathbb{X} \to  \bar{\Real}$  is defined for a closed, convex function $\varphi\colon \bar{\Real} \to \bar{\Real}$ that satisfies $\varphi(1) = 0$ and $\beta\in \Real_+$ as
+Second, we consider \emph{$\varphi$-divergence risk measures}~\cite{Ahmadi-Javid2012}. A divergence risk measure $\ER_{\varphi, \beta }\colon \mathbb{X} \to  \bar{\Real}$  is defined for a closed, convex function $\varphi\colon \bar{\Real} \to \bar{\Real}$ that satisfies $\varphi(1) = 0$ and $\beta\in \Real_+$ as
 \begin{align} \label{eq:fdiv-primal}
   \ER_{\varphi, \beta}[ \tilde{x} ]
   &:= \inf \left\{\bm{q}\tr \bm{x} \mid \bm{q}\in \Delta_n, H_{\varphi}(\bm{q} \| \bm{p}) \le \beta
@@ -136,10 +136,10 @@ The function $H_{\varphi}$ in~\eqref{eq:fdiv-primal} is a $\varphi$-divergence m
   H_\varphi(\bm{q} \| \bm{p}) := \sum_{\omega \in \Omega} p_{\omega} \cdot \varphi\left(\frac{q_{\omega}}{p_{\omega}}\right),
 \]
 and we adopt the common convention that $1 / 0 = \infty$ and $0 \cdot \infty = 0$~\cite{rockefeller1996variational}. Note that the absolute continuity restriction is not needed for finite probability spaces. 
-The function $\varphi$ is convex and satisfies $\varphi(1)=0$. 
+The function $\varphi\opt(x)$ is the convex conjugate of $\varphi(y)$
 
 
-as shown in \cref{tab:divergences}.
+
 
 
 \begin{proposition}
@@ -153,14 +153,14 @@ as shown in \cref{tab:divergences}.
 \end{proposition}
 
 
-Finally, it is important to note that $\varphi$-divergence risk measures are coherent, which means they are convex and positively homogeneous. Any coherent risk measure $\rho\colon \mathbb{X}\to \bar{\Real}$ satisfies for some closed convex non-empty set $\mathcal{Q} \subseteq \Delta^n$ that \todo{add the condition here}~\citep[Prop. 2.84]{Follmer2016}. 
+Finally, it is important to note that $\varphi$-divergence risk measures are coherent, which means they are convex and positively homogeneous. Any coherent risk measure $\rho\colon \mathbb{X}\to \bar{\Real}$ satisfies for some closed convex non-empty set $\mathcal{Q} \subseteq \Delta^n$ \citep[Prop. 2.84]{Follmer2016}. 
 We also consider \emph{Conditional-Value-at-Risk}~(CVaR), a common risk measure, which is defined for a random variable $\tilde{x} \in \mathbb{X}$ and risk level $\alpha \in (0,1]$ as~\cite{Follmer2016}
 \begin{equation} \label{eq:primal_cvar}
     \cvaro_\alpha(\tilde{x})
   := \max_{z \in \Real} \left(z - \frac{1}{\alpha} \cdot \E{[z -\bm{x}]_+}\right) 
   % = \min \left\{\bm{q}\tr \bm{x} \mid \bm{q} \leq \alpha^{-1} \bm{p},\, \bm{q}\in \Delta_n \right\},
 \end{equation}
-where $\bm{1}$ is a vector of ones. CVaR is usually continuously extended as $\cvaro_0[\tilde{x}] = \ess\inf[\tilde{x}]$.
+CVaR is usually continuously extended as $\cvaro_0[\tilde{x}] = \ess\inf[\tilde{x}]$.
 
 In the remainder of the paper, we first propose a linear-time algorithm for computing VaR then we build on it to propose a linear time algorithm for certain $\varphi$-divergence risk measures. 
 
@@ -273,7 +273,7 @@ Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite
   \end{lemma}
 \begin{proof}
  Loop Invariant: Before and after every iteration $\quant^+$ will remain in the array $x$ at an index $i$ such that $ f_k \leq i \leq b_k $.
-During the first loop: Every element in $x$ has an index $i$ such that $ front \leq i \leq back $, where $front=1$ and $back=n$. By Lemma 1, there exists an element with index $i$ such that \todo{$\alpha$}$\quant^+ = x[i] $. \todo{consistent indexing $f_k$ vs $x[i]$}
+During the first loop: Every element in $x$ has an index $i$ such that $ front \leq i \leq back $, where $front=1$ and $back=n$. By Lemma 1, there exists an element with index $i$ such that \todo{$\alpha$}$\quant^+ = x_i $. \todo{consistent indexing $f_k$ vs $x[i]$}
 
 During the loop, there are 3 possible scenarios at each iteration:
 \begin{enumerate}
@@ -501,7 +501,7 @@ We now prove the submodular function for TVaR and show that it also satisfies El
   $f$ will also satisfy ElementWiseSeparabaility with $m = 1$ and $c = \beta/2$ 
 \end{proposition}
 \begin{proof}
-  \mm{the first sentence is not needed}
+ 
   We first note that $\mathcal{O} = \emptyset$, then $Q(\mathcal{O}) = 0$, 
   Due to the set of constraints, we know that for all $ \mathcal{O} \text{ such that } \mathcal{O} \neq \emptyset,  q$ must be such that $Q({\mathcal{O}}) \leq {\P{\mathcal{O}}} + \frac{\beta}{2}$ as if $Q(\mathcal{O}) \geq \frac{\beta}{2} +  \P{\mathcal{O}}$ , then $Q(\mathcal{O'})$ must be $< \P{\mathcal{O}} - \frac{\beta}{2}$ in order for the sum constraint of the simplex to equal 1, thus violating the l1 Norm constraint.
   
@@ -758,7 +758,7 @@ This lemma is Theorem 4.5.1 from \cite{Bilmes18}: Given a ground set $V$. The fo
 \end{lemma}
 
 \begin{proof}
-Note the proof is not the same provided in \cite{Bilmes18}, but we feel this proof is easier to easier. It is well known that concave functions are subadditive - that is for any concave function $g$ and two values $y$ and $z$, $g(y) + g(z) \geq g(y + z)$. Given $A \subseteq B \subseteq E $, it follows $0 \leq a = m(A) \leq b = m(B)$. Therefore it follows that $f(A) + f(B) = g(a) + g(b) \geq g(a + b) = f(A \cup B)$. Thus it follows from the definition of sub-modularity that $f$ is submodular.
+Note the proof is not the same provided in \cite{Bilmes18}, but we feel this proof is easier. It is well known that concave functions are subadditive - that is for any concave function $g$ and two values $y$ and $z$, $g(y) + g(z) \geq g(y + z)$ on the interval $[0, \infty)$. Given $A \subseteq B \subseteq E $, it follows $0 \leq a = m(A) \leq b = m(B)$. Therefore it follows that $f(A) + f(B) = g(a) + g(b) \geq g(a + b) = f(A \cup B)$. Thus it follows from the definition of sub-modularity that $f$ is submodular.
 
 \end{proof}
 
@@ -922,6 +922,7 @@ Julia garbage collector, even when running synchronously.
 
 \section{Greedy Algorithm}
 
+\todo{what weights?}
 \mm{Why would we need the weights to be non-negative?}
 
 % \begin{algorithm} \label{alg:greedy-polymatroid}

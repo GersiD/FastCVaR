@@ -67,17 +67,19 @@ Monetary measures of risk generalize the expectation operator to be able to repr
 %However, in many applications such as robotics, finance, and autonomous systems, solutions must account for performance with respect to worst case scenarios rather than simply maximizing the mean. Therefore, it has become a common practice to optimize policies with respect to a risk measure~\cite{Follmer2016}, which focuses on the tails of the reward distribution rather than the expectation. 
 
 % what are we doing; our contributions
-This paper proposes new fast algorithms for computing risk measures of discrete random variables. First, we propose a new linear-time VaR evaluation algorithm. Our VaR algorithm, which we call \emph{QuickQuantile}, builds on the well-known ideas of QuickSelect but generalizes it to quantiles. The worst-case linear-time upper bound of \emph{QuickQuantile} matches the linear-time lower bound~\cite{}. Second, building on \emph{QuickQuantile} we propose a general algorithm for evaluating some $\varphi$-divergence risk measures~\cite{Ahmadi-Javid2012}, which include CVaR and the $\varphi$-divergence which uses the unweighted L1 norm as the divergence - which we will henceforth refer to as (TVaR)~\cite{Kruse2021}. The algorithm, which we call \emph{QuickDivergence}, works by representing certain $\varphi$-divergence risk measures as a linear minimization over polymatroids. The linear worst-case runtime of \emph{QuickDivergence} also matches the known lower bounds on the runtime~\cite{}. 
+This paper proposes fast algorithms for computing risk measures of discrete random variables. First, we show VaR can be seen as a special case of the WeightedMedian problem, which has well known linear time algorithms.
+%The worst-case linear-time upper bound of \emph{QuickQuantile} matches the linear-time lower bound~\cite{}. 
+Second, we propose a general algorithm for evaluating some $\varphi$-divergence risk measures~\cite{Ahmadi-Javid2012}, which include CVaR and the $\varphi$-divergence which uses the unweighted L1 norm as the divergence - which we will henceforth refer to as (TVaR)~\cite{Kruse2021}. The algorithm, which we call \emph{QuickDivergence}, works by representing certain $\varphi$-divergence risk measures as a linear minimization over polymatroids. The linear worst-case runtime of \emph{QuickDivergence} also matches the known lower bounds on the runtime~\cite{}. 
 
 There is limited prior work on fast algorithms for evaluating risk measures. The conventional VaR algorithm for a discrete random variable must sort its values before it can evaluate its risk. As a result, the sort's runtime, which requires   $\Omega(n \log n)$ operations where $n$ is the number of the probability mass function~(pmf) entries, dominates the runtime complexity of VaR. To the best of our knowledge at the time of writing, no prior work has proposed or studied linear-time algorithms for any of the above risk measures.
 
-Coherent risk measures, like CVaR and TVaR, can be evaluated by solving convex optimization problems~\cite{Follmer2016, rockefeller1996variational}. Although most of these optimization problems are tractable, their time complexity is too large to be practical for applications where they are most needed. Current practical implementations rely on specific properties of these optimization problems to compute the solution efficiently. For example, all existing CVaR algorithms must sort the values of the random variable to compute its value~\cite{}, as in the case for VaR. The $\Omega(n \log  n)$ time complexity of the sort dominates the time complexity and prevents linear time computation. In this paper, we circumvent the complexity of sorting by developing no-sort algorithms for these risk measures and others.
+Coherent risk measures, like CVaR and TVaR, can be evaluated by solving convex optimization problems~\cite{Follmer2016, rockefeller1996variational}. Although most of these optimization problems are tractable, their time complexity is too large to be practical for applications where they are most needed. Current practical implementations rely on specific properties of these optimization problems to compute the solution efficiently. For example, all existing CVaR algorithms must sort the values of the random variable to compute its value~\cite{}, as in the case for VaR. The $\Omega(n \log  n)$ time complexity of the sort dominates the time complexity and prevents linear time computation. In this paper, we circumvent the complexity of sorting by developing no-sort algorithms for these risk measures and others. \todo{We may have to rewrite this, the fractional knapsach which = CVaR is well known to be solvable in linear time}
 
 Numerous efficient algorithms have been designed for structured optimization problems that are similar to CVaR and TVaR evaluations. Some example of such structured optimization problems are the projection onto the simplex~\cite{adam2019projectionscanonicalsimplexadditional, Wang2013Simplex}, projection on k-capped simplex~\cite{kcapped_ang}, linear optimization on the intersection of $L_p$ or $\varphi$-divergence balls and the probability simplex as arise in robust optimizations~\cite{}, optimization for $\varphi$-divergence risk measures~\cite{}, and on polytopes defined by submodular functions which are known as polymatroids~\cite{}. Many of these algorithms require sorting the input variables, which has $O(n \log  n)$ complexity. There has been mention of the possibility of linear time algorithms however, we could find neither work describing nor studying them. One exception is \cite{Condat2016}, which proposes a linear-time algorithm for computing the projection onto the simplex, which does not leverage QuickSelect. 
 
 Our algorithms' time complexity improves on the state of the art by a logarithmic factor. Although this improvement may seem unimportant,  it is an acceleration that is practically meaningful without any serious drawbacks. Our algorithms are simple and easy to implement with little added complexity compared with the state-of-the-art. Our numerical results show that they can lead to an order of magnitude speed up for realistic large problems, a significant speed-up for moderately sized problems, and match the performance of existing algorithms for small problems.
 
-The remainder of the paper is organized as follows. \Cref{sec:preliminaries} describes the necessary background on risk measures, $\varphi$-divergence, and polymatroid optimization. Then, \Cref{sec:var-linear} describes \emph{QuickQuantile}, a new algorithm that computes VaR in linear time for a random variable defined by a pmf. Then, \cref{sec:phi-divergence} builds on the \emph{QuickQuantile} to develop \emph{QuickDivergence}, an algorithm that evaluates certain $\varphi$-divergence risk measures in linear time. We evaluate the algorithms numerically on synthetic and realistic problems in \cref{sec:experiments}. A tested implementation of the algorithms in Julia is available at \textcolor{green}{REDACTED}.
+The remainder of the paper is organized as follows. \Cref{sec:preliminaries} describes the necessary background on risk measures, $\varphi$-divergence, and polymatroid optimization. Then, \Cref{sec:var-linear} shows the relationship between VaR and the Weighted Median problem, allowing us to trivially adapt algorithms for the Weighted Median Problem to solve VaR. Then, \cref{sec:phi-divergence} builds on this to develop \emph{QuickDivergence}, an algorithm that evaluates certain $\varphi$-divergence risk measures in linear time. We evaluate the algorithms numerically on synthetic and realistic problems in \cref{sec:experiments}. A tested implementation of the algorithms in Julia is available at \textcolor{green}{REDACTED}.
 
 \section{Preliminaries}\label{sec:preliminaries}
 
@@ -160,18 +162,53 @@ We also consider \emph{Conditional-Value-at-Risk}~(CVaR), a common risk measure,
   := \max_{z \in \Real} \left(z - \frac{1}{\alpha} \cdot \E{[z -\bm{x}]_+}\right) 
   % = \min \left\{\bm{q}\tr \bm{x} \mid \bm{q} \leq \alpha^{-1} \bm{p},\, \bm{q}\in \Delta_n \right\},
 \end{equation}
-CVaR is usually continuously extended as $\cvaro_0[\tilde{x}] = \ess\inf[\tilde{x}]$.
+CVaR is usually extended continuously as $\cvaro_0[\tilde{x}] = \ess\inf[\tilde{x}]$.
 
 In the remainder of the paper, we first propose a linear-time algorithm for computing VaR then we build on it to propose a linear time algorithm for certain $\varphi$-divergence risk measures. 
 
 \section{Computing VaR in Linear Time} \label{sec:var-linear}
 
-In this section, we develop a quick algorithm to compute the VaR of a discrete random variable. The algorithm extends the well-known QuickSelect algorithm to account to non-uniform weights. We also take a special care to allow random variables $\tilde{x}$ with duplicate values such that $\tilde{x}(\omega_i) = \tilde{x}(\omega_j)$. This allows us to compute VaR in expected linear time as opposed to conventional algorithms such as A.1 in the appendix.
+In this section, we show the equivalence between VaR and the weighted-median problem, which is well known to be solvable in linear time \cite{korte2011combinatorial}\cite{cormen2001introduction}.
+
+In order to prove that that VaR and the weighted median problem are equivalent, we first show that $\quant_{\alpha}^+(\tilde{x})$ is an element in the array. 
+\begin{lemma}\label{lem:quantile-in-finite-omega}
+Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite $\Omega$. Then, there exist $\omega_+, \omega_-\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_+)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_-)$ for each $\alpha\in (0,1)$.
+\end{lemma}
+
+We now define our version of the Weighted Median problem.
+\begin{definition} \label{WM_Problem}
+    
+Let $n \in \mathbb{N}$, $\xi_1, \ldots, \xi_n \in \mathbb{R}$, $w_1, \ldots, w_n \in \mathbb{R}_{\geq 0}$, and $W \in \mathbb{R}$ with 
+\[
+0 < W < \sum_{i=1}^n w_i.
+\]
+Then the $(w_1, \ldots, w_n \mid W)$-weighted median with respect to $(\xi_1, \ldots, \xi_n)$ is defined to be the unique number $\xi^*$ for which
+\begin{equation}
+\sum_{i : \xi_i < \xi^*} w_i \leq W < \sum_{i : \xi_i \leq \xi^*} w_i.
+\label{WeightedMedianEquality}
+\end{equation}
+
+\textbf{Weighted Median Problem: } A natural number $n$, numbers $\ell_1, \ldots, \ell_n \in \mathbb{R}$, $w_1, \ldots, w_n \in \mathbb{R}^{\mathbb{C}}$,  
+and a number $W$ with $0 \leq W < \sum_{i=1}^{n} w_i$.
 
 
+\medskip
+
+\textbf{Task:} Find the $(w_1, \ldots, w_n; W)$-weighted median with respect to $(\ell_1, \ldots, \ell_n)$.
+\end{definition}
+We note that our definition differs very slightly from the popular definition in \cite{korte2011combinatorial} in that the position of the $\leq$ and $>$ in \cref{WeightedMedianEquality} are swapped.
+
+We now show that we can cast VaR as an instance of the Weighted Median problem
+\begin{lemma}
+The weighted median problem defined in \cref{WM_Problem} is equivalent to solving VaR when $W = \alpha$ for a discrete random variable $\tilde{x}\colon \Omega \to \Real$ with finite $\Omega$ such that the outcomes of the random variable $\xi_1, \ldots, \xi_n \in \mathbb{R}$ and the weights $w_1, \ldots, w_n \in \mathbb{R}^{\mathbb{C}}$ correspond to the probabilities of each outcome .
+\end{lemma}
+\begin{proof}
+Let $\xi^*$ be the optimal solution to the weighted median problem and let $W = \alpha$. Then $\P{\tilde{x} < \xi^*} \leq \alpha < \P{\tilde{x} \leq \xi^*}$. Thus $\xi^*$ is optimal for \eqref{eq:var-definition} among all outputs of $\tilde{x}$. Since the optimal value for VaR must be an outcome of $\tilde{x}$ by \cref{lem:quantile-in-finite-omega}, $\xi^*$ then must equal $\quant_{\alpha}[\tilde{x}]$ and the proof concludes.
+
+\end{proof}
 
 %We first restate some well-known properties of the Hoare Partition scheme.
-Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorithm works as follows. It first picks a pivot by taking the middle element between front and back and applies the partition scheme to easily compute the probability of all outcomes smaller than or equal to that of the pivot (Lines \ref{line:pivot_comp} - \ref{line:partion_line}). Note that three partitions are create, one where the elements are all less than the pivot, another containing all elements equal to the pivot, and a third pivot containing all elements greater than the pivot. We refer to these partitions as the left, middle, and right partition from here on. QVaR then determines whether the quantile can exist in the left, middle, or right pivot (lines \ref{line:determine_left}, \ref{line:determine_right}, and \ref{determine_middle} ) and adjusts the $f_k$ and $b_k$ respectively to reduce the search space to one of these partitions. We note that in the case the quantile is determined to exist in the middle partition, the algorithm can terminate since every value in the middle partition is the same. In the case of $\alpha^0 = 0$, we handle this separately and simply find the minimum element. 
+%Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorithm works as follows. It first picks a pivot by taking the middle element between front and back and applies the partition scheme to easily compute the probability of all outcomes smaller than or equal to that of the pivot (Lines \ref{line:pivot_comp} - \ref{line:partion_line}). Note that three partitions are create, one where the elements are all less than the pivot, another containing all elements equal to the pivot, and a third pivot containing all elements greater than the pivot. We refer to these partitions as the left, middle, and right partition from here on. QVaR then determines whether the quantile can exist in the left, middle, or right pivot (lines \ref{line:determine_left}, \ref{line:determine_right}, and \ref{determine_middle} ) and adjusts the $f_k$ and $b_k$ respectively to reduce the search space to one of these partitions. We note that in the case the quantile is determined to exist in the middle partition, the algorithm can terminate since every value in the middle partition is the same. In the case of $\alpha^0 = 0$, we handle this separately and simply find the minimum element. 
 
 % \begin{algorithm}
 %   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and $\alpha \in [0,1]$}}
@@ -261,46 +298,49 @@ Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorit
 
 
 
-The above conditions primarily state that each call to the partition scheme performs a partial sorting such that all elements $\leq v_k$ will have an index $< i_k$ , and elements greater than the pivot will have an index $> i_k$.
+%The above conditions primarily state that each call to the partition scheme performs a partial sorting such that all elements $\leq v_k$ will have an index $< i_k$ , and elements greater than the pivot will have an index $> i_k$.
+Below we present an algorithm for computing VaR in linear time. The algorithm is a highly trivial modification of that in \cite{korte2011combinatorial} and homework problems such as in \cite{cormen2001introduction} to account for the slight alteration in definition.
 
-In order to prove that the algorithm is optimal, we first show that $\quant_{\alpha}^+(\tilde{x})$ is an element in the array. 
-\begin{lemma}\label{lem:quantile-in-finite-omega}
-Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite $\Omega$. Then, there exist $\omega_+, \omega_-\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_+)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_-)$ for each $\alpha\in (0,1)$.
-\end{lemma}
 
-\begin{lemma}
-  \Cref{alg:quick-quantile} computes $\quant^+$.
+\begin{lemma} \label{PROOFCORRECTNESS}
+  \Cref{alg:quick-quantile} computes the optimal solution $\xi^*$ to the weighted median problem  when $W = \alpha_0$, $x^0$ represents the values and $p^0$ represent the weights.
   \end{lemma}
 \begin{proof}
- Loop Invariant: Before and after every iteration $\quant^+$ will remain in the array $x$ at an index $i$ such that $ f_k \leq i \leq b_k $.
-During the first loop: Every element in $x$ has an index $i$ such that $ front \leq i \leq back $, where $front=1$ and $back=n$. By Lemma 1, there exists an element with index $i$ such that \todo{$\alpha$}$\quant^+ = x_i $. \todo{consistent indexing $f_k$ vs $x[i]$}
+ Loop Invariant: Before and after every iteration $\xi^*$  will remain in the array $x^k$ at an index $i$ such that $ f_k \leq i \leq b_k $.
+Before any iteration is executed: Every element in $x$ has an index $i$ such that $ f_0 \leq i \leq b_0 $, where $f_0=1$ and $b_0=n$. 
 
 During the loop, there are 3 possible scenarios at each iteration:
 \begin{enumerate}
 
 \item[Case 1]: $\alpha_{k-1} < t_k$ 
- Assume there exists $j_k \geq l_k$ such that $x_{j_k}=\quant^+$. Then $\P{x < x_{j_k}} \geq t_k > \alpha_{k - 1}$, which means that $x_{j_k}$ is not feasible with \eqref{eq:var-definition}. Therefore, $\quant^+$ can not exist at any $x_{j_k}$ such that $j_k\geq l_k$, and the loop invariant is thus satisfied.
+ For all values $\xi^*$ at indices greater than $l_k, \sum_{i : \xi_i < \xi^*} w_i > W$ and thus can not be solutions to the weighted median problem. $f_k$ and $b_k$ are set accordingly to exclude these indices and thus the loop invariant holds.
 
 \item[Case 2]:  $t_k + e_k \leq \alpha_{k - 1}$
-
-  Assume there exists $j_k < g_k + 1$ such that $x_{j_k}]=\quant^+$. Then $\P{x < x[j_k]} < \P{x < x[g_k + 1]} \leq \alpha_{k - 1}$, which means that $x_{j_k}$ is not optimal with \eqref{eq:var-definition}. Therefore, $\quant^+$ can not exist at any $x_{j_k}$ such that $j_k < g_k + 1$, and the loop invariant is thus satisfied.
+For all values $\xi^*$ at indices less than or equal to $g_k, \sum_{i : \xi_i \leq \xi^*} w_i \leq W$ and thus can not be solutions to the weighted median problem. $f_k$ and $b_k$ are set accordingly to exclude these indices and thus the loop invariant holds.
+  .
 
 \item[Case 3]: $\alpha_{k - 1} \geq t_k$ and $\alpha_{k-1} < t_k + e_k $. 
- 
- Assume there exists $j_k $ such that $j_k < l_k $, and $x_{j_k}=\quant^+$. Then $\P{x < x_{j_k}} < \P{x < x_{l_k}} = t_k \leq \alpha$. Therefore, we arrive at a contradiction as $x_{j_k}$ be optimal by \eqref{eq:var-definition}. If we assume there exists $j_k $ such that $j_k > g_k $, and $x_{j_k}=\quant^+$, then $\P{x < x_{j_k}} > t_k + e_k > \alpha_{k - 1}$, which means that $x_{j_k}$ is not feasible with \eqref{eq:var-definition}.Therefore, $\quant^+$ can not exist at any $x_{j_k}$ such that $j_k\geq l_k$, and the loop invariant is thus satisfied. Since all elements in the range$(i_k, g_k)$ are equal, $\quant^+$ must be equal to this value. Thus we can set both $f_k$ and $b_k$ to $g_k$ and terminate the algorithm, while noting that the loop invariant remains satisfied as the quantile exists at this index. 
+We know for the value $\xi^*$ at indice $g_k$, $\sum_{i : \xi_i < \xi^*} w_i \leq W < \sum_{i : \xi_i \leq \xi^*} w_i$ holds true. Thus this is the solution to the weighted median problem, and accordingly $f_k$ and $b_k$ are both set to $g_k$. 
 
+
+At termination, $b_k=f_k$ will point to a single index. All other indices can not be a solution to the weighted median problem, hence this will be the optimal solution. Thus the loop invariant holds and the proof concludes.
+ 
 \end{enumerate}
+\end{proof}
+\begin{corollary}
+ \Cref{alg:quick-quantile} computes the $\quant_{\alpha}(\tilde{x})$.
+\end{corollary}
+\begin{proof}
+The proof directly follows from \cref{PROOFCORRECTNESS}.
 \end{proof}
 
 \begin{proposition}
 \label{TIMECOMPLEXITY}
-\Cref{alg:quick-quantile} runs in expected $O(n)$ time with random pivot selection.
+\Cref{alg:quick-quantile} runs in deterministic $O(n)$ time with median of medians pivot selection for $i_k$
 \end{proposition}
 \begin{proof}
-  We first note that at any given iteration, any steps after the partition scheme are bounded by the number of steps required to perform the partition scheme. Therefore, we can reduce the computation complexity analysis to a standard quickselect algorithm such as \cite{Yorgey19} as these algorithms also have computational complexity determined by the sum of all calls to the partition function. 
-
-  We note that standard quickselect algorithms have 2 partitions - one for elements less than the pivot and one for elements greater than or equal to the pivot \cite{Yorgey19}. The proof for time complexity relies on the fact that on average the array is split into pieces of $1/4$th or $3/4$th of the array at the previous iteration, where the array is defined by the indexes $f$ and $b$. In our case, there are 3 partitions, however if the partition that contains elements equal to the pivot is selected the algorithm immedieately terminates regardless of the size of partitions. If we assume that only the "less than" or "greater than" partition is selected, this provides a suitable upper bound on the expected complexity. In such a case, we can assume on average the array is split into at most $1/4$th and $3/4$th of the original array (less if there are multiple elements equal to the pivot). Thus we can then apply the argument from Theroem 3 \cite{Yorgey19} and show expected linear time complexity.
-\end{proof}
+  As in Theorem 17.3 of \cite{Korte2012}, we note at every iteration, the number of elements in the range $[f_k,b_k]$ is shrunk such that at least 3 elements are removed from at least half of the 5-elements blocks created during the median of median pivot selection step. The rest of proof then immediately follows from Theorem 17.3 in \cite{Korte2012}.
+\end{proof}.
 
 
 
@@ -308,7 +348,7 @@ During the loop, there are 3 possible scenarios at each iteration:
 \section{Computing \texorpdfstring{$\varphi$}{phi}-divergence Risk Measures in Linear Time} \label{sec:phi-divergence}
 
 
-In this section, we propose new linear-time algorithms for computing $\varphi$-divergence risk measures. We approach this challenge by representing comonotonic coherent risk measures as linear optimization over a polymatroid. As we show, for certain polymatroids the optimization can be solved in linear time compared to the $O(n \log  n)$ runtime of standard sort-based greedy algorithms. 
+In this section, we propose new linear-time algorithms for computing $\varphi$-divergence risk measures. We approach this challenge by solving a linear optimization problem over polymatroids . As we show, for certain polymatroids this optimization can be solved in linear time compared to the $O(n \log  n)$ runtime of standard sorting based greedy algorithms. 
 
 First, recall the standard definition of submodular functions and the related concept of polymatroid~\cite{Korte2012}.
 \begin{definition} \label{def:polymatroid}
@@ -321,9 +361,9 @@ A function $f \colon 2^{\mathcal{E}} \to \Real_+$ for a finite set finite set $\
 \]
 A \emph{polymatroid} $\mathcal{Q}_f$ for $f$ is a polytope defined as
   \[
-    \mathcal{Q}_f := \left\{ \bm{q} \in \Real_+^E  \mid   \bm{q}(\mathcal{U}) \leq f(\mathcal{U}), \, \forall \,  \mathcal{U} \subseteq \mathcal{E} \right\},
+    \mathcal{Q}_f := \left\{ q \in \Real_+^E  \mid   q(\mathcal{U}) \leq f(\mathcal{U}), \, \forall \,  \mathcal{U} \subseteq \mathcal{E} \right\},
   \]
-  where $q(\mathcal{U}) = \sum_{e \in \mathcal{U}} q(e)$ and $f(\mathcal{U})\rightarrow[0, 1]$. We note that $f(\mathcal{U})\rightarrow[0, 1]$ is not generally required for polymatroids, but is necessary in the context of probability distributions.
+  where $q(\mathcal{U}) = \sum_{e \in \mathcal{U}} q(e)$ and $f(\mathcal{U})\rightarrow[0, 1]$. We note that condition $f(\mathcal{U})\rightarrow[0, 1]$ is not necessary in general, but is needed in the context of probability distributions.
 \end{definition}
 
 % marek: we already say this in the preliminaries section
@@ -338,7 +378,7 @@ Polymatroids are important for our purpose because many risk measures can be for
 \begin{equation}\label{eq:comontonic-optimization}
    \rho[\tilde{x}] = \min_{\bm{q}\in \mathcal{Q}_c} \bm{q}\tr  \bm{x},
 \end{equation}
-where $\mathcal{Q}_c$ is the polymatroid in \cref{def:polymatroid} for $c := \rho(-\one_{\mathcal{A}})$ for each $\mathcal{A} \subseteq \Omega$. 
+where $\mathcal{Q}_c$ is the polymatroid in \cref{def:polymatroid} for $c(\mathcal{A}) := \rho(-\one_{\mathcal{A}})$ for each $\mathcal{A} \subseteq \Omega$. 
 \end{proposition}
 \begin{proof}
   The result is an immediate consequence of \cite[Corollary 4.89]{Follmer2016}
@@ -346,7 +386,7 @@ where $\mathcal{Q}_c$ is the polymatroid in \cref{def:polymatroid} for $c := \rh
 
 Conventional polymatroid optimization algorithms for risk measures and the closely related maximum weighted independent set (such as \cref{alg:greedy-polymatroid} in the appendix) solve the optimization problem in \cref{prop:coherent-polymatroid} using a greedy approach that requires sorting. We now show that for a special class of submodular functions $f$ as defined below, sorting is not necessary.
 
-\begin{assumption} \label{asm:submodular-function}
+\begin{definition} \label{asm:submodular-function}
   % marek: Not needed; implied by the construction below
   % For $\mathcal{N} = \left\{ 1, \dots , N \right\}$, the function $f\colon 2^{\mathcal{N}} \to \Real_+$ $f(\emptyset) = 0$, $f(N) = 1$,
 A \emph{submodular} function $f\colon 2^{\Omega} \to \Real_+$ is \emph{Element-Wise-Separable}~(EWS) if there exists $g\colon [0,1] \to  [0,1]$ such that $f(\mathcal{O}) = g(\P {\mathcal{O}}), \forall \mathcal{O} \subseteq \Omega$ and for some $c, m \text{ in }   \mathbb{R}_{+}$:
@@ -357,16 +397,17 @@ A \emph{submodular} function $f\colon 2^{\Omega} \to \Real_+$ is \emph{Element-W
     0 &\text{otherwise}.
     \end{cases}, \quad \forall x\in [0,1]
 \]
-\end{assumption}
+\end{definition}
 \begin{proposition}
 If $f\colon 2^{\Omega} \to  \Real_+$ is EWS then it is submodular.   
 \end{proposition}
 \begin{proof} 
-We first note Theorem~4.5.1 in~\cite{Bilmes18} (proof provided in Appendix) states that if $g(x)$ as defined in \cref{asm:submodular-function} is concave , $f$ is submodular. 
+We first note Theorem~4.5.1 in~\cite{Bilmes18} (proof provided in Appendix B.1) states that if $g(x)$ as defined in \cref{asm:submodular-function} is concave , $f$ is submodular. 
 
- We first prove concavity for g on the interval $(0, 1]$, where $0$ is not included. We note on the interval $x > 0$, there exists some $n < 1$ such that $g(n) = 1$.  The function $mx + c$  is twice differentiable such that the $g''(x) = 0$, which implies concavity. The constant function $1$ has a second derivate of $0$, also implying concavity. Since the minimum of two concave functions is also concave and $g(x)$ on this interval is the minimum of these two functions, it follows $g(x)$ must also be concave on this interval.
+ We first prove concavity for g on the interval $(0, 1]$, where $0$ is not included. On this interval, $g(x)$ is the minimum of two linear functions and is thus also concave.\cite{boyd2004convex}
+ %We note on the interval $x > 0$, there exists some $n < 1$ such that $g(n) = 1$.  The function $mx + c$  is twice differentiable such that the $g''(x) = 0$, which implies concavity. The constant function $1$ has a second derivate of $0$, also implying concavity. Since the minimum of two concave functions is also concave and $g(x)$ on this interval is the minimum of these two functions, it follows $g(x)$ must also be concave on this interval.
 
-We first prove concavity for g on the interval $[0, 1]$, where $0$ is not included. If we have value $a$ and $b$ such that $a = 0$ and thus $g(a) = 0$, we note that $(1 - z)g(a) + zg(b) = z*g(b) = min(z*c + z*m*b, z)$ where $z$ is some value between 0 and 1, will always be $\leq g(z*b + (1 - z)*a) = g(z * b) = min(c + z *m * b, 1)$. Thus, $g$ is concave on the interval $[0, b]$ where $b$ is some value $> 0$.
+We then prove concavity for g on the interval $[0, 1]$, where $0$ is included. If we have value $a$, $b$. and $z$ such that $a = 0$ and thus $g(a) = 0$, $b$ > 0, and $z$ in $(0, 1)$ we can shot that $(1 - z)g(a) + z\cdot g(b) = z\cdot g(b) = \min(z\cdot c + m\cdot z\cdot b, z)\leq \min(c + m \cdot z \cdot b, 1) =g(z * b) = g(z*b + (1 - z)*a)$. Thus, $g$ is concave on the interval $[0, b]$ for $b > 0$.
 
 Thus $g$ is concave, and the proof concludes.
 
@@ -380,29 +421,30 @@ Thus $g$ is concave, and the proof concludes.
 %If $f(Y) = 1$ and $f(Y \cup x) - f(Y) = 1$,  $f(Y \cup x) - f(Y) = 0 < c + m*p(x)$. 
 \end{proof}
 
-The statement in assumption \cref{asm:submodular-function} that $f(\mathcal{O}) = g(\P {\mathcal{O}}), \forall \mathcal{O} \subseteq \Omega$ is satisfied for any law-invariant comonotonic coherent risk measure \cite{Follmer2016}. 
 
-We now describe an algorithm for optimizing over polymatroids with this class of submodular function. We then show that both CVaR and TVaR can be computed by solving this optimization problem for a particular EWS function.
+
+We now describe an algorithm for optimizing over polymatroids with this class of submodular function. We then show that both CVaR and TVaR can be computed by solving this optimization problem for particular EWS functions.
 \begin{algorithm}
   \caption{Linear-time Algorithm for \mm{optimizing linear function on polymatroids} }\label{alg:maximum-weight-independent}
 
-  \Input{Finite $N = [1 \ldots n]$, $f\colon 2^N \to  \Real_+$ satisfying \cref{asm:submodular-function}, {vector $\bm{x}^0$, pmf $\bm{p}^0$}}
+  \Input{Finite $N = [1 \ldots n]$, $f\colon 2^N \to  \Real_+$ with $m$ and $c$ satisfying \cref{asm:submodular-function}, {vector $\bm{x}^0$, pmf $\bm{p}^0$}}
   \Output{$q_1, q_2, ... q_n$}
   
   \If{$c > 0$}
   {
-    Swap $x_1, p_1$ with $x_j, p_j$ where $j = min_j(x_j)$
+    Swap $x^0_1, p^0_1$ with $x^0_j, p^0_j$ where $j = \min_j(x_j)$
     
     $q_1 = f(p_1)$
     
     \If{$q_1 = 1$} {
-      \KwRet{$q_1 = 1, q_i = 0$ for $1 < i \leq n$}
+      \KwRet{$q_1 = 1, q_i = 0$ for  $\forall i = 2, ..., n$}
     }
    
   }
   $v = \operatorname{QuickQuantile}(p, x, \alpha = (1 - c)/m) $
   
-  Set $z$ to smallest  $i$ such that $x_i = v$
+  \[z \gets \min \{ i \mid x_i = v \}\]
+
   
   \If{$c > 0$}
   {
@@ -416,11 +458,11 @@ We now describe an algorithm for optimizing over polymatroids with this class of
   }
   $s = \sum_iq_i$
   
-  $q_{mid} \gets 1 - s$\;
+  $q_{z} \gets 1 - s$\;
   Let $q_i \gets 0 \text{ for } i > z$
 \end{algorithm}
 
-We now prove the optimality of the algorithm and it's expected linear time complexity. The proof of optimality is obtained by showing that every value we compute for $q$ is equivalent to what would be obtained by following the computational procedure defined in \cite[Remark 4.86]{Follmer2016}, which is proven to be optimal. The proof of the time complexity follows from the expected linear time complexity, and the fact that remaining operations can trivally be computed in linear time, and thus have no impact on the complexity.
+We now prove the optimality of the algorithm and it's expected linear time complexity. The proof of optimality is obtained by showing that every value we compute for $q$ is equivalent to what would be obtained by following the computational procedure defined in \cite[Remark 4.86]{Follmer2016}. The proof of the time complexity follows from the expected linear time complexity, and the fact that remaining operations can trivally be computed in linear time, and thus have no impact on the complexity.
 
 
 \begin{proposition}

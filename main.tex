@@ -462,23 +462,23 @@ We now describe an algorithm for optimizing over polymatroids with this class of
   Let $q_i \gets 0 \text{ for } i > z$
 \end{algorithm}
 
-We now prove the optimality of the algorithm and it's expected linear time complexity. The proof of optimality is obtained by showing that every value we compute for $q$ is equivalent to what would be obtained by following the computational procedure defined in \cite[Remark 4.86]{Follmer2016}. The proof of the time complexity follows from the expected linear time complexity, and the fact that remaining operations can trivally be computed in linear time, and thus have no impact on the complexity.
+We now prove the optimality of the algorithm and it's expected linear time complexity. The proof of optimality is obtained by showing that every value we compute for $q$ is equivalent to what would be obtained by following the computational procedure defined in \cite[Remark 4.86]{Follmer2016}. The proof of the time complexity follows from the expected linear time complexity, and the fact that remaining operations can be computed in linear time, and thus have no impact on the complexity.
 
 
 \begin{proposition}
-  \cref{alg:maximum-weight-independent} returns a optimal solution to optimization problem defined in \cref{comontonic optimization}. 
+  \cref{alg:maximum-weight-independent} returns a optimal solution to the optimization problem defined in \cref{comontonic optimization}. 
 \end{proposition}
 \begin{proof}
-The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal{O}_{i})$ \cite[Remark 4.86]{Follmer2016}, where $\mathcal{O}_i$ is the set of all elements that have values $\leq i$ .  For $f(\mathcal{O}_{i+1}) \leq 1$ and $f(\mathcal{O}_i) < 1$
+The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal{O}_{i})$ \cite[Remark 4.86]{Follmer2016}, where $\mathcal{O}_i$ is the set of all elements that have values $\leq i$ .  For $f(\mathcal{O}_{i+1}) < 1$ and $f(\mathcal{O}_i) < 1$
 
 
 \begin{align*}
-    f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_i) &= c  +\sum_{i \subset (1, i + 1)}p_{i} - c  +\sum_{i \subset (1, i)}m *p(i)\\
-    &= m *p(i + 1).
+    f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_i) &= c  +\sum_{j = 1}^{i + 1}p_{i} - (c  +\sum_{j = 1}^{i}p_{i})\\
+    &= m *p_{i+1}.
 \end{align*}
 
-For $i$ such that $f(\mathcal{O}_{i + 1}) = 1$ where $ (c  +\sum_{i \subset (1, i + 1)}m*p_{i}) > 1$ and $f(\mathcal{O}) \leq 1$, $f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_{i}) = 1 - c  +\sum_{i \subset (1, i )}m *p_i$. We know that such $i$ is the largest $i$ that satisfies
-$c  + m *\sum_{i \subset (1, i )}p_i \leq 1  $, which after algebraic manipulation results in the maximum $i$ such that $\sum_{i \subset (1, i )}p_i \leq (1 - c)/m $. We can thus see from \eqref{eq:var-definition} that VaR with $\alpha = (1 - c)/m$ will return the value at $x_{i + 1}$, which is calculated as $midval$ in the algorithm with $i + 1 = mid$. Thus, it follows that $q_{mid} = 1 - c  +\sum_{i \subset (1, i )}m *p_i$, where from the previous paragraph it follows that $ c  +\sum_{i \subset (1, i )}m *p_i = \sum_iq_i$. For all other $i > mid$, we note that $f(\mathcal{O}_{i}) - f(\mathcal{O}_{i - 1}) = 1 - 1 = 0$, and thus $q_i = 0$.
+For $i$ such that $f(\mathcal{O}_{i + 1}) = 1$ where $ (c  +\sum_{j = 1}^{i + 1}m*p_{j}) \geq 1$ and $f(\mathcal{O_i}) < 1$, $f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_{i}) = 1 - c  + \sum_{j = 1}^{i}m*p_{j}$. We know that such $i$ is the largest $i$ that satisfies
+$c  + \sum_{j = 1}^{i}m\cdot p_{j} \leq 1  $, which after algebraic manipulation results in the maximum $i$ such that $\sum_{j = 1}^{i}m*p_{j} < (1 - c)/m $. We can thus see from \eqref{eq:var-definition} that VaR with $\alpha = (1 - c)/m$ will return the value at $x_{i + 1}$, which is calculated as $v$ in the algorithm with $i + 1 = z$. Thus, it follows that $q_{z} = 1 - c  +\sum_{j = 1}^{i}m\cdot p_{j}$, where from the previous paragraph it follows that $ c  +\sum_{j = 1}^{i}m\cdot p_{j} = \sum_iq_i$. For all other $i > mid$, we note that $f(\mathcal{O}_{i}) - f(\mathcal{O}_{i - 1}) = 1 - 1 = 0$, and thus $q_i = 0$.
 \end{proof}
 
 \begin{proposition}

@@ -363,7 +363,7 @@ A \emph{polymatroid} $\mathcal{Q}_f$ for $f$ is a polytope defined as
   \[
     \mathcal{Q}_f := \left\{ q \in \Real_+^E  \mid   q(\mathcal{U}) \leq f(\mathcal{U}), \, \forall \,  \mathcal{U} \subseteq \mathcal{E} \right\},
   \]
-  where $q(\mathcal{U}) = \sum_{e \in \mathcal{U}} q(e)$ and $f(\mathcal{U})\rightarrow[0, 1]$. We note that condition $f(\mathcal{U})\rightarrow[0, 1]$ is not necessary in general, but is needed in the context of probability distributions.
+  where $q(\mathcal{U}) := \sum_{e \in \mathcal{U}} q(e)$ and $f(\mathcal{U})\rightarrow[0, 1]$. We note that condition $f(\mathcal{U})\rightarrow[0, 1]$ is not necessary in general, but is needed in the context of probability distributions.
 \end{definition}
 
 % marek: we already say this in the preliminaries section
@@ -398,6 +398,9 @@ A \emph{submodular} function $f\colon 2^{\Omega} \to \Real_+$ is \emph{Element-W
     \end{cases}, \quad \forall x\in [0,1]
 \]
 \end{definition}
+
+
+
 \begin{proposition}
 If $f\colon 2^{\Omega} \to  \Real_+$ is EWS then it is submodular.   
 \end{proposition}
@@ -477,8 +480,8 @@ The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal
     &= m *p_{i+1}.
 \end{align*}
 
-For $i$ such that $f(\mathcal{O}_{i + 1}) = 1$ where $ (c  +\sum_{j = 1}^{i + 1}m*p_{j}) \geq 1$ and $f(\mathcal{O_i}) < 1$, $f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_{i}) = 1 - c  + \sum_{j = 1}^{i}m*p_{j}$. It follows that such $i$ is the largest $i$ that satisfies
-$c  + \sum_{j = 1}^{i}m\cdot p_{j} < 1  $, which after algebraic manipulation results in the maximum $i$ such that $\sum_{j = 1}^{i}m*p_{j} < (1 - c)/m $. We can thus see from \eqref{eq:var-definition} that VaR with $\alpha = (1 - c)/m$ will return the value at $x_{i + 1}$, which is calculated as $v$ in the algorithm with $i + 1 = z$. Thus, it follows that $q_{z} = 1 - c  +\sum_{j = 1}^{i}m\cdot p_{j}$, where from the previous paragraph it follows that $ c  +\sum_{j = 1}^{i}m\cdot p_{j} = \sum_iq_i$. For all other $i > z$, we note that $f(\mathcal{O}_{i}) - f(\mathcal{O}_{i - 1}) = 1 - 1 = 0$, and thus $q_i = 0$.
+Consider the unique $i \in ???$ such that $f(\mathcal{O}_{i + 1}) = 1$ and $f(\mathcal{O}_i) < 1$. From the definition of $f$, $(c  +\sum_{j = 1}^{i + 1}m \cdot p_j) \geq 1$ and, therefore, $f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_{i}) = 1 - c  + \sum_{j = 1}^{i}m \cdot p_{j}$. It follows that such $i$ is the largest $i$ that satisfies
+$c  + \sum_{j = 1}^{i}m\cdot p_{j} < 1  $, which after algebraic manipulation results in the maximum $i$ such that $\sum_{j = 1}^{i} p_j < (1 - c)/m $. \mm{Why is $s$ than one here?} We can thus see from \eqref{eq:var-definition} that VaR with $\alpha = (1 - c)/m$ will return the value at $x_{i + 1}$, which is calculated as $v$ in the algorithm with $i + 1 = z$. Thus, it follows that $q_{z} = 1 - c  +\sum_{j = 1}^{i}m\cdot p_{j}$, where from the previous paragraph it follows that $ c  +\sum_{j = 1}^{i}m\cdot p_{j} = \sum_iq_i$. For all other $i > z$, we note that $f(\mathcal{O}_{i}) - f(\mathcal{O}_{i - 1}) = 1 - 1 = 0$, and thus $q_i = 0$.
 \end{proof}
 
 \begin{proposition}
@@ -535,14 +538,14 @@ We now prove the submodular function for TVaR and show that it also satisfies El
 \begin{proposition}
     
 
-  For $\mathcal{O} \subseteq \Omega$, define $f\colon 2^{\Omega} \to \Real_+$:
+  For $\mathcal{O} \subseteq \Omega$, define $f_{\beta}\colon 2^{\Omega} \to \Real_+$:
   \[
-    f(\mathcal{O}) = \min\left\{\P{\mathcal{O}} + \frac{\beta}{2}, 1\right\}.
-  \] if $\mathcal{O} \neq \emptyset$, and 0 otherwise, where $\beta$ represent the divergence constraint.
+    f_{\beta}(\mathcal{O}) = \min\left\{\P{\mathcal{O}} + \frac{\beta}{2}, 1\right\}.
+  \] if $\mathcal{O} \neq \emptyset$, and $0$ otherwise, where $\beta = \sqrt{ 2 \log 2 \cdot \log \frac{1}{\alpha}}$ for $\alpha\in (0,1)$ represent the divergence constraint.
   Then \[
-  \tvar{\alpha }{\tilde{x} } = \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}.
+  \tvar{\alpha }{\tilde{x} } = \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_{f_{\beta}}\right\}.
   \]
-  $f$ will also satisfy ElementWiseSeparabaility with $m = 1$ and $c = \beta/2$ 
+  $f_{\beta}$ also satisfy ElementWiseSeparability with $m = 1$ and $c = \beta/2$.
 \end{proposition}
 \begin{proof}
  

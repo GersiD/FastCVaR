@@ -509,7 +509,7 @@ Moreover $f$ also satisfies Element-Wise-Separabaility with $m = 1/\alpha$ and $
 \end{proposition}
 \begin{proof}
 
-Note: From here on, we will use $\setminus$ to denote the complement of a set.
+% Note: From here on, we will use $\setminus$ to denote the complement of a set.
 
 We first show that for any $q$ in $\mathcal{Q}_f$, $q(\mathcal{O})$ must be $\leq f(\mathcal{O})$. This directly follows from the constraint set in definition 2 of CVaR where we see that $q_i \leq ((1/\alpha)\cdot p_i)$ for any element $i$ in the distributions $p$ and $q$.
   
@@ -520,7 +520,7 @@ In this scenario, $q(\mathcal{O})$ = 1 since $\frac{1}{\alpha}\cdot \P{\mathcal{
 
 \item[Case 2]: $\P{\mathcal{O}} < \alpha$. 
 In this scenario, $q(\mathcal{O}) \leq \frac{1}{\alpha} \cdot  \P{\mathcal{O}} < 1$ . Then any given $\mathcal{O}$, we can construct $q(\mathcal{O}) = \frac{1}{\alpha} \cdot  \P{\mathcal{O}}$. 
-  This can be done by setting every element in $\mathcal{O}$ to $\frac{1}{\alpha} \cdot \P{\omega}$ for all $\omega$ in $\mathcal{O}$ and $\P{\omega} \cdot  d$ otherwise such that $\frac{1}{1 - \alpha} \cdot \P{\mathcal{O}} + d \cdot \P{\setminus \mathcal{O}} = 1$, where $\setminus \mathcal{O}$ contains all elements not in $\Omega$. Provided that $d \leq \frac{1}{\alpha}$, which is required for the constructed $Q$ to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{\alpha} \ge 1$. Since $\P{\mathcal{O}} + \P{\setminus \mathcal{O}} = 1$,  $d \leq 1$ in order for $\frac{1}{\alpha} \cdot  \P{\mathcal{O}} + d\cdot\P{\setminus \mathcal{O}} = 1$ to hold. Since $1 \leq \frac{1}{\alpha}$, this implies $d \le \frac{1}{\alpha}$.
+  This can be done by setting every element in $\mathcal{O}$ to $\frac{1}{\alpha} \cdot \P{\omega}$ for all $\omega$ in $\mathcal{O}$ and $\P{\omega} \cdot  d$ otherwise such that $\frac{1}{1 - \alpha} \cdot \P{\mathcal{O}} + d \cdot \P{\Omega\setminus \mathcal{O}} = 1$, where $\Omega\setminus \mathcal{O}$ contains all elements not in $\Omega$. Provided that $d \leq \frac{1}{\alpha}$, which is required for the constructed $Q$ to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{\alpha} \ge 1$. Since $\P{\mathcal{O}} + \P{\Omega\setminus \mathcal{O}} = 1$,  $d \leq 1$ in order for $\frac{1}{\alpha} \cdot  \P{\mathcal{O}} + d\cdot\P{\Omega\setminus \mathcal{O}} = 1$ to hold. Since $1 \leq \frac{1}{\alpha}$, this implies $d \le \frac{1}{\alpha}$.
   
   
   We have now shown that $q( \mathcal{O}) \leq f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$ and it is possible to construct $Q(\mathcal{O})$ such that $Q(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$. Thus by Remark 4.90 in \cite{Follmer2016}, $f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$

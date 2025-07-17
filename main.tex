@@ -443,7 +443,7 @@ We now describe an algorithm for optimizing over polymatroids with this class of
   }
   $v = \operatorname{QuickQuantile}(p, x, \alpha = (1 - c)/m) $
   
-  \[z \gets \min \{ i \mid x_i = v \}\]
+  $z \gets \min \{ i \mid x_i = v \}$
 
   
   \If{$c > 0$}
@@ -477,19 +477,19 @@ The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal
     &= m *p_{i+1}.
 \end{align*}
 
-For $i$ such that $f(\mathcal{O}_{i + 1}) = 1$ where $ (c  +\sum_{j = 1}^{i + 1}m*p_{j}) \geq 1$ and $f(\mathcal{O_i}) < 1$, $f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_{i}) = 1 - c  + \sum_{j = 1}^{i}m*p_{j}$. We know that such $i$ is the largest $i$ that satisfies
-$c  + \sum_{j = 1}^{i}m\cdot p_{j} \leq 1  $, which after algebraic manipulation results in the maximum $i$ such that $\sum_{j = 1}^{i}m*p_{j} < (1 - c)/m $. We can thus see from \eqref{eq:var-definition} that VaR with $\alpha = (1 - c)/m$ will return the value at $x_{i + 1}$, which is calculated as $v$ in the algorithm with $i + 1 = z$. Thus, it follows that $q_{z} = 1 - c  +\sum_{j = 1}^{i}m\cdot p_{j}$, where from the previous paragraph it follows that $ c  +\sum_{j = 1}^{i}m\cdot p_{j} = \sum_iq_i$. For all other $i > mid$, we note that $f(\mathcal{O}_{i}) - f(\mathcal{O}_{i - 1}) = 1 - 1 = 0$, and thus $q_i = 0$.
+For $i$ such that $f(\mathcal{O}_{i + 1}) = 1$ where $ (c  +\sum_{j = 1}^{i + 1}m*p_{j}) \geq 1$ and $f(\mathcal{O_i}) < 1$, $f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_{i}) = 1 - c  + \sum_{j = 1}^{i}m*p_{j}$. It follows that such $i$ is the largest $i$ that satisfies
+$c  + \sum_{j = 1}^{i}m\cdot p_{j} < 1  $, which after algebraic manipulation results in the maximum $i$ such that $\sum_{j = 1}^{i}m*p_{j} < (1 - c)/m $. We can thus see from \eqref{eq:var-definition} that VaR with $\alpha = (1 - c)/m$ will return the value at $x_{i + 1}$, which is calculated as $v$ in the algorithm with $i + 1 = z$. Thus, it follows that $q_{z} = 1 - c  +\sum_{j = 1}^{i}m\cdot p_{j}$, where from the previous paragraph it follows that $ c  +\sum_{j = 1}^{i}m\cdot p_{j} = \sum_iq_i$. For all other $i > z$, we note that $f(\mathcal{O}_{i}) - f(\mathcal{O}_{i - 1}) = 1 - 1 = 0$, and thus $q_i = 0$.
 \end{proof}
 
 \begin{proposition}
 \cref{alg:maximum-weight-independent} run with expected complexity $O(N)$.
 \end{proposition}
 \begin{proof}
-The quick quantile call runs in expected linear time complexity as shown in \cref{TIMECOMPLEXITY}. After the call to QuickQuantile, the noumber of operations is bounded by the number of elements in the input array and is thus linear time as well. 
+The quick quantile call runs in expected linear time complexity as shown in \cref{TIMECOMPLEXITY}. After the call to QuickQuantile, the number of operations is bounded by the number of elements in $x_0$ and $p_0$ and is thus linear time as well. 
 \end{proof}
 
 \subsection{CVaR}
-We now prove the submodular function for CVaR and show that it satisfies Element-Wise-Seperability as defined above. Therefore we can provably compute CVaR in expected linear time.
+We now prove that CVaR can be represented as a polymatroid with a submodular function that satisfies Element-Wise-Seperability as defined above. Therefore we can provably compute CVaR in expected linear time.
 
 \begin{proposition}
     
@@ -505,29 +505,31 @@ Then $f$ is submodular and the polymatroid $\mathcal{Q}_f$ satisfies
 \[
 \cvar{\alpha }{\tilde{x} } = \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}.
 \]
-$f$ will also satisfy Element-Wise-Separabaility with $m = 1/\alpha$ and $c = 0$ 
+Moreover $f$ also satisfies Element-Wise-Separabaility with $m = 1/\alpha$ and $c = 0$ 
 \end{proposition}
 \begin{proof}
 
-Note: From here on, we will use $'$ to denote the complement of a set.
+Note: From here on, we will use $\setminus$ to denote the complement of a set.
 
-We first show that we can for all $q$ such that $\cvar{\alpha }{\tilde{x} } \le  \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}$. This directly follows from the directly from definition 2 of CVaR where we see that $q \leq ((1/\alpha)\cdot p)$ 
-and all elements of $q$ must sum to 1.  
+We first show that for any $q$ in $\mathcal{Q}_f$, $q(\mathcal{O})$ must be $\leq f(\mathcal{O})$. This directly follows from the constraint set in definition 2 of CVaR where we see that $q_i \leq ((1/\alpha)\cdot p_i)$ for any element $i$ in the distributions $p$ and $q$.
+  
 
 We also show below, we can construct $q$ such that $q(\mathcal{O}) =\min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\} $ for any $\mathcal{O}$. 
-\item[Case 1]: $\P{\mathcal{O}} \geq \alpha$. In this scenario, $Q(\mathcal{O})$ = 1 since $\frac{1}{\alpha}\cdot \P{\mathcal{O}} > 1 $. Thus, every element in $\mathcal{O}$ should be scaled by $\frac{1}{\P{\mathcal{O}}}$ and all other elements should be set to 0 . Since  $\P{\mathcal{O}} \geq \alpha$, we can imply the reciprocal $\frac{1}{\P{\mathcal{O}}} \leq \frac{1}{\alpha}$ is also true given $\P{\mathcal{O}} \geq \alpha > 0$. 
+\item[Case 1]: $\P{\mathcal{O}} \geq \alpha$. 
+In this scenario, $q(\mathcal{O})$ = 1 since $\frac{1}{\alpha}\cdot \P{\mathcal{O}} > 1 $. Thus, every element in $\mathcal{O}$ should be scaled by $\frac{1}{\P{\mathcal{O}}}$ and all other elements should be set to 0 . Since  $\P{\mathcal{O}} \geq \alpha$, we can imply the reciprocal $\frac{1}{\P{\mathcal{O}}} \leq \frac{1}{\alpha}$ is also true given $\P{\mathcal{O}} \geq \alpha > 0$. 
 
-\item[Case 2]: $\P{\mathcal{O}} < \alpha$. In this scenario, $Q(\mathcal{O}) \leq \frac{1}{\alpha} \cdot  \P{\mathcal{O}} < 1$ . Then any given $\mathcal{O}$, we can construct $Q(\mathcal{O}) = \frac{1}{\alpha} \cdot  \P{\mathcal{O}}$. 
-  This can be done by setting every element in $\mathcal{O}$ to $\frac{1}{\alpha} \cdot \P{\omega}$ for all $\omega$ in $\Omega$ and $\P{\omega} \cdot  d$ otherwise such that $\frac{1}{1 - \alpha} \cdot \P{\Omega} + d \cdot \P{\Omega'} = 1$, where $\Omega'$ contains all elements not in $\Omega$. Provided that $d \leq \frac{1}{\alpha}$, which is required for the constructed $Q$ to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{\alpha} \ge 1$. Since $\P{\Omega} + \P{\Omega'} = 1$,  $d \leq 1$ in order for $\frac{1}{\alpha} \cdot  \P{\Omega} + d\cdot\P{\Omega'} = 1$ to hold. Since $1 \leq \frac{1}{\alpha}$, this implies $d \le \frac{1}{\alpha}$.
+\item[Case 2]: $\P{\mathcal{O}} < \alpha$. 
+In this scenario, $q(\mathcal{O}) \leq \frac{1}{\alpha} \cdot  \P{\mathcal{O}} < 1$ . Then any given $\mathcal{O}$, we can construct $q(\mathcal{O}) = \frac{1}{\alpha} \cdot  \P{\mathcal{O}}$. 
+  This can be done by setting every element in $\mathcal{O}$ to $\frac{1}{\alpha} \cdot \P{\omega}$ for all $\omega$ in $\mathcal{O}$ and $\P{\omega} \cdot  d$ otherwise such that $\frac{1}{1 - \alpha} \cdot \P{\mathcal{O}} + d \cdot \P{\setminus \mathcal{O}} = 1$, where $\setminus \mathcal{O}$ contains all elements not in $\Omega$. Provided that $d \leq \frac{1}{\alpha}$, which is required for the constructed $Q$ to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{\alpha} \ge 1$. Since $\P{\mathcal{O}} + \P{\setminus \mathcal{O}} = 1$,  $d \leq 1$ in order for $\frac{1}{\alpha} \cdot  \P{\mathcal{O}} + d\cdot\P{\setminus \mathcal{O}} = 1$ to hold. Since $1 \leq \frac{1}{\alpha}$, this implies $d \le \frac{1}{\alpha}$.
   
   
-  We have now shown that $Q(\Omega) \leq f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$ and it is possible to construct $Q(\Omega)$ such that $Q(\Omega) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$. Thus by Remark 4.90 in \cite{Follmer2016}, $f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$
+  We have now shown that $q( \mathcal{O}) \leq f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$ and it is possible to construct $Q(\mathcal{O})$ such that $Q(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$. Thus by Remark 4.90 in \cite{Follmer2016}, $f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$
 \end{proof}
 
 
 \subsection{TVaR}
-We remind the reader that in this work we define TVaR as the $\varphi$-divergence risk that uses the L1 norm divergence. This may not seem very interpretable, however we can show that we can set the divergence constraint, or $\beta$, such that it can be a provable lower bound for a given EVaR with $\alpha$ value between 0 and 1.
-From previous work , we know that $D(p\|q) \leq \frac{1}{2 \log(2)} \, \|p - q\|_1^2$ \cite{Iyengar2005}. Thus, by algebraic manipulation it can be seen that the coherent risk measure TVaR with the divergence constraint $\|p - q\|_1 \leq \sqrt{2 \log(2) *-\log(\alpha)}$  must be $\leq EVaR_\alpha[\tilde{x}]$. 
+We remind the reader that in this work we define TVaR as the $\varphi$-divergence risk that uses the $L_1$ norm divergence. This may not seem very interpretable, however we can show that we can set the divergence constraint, or $\beta$, such that it can be a provable lower bound for a given EVaR with $\alpha$ value between 0 and 1.
+From previous work , we know that the KL divergece is $\leq \frac{1}{2 \log(2)} \, \|p - q\|_1^2$ \cite{Iyengar2005}. Thus, by algebraic manipulation it can be seen that the coherent risk measure TVaR with the divergence constraint $\|p - q\|_1 \leq \sqrt{2 \log(2) *-\log(\alpha)}$  must be $\leq EVaR_\alpha[\tilde{x}]$. 
 
 We now prove the submodular function for TVaR and show that it also satisfies ElementWiseSeperability as defined above.
 \begin{proposition}

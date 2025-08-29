@@ -123,7 +123,7 @@ The lower and upper bounds of the quantile set are denoted by $\quant^+_{\alpha}
 \todo{can we remove this discussion?}
 \mm{Why phi needs to be non-negative? Where do we use the fact that the minimum is 0? Also, the Ahmadi-javid paper does not restate all the requirements from the OCE paper.}
 \palash{removed the non negative condition. All other conditions are directly from the ahmadi-javid EVAR paper - previously we are citing a different ahmad-javid paper which I fixed now }
-Second, we consider \emph{$\varphi$-divergence risk measures}~\cite{Ahmadi-Javid2012}. A divergence risk measure $\ER_{\varphi, \beta }\colon \mathbb{X} \to  \bar{\Real}$  is defined for a closed, convex function $\varphi\colon \bar{\Real} \to \bar{\Real}$ that satisfies $\varphi(1) = 0$ and $\beta\in \Real_+$ as
+Second, we consider \emph{$\varphi$-divergence risk measures}~\cite{Ahmadi-Javid2012}. A divergence risk measure $\ER_{\varphi, \beta }\colon \mathbb{X} \to  \bar{\Real}$  is defined for a closed, convex function $\varphi\colon \bar{\Real} \to \bar{\Real}$ that satisfies $\varphi(1) = 0$ and $\beta\in \Real_{\ge 0}$ as
 \begin{align} \label{eq:fdiv-primal}
   \ER_{\varphi, \beta}[ \tilde{x} ]
   &:= \inf \left\{\bm{q}\tr \bm{x} \mid \bm{q}\in \Delta_n, H_{\varphi}(\bm{q} \| \bm{p}) \le \beta
@@ -178,7 +178,7 @@ Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite
 We now define our version of the Weighted Median problem.
 \begin{definition} \label{WM_Problem}
     
-Let $n \in \mathbb{N}$, $\xi_1, \ldots, \xi_n \in \mathbb{R}$, $w_1, \ldots, w_n \in \mathbb{R}_{\geq 0}$, and $W \in \mathbb{R}$ with 
+Let $n \in \mathbb{N}$, $\xi_1, \ldots, \xi_n \in \Real$, $w_1, \ldots, w_n \in \Real_{\geq 0}$, and $W \in \Real$ with 
 \[
 0 < W < \sum_{i=1}^n w_i.
 \]
@@ -188,7 +188,7 @@ Then the $(w_1, \ldots, w_n \mid W)$-weighted median with respect to $(\xi_1, \l
 \label{WeightedMedianEquality}
 \end{equation}
 
-\textbf{Weighted Median Problem: } A natural number $n$, numbers $\ell_1, \ldots, \ell_n \in \mathbb{R}$, $w_1, \ldots, w_n \in \mathbb{R}^{\mathbb{C}}$,  
+\textbf{Weighted Median Problem: } A natural number $n$, numbers $\ell_1, \ldots, \ell_n \in \Real$, $w_1, \ldots, w_n \in \Real^{\mathbb{C}}$,  
 and a number $W$ with $0 \leq W < \sum_{i=1}^{n} w_i$.
 
 
@@ -200,7 +200,7 @@ We note that our definition differs very slightly from the popular definition in
 
 We now show that we can cast VaR as an instance of the Weighted Median problem
 \begin{lemma}
-The weighted median problem defined in \cref{WM_Problem} is equivalent to solving VaR when $W = \alpha$ for a discrete random variable $\tilde{x}\colon \Omega \to \Real$ with finite $\Omega$ such that the outcomes of the random variable $\xi_1, \ldots, \xi_n \in \mathbb{R}$ and the weights $w_1, \ldots, w_n \in \mathbb{R}^{\mathbb{C}}$ correspond to the probabilities of each outcome .
+The weighted median problem defined in \cref{WM_Problem} is equivalent to solving VaR when $W = \alpha$ for a discrete random variable $\tilde{x}\colon \Omega \to \Real$ with finite $\Omega$ such that the outcomes of the random variable $\xi_1, \ldots, \xi_n \in \Real$ and the weights $w_1, \ldots, w_n \in \Real^{\mathbb{C}}$ correspond to the probabilities of each outcome .
 \end{lemma}
 \begin{proof}
 Let $\xi^*$ be the optimal solution to the weighted median problem and let $W = \alpha$. Then $\P{\tilde{x} < \xi^*} \leq \alpha < \P{\tilde{x} \leq \xi^*}$. Thus $\xi^*$ is optimal for \eqref{eq:var-definition} among all outputs of $\tilde{x}$. Since the optimal value for VaR must be an outcome of $\tilde{x}$ by \cref{lem:quantile-in-finite-omega}, $\xi^*$ then must equal $\quant_{\alpha}[\tilde{x}]$ and the proof concludes.
@@ -352,8 +352,7 @@ In this section, we propose new linear-time algorithms for computing $\varphi$-d
 
 First, recall the standard definition of submodular functions and the related concept of polymatroid~\cite{Korte2012}.
 \begin{definition} \label{def:polymatroid}
-A function $f \colon 2^{\mathcal{E}} \to \Real_+$ for a finite set finite set $\mathcal{E} = \left\{ 1, \dots , E \right\}$ is \emph{submodular} if
-
+A function $f \colon 2^{\mathcal{E}} \to \Real_{\ge 0}$ for a finite set $\mathcal{E} = \left\{ 1, \dots , E \right\}$ and $E\in \Nats$ is \emph{submodular} if
 \[ 
   f(\mathcal{A}) + f(\mathcal{B}) \geq f(\mathcal{A} \cup \mathcal{\mathcal{B}}) + f(\mathcal{A} \cap \mathcal{B}),
   \quad
@@ -361,9 +360,10 @@ A function $f \colon 2^{\mathcal{E}} \to \Real_+$ for a finite set finite set $\
 \]
 A \emph{polymatroid} $\mathcal{Q}_f$ for $f$ is a polytope defined as
   \[
-    \mathcal{Q}_f := \left\{ q \in \Real_+^E  \mid   q(\mathcal{U}) \leq f(\mathcal{U}), \, \forall \,  \mathcal{U} \subseteq \mathcal{E} \right\},
+    \mathcal{Q}_f := \left\{ q \in \Real_{\ge 0}^E  \mid   q(\mathcal{U}) \leq f(\mathcal{U}), \, \forall \,  \mathcal{U} \subseteq \mathcal{E} \right\},
   \]
-  where $q(\mathcal{U}) := \sum_{e \in \mathcal{U}} q(e)$ and $f(\mathcal{U})\rightarrow[0, 1]$. We note that condition $f(\mathcal{U})\rightarrow[0, 1]$ is not necessary in general, but is needed in the context of probability distributions.
+  where $q(\mathcal{U}) := \sum_{e \in \mathcal{U}} q(e)$. %and $f(\mathcal{U})\rightarrow[0, 1]$. We note that condition $f(\mathcal{U})\rightarrow[0, 1]$ is not necessary in general, but is needed in the context of probability distributions.
+  \mm{Do we need to assume that $f(\emptyset) = 0$?}
 \end{definition}
 
 % marek: we already say this in the preliminaries section
@@ -388,8 +388,8 @@ Conventional polymatroid optimization algorithms for risk measures and the close
 
 \begin{definition} \label{asm:submodular-function}
   % marek: Not needed; implied by the construction below
-  % For $\mathcal{N} = \left\{ 1, \dots , N \right\}$, the function $f\colon 2^{\mathcal{N}} \to \Real_+$ $f(\emptyset) = 0$, $f(N) = 1$,
-A \emph{submodular} function $f\colon 2^{\Omega} \to \Real_+$ is \emph{Element-Wise-Separable}~(EWS) if there exists $g\colon [0,1] \to  [0,1]$ such that $f(\mathcal{O}) = g(\P {\mathcal{O}}), \forall \mathcal{O} \subseteq \Omega$ and for some $c, m \text{ in }   \mathbb{R}_{+}$:
+  % For $\mathcal{N} = \left\{ 1, \dots , N \right\}$, the function $f\colon 2^{\mathcal{N}} \to \Real_{\ge 0}$ $f(\emptyset) = 0$, $f(N) = 1$,
+A \emph{submodular} function $f\colon 2^{\Omega} \to \Real_{\ge 0}$ is \emph{Element-Wise-Separable}~(EWS) if there exists $g\colon [0,1] \to  [0,1]$ such that $f(\mathcal{O}) = g(\P {\mathcal{O}}), \forall \mathcal{O} \subseteq \Omega$ and for some $c \in \Real_{\ge 0}$ and $m\in \Real_{>0}$:
 \[
     g(x) =
     \begin{cases}        
@@ -397,12 +397,13 @@ A \emph{submodular} function $f\colon 2^{\Omega} \to \Real_+$ is \emph{Element-W
     0 &\text{otherwise}.
     \end{cases}, \quad \forall x\in [0,1]
 \]
+The values $m$ and $c$ are such that $c + m \ge 1$ and, therefore, $g(1) = 1$.
 \end{definition}
 
 
 
 \begin{proposition}
-If $f\colon 2^{\Omega} \to  \Real_+$ is EWS then it is submodular.   
+If $f\colon 2^{\Omega} \to  \Real_{\ge 0}$ is EWS then it is submodular.   
 \end{proposition}
 \begin{proof} 
 We first note Theorem~4.5.1 in~\cite{Bilmes18} (proof provided in Appendix B.1) states that if $g(x)$ as defined in \cref{asm:submodular-function} is concave , $f$ is submodular. 
@@ -431,49 +432,43 @@ We now describe an algorithm for optimizing over polymatroids with this class of
 \begin{algorithm}
   \caption{Linear-time Algorithm for optimizing linear function on polymatroids} \label{alg:maximum-weight-independent}
 
-  \Input{Finite $N = [1 \ldots n]$, $f\colon 2^N \to  \Real_+$ with $m$ and $c$ satisfying \cref{asm:submodular-function}, {vector $\bm{x}^0$, pmf $\bm{p}^0$}}
-  \Output{$q_1, q_2, ... q_n$}
-  
-  \If{$c > 0$}
-  {
-    Swap $x^0_1, p^0_1$ with $x^0_j, p^0_j$ where $j = \min_j(x_j)$
-    
-    $q_1 = f(p_1)$
-    
-    \If{$q_1 = 1$} {
-      \KwRet{$q_1 = 1, q_i = 0$ for  $\forall i = 2, ..., n$}
-    }
-   
-  }
-  $v = \operatorname{QVaR}(p, x, \alpha = (1 - c)/m) $
-  
-  $z \gets \min \{ i \mid x_i = v \}$
+  \Input{EWS function $f\colon 2^{\left\{ 1, \dots , N \right\}} \to  \Real_{\ge 0}$ satisfying \cref{asm:submodular-function} with some $m$ and $c$, {vector $\bm{x}^0$, pmf $\bm{p}^0$}}
+  \Output{$q \in \Real^n$}
 
+  $v \gets \operatorname{QVaR}(p, x, \alpha = (1 - c)/m) $
   
-  \If{$c > 0$}
-  {
-    $q_i \gets m \cdot p_i$ for $1 < i < z$;
-    
-  }
-  \Else
-  {
-    $q_i \gets m \cdot p_i$ for $i < z$
+  $\mathcal{Z} \gets \{ i \mid x_i = v \}$ \;
+  % $j \in \arg\min_{j\in 1, \dots , N}  x_j$ \;
+  % \If{$c > 0$}
+  % {
+  %   $q_i \gets m \cdot p_i$ for $1 < i < z$;
+  % }
+  % \Else
+  % {
+  %   $q_i \gets m \cdot p_i$ for $i < z$
+  % }
+  % $s_0 \gets \sum_iq_i$
+  % $k \gets 0$
   
-  }
-  $s_0 \gets \sum_iq_i$
-  $k \gets 0$
-  
-  \While
-  {
-  $x_i = v \text{ and } s_k < 1$
-  }
-  {$q_{z + k} \gets \min(m\cdot p_{z + k}, 1 - s_k)$\;
-  $s_{k + 1} \gets s_k + q_{z + k}$
-  $k \gets k + 1$\;
-  
-  }
- 
-  $q_i \gets 0 \text{ for } i > z + k$
+  % \While
+  % {
+  % $x_i = v \text{ and } s_k < 1$
+  % }
+  % {$q_{z + k} \gets \min(m\cdot p_{z + k}, 1 - s_k)$\;
+  % $s_{k + 1} \gets s_k + q_{z + k}$
+  % $k \gets k + 1$\;
+  % }
+  % $q_i \gets 0 \text{ for } i > z + k$
+  $ y = \alpha - \sum_{k : x_k  v} m\cdot p_i$ \mm{distribute the shortfall} \;
+  \[
+    q_i =
+    \begin{cases}
+      m\cdot pi + c &\text{if} i = j \\
+      y  &\text{if} i = z \\
+      m \cdot p_i &\text{if} x_i < v \wedge i \ne j \\
+      0 &\text{otherwise}  \\
+    \end{cases}
+  \]
  \end{algorithm}
 
 We now prove the optimality of the algorithm and it's expected linear time complexity. The proof of optimality is obtained by showing that every value we compute for $q$ is equivalent to what would be obtained by following the computational procedure defined in \cite[Remark 4.86]{Follmer2016}. The proof of the time complexity follows from the expected linear time complexity, and the fact that remaining operations can be computed in linear time, and thus have no impact on the complexity.
@@ -491,8 +486,7 @@ The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal
     &= m \cdot p_{i+1}.
 \end{align*}
 
-We assume that no elements have a probability of 0. Thus, $f(\mathcal{O}_i)$ has a unique value for every $i$. Consider the unique $i$ such that $f(\mathcal{O}_{i + 1}) = 1$ and $f(\mathcal{O}_i) < 1$. From the definition of $f$, $(c  +\sum_{j = 1}^{i + 1}m \cdot p_j) \geq 1$ and, therefore, $f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_{i}) = 1 - c  + \sum_{j = 1}^{i}m \cdot p_{j}$. Crucially, if  $(c  +\sum_{j = 1}^{i + 1}m \cdot p_j) = 1$, then $f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_{i}) = m *p_{i+1}$.
-
+We assume that no elements have a probability of 0. Thus, $f(\mathcal{O}_i)$ has a unique value for every $i$. Consider the unique $i$ such that $f(\mathcal{O}_{i + 1}) = 1$ and $f(\mathcal{O}_i) < 1$. From the definition of $f$, $(c  +\sum_{j = 1}^{i + 1}m \cdot p_j) \geq 1$ and, therefore, $f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_{i}) = 1 - c  + \sum_{j = 1}^{i}m \cdot p_{j}$. Crucially, if  $(c  +\sum_{j = 1}^{i + 1}m \cdot p_j) = 1$, then $f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_{i}) = m *p_{i+1}$
 We know from \eqref{eq:var-definition} that $v$ is the largest $\tau$ such that $P[x < \tau] \leq \frac{1 - c}{m}$. Thus, for any $i$ less than $z$, $(c  +\sum_{j = 1}^{i}m \cdot p_j) \leq 1$
 and thus $q_i$ must equal $m*p_i$.
 
@@ -516,7 +510,7 @@ We now prove that CVaR can be represented as a polymatroid with a submodular fun
 \begin{proposition}
     
 
-Let $f\colon 2^{\Omega} \to \Real_+$ be defined as
+Let $f\colon 2^{\Omega} \to \Real_{\ge 0}$ be defined as
 \[
   f(\mathcal{O})
   :=
@@ -559,7 +553,7 @@ We now prove the submodular function for TVaR and show that it also satisfies El
 \begin{proposition}
     
 
-For $\mathcal{O} \subseteq \Omega$, define $f_{\beta}\colon 2^{\Omega} \to \Real_+$:
+For $\mathcal{O} \subseteq \Omega$, define $f_{\beta}\colon 2^{\Omega} \to \Real_{\ge 0}$:
   \[
     f_{\beta}(\mathcal{O}) = \min\left\{\P{\mathcal{O}} + \frac{\beta}{2}, 1\right\}.
   \]
@@ -815,12 +809,12 @@ Let $v$ be an input to \cref{alg:partition} and consider the following invariant
 \begin{lemma}
 This lemma is Theorem 4.5.1 from \cite{Bilmes18}: Given a ground set $V$. The following two are equivalent:
 \begin{enumerate}
-    \item For all modular functions $m \colon  2^V \rightarrow \mathbb{R}_+$, the function $f\colon  2^V \rightarrow \mathbb{R}$ defined as
+    \item For all modular functions $m \colon  2^V \rightarrow \Real_{\ge 0}$, the function $f\colon  2^V \rightarrow \Real$ defined as
     \[
     f(A) = g(m(A))
     \]
     is submodular.
-    \item $g \colon  \mathbb{R}_+ \rightarrow \mathbb{R}$ is concave.
+    \item $g \colon  \Real_{\ge 0} \rightarrow \Real$ is concave.
 \end{enumerate}
 
 \end{lemma}
@@ -1009,10 +1003,10 @@ Julia garbage collector, even when running synchronously.
 \begin{algorithm}
     \caption{Greedy algorithm from Submodular Functions, Polymatroids, TDI}\label{alg:greedy-polymatroid}
 
-    \Input{Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$}
-    \Output{$\max \{f(S) : S\subseteq N\}$}
+    \Input{Finite $N = [1 \ldots n]$, non-decreasing submodular function $f \colon  2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$}
+    \Output{$\min \{f(S) : S\subseteq N\}$}
 
-    Order the elements such that $c_1 \geq c_2 \cdots \geq c_n$\;
+    Assume that $c_1 \le c_2 \cdots \le c_n$\;
     Let $S_i := \{1, \dots, i\}$ and $S_0 := \emptyset$\;
     Let $x_i :=  \begin{cases}f(S_i) - f(S_{i-1}) & \text{for } i = 1,\dots, r \\ 0 & \text{otherwise} \end{cases}$\;
 \end{algorithm}

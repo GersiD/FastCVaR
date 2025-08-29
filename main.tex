@@ -406,11 +406,12 @@ If $f\colon 2^{\Omega} \to  \Real_+$ is EWS then it is submodular.
 \end{proposition}
 \begin{proof} 
 We first note Theorem~4.5.1 in~\cite{Bilmes18} (proof provided in Appendix B.1) states that if $g(x)$ as defined in \cref{asm:submodular-function} is concave , $f$ is submodular. 
+It remains to prove that $g$ is concave.
 
  We first prove concavity for g on the interval $(0, 1]$, where $0$ is not included. On this interval, $g(x)$ is the minimum of two linear functions and is thus also concave.\cite{boyd2004convex}
  %We note on the interval $x > 0$, there exists some $n < 1$ such that $g(n) = 1$.  The function $mx + c$  is twice differentiable such that the $g''(x) = 0$, which implies concavity. The constant function $1$ has a second derivate of $0$, also implying concavity. Since the minimum of two concave functions is also concave and $g(x)$ on this interval is the minimum of these two functions, it follows $g(x)$ must also be concave on this interval.
 
-We then prove concavity for g on the interval $[0, 1]$, where $0$ is included. If we have value $a$, $b$. and $z$ such that $a = 0$ and thus $g(a) = 0$, $b$ > 0, and $z$ in $(0, 1)$ we can shot that $(1 - z)g(a) + z\cdot g(b) = z\cdot g(b) = \min(z\cdot c + m\cdot z\cdot b, z)\leq \min(c + m \cdot z \cdot b, 1) =g(z * b) = g(z*b + (1 - z)*a)$. Thus, $g$ is concave on the interval $[0, b]$ for $b > 0$.
+We then prove concavity for g on the interval $[0, 1]$, where $0$ is included. If we have value $a$, $b$. and $z$ such that $a = 0$ and thus $g(a) = 0$, $b > 0$, and $z$ in $(0, 1)$ we can shot that $(1 - z)g(a) + z\cdot g(b) = z\cdot g(b) = \min(z\cdot c + m\cdot z\cdot b, z)\leq \min(c + m \cdot z \cdot b, 1) =g(z * b) = g(z*b + (1 - z)*a)$. Thus, $g$ is concave on the interval $[0, b]$ for $b > 0$.
 
 Thus $g$ is concave, and the proof concludes.
 
@@ -428,7 +429,7 @@ Thus $g$ is concave, and the proof concludes.
 
 We now describe an algorithm for optimizing over polymatroids with this class of submodular function. We then show that both CVaR and TVaR can be computed by solving this optimization problem for particular EWS functions.
 \begin{algorithm}
-  \caption{Linear-time Algorithm for \mm{optimizing linear function on polymatroids} }\label{alg:maximum-weight-independent}
+  \caption{Linear-time Algorithm for optimizing linear function on polymatroids} \label{alg:maximum-weight-independent}
 
   \Input{Finite $N = [1 \ldots n]$, $f\colon 2^N \to  \Real_+$ with $m$ and $c$ satisfying \cref{asm:submodular-function}, {vector $\bm{x}^0$, pmf $\bm{p}^0$}}
   \Output{$q_1, q_2, ... q_n$}
@@ -444,7 +445,7 @@ We now describe an algorithm for optimizing over polymatroids with this class of
     }
    
   }
-  $v = \operatorname{QuickQuantile}(p, x, \alpha = (1 - c)/m) $
+  $v = \operatorname{QVaR}(p, x, \alpha = (1 - c)/m) $
   
   $z \gets \min \{ i \mid x_i = v \}$
 
@@ -459,11 +460,21 @@ We now describe an algorithm for optimizing over polymatroids with this class of
     $q_i \gets m \cdot p_i$ for $i < z$
   
   }
-  $s = \sum_iq_i$
+  $s_0 \gets \sum_iq_i$
+  $k \gets 0$
   
-  $q_{z} \gets 1 - s$\;
-  Let $q_i \gets 0 \text{ for } i > z$
-\end{algorithm}
+  \While
+  {
+  $x_i = v \text{ and } s_k < 1$
+  }
+  {$q_{z + k} \gets \min(m\cdot p_{z + k}, 1 - s_k)$\;
+  $s_{k + 1} \gets s_k + q_{z + k}$
+  $k \gets k + 1$\;
+  
+  }
+ 
+  $q_i \gets 0 \text{ for } i > z + k$
+ \end{algorithm}
 
 We now prove the optimality of the algorithm and it's expected linear time complexity. The proof of optimality is obtained by showing that every value we compute for $q$ is equivalent to what would be obtained by following the computational procedure defined in \cite[Remark 4.86]{Follmer2016}. The proof of the time complexity follows from the expected linear time complexity, and the fact that remaining operations can be computed in linear time, and thus have no impact on the complexity.
 
@@ -472,7 +483,7 @@ We now prove the optimality of the algorithm and it's expected linear time compl
   \cref{alg:maximum-weight-independent} returns a optimal solution to the optimization problem defined in \cref{comontonic optimization}. 
 \end{proposition}
 \begin{proof}
-The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal{O}_{i})$ \cite[Remark 4.86]{Follmer2016}, where $\mathcal{O}_i$ is the set of all elements that have values $\leq i$ .  For $f(\mathcal{O}_{i+1}) < 1$ and $f(\mathcal{O}_i) < 1$
+The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal{O}_{i})$ \cite[Remark 4.86]{Follmer2016}, where $\mathcal{O}_i$ is the set of all elements that have only has values less than or equal to the i-th largest element .  For $f(\mathcal{O}_{i+1}) < 1$ and $f(\mathcal{O}_i) < 1$
 
 
 \begin{align*}
@@ -480,15 +491,23 @@ The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal
     &= m \cdot p_{i+1}.
 \end{align*}
 
-Consider the unique $i \in ???$ such that $f(\mathcal{O}_{i + 1}) = 1$ and $f(\mathcal{O}_i) < 1$. From the definition of $f$, $(c  +\sum_{j = 1}^{i + 1}m \cdot p_j) \geq 1$ and, therefore, $f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_{i}) = 1 - c  + \sum_{j = 1}^{i}m \cdot p_{j}$. It follows that such $i$ is the largest $i$ that satisfies
-$c  + \sum_{j = 1}^{i}m\cdot p_{j} < 1  $, which after algebraic manipulation results in the maximum $i$ such that $\sum_{j = 1}^{i} p_j < (1 - c)/m $. \mm{Why is $s$ than one here?} We can thus see from \eqref{eq:var-definition} that VaR with $\alpha = (1 - c)/m$ will return the value at $x_{i + 1}$, which is calculated as $v$ in the algorithm with $i + 1 = z$. Thus, it follows that $q_{z} = 1 - c  +\sum_{j = 1}^{i}m\cdot p_{j}$, where from the previous paragraph it follows that $ c  +\sum_{j = 1}^{i}m\cdot p_{j} = \sum_iq_i$. For all other $i > z$, we note that $f(\mathcal{O}_{i}) - f(\mathcal{O}_{i - 1}) = 1 - 1 = 0$, and thus $q_i = 0$.
+We assume that no elements have a probability of 0. Thus, $f(\mathcal{O}_i)$ has a unique value for every $i$. Consider the unique $i$ such that $f(\mathcal{O}_{i + 1}) = 1$ and $f(\mathcal{O}_i) < 1$. From the definition of $f$, $(c  +\sum_{j = 1}^{i + 1}m \cdot p_j) \geq 1$ and, therefore, $f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_{i}) = 1 - c  + \sum_{j = 1}^{i}m \cdot p_{j}$. Crucially, if  $(c  +\sum_{j = 1}^{i + 1}m \cdot p_j) = 1$, then $f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_{i}) = m *p_{i+1}$.
+
+We know from \eqref{eq:var-definition} that $v$ is the largest $\tau$ such that $P[x < \tau] \leq \frac{1 - c}{m}$. Thus, for any $i$ less than $z$, $(c  +\sum_{j = 1}^{i}m \cdot p_j) \leq 1$
+and thus $q_i$ must equal $m*p_i$.
+
+For $i \geq z_0$ such that $x_i = v$, we know that $s_k$ equals $(c  +\sum_{j = 1}^{i - 1}m \cdot p_j) = f(\mathcal{O}_{i - 1}) when s^k < 1$. If $s_k < 1$, it then follows $q_i =  f(\mathcal{O}_{i}) -f(\mathcal{O}_{i - 1})$ = $\min(s_k + m\cdot p_i, 1) - s_k = \min(m\cdot p_i, 1 - s_k )$. If $s_k \geq 1$, then $q_i =  f(\mathcal{O}_{i}) -f(\mathcal{O}_{i - 1}) = 0$.
+
+
+
+For all other $i > z$, we note that $f(\mathcal{O}_{i}) - f(\mathcal{O}_{i - 1}) = 1 - 1 = 0$, and thus $q_i = 0$.
 \end{proof}
 
 \begin{proposition}
 \cref{alg:maximum-weight-independent} run with expected complexity $O(N)$.
 \end{proposition}
 \begin{proof}
-The quick quantile call runs in expected linear time complexity as shown in \cref{TIMECOMPLEXITY}. After the call to QuickQuantile, the number of operations is bounded by the number of elements in $x_0$ and $p_0$ and is thus linear time as well. 
+The quick quantile call runs in expected linear time complexity as shown in \cref{TIMECOMPLEXITY}. After the call to QuickQuantile, the number of operations is bounded by the number of elements in $x_0$ and $p_0$ and thus is linear time as well. 
 \end{proof}
 
 \subsection{CVaR}
@@ -514,16 +533,18 @@ Moreover $f$ also satisfies Element-Wise-Separabaility with $m = 1/\alpha$ and $
 
 % Note: From here on, we will use $\setminus$ to denote the complement of a set.
 
-We first show that for any $q$ in $\mathcal{Q}_f$, $q(\mathcal{O})$ must be $\leq f(\mathcal{O})$. This directly follows from the constraint set in definition 2 of CVaR where we see that $q_i \leq ((1/\alpha)\cdot p_i)$ for any element $i$ in the distributions $p$ and $q$.
+We first show that for any $q$ in $\mathcal{Q}_f$, $q(\mathcal{O})$ $\leq f(\mathcal{O})$. This directly follows from the constraint set in definition 2 of CVaR where we see that $q_i \leq ((1/\alpha)\cdot p_i)$ for any element $i$ in the distributions $p$ and $q$.
   
 
 We also show below, we can construct $q$ such that $q(\mathcal{O}) =\min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\} $ for any $\mathcal{O}$. 
 \item[Case 1]: $\P{\mathcal{O}} \geq \alpha$. 
-In this scenario, $q(\mathcal{O})$ = 1 since $\frac{1}{\alpha}\cdot \P{\mathcal{O}} > 1 $. Thus, every element in $\mathcal{O}$ should be scaled by $\frac{1}{\P{\mathcal{O}}}$ and all other elements should be set to 0 . Since  $\P{\mathcal{O}} \geq \alpha$, we can imply the reciprocal $\frac{1}{\P{\mathcal{O}}} \leq \frac{1}{\alpha}$ is also true given $\P{\mathcal{O}} \geq \alpha > 0$. 
+In this scenario, we aim to construct $q(\mathcal{O})$ = 1 since $\frac{1}{\alpha}\cdot \P{\mathcal{O}} \geq 1 $. Thus, every $q_i$ such that $i$ represents an element in $\mathcal{O}$ should be set to $p_i \cdot \frac{1}{\P{\mathcal{O}}}$ and all other $q_i$ should be set to 0 . Since  $\P{\mathcal{O}} \geq \alpha$, we can imply the reciprocal $\frac{1}{\P{\mathcal{O}}} \leq \frac{1}{\alpha}$ is also true given $\P{\mathcal{O}} \geq \alpha > 0$. Therefore, every $q_i$ is feasible given definition 2.
 
 \item[Case 2]: $\P{\mathcal{O}} < \alpha$. 
-In this scenario, $q(\mathcal{O}) \leq \frac{1}{\alpha} \cdot  \P{\mathcal{O}} < 1$ . Then any given $\mathcal{O}$, we can construct $q(\mathcal{O}) = \frac{1}{\alpha} \cdot  \P{\mathcal{O}}$. 
-  This can be done by setting every element in $\mathcal{O}$ to $\frac{1}{\alpha} \cdot \P{\omega}$ for all $\omega$ in $\mathcal{O}$ and $\P{\omega} \cdot  d$ otherwise such that $\frac{1}{1 - \alpha} \cdot \P{\mathcal{O}} + d \cdot \P{\Omega\setminus \mathcal{O}} = 1$, where $\Omega\setminus \mathcal{O}$ contains all elements not in $\Omega$. Provided that $d \leq \frac{1}{\alpha}$, which is required for the constructed $Q$ to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{\alpha} \ge 1$. Since $\P{\mathcal{O}} + \P{\Omega\setminus \mathcal{O}} = 1$,  $d \leq 1$ in order for $\frac{1}{\alpha} \cdot  \P{\mathcal{O}} + d\cdot\P{\Omega\setminus \mathcal{O}} = 1$ to hold. Since $1 \leq \frac{1}{\alpha}$, this implies $d \le \frac{1}{\alpha}$.
+In this scenario, since $\frac{1}{\alpha} \cdot  \P{\mathcal{O}} < 1$ . Then we construct $q$ such that $q(\mathcal{O}) = \frac{1}{\alpha} \cdot  \P{\mathcal{O}}$. 
+  Thus, every $q_i$ such that $i$ represents an element in $\mathcal{O}$ should be set to $\frac{1}{\alpha} \cdot p_i$ and $p_i \cdot  d$ for all other $i$ such that $\frac{1}{1 - \alpha} \cdot \P{\mathcal{O}} + d \cdot \P{\mathcal{O}\setminus} = 1$, where $ \mathcal{O}\setminus$ contains all elements not in $\mathcal{O}$. 
+  
+  We now show  that $d \leq \frac{1}{\alpha}$, which is required for the constructed $Q$ to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{\alpha} \geq 1$. Since $\P{\mathcal{O}} + \P{ \mathcal{O}\setminus} = 1$,  $d \leq 1$ in order for $\frac{1}{\alpha} \cdot  \P{\mathcal{O}} + d\cdot\P{\mathcal{O}\setminus} = 1$ to hold. Since $1 \leq \frac{1}{\alpha}$, this implies $d \le \frac{1}{\alpha}$.
   
   
   We have now shown that $q( \mathcal{O}) \leq f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$ and it is possible to construct $Q(\mathcal{O})$ such that $Q(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$. Thus by Remark 4.90 in \cite{Follmer2016}, $f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$
@@ -550,8 +571,7 @@ $f_{\beta}$ also satisfy ElementWiseSeparability with $m = 1$ and $c = \beta/2$.
 \end{proposition}
 \begin{proof}
  
-  We first note that $\mathcal{O} = \emptyset$, then $Q(\mathcal{O}) = 0$, 
-  Due to the set of constraints, we know that for all $ \mathcal{O} \text{ such that } \mathcal{O} \neq \emptyset,  q$ must be such that $Q({\mathcal{O}}) \leq {\P{\mathcal{O}}} + \frac{\beta}{2}$ as if $Q(\mathcal{O}) \geq \frac{\beta}{2} +  \P{\mathcal{O}}$ , then $Q(\mathcal{O'})$ must be $< \P{\mathcal{O}} - \frac{\beta}{2}$ in order for the sum constraint of the simplex to equal 1, thus violating the l1 Norm constraint.
+  We first note that $\mathcal{O} = \emptyset$, then $Q(\mathcal{O}) = 0$,   Due to the set of constraints, we know that for all $ \mathcal{O} \text{ such that } \mathcal{O} \neq \emptyset,  q$ must be such that $Q({\mathcal{O}}) \leq {\P{\mathcal{O}}} + \frac{\beta}{2}$ as if $Q(\mathcal{O}) \geq \frac{\beta}{2} +  \P{\mathcal{O}}$ , then $Q(\mathcal{O'})$ must be $< \P{\mathcal{O}} - \frac{\beta}{2}$ in order for the sum constraint of the simplex to equal 1, thus violating the l1 Norm constraint.
   
   Furthermore, as we show below, we can construct $q$ such that  for any $\mathcal{O} \neq \emptyset$,   
   \[f(\mathcal{O}) = \min\left\{\P{\mathcal{O}} + \frac{\beta}{2}, 1\right\}

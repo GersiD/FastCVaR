@@ -73,7 +73,7 @@ Second, we propose a general algorithm for evaluating some $\varphi$-divergence 
 
 There is limited prior work on fast algorithms for evaluating risk measures. The conventional VaR algorithm for a discrete random variable must sort its values before it can evaluate its risk. As a result, the sort's runtime, which requires   $\Omega(n \log n)$ operations where $n$ is the number of the probability mass function~(pmf) entries, dominates the runtime complexity of VaR. To the best of our knowledge at the time of writing, no prior work has proposed or studied linear-time algorithms for any of the above risk measures.
 
-Coherent risk measures, like CVaR and TVaR, can be evaluated by solving convex optimization problems~\cite{Follmer2016, rockefeller1996variational}. Although most of these optimization problems are tractable, their time complexity is too large to be practical for applications where they are most needed. Current practical implementations rely on specific properties of these optimization problems to compute the solution efficiently. For example, all existing CVaR algorithms must sort the values of the random variable to compute its value~\cite{}, as in the case for VaR. The $\Omega(n \log  n)$ time complexity of the sort dominates the time complexity and prevents linear time computation. In this paper, we circumvent the complexity of sorting by developing no-sort algorithms for these risk measures and others. \todo{We may have to rewrite this, the fractional knapsach which = CVaR is well known to be solvable in linear time}
+Coherent risk measures, like CVaR and TVaR, can be evaluated by solving convex optimization problems~\cite{Follmer2016, rockefeller1996variational}. Although most of these optimization problems are tractable, their time complexity is too large to be practical for applications where they are most needed. Current practical implementations rely on specific properties of these optimization problems to compute the solution efficiently. For example, all existing CVaR algorithms must sort the values of the random variable to compute its value~\cite{}, as in the case for VaR. The $\Omega(n \log  n)$ time complexity of the sort dominates the time complexity and prevents linear time computation. In this paper, we circumvent the complexity of sorting by developing no-sort algorithms for these risk measures and others. 
 
 Numerous efficient algorithms have been designed for structured optimization problems that are similar to CVaR and TVaR evaluations. Some example of such structured optimization problems are the projection onto the simplex~\cite{adam2019projectionscanonicalsimplexadditional, Wang2013Simplex}, projection on k-capped simplex~\cite{kcapped_ang}, linear optimization on the intersection of $L_p$ or $\varphi$-divergence balls and the probability simplex as arise in robust optimizations~\cite{}, optimization for $\varphi$-divergence risk measures~\cite{}, and on polytopes defined by submodular functions which are known as polymatroids~\cite{}. Many of these algorithms require sorting the input variables, which has $O(n \log  n)$ complexity. There has been mention of the possibility of linear time algorithms however, we could find neither work describing nor studying them. One exception is \cite{Condat2016}, which proposes a linear-time algorithm for computing the projection onto the simplex, which does not leverage QuickSelect. 
 
@@ -102,7 +102,6 @@ The first maximum in~\eqref{eq:var-definition} exists because $\tau \mapsto \P{\
 The lower and upper bounds of the quantile set are denoted by $\quant^+_{\alpha}[\tilde{x}] := \max \quant_{\alpha}[\tilde{x}] = \var{\alpha }{\tilde{x}}$ and $\quant^-_{\alpha}[\tilde{x}] := \min \quant_{\alpha}[\tilde{x}]$.
 
 \begin{table}
-    \caption{Parameters for selected $\varphi$-divergence risk measures for $\alpha\in (0,1)$.}
     \centering
     \label{tab:divergences}
     \begin{tabular}{l|c|c|c}
@@ -118,11 +117,9 @@ The lower and upper bounds of the quantile set are denoted by $\quant^+_{\alpha}
          $\tvaro_{\alpha}$     & $|y - 1|$ & $ \begin{cases} x &\text{if } |x| \le 1\\ \infty &\text{otherwise} \end{cases} $& $\sqrt{ 2 \log 2 \cdot \log \frac{1}{\alpha} }$ \\
          \bottomrule
     \end{tabular}
+    \caption{Parameters for selected $\varphi$-divergence risk measures for $\alpha\in (0,1)$.}
 \end{table}
 
-\todo{can we remove this discussion?}
-\mm{Why phi needs to be non-negative? Where do we use the fact that the minimum is 0? Also, the Ahmadi-javid paper does not restate all the requirements from the OCE paper.}
-\palash{removed the non negative condition. All other conditions are directly from the ahmadi-javid EVAR paper - previously we are citing a different ahmad-javid paper which I fixed now }
 Second, we consider \emph{$\varphi$-divergence risk measures}~\cite{Ahmadi-Javid2012}. A divergence risk measure $\ER_{\varphi, \beta }\colon \mathbb{X} \to  \bar{\Real}$  is defined for a closed, convex function $\varphi\colon \bar{\Real} \to \bar{\Real}$ that satisfies $\varphi(1) = 0$ and $\beta\in \Real_{\ge 0}$ as
 \begin{align} \label{eq:fdiv-primal}
   \ER_{\varphi, \beta}[ \tilde{x} ]
@@ -138,13 +135,8 @@ The function $H_{\varphi}$ in~\eqref{eq:fdiv-primal} is a $\varphi$-divergence m
   H_\varphi(\bm{q} \| \bm{p}) := \sum_{\omega \in \Omega} p_{\omega} \cdot \varphi\left(\frac{q_{\omega}}{p_{\omega}}\right),
 \]
 and we adopt the common convention that $1 / 0 = \infty$ and $0 \cdot \infty = 0$~\cite{rockefeller1996variational}. Note that the absolute continuity restriction is not needed for finite probability spaces. 
-The function $\varphi\opt(x)$ is the convex conjugate of $\varphi(y)$
-
-
-
-
-
-\begin{proposition}
+The function $\varphi\opt(x)$ is the convex conjugate of $\varphi(y)$ \mm{unfinished?}
+% \begin{proposition}
 \[
   \cvar{\alpha}{\tilde{x}}
   \ge
@@ -152,7 +144,7 @@ The function $\varphi\opt(x)$ is the convex conjugate of $\varphi(y)$
   \ge
   \tvar{\alpha}{\tilde{x}}.
 \]
-\end{proposition}
+% \end{proposition}
 
 
 Finally, it is important to note that $\varphi$-divergence risk measures are coherent, which means they are convex and positively homogeneous. Any coherent risk measure $\rho\colon \mathbb{X}\to \bar{\Real}$ satisfies for some closed convex non-empty set $\mathcal{Q} \subseteq \Delta^n$ \citep[Prop. 2.84]{Follmer2016}. 
@@ -459,20 +451,19 @@ We now describe an algorithm for optimizing over polymatroids with this class of
   % $k \gets k + 1$\;
   % }
   % $q_i \gets 0 \text{ for } i > z + k$
-  $ y = \alpha - \sum_{k : x_k  v} m\cdot p_i$ \mm{distribute the shortfall} \;
+  $ y = \alpha - \sum_{k : x_k \le  v} m\cdot p_i$  \;
   \[
     q_i =
     \begin{cases}
-      m\cdot pi + c &\text{if} i = j \\
-      y  &\text{if} i = z \\
-      m \cdot p_i &\text{if} x_i < v \wedge i \ne j \\
-      0 &\text{otherwise}  \\
+      m\cdot pi + c &\text{if } i = j \\
+      y  &\text{if } i = z \\
+      m \cdot p_i &\text{if } x_i < v \wedge i \ne j \\
+      0 &\text{otherwise}.  \\
     \end{cases}
   \]
  \end{algorithm}
 
 We now prove the optimality of the algorithm and it's expected linear time complexity. The proof of optimality is obtained by showing that every value we compute for $q$ is equivalent to what would be obtained by following the computational procedure defined in \cite[Remark 4.86]{Follmer2016}. The proof of the time complexity follows from the expected linear time complexity, and the fact that remaining operations can be computed in linear time, and thus have no impact on the complexity.
-
 
 \begin{proposition}
   \cref{alg:maximum-weight-independent} returns a optimal solution to the optimization problem defined in \cref{comontonic optimization}. 

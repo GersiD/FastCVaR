@@ -477,7 +477,7 @@ The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal
 
 \begin{align*}
     f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_i) &= c  +\sum_{j = 1}^{i + 1}p_{i} - (c  +\sum_{j = 1}^{i}p_{i})\\
-    &= m *p_{i+1}.
+    &= m \cdot p_{i+1}.
 \end{align*}
 
 Consider the unique $i \in ???$ such that $f(\mathcal{O}_{i + 1}) = 1$ and $f(\mathcal{O}_i) < 1$. From the definition of $f$, $(c  +\sum_{j = 1}^{i + 1}m \cdot p_j) \geq 1$ and, therefore, $f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_{i}) = 1 - c  + \sum_{j = 1}^{i}m \cdot p_{j}$. It follows that such $i$ is the largest $i$ that satisfies
@@ -538,14 +538,15 @@ We now prove the submodular function for TVaR and show that it also satisfies El
 \begin{proposition}
     
 
-  For $\mathcal{O} \subseteq \Omega$, define $f_{\beta}\colon 2^{\Omega} \to \Real_+$:
+For $\mathcal{O} \subseteq \Omega$, define $f_{\beta}\colon 2^{\Omega} \to \Real_+$:
   \[
     f_{\beta}(\mathcal{O}) = \min\left\{\P{\mathcal{O}} + \frac{\beta}{2}, 1\right\}.
-  \] if $\mathcal{O} \neq \emptyset$, and $0$ otherwise, where $\beta = \sqrt{ 2 \log 2 \cdot \log \frac{1}{\alpha}}$ for $\alpha\in (0,1)$ represent the divergence constraint.
-  Then \[
+  \]
+If $\mathcal{O} \neq \emptyset$, and $0$ otherwise, where $\beta = \sqrt{ 2 \log 2 \cdot \log \frac{1}{\alpha}}$ for $\alpha\in (0,1)$ represent the divergence constraint. Then
+\[
   \tvar{\alpha }{\tilde{x} } = \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_{f_{\beta}}\right\}.
   \]
-  $f_{\beta}$ also satisfy ElementWiseSeparability with $m = 1$ and $c = \beta/2$.
+$f_{\beta}$ also satisfy ElementWiseSeparability with $m = 1$ and $c = \beta/2$.
 \end{proposition}
 \begin{proof}
  
@@ -794,12 +795,12 @@ Let $v$ be an input to \cref{alg:partition} and consider the following invariant
 \begin{lemma}
 This lemma is Theorem 4.5.1 from \cite{Bilmes18}: Given a ground set $V$. The following two are equivalent:
 \begin{enumerate}
-    \item For all modular functions $m : 2^V \rightarrow \mathbb{R}_+$, the function $f : 2^V \rightarrow \mathbb{R}$ defined as
+    \item For all modular functions $m \colon  2^V \rightarrow \mathbb{R}_+$, the function $f\colon  2^V \rightarrow \mathbb{R}$ defined as
     \[
     f(A) = g(m(A))
     \]
     is submodular.
-    \item $g : \mathbb{R}_+ \rightarrow \mathbb{R}$ is concave.
+    \item $g \colon  \mathbb{R}_+ \rightarrow \mathbb{R}$ is concave.
 \end{enumerate}
 
 \end{lemma}

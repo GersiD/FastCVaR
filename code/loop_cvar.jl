@@ -82,7 +82,7 @@ function qCVaR!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, α::Rea
   value = zero(T)           # CVaR value
   pc = zeros(T, length(p))  # this is the new distribution
   p_left = one(T)           # probabilities left for allocation
-  α̂ = α                    # probabilities to allocate
+  α̂ = α                     # probabilities to allocate
 
   @inbounds for i ∈ 1:qind
     # if vals[i] <= q # all elements up to qind are less than or equal to q by def of partition

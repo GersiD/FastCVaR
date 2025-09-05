@@ -428,7 +428,7 @@ We now describe an algorithm for optimizing over polymatroids with this class of
   \Output{$q \in \Real^n$}
 
   $v \gets \operatorname{QVaR}(p, x, \alpha = (1 - c)/m) $
-  
+  $j \gets min_ix_i$
   $\mathcal{Z} \gets \{ i \mid x_i = v \}$ \;
   % $j \in \arg\min_{j\in 1, \dots , N}  x_j$ \;
   % \If{$c > 0$}
@@ -451,7 +451,7 @@ We now describe an algorithm for optimizing over polymatroids with this class of
   % $k \gets k + 1$\;
   % }
   % $q_i \gets 0 \text{ for } i > z + k$
-  $ y = \alpha - \sum_{k : x_k \le  v} m\cdot p_i$  \;
+  $ y = 1 - c + \sum_{k : x_k \le  v} m\cdot p_i$  \;
   \[
     q_i =
     \begin{cases}
@@ -469,23 +469,38 @@ We now prove the optimality of the algorithm and it's expected linear time compl
   \cref{alg:maximum-weight-independent} returns a optimal solution to the optimization problem defined in \cref{comontonic optimization}. 
 \end{proposition}
 \begin{proof}
-The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal{O}_{i})$ \cite[Remark 4.86]{Follmer2016}, where $\mathcal{O}_i$ is the set of all elements that have only has values less than or equal to the i-th largest element .  For $f(\mathcal{O}_{i+1}) < 1$ and $f(\mathcal{O}_i) < 1$
+We assume that no elements have a probability of 0. Thus, $f(\mathcal{O}_i)$ has a unique value for every $i$. Consider the unique $i$ such that $f(\mathcal{O}_{i + 1}) = 1$ and $f(\mathcal{O}_i) < 1$. From the definition of $f$, $(c  +\sum_{j = 1}^{i + 1}m \cdot p_j) \geq 1$ and, therefore, $f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_{i}) = 1 - c  + \sum_{j = 1}^{i}m \cdot p_{j}$. 
+We know from \eqref{eq:var-definition} that $v$ is the largest $\tau$ such that $P[x < \tau] \leq \frac{1 - c}{m}$. 
+
+The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal{O}_{i})$ \cite[Remark 4.86]{Follmer2016}, where $\mathcal{O}_i$ is the set of all elements that have only has values less than or equal to the i-th largest element .  For $f(\mathcal{O}_{i+1}) \leq 1$ and $f(\mathcal{O}_i) < 1$ and $O_i \neq \emptyset$
 
 
 \begin{align*}
-    f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_i) &= c  +\sum_{j = 1}^{i + 1}p_{i} - (c  +\sum_{j = 1}^{i}p_{i})\\
+    f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_i) &= c  +m \cdot \sum_{k = 1}^{i + 1}p_{k} - (c  +m \cdot \sum_{k = 1}^{i}p_{i})\\
     &= m \cdot p_{i+1}.
 \end{align*}
 
-We assume that no elements have a probability of 0. Thus, $f(\mathcal{O}_i)$ has a unique value for every $i$. Consider the unique $i$ such that $f(\mathcal{O}_{i + 1}) = 1$ and $f(\mathcal{O}_i) < 1$. From the definition of $f$, $(c  +\sum_{j = 1}^{i + 1}m \cdot p_j) \geq 1$ and, therefore, $f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_{i}) = 1 - c  + \sum_{j = 1}^{i}m \cdot p_{j}$. Crucially, if  $(c  +\sum_{j = 1}^{i + 1}m \cdot p_j) = 1$, then $f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_{i}) = m *p_{i+1}$
-We know from \eqref{eq:var-definition} that $v$ is the largest $\tau$ such that $P[x < \tau] \leq \frac{1 - c}{m}$. Thus, for any $i$ less than $z$, $(c  +\sum_{j = 1}^{i}m \cdot p_j) \leq 1$
+Thus, for any $i$ such that $x_i < z$ and $i \neq j$, $(c  +\sum_{j = 1}^{i}m \cdot p_j) \leq 1$
 and thus $q_i$ must equal $m*p_i$.
 
-For $i \geq z_0$ such that $x_i = v$, we know that $s_k$ equals $(c  +\sum_{j = 1}^{i - 1}m \cdot p_j) = f(\mathcal{O}_{i - 1}) when s^k < 1$. If $s_k < 1$, it then follows $q_i =  f(\mathcal{O}_{i}) -f(\mathcal{O}_{i - 1})$ = $\min(s_k + m\cdot p_i, 1) - s_k = \min(m\cdot p_i, 1 - s_k )$. If $s_k \geq 1$, then $q_i =  f(\mathcal{O}_{i}) -f(\mathcal{O}_{i - 1}) = 0$.
+
+For $f(\mathcal{O}_{i+1}) \leq 1$ and $f(\mathcal{O}_i) = 0$ and $O_i \neq \emptyset$
+
+
+\begin{align*}
+    f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_i) &= c  +\sum_{k = 1}^{i + 1}m\cdot p_{k}
+\end{align*}
+
+Thus, for any $i$ such that $x_i < z$ and $i = j$, $q_i$ must equal $m*p_i + c$.
 
 
 
-For all other $i > z$, we note that $f(\mathcal{O}_{i}) - f(\mathcal{O}_{i - 1}) = 1 - 1 = 0$, and thus $q_i = 0$.
+
+For all other $i$ such that $x_i> z$, we note that $P[x < \tau] > \frac{1 - c}{m}$ indicating $f(\mathcal{O}_{i}) - f(\mathcal{O}_{i - 1}) = 1 - 1 = 0$, and thus $q_i = 0$.
+
+For all other $i$ such that $x_i=z$, since all $q_i$ must sum to 1, it can be seen for all such $i$, $\sum_{k : x_k =  v}p_k$ must equal $y$. The solution of the LP is not affected by which $i$ this sum is distributed, so we set $x_z$ to $y$ and everything else to 0. 
+
+
 \end{proof}
 
 \begin{proposition}

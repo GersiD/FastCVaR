@@ -427,37 +427,19 @@ We now describe an algorithm for optimizing over polymatroids with this class of
   \Input{EWS function $f\colon 2^{\left\{ 1, \dots , N \right\}} \to  \Real_{\ge 0}$ satisfying \cref{asm:submodular-function} with some $m$ and $c$, {vector $\bm{x}^0$, pmf $\bm{p}^0$}}
   \Output{$q \in \Real^n$}
 
-  $v \gets \operatorname{QVaR}(p, x, \alpha = (1 - c)/m) $
-  $j \gets min_ix_i$
-  $\mathcal{Z} \gets \{ i \mid x_i = v \}$ \;
-  % $j \in \arg\min_{j\in 1, \dots , N}  x_j$ \;
-  % \If{$c > 0$}
-  % {
-  %   $q_i \gets m \cdot p_i$ for $1 < i < z$;
-  % }
-  % \Else
-  % {
-  %   $q_i \gets m \cdot p_i$ for $i < z$
-  % }
-  % $s_0 \gets \sum_iq_i$
-  % $k \gets 0$
-  
-  % \While
-  % {
-  % $x_i = v \text{ and } s_k < 1$
-  % }
-  % {$q_{z + k} \gets \min(m\cdot p_{z + k}, 1 - s_k)$\;
-  % $s_{k + 1} \gets s_k + q_{z + k}$
-  % $k \gets k + 1$\;
-  % }
-  % $q_i \gets 0 \text{ for } i > z + k$
-  $ y = 1 - c + \sum_{k : x_k \le  v} m\cdot p_i$  \;
+  $v \gets \operatorname{QVaR}(p, x, \alpha = (1 - c)/m) $ \;
+  $k_{\min} \gets \min_{i = 1, \dots, n} x_i$  \tcp{Breaking ties arbitrarily}
+  $\mathcal{K}_{< v} \gets \{ i = 1, \dots , n \mid x_i < v \}$ \;
+  $\mathcal{K}_{= v} \gets \{ i = 1, \dots , n \mid x_i = v \}$ \;
+  $\theta \gets \left( 1 - c + \sum_{k = \mathcal{K}_{< v}} m\cdot p_k\right) / (\sum_{k \in \mathcal{K}_{=v}} p_k) $   \;
   \[
-    q_i =
+    \forall i\in 1, \dots , n:
+    \qquad
+    q_i \gets
     \begin{cases}
-      m\cdot pi + c &\text{if } i = j \\
-      y  &\text{if } i = z \\
-      m \cdot p_i &\text{if } x_i < v \wedge i \ne j \\
+      m\cdot p_i + c &\text{if } i = k_{\min} \\
+      m \cdot p_i &\text{if } i \in \mathcal{K}_{< v} \wedge i \ne k_{\min} \\
+      \theta \cdot  p_i  &\text{if } i \in \mathcal{K}_{=v} \\
       0 &\text{otherwise}.  \\
     \end{cases}
   \]
@@ -469,10 +451,13 @@ We now prove the optimality of the algorithm and it's expected linear time compl
   \cref{alg:maximum-weight-independent} returns a optimal solution to the optimization problem defined in \cref{comontonic optimization}. 
 \end{proposition}
 \begin{proof}
-We assume that no elements have a probability of 0. Thus, $f(\mathcal{O}_i)$ has a unique value for every $i$. Consider the unique $i$ such that $f(\mathcal{O}_{i + 1}) = 1$ and $f(\mathcal{O}_i) < 1$. From the definition of $f$, $(c  +\sum_{j = 1}^{i + 1}m \cdot p_j) \geq 1$ and, therefore, $f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_{i}) = 1 - c  + \sum_{j = 1}^{i}m \cdot p_{j}$. 
-We know from \eqref{eq:var-definition} that $v$ is the largest $\tau$ such that $P[x < \tau] \leq \frac{1 - c}{m}$. 
-
-The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal{O}_{i})$ \cite[Remark 4.86]{Follmer2016}, where $\mathcal{O}_i$ is the set of all elements that have only has values less than or equal to the i-th largest element .  For $f(\mathcal{O}_{i+1}) \leq 1$ and $f(\mathcal{O}_i) < 1$ and $O_i \neq \emptyset$
+Assume that $x_1 \le x_2 \le  \dots  \le x_n$ without loss of generality \mm{Why?}.
+  
+  The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal{O}_{i})$ \cite[Remark 4.86]{Follmer2016}, where $\mathcal{O}_i$ is the set of all elements that have only values less than or equal to the i-th largest element:
+  \[
+   \mathcal{O}_i := \left\{1, \dots ,i  \right\}, \quad \forall  i = 1, \dots, n,
+ \]
+ and $\mathcal{O}_{0 } := \emptyset$. For $f(\mathcal{O}_{i+1}) \leq 1$ and $f(\mathcal{O}_i) < 1$ and $\mathcal{O}_i \neq \emptyset$ \mm{???}
 
 
 \begin{align*}
@@ -482,6 +467,11 @@ The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal
 
 Thus, for any $i$ such that $x_i < z$ and $i \neq j$, $(c  +\sum_{j = 1}^{i}m \cdot p_j) \leq 1$
 and thus $q_i$ must equal $m*p_i$.
+
+  
+We assume that no elements have a probability of 0. Thus, $f(\mathcal{O}_i)$ has a unique value for every $i$. Consider the unique $i$ such that $f(\mathcal{O}_{i + 1}) = 1$ and $f(\mathcal{O}_i) < 1$. From the definition of $f$, $(c  +\sum_{j = 1}^{i + 1}m \cdot p_j) \geq 1$ and, therefore, $f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_{i}) = 1 - c  + \sum_{j = 1}^{i}m \cdot p_{j}$. 
+We know from \eqref{eq:var-definition} that $v$ is the largest $\tau$ such that $P[x < \tau] \leq \frac{1 - c}{m}$. 
+
 
 
 For $f(\mathcal{O}_{i+1}) \leq 1$ and $f(\mathcal{O}_i) = 0$ and $O_i \neq \emptyset$

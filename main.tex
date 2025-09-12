@@ -69,7 +69,7 @@ Monetary measures of risk generalize the expectation operator to be able to repr
 % what are we doing; our contributions
 This paper proposes fast algorithms for computing risk measures of discrete random variables. First, we show VaR can be seen as a special case of the WeightedMedian problem, which has well known linear time algorithms.
 %The worst-case linear-time upper bound of \emph{QuickQuantile} matches the linear-time lower bound~\cite{}. 
-Second, we propose a general algorithm for evaluating some $\varphi$-divergence risk measures~\cite{Ahmadi-Javid2012}, which include CVaR and the $\varphi$-divergence which uses the unweighted L1 norm as the divergence - which we will henceforth refer to as (TVaR)~\cite{Kruse2021}. The algorithm, which we call \emph{QuickDivergence}, works by representing certain $\varphi$-divergence risk measures as a linear minimization over polymatroids. The linear worst-case runtime of \emph{QuickDivergence} also matches the known lower bounds on the runtime~\cite{}. 
+Second, we propose a general algorithm for evaluating some $\varphi$-divergence risk measures~\cite{Ahmadi-Javid2012}, including CVaR and $\varphi$ -divergence, which uses the unweighted L1 norm as the divergence - which we will henceforth refer to as (TVaR)~\cite{Kruse2021}. The algorithm, which we call \emph{QuickDivergence}, works by representing certain $\varphi$-divergence risk measures as a linear minimization over polymatroids. The linear worst-case runtime of \emph{QuickDivergence} also matches the known lower bounds on the runtime~\cite{}. 
 
 There is limited prior work on fast algorithms for evaluating risk measures. The conventional VaR algorithm for a discrete random variable must sort its values before it can evaluate its risk. As a result, the sort's runtime, which requires   $\Omega(n \log n)$ operations where $n$ is the number of the probability mass function~(pmf) entries, dominates the runtime complexity of VaR. To the best of our knowledge at the time of writing, no prior work has proposed or studied linear-time algorithms for any of the above risk measures.
 
@@ -127,7 +127,7 @@ Second, we consider \emph{$\varphi$-divergence risk measures}~\cite{Ahmadi-Javid
     %, \bm{q} \ll \bm{p}
     \right\} \\
   \label{eq:fdiv-dual}
-  &= \sup \left\{  t \cdot v - t\cdot \E { \varphi\opt \left(- \frac{\tilde{x}}{t} + v + \beta \right)} \mid  t,v \in \Real, \, t > 0 \right\}.
+  &= \sup \left\{  t \cdot v - t\cdot \E { \varphi\opt \left(- \frac{\tilde{x}}{t} + v + \beta \right)} \mid  t,v \in \Real, \,  > 0 \right\}.
 \end{align}
 % The notation $\bm{q} \ll \bm{p}$ indicates that $\bm{q}$ is absolutely continuous with respect to $\bm{p}$: $p_{\omega} =0 \implies q_{\omega} = 0, \forall  \omega \in \Omega$.
 The function $H_{\varphi}$ in~\eqref{eq:fdiv-primal} is a $\varphi$-divergence measure defined as~\cite{Bayraksan2015}
@@ -341,8 +341,7 @@ The proof directly follows from \cref{PROOFCORRECTNESS}.
 
 
 In this section, we propose new linear-time algorithms for computing $\varphi$-divergence risk measures. We approach this challenge by solving a linear optimization problem over polymatroids . As we show, for certain polymatroids this optimization can be solved in linear time compared to the $O(n \log  n)$ runtime of standard sorting based greedy algorithms. 
-
-First, recall the standard definition of submodular functions and the related concept of polymatroid~\cite{Korte2012}.
+First, recall ethe standard definition of submodular functions and the related concept of polymatroid~\cite{Korte2012}.
 \begin{definition} \label{def:polymatroid}
 A function $f \colon 2^{\mathcal{E}} \to \Real_{\ge 0}$ for a finite set $\mathcal{E} = \left\{ 1, \dots , E \right\}$ and $E\in \Nats$ is \emph{submodular} if
 \[ 
@@ -451,7 +450,7 @@ We now prove the optimality of the algorithm and it's expected linear time compl
   \cref{alg:maximum-weight-independent} returns a optimal solution to the optimization problem defined in \cref{comontonic optimization}. 
 \end{proposition}
 \begin{proof}
-Assume that $x_1 \le x_2 \le  \dots  \le x_n$ without loss of generality \mm{Why?}.
+Assume that $x_1 \le x_2 \le  \dots  \le x_n$ .
   
   The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal{O}_{i})$ \cite[Remark 4.86]{Follmer2016}, where $\mathcal{O}_i$ is the set of all elements that have only values less than or equal to the i-th largest element:
   \[
@@ -460,21 +459,23 @@ Assume that $x_1 \le x_2 \le  \dots  \le x_n$ without loss of generality \mm{Why
  and $\mathcal{O}_{0 } := \emptyset$. For $f(\mathcal{O}_{i+1}) \leq 1$ and $f(\mathcal{O}_i) < 1$ and $\mathcal{O}_i \neq \emptyset$ \mm{???}
 
 
+
 \begin{align*}
     f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_i) &= c  +m \cdot \sum_{k = 1}^{i + 1}p_{k} - (c  +m \cdot \sum_{k = 1}^{i}p_{i})\\
     &= m \cdot p_{i+1}.
 \end{align*}
 
+
+We know from \eqref{eq:var-definition} that $v$ is the largest $\tau$ such that $P[x < \tau] \leq \frac{1 - c}{m}$. 
 Thus, for any $i$ such that $x_i < z$ and $i \neq j$, $(c  +\sum_{j = 1}^{i}m \cdot p_j) \leq 1$
 and thus $q_i$ must equal $m*p_i$.
 
   
-We assume that no elements have a probability of 0. Thus, $f(\mathcal{O}_i)$ has a unique value for every $i$. Consider the unique $i$ such that $f(\mathcal{O}_{i + 1}) = 1$ and $f(\mathcal{O}_i) < 1$. From the definition of $f$, $(c  +\sum_{j = 1}^{i + 1}m \cdot p_j) \geq 1$ and, therefore, $f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_{i}) = 1 - c  + \sum_{j = 1}^{i}m \cdot p_{j}$. 
-We know from \eqref{eq:var-definition} that $v$ is the largest $\tau$ such that $P[x < \tau] \leq \frac{1 - c}{m}$. 
 
 
 
-For $f(\mathcal{O}_{i+1}) \leq 1$ and $f(\mathcal{O}_i) = 0$ and $O_i \neq \emptyset$
+
+For $f(\mathcal{O}_{i+1}) \leq 1$ and $f(\mathcal{O}_i) = 0$
 
 
 \begin{align*}

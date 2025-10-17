@@ -160,44 +160,23 @@ In the remainder of the paper, we first propose a linear-time algorithm for comp
 
 \section{Computing VaR in Linear Time} \label{sec:var-linear}
 
-In this section, we show the equivalence between VaR and the weighted-median problem, which is well known to be solvable in linear time \cite{korte2011combinatorial}\cite{cormen2001introduction}.
+In this section, we show the equivalence between VaR and the weighted-median problem, which is well known to be solvable in linear time \cite{korte2011combinatorial,cormen2001introduction}.
 
 In order to prove that that VaR and the weighted median problem are equivalent, we first show that $\quant_{\alpha}^+(\tilde{x})$ is an element in the array. 
 \begin{lemma}\label{lem:quantile-in-finite-omega}
 Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite $\Omega$. Then, there exist $\omega_+, \omega_-\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_+)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_-)$ for each $\alpha\in (0,1)$.
 \end{lemma}
 
-We now define our version of the Weighted Median problem.
-\begin{definition} \label{WM_Problem}
-    
-Let $n \in \mathbb{N}$, $\xi_1, \ldots, \xi_n \in \Real$, $w_1, \ldots, w_n \in \Real_{\geq 0}$, and $W \in \Real$ with 
-\[
-0 < W < \sum_{i=1}^n w_i.
-\]
-Then the $(w_1, \ldots, w_n \mid W)$-weighted median with respect to $(\xi_1, \ldots, \xi_n)$ is defined to be the unique number $\xi^*$ for which
-\begin{equation}
-\sum_{i : \xi_i < \xi^*} w_i \leq W < \sum_{i : \xi_i \leq \xi^*} w_i.
-\label{WeightedMedianEquality}
-\end{equation}
+% We now define our version of the Weighted Median problem.
+% \begin{definition} \label{WM_Problem}
 
-\textbf{Weighted Median Problem: } A natural number $n$, numbers $\ell_1, \ldots, \ell_n \in \Real$, $w_1, \ldots, w_n \in \Real^{\mathbb{C}}$,  
-and a number $W$ with $0 \leq W < \sum_{i=1}^{n} w_i$.
-
-
-\medskip
-
-\textbf{Task:} Find the $(w_1, \ldots, w_n; W)$-weighted median with respect to $(\ell_1, \ldots, \ell_n)$.
-\end{definition}
-We note that our definition differs very slightly from the popular definition in \cite{korte2011combinatorial} in that the position of the $\leq$ and $>$ in \cref{WeightedMedianEquality} are swapped.
-
-We now show that we can cast VaR as an instance of the Weighted Median problem
-\begin{lemma}
-The weighted median problem defined in \cref{WM_Problem} is equivalent to solving VaR when $W = \alpha$ for a discrete random variable $\tilde{x}\colon \Omega \to \Real$ with finite $\Omega$ such that the outcomes of the random variable $\xi_1, \ldots, \xi_n \in \Real$ and the weights $w_1, \ldots, w_n \in \Real^{\mathbb{C}}$ correspond to the probabilities of each outcome .
-\end{lemma}
-\begin{proof}
-Let $\xi^*$ be the optimal solution to the weighted median problem and let $W = \alpha$. Then $\P{\tilde{x} < \xi^*} \leq \alpha < \P{\tilde{x} \leq \xi^*}$. Thus $\xi^*$ is optimal for \eqref{eq:var-definition} among all outputs of $\tilde{x}$. Since the optimal value for VaR must be an outcome of $\tilde{x}$ by \cref{lem:quantile-in-finite-omega}, $\xi^*$ then must equal $\quant_{\alpha}[\tilde{x}]$ and the proof concludes.
-
-\end{proof}
+% We now show that we can cast VaR as an instance of the Weighted Median problem
+% \begin{lemma}
+% The weighted median problem defined in \cref{WM_Problem} is equivalent to solving VaR when $W = \alpha$ for a discrete random variable $\tilde{x}\colon \Omega \to \Real$ with finite $\Omega$ such that the outcomes of the random variable $\xi_1, \ldots, \xi_n \in \Real$ and the weights $w_1, \ldots, w_n \in \Real^{\mathbb{C}}$ correspond to the probabilities of each outcome .
+% \end{lemma}
+% \begin{proof}
+% Let $\xi^*$ be the optimal solution to the weighted median problem and let $W = \alpha$. Then $\P{\tilde{x} < \xi^*} \leq \alpha < \P{\tilde{x} \leq \xi^*}$. Thus $\xi^*$ is optimal for \eqref{eq:var-definition} among all outputs of $\tilde{x}$. Since the optimal value for VaR must be an outcome of $\tilde{x}$ by \cref{lem:quantile-in-finite-omega}, $\xi^*$ then must equal $\quant_{\alpha}[\tilde{x}]$ and the proof concludes.
+% \end{proof}
 
 %We first restate some well-known properties of the Hoare Partition scheme.
 %Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorithm works as follows. It first picks a pivot by taking the middle element between front and back and applies the partition scheme to easily compute the probability of all outcomes smaller than or equal to that of the pivot (Lines \ref{line:pivot_comp} - \ref{line:partion_line}). Note that three partitions are create, one where the elements are all less than the pivot, another containing all elements equal to the pivot, and a third pivot containing all elements greater than the pivot. We refer to these partitions as the left, middle, and right partition from here on. QVaR then determines whether the quantile can exist in the left, middle, or right pivot (lines \ref{line:determine_left}, \ref{line:determine_right}, and \ref{determine_middle} ) and adjusts the $f_k$ and $b_k$ respectively to reduce the search space to one of these partitions. We note that in the case the quantile is determined to exist in the middle partition, the algorithm can terminate since every value in the middle partition is the same. In the case of $\alpha^0 = 0$, we handle this separately and simply find the minimum element. 
@@ -312,38 +291,49 @@ For all values $\xi^*$ at indices less than or equal to $g_k, \sum_{i : \xi_i \l
 \item[Case 3]: $\alpha_{k - 1} \geq t_k$ and $\alpha_{k-1} < t_k + e_k $. 
 We know for the value $\xi^*$ at indice $g_k$, $\sum_{i : \xi_i < \xi^*} w_i \leq W < \sum_{i : \xi_i \leq \xi^*} w_i$ holds true. Thus this is the solution to the weighted median problem, and accordingly $f_k$ and $b_k$ are both set to $g_k$. 
 
-
 At termination, $b_k=f_k$ will point to a single index. All other indices can not be a solution to the weighted median problem, hence this will be the optimal solution. Thus the loop invariant holds and the proof concludes.
  
 \end{enumerate}
 \end{proof}
-\begin{corollary}
- \Cref{alg:quick-quantile} computes the $\quant_{\alpha}(\tilde{x})$.
-\end{corollary}
-\begin{proof}
-The proof directly follows from \cref{PROOFCORRECTNESS}.
-\end{proof}
-\begin{proposition}
-\label{TIMECOMPLEXITY}
-\Cref{alg:quick-quantile} runs in expected deterministic $O(n)$ time. with median of medians pivot selection for $i_k$
+% \begin{corollary}
+%  \Cref{alg:quick-quantile} computes the $\quant_{\alpha}(\tilde{x})$.
+% \end{corollary}
+% \begin{proof}
+% The proof directly follows from \cref{PROOFCORRECTNESS}.
+% \end{proof}
+
+\begin{proposition} \label{TIMECOMPLEXITY}
+\Cref{alg:quick-quantile} runs in expected $O(n)$ time when one use uniformly random pivot selection for $i_k, k \in \Nats$.
 \end{proposition}
-
-
-
 \begin{proof}
-We analyze the expected running time \(T(n)\) of the while \Cref{alg:quick-quantile}on an input of size \(n\) ($b_k - f_k  = n$).
+\mm{this is a proof by induction on $n \in \Nats$, and define $T(n)$}
+  
+\mm{??}We analyze the expected running time \(T(n)\) of the while \Cref{alg:quick-quantile} on an input of size \(n\) ($b_k - f_k  = n$). \mm{make this more precise?}
 
-Suppose \(i_{k^\star}\) is the \(i\)-th smallest element (i.e. there are \(i-1\) elements smaller than \(q\) and \(n - i - d\) elements larger than \(a\)), where $d$ is the number of elements equal to the selected pivot.
+\mm{define $k\opt$ and make it clear what $i$. There exists $i$, such that there are $i-1$ elementts smaller ...., use quations for the defintion if you can.}
+Suppose \(i_{k^\star}\) is the \(i\)-th smallest element \mm{in what?} (i.e. there are \(i-1\) elements smaller than \(q\) and \(n - i - d\) elements larger than \(a\) \mm{typo}), where $d$ is the number of elements equal to the selected pivot.
+
+\mm{good idea is to reference specific line numbers in the code}
+
+\mm{not clear to me}
 Since the pivot is chosen uniformly, each \(i\in\{1,2,\dots,n\}\) occurs with probability \(1/n\).
 
+\mm{Is there a way you can write this as a recursive statement on $T$}
 If  $t_k > \alpha_{k - 1}$, the while loop continues on the \(i-1 - d\) elements smaller than $v_k$.
 If $t_k  \leq \alpha$ and $t_k + e_k > \alpha$ the pivot is the answer and no recursion is needed.
 If $t_k + e_k < \alpha$ the algorithm recurses on the \(n-i - d\) elements larger than \(a\).
 Thus, conditioned on pivot rank \(i_k\), the recursive work is either \(T(i-1)\) or \(T(n - i - d)\) (or \(0\) when $P[x_k < v_k] = \alpha$. 
 
-Thus, the expected cost of the recursion at line 4 or 6 is
+\mm{Need also the distribution over $l_k$ and $e_k$ as a function of the random $i_k$.}
+
 \[
-\frac{1}{n} \left( \sum_{i = i_{k^\star} + d + 1}^{n} T(i - 1) + \sum_{i = 1}^{i_{k^\star} - 1} T(n - i - d) \right)
+ T(n) \le c(n) +  \max \left\{  T(n - ??) , T(n - ??)  \right\}  
+\]
+Here $c(n)$ is the runtime of lines 3-7. The is expected worst-case over the individual cases. 
+
+Thus, the \mm{what is this?} expected cost of the recursion at line 4 or 6 is \mm{this assumes the uniform}
+\[
+  \frac{1}{n} \left( \sum_{i = i_{k^\star} + d + 1}^{n} T(i - 1) + \sum_{i = 1}^{i_{k^\star} - 1} T(n - i - d) \right)
 \leq \frac{1}{n} \left( \sum_{i = i_k}^{n} T(i - 1) + \sum_{i = 1}^{i_k} T(n - i) \right)
 \]
 The right hand equation is an upper bound and focuses on the case when no elements are equal to the pivot ($d = 0$). We thus focus only on the analysis of this case for the remainder of the proof.
@@ -402,6 +392,23 @@ By induction, \(T(n)\le 4cn\) for all integers \(n\ge 1\). This proves that the 
 \end{proof}
 
 
+\begin{remark}
+Let $n \in \mathbb{N}$, $\xi_1, \ldots, \xi_n \in \Real$, $w_1, \ldots, w_n \in \Real_{\geq 0}$, and $W \in \Real$ with 
+\[
+0 < W < \sum_{i=1}^n w_i.
+\]
+Then the $(w_1, \ldots, w_n \mid W)$-weighted median with respect to $(\xi_1, \ldots, \xi_n)$ is defined to be the unique number $\xi^*$ for which
+\begin{equation}
+\sum_{i : \xi_i < \xi^*} w_i \leq W < \sum_{i : \xi_i \leq \xi^*} w_i.
+\label{WeightedMedianEquality}
+\end{equation}
+
+\emph{Weighted Median Problem}:  A natural number $n$, numbers $\ell_1, \ldots, \ell_n \in \Real$, $w_1, \ldots, w_n \in \Real^{\mathbb{C}}$,  
+and a number $W$ with $0 \leq W < \sum_{i=1}^{n} w_i$.
+% \textbf{Task:} Find the $(w_1, \ldots, w_n; W)$-weighted median with respect to $(\ell_1, \ldots, \ell_n)$.
+% \end{definition}
+We note that our definition differs very slightly from the popular definition in \cite{korte2011combinatorial} in that the position of the $\leq$ and $>$ in \cref{WeightedMedianEquality} are swapped.
+\end{remark}
 .
 
 

@@ -77,7 +77,7 @@ Coherent risk measures, like CVaR and TVaR, can be evaluated by solving convex o
 
 Numerous efficient algorithms have been designed for structured optimization problems that are similar to CVaR and TVaR evaluations. Some example of such structured optimization problems are the projection onto the simplex~\cite{adam2019projectionscanonicalsimplexadditional, Wang2013Simplex}, projection on k-capped simplex~\cite{kcapped_ang}, linear optimization on the intersection of $L_p$ or $\varphi$-divergence balls and the probability simplex as arise in robust optimizations~\cite{}, optimization for $\varphi$-divergence risk measures~\cite{}, and on polytopes defined by submodular functions which are known as polymatroids~\cite{}. Many of these algorithms require sorting the input variables, which has $O(n \log  n)$ complexity. There has been mention of the possibility of linear time algorithms however, we could find neither work describing nor studying them. One exception is \cite{Condat2016}, which proposes a linear-time algorithm for computing the projection onto the simplex, which does not leverage QuickSelect. 
 
-Our algorithms' time complexity improves on the state of the art by a logarithmic factor. Although this improvement may seem unimportant,  it is an acceleration that is practically meaningful without any serious drawbacks. Our algorithms are simple and easy to implement with little added complexity compared with the state-of-the-art. Our numerical results show that they can lead to an order of magnitude speed up for realistic large problems, a significant speed-up for moderately sized problems, and match the performance of existing algorithms for small problems.
+Our algorithms' time complexity improves on the state of the art by a logarithmic factor. Although this improvement may seem unimportant,  it is an acceleration that is practically meaningful without any serious drawbacks. Our algorithms are simple and easy to implement, with little added complexity compared to the state-of-the-art. Our numerical results show that they can lead to an order of magnitude speed-up for realistic large problems, a significant speed-up for moderately sized problems, and match the performance of existing algorithms for small problems.
 
 The remainder of the paper is organized as follows. \Cref{sec:preliminaries} describes the necessary background on risk measures, $\varphi$-divergence, and polymatroid optimization. Then, \Cref{sec:var-linear} shows the relationship between VaR and the Weighted Median problem, allowing us to trivially adapt algorithms for the Weighted Median Problem to solve VaR. Then, \cref{sec:phi-divergence} builds on this to develop \emph{QuickDivergence}, an algorithm that evaluates certain $\varphi$-divergence risk measures in linear time. We evaluate the algorithms numerically on synthetic and realistic problems in \cref{sec:experiments}. A tested implementation of the algorithms in Julia is available at \textcolor{green}{REDACTED}.
 
@@ -292,8 +292,6 @@ Let $\xi^*$ be the optimal solution to the weighted median problem and let $W = 
 
 %The above conditions primarily state that each call to the partition scheme performs a partial sorting such that all elements $\leq v_k$ will have an index $< i_k$ , and elements greater than the pivot will have an index $> i_k$.
 Below we present an algorithm for computing VaR in linear time. The algorithm is a highly trivial modification of that in \cite{korte2011combinatorial} and homework problems such as in \cite{cormen2001introduction} to account for the slight alteration in definition.
-
-
 \begin{lemma} \label{PROOFCORRECTNESS}
   \Cref{alg:quick-quantile} computes the optimal solution $\xi^*$ to the weighted median problem  when $W = \alpha_0$, $x^0$ represents the values and $p^0$ represent the weights.
   \end{lemma}
@@ -325,14 +323,86 @@ At termination, $b_k=f_k$ will point to a single index. All other indices can no
 \begin{proof}
 The proof directly follows from \cref{PROOFCORRECTNESS}.
 \end{proof}
-
 \begin{proposition}
 \label{TIMECOMPLEXITY}
-\Cref{alg:quick-quantile} runs in deterministic $O(n)$ time with median of medians pivot selection for $i_k$
+\Cref{alg:quick-quantile} runs in expected deterministic $O(n)$ time. with median of medians pivot selection for $i_k$
 \end{proposition}
+
+
+
 \begin{proof}
-  As in Theorem 17.3 of \cite{Korte2012}, we note at every iteration, the number of elements in the range $[f_k,b_k]$ is shrunk such that at least 3 elements are removed from at least half of the 5-elements blocks created during the median of median pivot selection step. The rest of proof then immediately follows from Theorem 17.3 in \cite{Korte2012}.
-\end{proof}.
+We analyze the expected running time \(T(n)\) of the while \Cref{alg:quick-quantile}on an input of size \(n\) ($b_k - f_k  = n$).
+
+Suppose \(i_{k^\star}\) is the \(i\)-th smallest element (i.e. there are \(i-1\) elements smaller than \(q\) and \(n - i - d\) elements larger than \(a\)), where $d$ is the number of elements equal to the selected pivot.
+Since the pivot is chosen uniformly, each \(i\in\{1,2,\dots,n\}\) occurs with probability \(1/n\).
+
+If  $t_k > \alpha_{k - 1}$, the while loop continues on the \(i-1 - d\) elements smaller than $v_k$.
+If $t_k  \leq \alpha$ and $t_k + e_k > \alpha$ the pivot is the answer and no recursion is needed.
+If $t_k + e_k < \alpha$ the algorithm recurses on the \(n-i - d\) elements larger than \(a\).
+Thus, conditioned on pivot rank \(i_k\), the recursive work is either \(T(i-1)\) or \(T(n - i - d)\) (or \(0\) when $P[x_k < v_k] = \alpha$. 
+
+Thus, the expected cost of the recursion at line 4 or 6 is
+\[
+\frac{1}{n} \left( \sum_{i = i_{k^\star} + d + 1}^{n} T(i - 1) + \sum_{i = 1}^{i_{k^\star} - 1} T(n - i - d) \right)
+\leq \frac{1}{n} \left( \sum_{i = i_k}^{n} T(i - 1) + \sum_{i = 1}^{i_k} T(n - i) \right)
+\]
+The right hand equation is an upper bound and focuses on the case when no elements are equal to the pivot ($d = 0$). We thus focus only on the analysis of this case for the remainder of the proof.
+
+The rest of procedure \textsc{SELECT} requires $cn$ time for some constant $c$,  
+so we have the following inequality for $n \ge 2$:
+\begin{equation}
+T(n) \le cn + \frac{1}{n} \max_{1 \le i_k \le n} 
+\left\{ \sum_{i = 1}^{i_k - 1} T(i) + \sum_{i = n - i_k + 1}^{n - 1} T(i) \right\}.
+\label{eq:select_recurrence}
+\end{equation}
+
+The remaining (non-recursive) work performed by the procedure on an input of size \(n\) is \(\Theta(n)\).
+Thus there exists a constant \(c>0\) such that, for all \(n\ge 2\),
+\begin{equation}\label{eq:recurrence}
+T(n) \le c n + \frac{2}{n}\sum_{i=1}^{n-1} T(i).
+\end{equation}
+
+We now prove by induction that if \(T(1)\le c\) then for every integer \(n\ge 1\),
+\[
+T(n)\le 4 c n.
+\]
+
+\medskip\noindent\textbf{Base case.}
+For \(n=1\) we have \(T(1)\le c \le 4c\), so the claim holds.
+
+\medskip\noindent\textbf{Inductive step.}
+Assume the claim holds for all positive integers less than \(n\);
+that is, assume \(T(i)\le 4 c i\) for all \(1\le i\le n-1\).
+Then
+\[
+\sum_{i=1}^{n-1} T(i) \le \sum_{i=1}^{n-1} 4 c i
+= 4c \sum_{i=1}^{n-1} i.
+\]
+Compute the arithmetic sum:
+\[
+\sum_{i=1}^{n-1} i = \frac{(n-1)n}{2}.
+\]
+Hence
+\[
+\sum_{i=1}^{n-1} T(i) \le 4c\cdot\frac{(n-1)n}{2} = 2c\,n(n-1).
+\]
+Substituting this bound into the recurrence \eqref{eq:recurrence} yields
+\[
+T(n) \le c n + \frac{2}{n}\cdot \bigl(2c\,n(n-1)\bigr)
+= c n + 4c(n-1) = 4cn - 3c.
+\]
+Therefore
+\[
+T(n) \le 4cn - 3c \le 4cn,
+\]
+which establishes the inductive step.
+
+\medskip\noindent\textbf{Conclusion.}
+By induction, \(T(n)\le 4cn\) for all integers \(n\ge 1\). This proves that the expected running time of \textsc{SELECT} is linear in \(n\).
+\end{proof}
+
+
+.
 
 
 
@@ -341,7 +411,7 @@ The proof directly follows from \cref{PROOFCORRECTNESS}.
 
 
 In this section, we propose new linear-time algorithms for computing $\varphi$-divergence risk measures. We approach this challenge by solving a linear optimization problem over polymatroids . As we show, for certain polymatroids this optimization can be solved in linear time compared to the $O(n \log  n)$ runtime of standard sorting based greedy algorithms. 
-First, recall ethe standard definition of submodular functions and the related concept of polymatroid~\cite{Korte2012}.
+First, recall the standard definition of submodular functions and the related concept of polymatroid~\cite{Korte2012}.
 \begin{definition} \label{def:polymatroid}
 A function $f \colon 2^{\mathcal{E}} \to \Real_{\ge 0}$ for a finite set $\mathcal{E} = \left\{ 1, \dots , E \right\}$ and $E\in \Nats$ is \emph{submodular} if
 \[ 
@@ -378,8 +448,7 @@ where $\mathcal{Q}_c$ is the polymatroid in \cref{def:polymatroid} for $c(\mathc
 Conventional polymatroid optimization algorithms for risk measures and the closely related maximum weighted independent set (such as \cref{alg:greedy-polymatroid} in the appendix) solve the optimization problem in \cref{prop:coherent-polymatroid} using a greedy approach that requires sorting. We now show that for a special class of submodular functions $f$ as defined below, sorting is not necessary.
 
 \begin{definition} \label{asm:submodular-function}
-  % marek: Not needed; implied by the construction below
-  % For $\mathcal{N} = \left\{ 1, \dots , N \right\}$, the function $f\colon 2^{\mathcal{N}} \to \Real_{\ge 0}$ $f(\emptyset) = 0$, $f(N) = 1$,
+
 A \emph{submodular} function $f\colon 2^{\Omega} \to \Real_{\ge 0}$ is \emph{Element-Wise-Separable}~(EWS) if there exists $g\colon [0,1] \to  [0,1]$ such that $f(\mathcal{O}) = g(\P {\mathcal{O}}), \forall \mathcal{O} \subseteq \Omega$ and for some $c \in \Real_{\ge 0}$ and $m\in \Real_{>0}$:
 \[
     g(x) =

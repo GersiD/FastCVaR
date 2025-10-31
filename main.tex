@@ -38,6 +38,7 @@
 \DeclareMathOperator{\KL}{KL}
 \DeclareMathOperator{\ext}{ext}
 \DeclareMathOperator{\conv}{conv}
+\DeclareMathOperator{\qvar}{QVaR}
 \newcommand{\quant}{{\mathfrak{q}}}
 
 \renewcommand{\cite}{\citep}
@@ -223,13 +224,13 @@ Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite
 \begin{algorithm}
   \caption{Recursive QVaR: Linear-time recursive algorithm for VaR}\label{alg:recursive-qvar}
   \Input{vector $\bm{x}$, pmf $\bm{p}$, $\alpha \in (0,1)$, indices $f$, $b$}
-  \Output{$VaR_{\alpha}[\tilde{x}]$}
+  \Output{$\varo_{\alpha}[\tilde{x}]$}
   
   \If{$b \le f$}{
     \KwRet{$x_b$}\;
   }
 
-  $i \gets f + \lceil \frac{b-f}{2} \rceil$ \tcp*{Pivot index}
+  $i \gets \operatorname{rand}(\left\{ f, f+1, \dots , b \right\})$ \tcp*{Pivot index}
   $v \gets x_i$ \tcp*{Pivot value}
   $l, g, \bm{x}', \bm{p}' \gets \operatorname{partition}(\bm{x}, \bm{p}, v, f, b)$
   \tcp*{Rearrange elements into $<$, $=$, and $>$ groups}
@@ -239,11 +240,11 @@ Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite
 
   \If{$\alpha < t$}{
     \tcp{Quantile lies to the left of the pivot}
-    \KwRet{$\text{QVaR}(\bm{x}', \bm{p}', \alpha, f, l-1)$}\;
+    \KwRet{$\qvar(\bm{x}', \bm{p}', \alpha, f, l-1)$}\;
   }
   \ElseIf{$\alpha \ge t + e$}{
     \tcp{Quantile lies to the right of the pivot}
-    \KwRet{$\text{QVaR}(\bm{x}', \bm{p}', \alpha - t - e, g+1, b)$}\;
+    \KwRet{$\qvar(\bm{x}', \bm{p}', \alpha - t - e, g+1, b)$}\;
   }
   \Else{
     \tcp{Quantile equals pivot value}
@@ -301,21 +302,19 @@ Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite
 %The above conditions primarily state that each call to the partition scheme performs a partial sorting such that all elements $\leq v_k$ will have an index $< i_k$ , and elements greater than the pivot will have an index $> i_k$.
 Below we present an algorithm for computing VaR in linear time. The algorithm is a highly trivial modification of that in \cite{korte2011combinatorial} and homework problems such as in \cite{cormen2001introduction} to account for the slight alteration in definition.
 \begin{lemma} \label{PROOFCORRECTNESS}
-  \Cref{alg:recursive-qvar} returns $VaR_{\alpha}[\tilde{x}]$. 
+  \Cref{alg:recursive-qvar} returns $\varo_{\alpha}[\tilde{x}]$ for $\alpha\in [0,1)$. 
 \end{lemma}
 \begin{proof}
 
 We proceed by induction on the number of elements in the recursion interval, 
 $n = b - f + 1$.
 
-
 \paragraph{Inductive hypothesis.}
 Assume that for all inputs of size less than or equal to $n$, 
-the algorithm correctly returns the $VaR_{\alpha}[\tilde{x}]$.
-
+the algorithm correctly returns the $\varo_{\alpha}[\tilde{x}]$.
 
 \paragraph{Base case ($n = 1$).}
-If $b \le f$, the algorithm returns $x_b$.
+Since $b = f$, the algorithm returns $x_b$.
 Since there is only one possible outcome, we have $\Pr[\tilde{x} < x_b] = 0 \le \alpha$ and $\Pr[\tilde{x} \le x_b] = 1 > \alpha$.
 Hence, by definition, $x_b$ is the $VaR_{\alpha}[\tilde{x}]$. 
 Therefore, the algorithm is correct for $n=1$.
@@ -366,11 +365,7 @@ There are three possible cases depending on the pivot value $v$ that is selected
   which implies that $v$ itself is the $VaR_{\alpha}[\tilde{x}]$ .
   The algorithm correctly returns $v$ in this case.
 \end{enumerate}
-
-\noindent
-In all three cases, the return value satisfies the quantile definition. 
-By the principle of mathematical induction, the algorithm returns
-$\mathrm{QVaR}(\bm{x}, \bm{p}, \alpha)$ for all valid inputs.
+In all three cases, the return value satisfies the quantile definition. By the principle of mathematical induction, the algorithm returns $\mathrm{QVaR}(\bm{x}, \bm{p}, \alpha, f, b)$ for all valid inputs.
 \end{proof}
 
 % \begin{corollary}
@@ -384,31 +379,22 @@ $\mathrm{QVaR}(\bm{x}, \bm{p}, \alpha)$ for all valid inputs.
 \Cref{alg:recursive-qvar} runs in expected $O(n)$ time when one use uniformly random pivot selection.
 \end{proposition}
 \begin{proof}
-Let $T(n)$ be the expected running time of \Cref{alg:recursive-qvar} for $n$. 
+Let $T(n)$ be the expected running time of \Cref{alg:recursive-qvar} for $n := b - f + 1$. 
 
-
-
-Suppose $VaR_{\alpha}[\tilde{x}]$ (the optimal quantile) is the \(k\)-th smallest element in $x$ (i.e. there are \(k-1\) smaller elements and \(n - k - d\) elements larger, where $d$ is the number of elements equal to $VaR_{\alpha}[\tilde{x}]$.
+Suppose $\qvar_{\alpha}(\tilde{x}, \bm{p}, \alpha, f, b)$ returns the \(k\)-th smallest element in $x_f, \dots, x_b$ (i.e. there are \(k-1\) smaller elements and \(n - k - d\) elements larger, where $d$ is the number of elements equal to $\qvar(\bm{x}, \bm{p}, \alpha, f, b)$.
 
 Furthermore let $v$ be the \(i\)-th smallest element in $x$ (i.e. there are \(i-1\) smaller elements and \(n - i - f\) elements larger, where $d$ is the number of elements equal to $v$
 
-\mm{good idea is to reference specific line numbers in the code}
-
-\mm{not clear to me}
 Since the pivot is chosen uniformly, each element with probability \(1/n\).
 
-
-
-
-
-
-
 Thus, the expected cost of the recursion at line 4 or 6 is 
-\[
-  \frac{1}{n} \left( \sum_{i = 1}^{k} T(n - i - f) + \sum_{i = k + 1 + d}^{n} T(i - 1) \right) \leq
-  \frac{1}{n} \left( \sum_{i = 1}^{k} T(n - i) + \sum_{i = k + 1}^{n} T(i - 1) \right) =
+\begin{align*}
+  \frac{1}{n} \left( \sum_{i = 1}^{k} T(n - i - f) + \sum_{i = k + 1 + d}^{n} T(i - 1) \right)
+  &\leq
+  \frac{1}{n} \left( \sum_{i = 1}^{k} T(n - i) + \sum_{i = k + 1}^{n} T(i - 1) \right) \\
+  &=
 \frac{1}{n} \left( \sum_{i = n - k + 1}^{n - 1} T(i) + \sum_{i = k}^{n - 1} T(i) \right)
-\]
+\end{align*}
 The second equation is an upper bound and focuses on the case when there is a unique element that equals VaR and a unique element that equals the pivot   ($d = 0$ and $f = 0$). We thus focus only on the analysis of this case for the remainder of the proof.
 
 The rest of procedure \textsc{SELECT} requires $cn$ time for some constant $c$,  

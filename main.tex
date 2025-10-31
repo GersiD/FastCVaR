@@ -174,9 +174,7 @@ Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite
 % \begin{lemma}
 % The weighted median problem defined in \cref{WM_Problem} is equivalent to solving VaR when $W = \alpha$ for a discrete random variable $\tilde{x}\colon \Omega \to \Real$ with finite $\Omega$ such that the outcomes of the random variable $\xi_1, \ldots, \xi_n \in \Real$ and the weights $w_1, \ldots, w_n \in \Real^{\mathbb{C}}$ correspond to the probabilities of each outcome .
 % \end{lemma}
-% \begin{proof}
-% Let $\xi^*$ be the optimal solution to the weighted median problem and let $W = \alpha$. Then $\P{\tilde{x} < \xi^*} \leq \alpha < \P{\tilde{x} \leq \xi^*}$. Thus $\xi^*$ is optimal for \eqref{eq:var-definition} among all outputs of $\tilde{x}$. Since the optimal value for VaR must be an outcome of $\tilde{x}$ by \cref{lem:quantile-in-finite-omega}, $\xi^*$ then must equal $\quant_{\alpha}[\tilde{x}]$ and the proof concludes.
-% \end{proof}
+
 
 %We first restate some well-known properties of the Hoare Partition scheme.
 %Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorithm works as follows. It first picks a pivot by taking the middle element between front and back and applies the partition scheme to easily compute the probability of all outcomes smaller than or equal to that of the pivot (Lines \ref{line:pivot_comp} - \ref{line:partion_line}). Note that three partitions are create, one where the elements are all less than the pivot, another containing all elements equal to the pivot, and a third pivot containing all elements greater than the pivot. We refer to these partitions as the left, middle, and right partition from here on. QVaR then determines whether the quantile can exist in the left, middle, or right pivot (lines \ref{line:determine_left}, \ref{line:determine_right}, and \ref{determine_middle} ) and adjusts the $f_k$ and $b_k$ respectively to reduce the search space to one of these partitions. We note that in the case the quantile is determined to exist in the middle partition, the algorithm can terminate since every value in the middle partition is the same. In the case of $\alpha^0 = 0$, we handle this separately and simply find the minimum element. 
@@ -221,6 +219,38 @@ Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite
 %   }
 %   \KwRet{$x^k_{b_k}$}\;    
 % \end{algorithm}  
+
+\begin{algorithm}
+  \caption{Recursive QVaR: Linear-time recursive algorithm for VaR}\label{alg:recursive-qvar}
+  \Input{vector $\bm{x}$, pmf $\bm{p}$, $\alpha \in (0,1)$, indices $f$, $b$}
+  \Output{$VaR_{\alpha}[\tilde{x}]$}
+  
+  \If{$b \le f$}{
+    \KwRet{$x_b$}\;
+  }
+
+  $i \gets f + \lceil \frac{b-f}{2} \rceil$ \tcp*{Pivot index}
+  $v \gets x_i$ \tcp*{Pivot value}
+  $l, g, \bm{x}', \bm{p}' \gets \operatorname{partition}(\bm{x}, \bm{p}, v, f, b)$
+  \tcp*{Rearrange elements into $<$, $=$, and $>$ groups}
+
+  $t \gets \sum_{j=f}^{l-1} p'_j$ \tcp*{$\P{\tilde{x}' < v}$}
+  $e \gets \sum_{j=l}^{g} p'_j$  \tcp*{$\P{\tilde{x}' = v}$}
+
+  \If{$\alpha < t$}{
+    \tcp{Quantile lies to the left of the pivot}
+    \KwRet{$\text{QVaR}(\bm{x}', \bm{p}', \alpha, f, l-1)$}\;
+  }
+  \ElseIf{$\alpha \ge t + e$}{
+    \tcp{Quantile lies to the right of the pivot}
+    \KwRet{$\text{QVaR}(\bm{x}', \bm{p}', \alpha - t - e, g+1, b)$}\;
+  }
+  \Else{
+    \tcp{Quantile equals pivot value}
+    \KwRet{$v$}\;
+  }
+\end{algorithm}
+
 
 \begin{algorithm}
   \caption{QVaR: Linear-time algorithm for VaR}\label{alg:quick-quantile}
@@ -268,33 +298,81 @@ Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite
 \end{algorithm}  
 
 
-
 %The above conditions primarily state that each call to the partition scheme performs a partial sorting such that all elements $\leq v_k$ will have an index $< i_k$ , and elements greater than the pivot will have an index $> i_k$.
 Below we present an algorithm for computing VaR in linear time. The algorithm is a highly trivial modification of that in \cite{korte2011combinatorial} and homework problems such as in \cite{cormen2001introduction} to account for the slight alteration in definition.
 \begin{lemma} \label{PROOFCORRECTNESS}
-  \Cref{alg:quick-quantile} computes the optimal solution $\xi^*$ to the weighted median problem  when $W = \alpha_0$, $x^0$ represents the values and $p^0$ represent the weights.
-  \end{lemma}
+  \Cref{alg:recursive-qvar} returns $VaR_{\alpha}[\tilde{x}]$. 
+\end{lemma}
 \begin{proof}
- Loop Invariant: Before and after every iteration $\xi^*$  will remain in the array $x^k$ at an index $i$ such that $ f_k \leq i \leq b_k $.
-Before any iteration is executed: Every element in $x$ has an index $i$ such that $ f_0 \leq i \leq b_0 $, where $f_0=1$ and $b_0=n$. 
 
-During the loop, there are 3 possible scenarios at each iteration:
+We proceed by induction on the number of elements in the recursion interval, 
+$n = b - f + 1$.
+
+
+\paragraph{Inductive hypothesis.}
+Assume that for all inputs of size less than or equal to $n$, 
+the algorithm correctly returns the $VaR_{\alpha}[\tilde{x}]$.
+
+
+\paragraph{Base case ($n = 1$).}
+If $b \le f$, the algorithm returns $x_b$.
+Since there is only one possible outcome, we have $\Pr[\tilde{x} < x_b] = 0 \le \alpha$ and $\Pr[\tilde{x} \le x_b] = 1 > \alpha$.
+Hence, by definition, $x_b$ is the $VaR_{\alpha}[\tilde{x}]$. 
+Therefore, the algorithm is correct for $n=1$.
+
+
+
+\paragraph{Inductive step.}
+Consider a call with interval size $j > 1$  and suppose that the inductive hypothesis holds for all n with $1 \le n < j$:
+\[
+  \textsc{Recursive~QVaR}(\bm{x}, \bm{p}, \alpha, f, b).
+\]
+
+There are three possible cases depending on the pivot value $v$ that is selected:
+
 \begin{enumerate}
+  \item[\textbf{(i)}] \textbf{Case 1 $\bm{\alpha < t}$.}
+  Then $\Pr[\tilde{x}' < v] = t > \alpha$, 
+  implying that the  $VaR_{\alpha}[\tilde{x}]$ lies entirely within the left segment 
+  $[f, l-1]$.
+  The algorithm recurses on this subarray with the same $\alpha$. 
+  By the inductive hypothesis, the recursive call returns
+   \begin{equation}
+    \max\ \left\{\tau \in \bar{\Real} \mid \P{\tilde{x_{f:l - 1}} < \tau}  \le \alpha\right\} 
+   \end{equation}.
 
-\item[Case 1]: $\alpha_{k-1} < t_k$ 
- For all values $\xi^*$ at indices greater than $l_k, \sum_{i : \xi_i < \xi^*} w_i > W$ and thus can not be solutions to the weighted median problem. $f_k$ and $b_k$ are set accordingly to exclude these indices and thus the loop invariant holds.
+  \item[\textbf{(ii)}] \textbf{Case 2 $\bm{\alpha \ge t + e}$.}
+  In this case, the cumulative probability mass up to $v$ is less than $\alpha$, 
+  so the  $VaR_{\alpha}[\tilde{x}]$ lies in the right segment $[g+1, b]$.
+  The algorithm recurses on this interval with an adjusted quantile level
+  \[
+    \alpha' = \alpha - (t + e),
+  \]
+  representing the conditional probability mass within the right tail.
+  By the inductive hypothesis, the recursive call returns
+    \begin{equation}
+    \max\ \left\{\tau \in \bar{\Real} \mid \P{\tilde{x_{g + 1:b}} < \tau}  \le \alpha'\right\} 
+   \end{equation}
+  and since the left and middle partitions contribute total mass $t + e$, 
+  the returned value satisfies
+  \[
+    (t + e) + \Pr[\tilde{x}'_{g+1:b} \le x] \ge \alpha,
+  \]
+  which is equivalent to \cref{eq:var-definition} for $\tilde{x}$.
 
-\item[Case 2]:  $t_k + e_k \leq \alpha_{k - 1}$
-For all values $\xi^*$ at indices less than or equal to $g_k, \sum_{i : \xi_i \leq \xi^*} w_i \leq W$ and thus can not be solutions to the weighted median problem. $f_k$ and $b_k$ are set accordingly to exclude these indices and thus the loop invariant holds.
-  .
-
-\item[Case 3]: $\alpha_{k - 1} \geq t_k$ and $\alpha_{k-1} < t_k + e_k $. 
-We know for the value $\xi^*$ at indice $g_k$, $\sum_{i : \xi_i < \xi^*} w_i \leq W < \sum_{i : \xi_i \leq \xi^*} w_i$ holds true. Thus this is the solution to the weighted median problem, and accordingly $f_k$ and $b_k$ are both set to $g_k$. 
-
-At termination, $b_k=f_k$ will point to a single index. All other indices can not be a solution to the weighted median problem, hence this will be the optimal solution. Thus the loop invariant holds and the proof concludes.
- 
+  \item[\textbf{(iii)}] \textbf{Case 3 $\bm{t \le \alpha < t + e}$.}
+  Then $\Pr[\tilde{x}' < v] = t \le \alpha$ and 
+  $\Pr[\tilde{x}' \le v] = t + e > \alpha$, 
+  which implies that $v$ itself is the $VaR_{\alpha}[\tilde{x}]$ .
+  The algorithm correctly returns $v$ in this case.
 \end{enumerate}
+
+\noindent
+In all three cases, the return value satisfies the quantile definition. 
+By the principle of mathematical induction, the algorithm returns
+$\mathrm{QVaR}(\bm{x}, \bm{p}, \alpha)$ for all valid inputs.
 \end{proof}
+
 % \begin{corollary}
 %  \Cref{alg:quick-quantile} computes the $\quant_{\alpha}(\tilde{x})$.
 % \end{corollary}
@@ -303,46 +381,41 @@ At termination, $b_k=f_k$ will point to a single index. All other indices can no
 % \end{proof}
 
 \begin{proposition} \label{TIMECOMPLEXITY}
-\Cref{alg:quick-quantile} runs in expected $O(n)$ time when one use uniformly random pivot selection for $i_k, k \in \Nats$.
+\Cref{alg:recursive-qvar} runs in expected $O(n)$ time when one use uniformly random pivot selection.
 \end{proposition}
 \begin{proof}
-\mm{this is a proof by induction on $n \in \Nats$, and define $T(n)$}
-  
-\mm{??}We analyze the expected running time \(T(n)\) of the while \Cref{alg:quick-quantile} on an input of size \(n\) ($b_k - f_k  = n$). \mm{make this more precise?}
+Let $T(n)$ be the expected running time of \Cref{alg:recursive-qvar} for $n$. 
 
-\mm{define $k\opt$ and make it clear what $i$. There exists $i$, such that there are $i-1$ elementts smaller ...., use quations for the defintion if you can.}
-Suppose \(i_{k^\star}\) is the \(i\)-th smallest element \mm{in what?} (i.e. there are \(i-1\) elements smaller than \(q\) and \(n - i - d\) elements larger than \(a\) \mm{typo}), where $d$ is the number of elements equal to the selected pivot.
+
+
+Suppose $VaR_{\alpha}[\tilde{x}]$ (the optimal quantile) is the \(k\)-th smallest element in $x$ (i.e. there are \(k-1\) smaller elements and \(n - k - d\) elements larger, where $d$ is the number of elements equal to $VaR_{\alpha}[\tilde{x}]$.
+
+Furthermore let $v$ be the \(i\)-th smallest element in $x$ (i.e. there are \(i-1\) smaller elements and \(n - i - f\) elements larger, where $d$ is the number of elements equal to $v$
 
 \mm{good idea is to reference specific line numbers in the code}
 
 \mm{not clear to me}
-Since the pivot is chosen uniformly, each \(i\in\{1,2,\dots,n\}\) occurs with probability \(1/n\).
+Since the pivot is chosen uniformly, each element with probability \(1/n\).
 
-\mm{Is there a way you can write this as a recursive statement on $T$}
-If  $t_k > \alpha_{k - 1}$, the while loop continues on the \(i-1 - d\) elements smaller than $v_k$.
-If $t_k  \leq \alpha$ and $t_k + e_k > \alpha$ the pivot is the answer and no recursion is needed.
-If $t_k + e_k < \alpha$ the algorithm recurses on the \(n-i - d\) elements larger than \(a\).
-Thus, conditioned on pivot rank \(i_k\), the recursive work is either \(T(i-1)\) or \(T(n - i - d)\) (or \(0\) when $P[x_k < v_k] = \alpha$. 
 
-\mm{Need also the distribution over $l_k$ and $e_k$ as a function of the random $i_k$.}
 
+
+
+
+
+Thus, the expected cost of the recursion at line 4 or 6 is 
 \[
- T(n) \le c(n) +  \max \left\{  T(n - ??) , T(n - ??)  \right\}  
+  \frac{1}{n} \left( \sum_{i = 1}^{k} T(n - i - f) + \sum_{i = k + 1 + d}^{n} T(i - 1) \right) \leq
+  \frac{1}{n} \left( \sum_{i = 1}^{k} T(n - i) + \sum_{i = k + 1}^{n} T(i - 1) \right) =
+\frac{1}{n} \left( \sum_{i = n - k + 1}^{n - 1} T(i) + \sum_{i = k}^{n - 1} T(i) \right)
 \]
-Here $c(n)$ is the runtime of lines 3-7. The is expected worst-case over the individual cases. 
-
-Thus, the \mm{what is this?} expected cost of the recursion at line 4 or 6 is \mm{this assumes the uniform}
-\[
-  \frac{1}{n} \left( \sum_{i = i_{k^\star} + d + 1}^{n} T(i - 1) + \sum_{i = 1}^{i_{k^\star} - 1} T(n - i - d) \right)
-\leq \frac{1}{n} \left( \sum_{i = i_k}^{n} T(i - 1) + \sum_{i = 1}^{i_k} T(n - i) \right)
-\]
-The right hand equation is an upper bound and focuses on the case when no elements are equal to the pivot ($d = 0$). We thus focus only on the analysis of this case for the remainder of the proof.
+The second equation is an upper bound and focuses on the case when there is a unique element that equals VaR and a unique element that equals the pivot   ($d = 0$ and $f = 0$). We thus focus only on the analysis of this case for the remainder of the proof.
 
 The rest of procedure \textsc{SELECT} requires $cn$ time for some constant $c$,  
 so we have the following inequality for $n \ge 2$:
 \begin{equation}
-T(n) \le cn + \frac{1}{n} \max_{1 \le i_k \le n} 
-\left\{ \sum_{i = 1}^{i_k - 1} T(i) + \sum_{i = n - i_k + 1}^{n - 1} T(i) \right\}.
+T(n) \le cn + \max_{k} 
+\left\{\frac{1}{n} (\sum_{i = n - k + 1}^{n - 1} T(i) + \sum_{i = k}^{n - 1} T(i) ) \right\}.
 \label{eq:select_recurrence}
 \end{equation}
 
@@ -388,7 +461,7 @@ T(n) \le 4cn - 3c \le 4cn,
 which establishes the inductive step.
 
 \medskip\noindent\textbf{Conclusion.}
-By induction, \(T(n)\le 4cn\) for all integers \(n\ge 1\). This proves that the expected running time of \textsc{SELECT} is linear in \(n\).
+By induction, \(T(n)\le 4cn\) for all integers \(n\ge 1\). This proves that the expected running time of QVaR is linear in \(n\).
 \end{proof}
 
 
@@ -408,8 +481,11 @@ and a number $W$ with $0 \leq W < \sum_{i=1}^{n} w_i$.
 % \textbf{Task:} Find the $(w_1, \ldots, w_n; W)$-weighted median with respect to $(\ell_1, \ldots, \ell_n)$.
 % \end{definition}
 We note that our definition differs very slightly from the popular definition in \cite{korte2011combinatorial} in that the position of the $\leq$ and $>$ in \cref{WeightedMedianEquality} are swapped.
-\end{remark}
-.
+\end{remark}.
+
+ \begin{proof}
+ Let $\xi^*$ be the optimal solution to the weighted median problem and let $W = \alpha$. Then $\P{\tilde{x} < \xi^*} \leq \alpha$ and thus $\xi^*$ is feasible for \eqref{eq:var-definition}. Since $\alpha < \P{\tilde{x} \leq \xi^*}$, $\alpha < \P{\tilde{x} \leq \xi^*}$ $\forall \xi > \xi^*$ .Thus $\xi^*$ is optimal for \eqref{eq:var-definition}. Since the optimal value for VaR must be an outcome of $\tilde{x}$ by \cref{lem:quantile-in-finite-omega}, $\xi^*$ then must equal $\quant_{\alpha}[\tilde{x}]$ and the proof concludes.
+ \end{proof}
 
 
 
@@ -499,7 +575,6 @@ We now describe an algorithm for optimizing over polymatroids with this class of
 \begin{algorithm}
   \caption{Linear-time Algorithm for optimizing linear function on polymatroids} \label{alg:maximum-weight-independent}
 
-  \Input{EWS function $f\colon 2^{\left\{ 1, \dots , N \right\}} \to  \Real_{\ge 0}$ satisfying \cref{asm:submodular-function} with some $m$ and $c$, {vector $\bm{x}^0$, pmf $\bm{p}^0$}}
   \Output{$q \in \Real^n$}
 
   $v \gets \operatorname{QVaR}(p, x, \alpha = (1 - c)/m) $ \;

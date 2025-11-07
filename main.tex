@@ -311,11 +311,11 @@ $n = b - f + 1$.
 
 \paragraph{Inductive hypothesis.}
 Assume that for all inputs of size less than or equal to $n$, 
-the algorithm correctly returns the $\varo_{\alpha}[\tilde{x}]$.
+the algorithm correctly returns the \label{GeneralVarDEF}$\max {\tau \in x \text{ s.t } ( \sum_{m = f}^b p_m} \cdot I(x_m < \tau)) \leq \alpha$, where $\alpha < \sum_{m = f}^{b}$.
 
 \paragraph{Base case ($n = 1$).}
 Since $b = f$, the algorithm returns $x_b$.
-Since there is only one possible outcome, we have $\Pr[\tilde{x} < x_b] = 0 \le \alpha$ and $\Pr[\tilde{x} \le x_b] = 1 > \alpha$.
+Since there is only one possible outcome, we have $\sum_{m = f}^b p_m \cdot I(x_m < x_b)  =  0 \le \alpha$ and $\sum_{m = f}^b p_m \cdot I(x_m \leq x_b) > \alpha$ bu the inductive hypothesis.
 Hence, by definition, $x_b$ is the $VaR_{\alpha}[\tilde{x}]$. 
 Therefore, the algorithm is correct for $n=1$.
 
@@ -331,41 +331,33 @@ There are three possible cases depending on the pivot value $v$ that is selected
 
 \begin{enumerate}
   \item[\textbf{(i)}] \textbf{Case 1 $\bm{\alpha < t}$.}
-  Then $\Pr[\tilde{x}' < v] = t > \alpha$, 
-  implying that the  $VaR_{\alpha}[\tilde{x}]$ lies entirely within the left segment 
+  Then $\sum_{m = f}^b p_m \cdot I(x_m < v) = t > \alpha$, 
+  implying that the  optimal $\tau$ in \cref{GeneralVarDEF} lies entirely within the left segment 
   $[f, l-1]$.
   The algorithm recurses on this subarray with the same $\alpha$. 
-  By the inductive hypothesis, the recursive call returns
-   \begin{equation}
-    \max\ \left\{\tau \in \bar{\Real} \mid \P{\tilde{x_{f:l - 1}} < \tau}  \le \alpha\right\} 
-   \end{equation}.
+  By the inductive hypothesis, the recursive call returns $\max {\tau \in x \text{ s.t } ( \sum_{m = f}^{l - 1} p_m} \cdot I(x_m < \tau)) \leq \alpha$ as discussed above when $l - 1$ is set to $b$.
 
   \item[\textbf{(ii)}] \textbf{Case 2 $\bm{\alpha \ge t + e}$.}
-  In this case, the cumulative probability mass up to $v$ is less than $\alpha$, 
-  so the  $VaR_{\alpha}[\tilde{x}]$ lies in the right segment $[g+1, b]$.
+  In this case, $\sum_{m = f}^b p_m \cdot I(x_m < v) = t < \alpha$, 
+  so the  optimal $\tau$ lies in the right segment $[g+1, b]$.
   The algorithm recurses on this interval with an adjusted quantile level
   \[
     \alpha' = \alpha - (t + e),
   \]
   representing the conditional probability mass within the right tail.
-  By the inductive hypothesis, the recursive call returns
-    \begin{equation}
-    \max\ \left\{\tau \in \bar{\Real} \mid \P{\tilde{x_{g + 1:b}} < \tau}  \le \alpha'\right\} 
-   \end{equation}
+  By the inductive hypothesis, the recursive call returns $\max {\tau \in x \text{ s.t } ( \sum_{m = g + 1}^{b} p_m} \cdot I(x_m < \tau)) \leq \alpha - (t + e)$
   and since the left and middle partitions contribute total mass $t + e$, 
   the returned value satisfies
-  \[
-    (t + e) + \Pr[\tilde{x}'_{g+1:b} \le x] \ge \alpha,
-  \]
+  $\max {\tau \in x \text{ s.t } ( \sum_{m = f}^{b} p_m} \cdot I(x_m < \tau)) \leq \alpha$
   which is equivalent to \cref{eq:var-definition} for $\tilde{x}$.
 
   \item[\textbf{(iii)}] \textbf{Case 3 $\bm{t \le \alpha < t + e}$.}
-  Then $\Pr[\tilde{x}' < v] = t \le \alpha$ and 
-  $\Pr[\tilde{x}' \le v] = t + e > \alpha$, 
-  which implies that $v$ itself is the $VaR_{\alpha}[\tilde{x}]$ .
+  Then $\sum_{m = f}^b p_m \cdot I(x_m < v) = t \le \alpha$ and 
+  $\sum_{m = f}^b p_m \cdot I(x_m \le v) = t + e > \alpha$, 
+  which implies that $v$ itself is the optimal $\tau$ that satisfies $\cref{GeneralVarDEF}$
   The algorithm correctly returns $v$ in this case.
 \end{enumerate}
-In all three cases, the return value satisfies the quantile definition. By the principle of mathematical induction, the algorithm returns $\mathrm{QVaR}(\bm{x}, \bm{p}, \alpha, f, b)$ for all valid inputs.
+If our starting indices $f$ and $b$ are set such that array is a probability distribution (the sum of all values in the p vector sum to 1), then it can be trivially seen that the \cref{GeneralVarDEF} is equivalent to the \cref{eq:var-definition} and the proof concludes.
 \end{proof}
 
 % \begin{corollary}
@@ -383,19 +375,19 @@ Let $T(n)$ be the expected running time of \Cref{alg:recursive-qvar} for $n := b
 
 Suppose $\qvar_{\alpha}(\tilde{x}, \bm{p}, \alpha, f, b)$ returns the \(k\)-th smallest element in $x_f, \dots, x_b$ (i.e. there are \(k-1\) smaller elements and \(n - k - d\) elements larger, where $d$ is the number of elements equal to $\qvar(\bm{x}, \bm{p}, \alpha, f, b)$.
 
-Furthermore let $v$ be the \(i\)-th smallest element in $x$ (i.e. there are \(i-1\) smaller elements and \(n - i - f\) elements larger, where $d$ is the number of elements equal to $v$
+Furthermore let $v$ be the \(i\)-th smallest element in $x$ (i.e. there are \(i-1\) smaller elements and \(n - i - s\) elements larger, where $s$ is the number of elements equal to $v$
 
 Since the pivot is chosen uniformly, each element with probability \(1/n\).
 
 Thus, the expected cost of the recursion at line 4 or 6 is 
 \begin{align*}
-  \frac{1}{n} \left( \sum_{i = 1}^{k} T(n - i - f) + \sum_{i = k + 1 + d}^{n} T(i - 1) \right)
+  \frac{1}{n} \left( \sum_{i = 1}^{k} T(n - i - s) + \sum_{i = k + 1 + d}^{n} T(i - 1) \right)
   &\leq
   \frac{1}{n} \left( \sum_{i = 1}^{k} T(n - i) + \sum_{i = k + 1}^{n} T(i - 1) \right) \\
   &=
 \frac{1}{n} \left( \sum_{i = n - k + 1}^{n - 1} T(i) + \sum_{i = k}^{n - 1} T(i) \right)
 \end{align*}
-The second equation is an upper bound and focuses on the case when there is a unique element that equals VaR and a unique element that equals the pivot   ($d = 0$ and $f = 0$). We thus focus only on the analysis of this case for the remainder of the proof.
+The second equation is an upper bound and focuses on the case when there is a unique element that equals VaR and a unique element that equals the pivot   ($d = 0$ and $s = 0$). We thus focus only on the analysis of this case for the remainder of the proof.
 
 The rest of procedure \textsc{SELECT} requires $cn$ time for some constant $c$,  
 so we have the following inequality for $n \ge 2$:

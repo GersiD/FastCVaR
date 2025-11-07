@@ -234,7 +234,6 @@ Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite
   $v \gets x_i$ \tcp*{Pivot value}
   $l, g, \bm{x}', \bm{p}' \gets \operatorname{partition}(\bm{x}, \bm{p}, v, f, b)$
   \tcp*{Rearrange elements into $<$, $=$, and $>$ groups}
-
   $t \gets \sum_{j=f}^{l-1} p'_j$ \tcp*{$\P{\tilde{x}' < v}$}
   $e \gets \sum_{j=l}^{g} p'_j$  \tcp*{$\P{\tilde{x}' = v}$}
 
@@ -302,16 +301,25 @@ Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite
 %The above conditions primarily state that each call to the partition scheme performs a partial sorting such that all elements $\leq v_k$ will have an index $< i_k$ , and elements greater than the pivot will have an index $> i_k$.
 Below we present an algorithm for computing VaR in linear time. The algorithm is a highly trivial modification of that in \cite{korte2011combinatorial} and homework problems such as in \cite{cormen2001introduction} to account for the slight alteration in definition.
 \begin{lemma} \label{PROOFCORRECTNESS}
-  \Cref{alg:recursive-qvar} returns $\varo_{\alpha}[\tilde{x}]$ for $\alpha\in [0,1)$. 
+  % \Cref{alg:recursive-qvar} returns $\varo_{\alpha}[\tilde{x}]$ for $\alpha\in [0,1)$. 
+  % \Cref{alg:recursive-qvar} returns $\varo_{\alpha}[\tilde{x}]$ for $\alpha\in [0,1)$. 
+\[
+  \max \left\{\tau \in \Real \mid   \sum_{m = f}^b p_m \cdot I(x_m < \tau) \leq \alpha \right\},
+\]
+where $\alpha < \sum_{m = f}^{b}$.
 \end{lemma}
 \begin{proof}
 
 We proceed by induction on the number of elements in the recursion interval, 
 $n = b - f + 1$.
 
-\paragraph{Inductive hypothesis.}
-Assume that for all inputs of size less than or equal to $n$, 
-the algorithm correctly returns the \label{GeneralVarDEF}$\max {\tau \in x \text{ s.t } ( \sum_{m = f}^b p_m} \cdot I(x_m < \tau)) \leq \alpha$, where $\alpha < \sum_{m = f}^{b}$.
+% \paragraph{Inductive hypothesis.} \label{GeneralVarDEF}
+% Assume that for all inputs of size less than or equal to $n$, 
+% the algorithm correctly returns the
+% \[
+%   \max \left\{\tau \in \Real \mid  ( \sum_{m = f}^b p_m\right\} \cdot I(x_m < \tau)) \leq \alpha,
+% \]
+% where $\alpha < \sum_{m = f}^{b}$.
 
 \paragraph{Base case ($n = 1$).}
 Since $b = f$, the algorithm returns $x_b$.
@@ -331,11 +339,27 @@ There are three possible cases depending on the pivot value $v$ that is selected
 
 \begin{enumerate}
   \item[\textbf{(i)}] \textbf{Case 1 $\bm{\alpha < t}$.}
-  Then $\sum_{m = f}^b p_m \cdot I(x_m < v) = t > \alpha$, 
-  implying that the  optimal $\tau$ in \cref{GeneralVarDEF} lies entirely within the left segment 
-  $[f, l-1]$.
-  The algorithm recurses on this subarray with the same $\alpha$. 
-  By the inductive hypothesis, the recursive call returns $\max {\tau \in x \text{ s.t } ( \sum_{m = f}^{l - 1} p_m} \cdot I(x_m < \tau)) \leq \alpha$ as discussed above when $l - 1$ is set to $b$.
+    We can also, show by contradiction that $\tau\opt$ optimal in \mm{??} must satisfy that
+    \[
+     \tau\opt < v,
+   \]
+   because 
+    \[
+      \alpha  < t = \sum_{m = f}^{l-1} p'_m  = \sum_{m = f}^b p'_m I(x'_m < v),
+    \]
+  % implying that the optimal $\tau\opt \in f{:}(l-1)$.
+    Moreover, $x'_m < v, \forall m \in f{:}(l-1)$ from the partition function. 
+  By the inductive hypothesis,
+  \begin{align*}
+    \qvar(\bm{x}', \bm{p}', \alpha, f, l-1)
+    &= \max \left\{\tau \in \Real \mid  \sum_{m = f}^{l - 1} p'_m \cdot I(x'_m < \tau) \leq \alpha \right\} \\
+    &= \max \left\{\tau \in (-\infty, v) \mid  \sum_{m = f}^{l - 1} p'_m \cdot I(x'_m < \tau) \leq \alpha \right\} \\
+    &\stackrel{\text(a)}{=} \max \left\{\tau \in (-\infty, v)  \mid  \sum_{m = f}^{b} p'_m \cdot I(x'_m < \tau) \leq \alpha \right\} \\
+    &= \max \left\{\tau \in (-\infty, v)  \mid  \sum_{m = f}^{b} p_m \cdot I(x_m < \tau) \leq \alpha \right\} \\
+    &= \max \left\{\tau \in \Real  \mid  \sum_{m = f}^{b} p_m \cdot I(x_m < \tau) \leq \alpha \right\} \\
+    &= \tau\opt.
+  \end{align*}
+  The equality \emph{(a)} holds because we just add 0.
 
   \item[\textbf{(ii)}] \textbf{Case 2 $\bm{\alpha \ge t + e}$.}
   In this case, $\sum_{m = f}^b p_m \cdot I(x_m < v) = t < \alpha$, 

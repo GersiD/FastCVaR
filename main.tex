@@ -303,10 +303,10 @@ Below we present an algorithm for computing VaR in linear time. The algorithm is
 \begin{lemma} \label{PROOFCORRECTNESS}
   % \Cref{alg:recursive-qvar} returns $\varo_{\alpha}[\tilde{x}]$ for $\alpha\in [0,1)$. 
   % \Cref{alg:recursive-qvar} returns $\varo_{\alpha}[\tilde{x}]$ for $\alpha\in [0,1)$. 
-\[
+The algorithm returns \[
   \max \left\{\tau \in \Real \mid   \sum_{m = f}^b p_m \cdot I(x_m < \tau) \leq \alpha \right\},
-\]
-where $\alpha < \sum_{m = f}^{b}$.
+\] \label{INDUCTHYPOTH}
+$\forall \alpha < \sum_{m = f}^{b}p_m$.
 \end{lemma}
 \begin{proof}
 
@@ -323,8 +323,8 @@ $n = b - f + 1$.
 
 \paragraph{Base case ($n = 1$).}
 Since $b = f$, the algorithm returns $x_b$.
-Since there is only one possible outcome, we have $\sum_{m = f}^b p_m \cdot I(x_m < x_b)  =  0 \le \alpha$ and $\sum_{m = f}^b p_m \cdot I(x_m \leq x_b) > \alpha$ bu the inductive hypothesis.
-Hence, by definition, $x_b$ is the $VaR_{\alpha}[\tilde{x}]$. 
+Since there is only one possible outcome, we have $\sum_{m = f}^b p_m \cdot I(x_m < x_b)  =  0 \le \alpha \textbf{ } \forall \alpha < p_b $ and $\sum_{m = f}^b p_m \cdot I(x_m \leq x_b) > \alpha \textbf {}\forall \alpha < p_b. $ by the inductive hypothesis.
+Hence, by definition, $x_b$ is the optimal $\tau$ for . 
 Therefore, the algorithm is correct for $n=1$.
 
 
@@ -332,13 +332,13 @@ Therefore, the algorithm is correct for $n=1$.
 \paragraph{Inductive step.}
 Consider a call with interval size $j > 1$  and suppose that the inductive hypothesis holds for all n with $1 \le n < j$:
 \[
-  \textsc{Recursive~QVaR}(\bm{x}, \bm{p}, \alpha, f, b).
+  \textsc{QVaR}(\bm{x}, \bm{p}, \alpha, f, b).
 \]
 
 There are three possible cases depending on the pivot value $v$ that is selected:
 \begin{enumerate}
   \item[\textbf{(i)}] \textbf{Case 1 $\bm{\alpha < t}$.}
-    We can also, show by contradiction that $\tau\opt$ optimal in \mm{??} must satisfy that
+    We can also, show by contradiction that $\tau\opt$ optimal in \cref{INDUCTHYPOTH} must satisfy that
     \[
      \tau\opt < v,
    \]
@@ -360,35 +360,41 @@ There are three possible cases depending on the pivot value $v$ that is selected
   \end{align*}
   The equality \emph{(a)} holds because we just add 0.
 
-  \item[\textbf{(ii)}] \textbf{Case 2 $\bm{\alpha \ge t + e}$.}
-  In this case, $\sum_{m = f}^b p_m \cdot I(x_m < v) = t < \alpha$, 
-  so the  optimal $\tau$ lies in the right segment $[g+1, b]$.
-  The algorithm recurses on this interval with an adjusted quantile level
-  \[
-    \alpha' = \alpha - (t + e),
-  \]
-  representing the conditional probability mass within the right tail.
-  By the inductive hypothesis, the recursive call returns $\max {\tau \in x \text{ s.t } ( \sum_{m = g + 1}^{b} p_m} \cdot I(x_m < \tau)) \leq \alpha - (t + e)$
-  and since the left and middle partitions contribute total mass $t + e$, 
-  the returned value satisfies
-  $\max {\tau \in x \text{ s.t } ( \sum_{m = f}^{b} p_m} \cdot I(x_m < \tau)) \leq \alpha$
-  which is equivalent to \cref{eq:var-definition} for $\tilde{x}$.
-
+  \item[\textbf{(ii)}] \textbf{Case 2 $\bm{\alpha > t + e}$.}
+  We can also, show by contradiction that $\tau\opt$ optimal in \cref{INDUCTHYPOTH} must satisfy that
+    \[
+     \tau\opt > v,
+   \]
+   because 
+    \[
+      \alpha  > t + e = \sum_{m = f}^{g} p'_m  = \sum_{m = f}^b p'_m I(x'_m \le v),
+    \]
+  % implying that the optimal $\tau\opt \in f{:}(l-1)$.
+    Moreover, $x'_m > v, \forall m \in g + 1{:}(b)$ from the partition function. 
+  By the inductive hypothesis,
+  \begin{align*}
+    \qvar(\bm{x}', \bm{p}', \alpha - (t + e), g + 1, b)
+    &= \max \left\{\tau \in \Real \mid  \sum_{m = g + 1}^{b} p'_m \cdot I(x'_m < \tau) \leq \alpha - (t + e) \right\} \\
+    &= \max \left\{\tau \in \Real \mid  t + e + \sum_{m = g + 1}^{b} p'_m \cdot I(x'_m < \tau) \leq \alpha \right\} \\
+    &\stackrel{\text(a)}{=} \max \left\{\tau \in \Real  \mid  \sum_{m = f}^{b} p'_m \cdot I(x'_m < \tau) \leq \alpha \right\} \\
+    &= \tau\opt.
+  \end{align*}
+  The equality \emph{(a)} holds because we just add 0.
   \item[\textbf{(iii)}] \textbf{Case 3 $\bm{t \le \alpha < t + e}$.}
   Then $\sum_{m = f}^b p_m \cdot I(x_m < v) = t \le \alpha$ and 
   $\sum_{m = f}^b p_m \cdot I(x_m \le v) = t + e > \alpha$, 
-  which implies that $v$ itself is the optimal $\tau$ that satisfies $\cref{GeneralVarDEF}$
+  which implies that $v$ itself is the optimal $\tau$ that satisfies $\cref{INDUCTHYPOTH}$
   The algorithm correctly returns $v$ in this case.
 \end{enumerate}
-If our starting indices $f$ and $b$ are set such that array is a probability distribution (the sum of all values in the p vector sum to 1), then it can be trivially seen that the \cref{GeneralVarDEF} is equivalent to the \cref{eq:var-definition} and the proof concludes.
+
 \end{proof}
 
-% \begin{corollary}
-%  \Cref{alg:quick-quantile} computes the $\quant_{\alpha}(\tilde{x})$.
-% \end{corollary}
-% \begin{proof}
-% The proof directly follows from \cref{PROOFCORRECTNESS}.
-% \end{proof}
+ \begin{corollary}
+  \Cref{alg:quick-quantile} computes the $\quant_{\alpha}(\tilde{x})$.
+ \end{corollary}
+ \begin{proof}
+ The proof directly follows from \cref{PROOFCORRECTNESS}.
+ \end{proof}
 
 \begin{proposition} \label{TIMECOMPLEXITY}
 \Cref{alg:recursive-qvar} runs in expected $O(n)$ time when one use uniformly random pivot selection.
@@ -523,7 +529,7 @@ Polymatroids are important for our purpose because many risk measures can be for
 \begin{equation}\label{eq:comontonic-optimization}
    \rho[\tilde{x}] = \min_{\bm{q}\in \mathcal{Q}_c} \bm{q}\tr  \bm{x},
 \end{equation}
-where $\mathcal{Q}_c$ is the polymatroid in \cref{def:polymatroid} for $c(\mathcal{A}) := \rho(-\one_{\mathcal{A}})$ for each $\mathcal{A} \subseteq \Omega$. \mm{Missing a negative sign?}
+where $\mathcal{Q}_c$ is the polymatroid in \cref{def:polymatroid} for $c(\mathcal{A}) := -\rho(-\one_{\mathcal{A}})$ for each $\mathcal{A} \subseteq \Omega$. \mm{Missing a negative sign?}
 \end{proposition}
 \begin{proof}
   The result is an immediate consequence of \cite[Corollary 4.89]{Follmer2016}

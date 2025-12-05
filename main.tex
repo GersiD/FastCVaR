@@ -56,7 +56,7 @@
 \maketitle
 
 \begin{abstract}
-Monetary risk measures have gained popularity in expressing decision-makers' preferences for risk aversion. Value-at-Risk (VaR) and Conditional-Value-at-Risk (CVaR) are very common risk measures. This paper proposes novel algorithms for computing these risk measures for discrete distributions in linear time. Our algorithms improve upon existing algorithms, which must sort the random variable by at least a logarithmic factor. We adapt the QuickSelect algorithm and combine it with a general polymatroid representation of $\varphi$-divergence risk measures. Numerical results show that our new algorithms offer an order of magnitude speed up for large domains, and a library implementation of the algorithms is available at \textcolor{green}{REDACTED}.     
+Monetary risk measures have gained popularity in expressing decision-makers' preferences for risk aversion. Value-at-Risk (VaR) and Conditional-Value-at-Risk (CVaR) in particular are used commonly for this purpose. This paper proposes a novel approach for computing these risk measures as well as others for discrete distributions in linear time. We adapt the Quick Select algorithm and combine it with a general polymathic representation of $\varphi$-divergence risk measures. Numerical results show that our new algorithms offer an order of magnitude speed up for large domains, and a library implementation of the algorithms is available at \textcolor{green}{REDACTED}.     
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
@@ -303,8 +303,8 @@ Below we present an algorithm for computing VaR in linear time. The algorithm is
 \begin{lemma} \label{PROOFCORRECTNESS}
   % \Cref{alg:recursive-qvar} returns $\varo_{\alpha}[\tilde{x}]$ for $\alpha\in [0,1)$. 
   % \Cref{alg:recursive-qvar} returns $\varo_{\alpha}[\tilde{x}]$ for $\alpha\in [0,1)$. 
-The algorithm returns \[
-  \max \left\{\tau \in \Real \mid   \sum_{m = f}^b p_m \cdot I(x_m < \tau) \leq \alpha \right\},
+Algorithm \ref{alg:quick-quantile} returns $\tau\star$ where \[
+  \tau\star \in \argmax \left\{\tau \in \Real \mid   \sum_{m = f}^b p_m \cdot I(x_m < \tau) \leq \alpha \right\},
 \] \label{INDUCTHYPOTH}
 $\forall \alpha < \sum_{m = f}^{b}p_m$.
 \end{lemma}
@@ -390,7 +390,7 @@ There are three possible cases depending on the pivot value $v$ that is selected
 \end{proof}
 
  \begin{corollary}
-  \Cref{alg:quick-quantile} computes the $\quant_{\alpha}(\tilde{x})$.
+  \Cref{alg:quick-quantile} computes $\quant_{\alpha}(\tilde{x})$.
  \end{corollary}
  \begin{proof}
  The proof directly follows from \cref{PROOFCORRECTNESS}.

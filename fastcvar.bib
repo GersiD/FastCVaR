@@ -372,15 +372,6 @@ CSCI 382, Algorithms},
   year          = {2019},
   publisher={Hendrix College}
 }
-@article{ahmadi2012entropic,
-  title={Entropic value-at-risk: A new coherent risk measure},
-  author={Ahmadi-Javid, Amir},
-  journal={Journal of Optimization Theory and Applications},
-  volume={155},
-  pages={1105--1123},
-  year={2012},
-  publisher={Springer}
-}
 
 @article{Inzunza2016,
   title = {{{CVaR}} Constrained Planning of Renewable Generation with Consideration of System Inertial Response, Reserve Services and Demand Participation},
@@ -406,4 +397,45 @@ CSCI 382, Algorithms},
   pages = {3340--3351},
   copyright = {All rights reserved},
   file = {/home/marek/Zotero/storage/9RPGBRXF/Barahona et al. - 2013 - Agile logistics simulation and optimization for managing disaster responses.pdf}
+}
+@inproceedings{Hau2023,
+  title = {Entropic Risk Optimization in Discounted {{MDPs}}},
+  booktitle = {Artificial {{Intelligence}} and {{Statistics}} ({{AISTATS}})},
+  author = {Hau, Jia Lin and Petrik, Marek and Ghavamzadeh, Mohammad},
+  year = 2023,
+  copyright = {Creative Commons Attribution-ShareAlike 4.0 International License (CC-BY-SA)},
+  file = {/home/marek/Zotero/storage/HU8E3D43/Hau et al_2023_Entropic Risk Optimization in.pdf}
+}
+
+@inproceedings{Hau2023a,
+  title = {On Dynamic Programming Decompositions of Static Risk Measures in {{Markov}} Decision Processes},
+  booktitle = {Neural {{Information Processing Systems}} ({{NeurIPS}})},
+  author = {Hau, Jia Lin and Delage, Erick and Ghavamzadeh, Mohammad and Petrik, Marek},
+  year = 2023,
+  eprint = {2304.12477},
+  primaryclass = {cs, math},
+  doi = {10.48550/arXiv.2304.12477},
+  urldate = {2023-05-04},
+  abstract = {Optimizing static risk-averse objectives in Markov decision processes is challenging because they do not readily admit dynamic programming decompositions. Prior work has proposed to use a dynamic decomposition of risk measures that help to formulate dynamic programs on an augmented state space. This paper shows that several existing decompositions are inherently inexact, contradicting several claims in the literature. In particular, we give examples that show that popular decompositions for CVaR and EVaR risk measures are strict overestimates of the true risk values. However, an exact decomposition is possible for VaR, and we give a simple proof that illustrates the fundamental difference between VaR and CVaR dynamic programming properties.},
+  archiveprefix = {arXiv},
+  copyright = {Creative Commons Attribution-ShareAlike 4.0 International License (CC-BY-SA)},
+  keywords = {Computer Science - Artificial Intelligence,Mathematics - Optimization and Control},
+  file = {/home/marek/Zotero/storage/QVTEG4KL/Hau et al_2023_On Dynamic Program Decompositions of.pdf;/home/marek/Zotero/storage/NI2IIKW3/2304.html}
+}
+
+@inproceedings{Hau2025,
+  title = {Q-Learning for Quantile {{MDPs}}: {{A}} Decomposition, Performance, and Convergence Analysis},
+  shorttitle = {Q-Learning for Quantile {{MDPs}}},
+  booktitle = {Artificial {{Intelligence}} and {{Statistics}} ({{AISTATS}})},
+  author = {Hau, Jia Lin and Delage, Erick and Derman, Esther and Ghavamzadeh, Mohammad and Petrik, Marek},
+  year = 2025,
+  eprint = {2410.24128},
+  primaryclass = {cs},
+  doi = {10.48550/arXiv.2410.24128},
+  urldate = {2025-07-22},
+  abstract = {In Markov decision processes (MDPs), quantile risk measures such as Value-at-Risk are a standard metric for modeling RL agents' preferences for certain outcomes. This paper proposes a new Q-learning algorithm for quantile optimization in MDPs with strong convergence and performance guarantees. The algorithm leverages a new, simple dynamic program (DP) decomposition for quantile MDPs. Compared with prior work, our DP decomposition requires neither known transition probabilities nor solving complex saddle point equations and serves as a suitable foundation for other model-free RL algorithms. Our numerical results in tabular domains show that our Q-learning algorithm converges to its DP variant and outperforms earlier algorithms.},
+  archiveprefix = {arXiv},
+  copyright = {All rights reserved},
+  keywords = {Computer Science - Machine Learning},
+  file = {/home/marek/Zotero/storage/EKHZPFM2/Hau et al. - 2024 - Q-learning for Quantile MDPs A Decomposition, Performance, and Convergence Analysis.pdf;/home/marek/Zotero/storage/X5KNPGFP/2410.html}
 }

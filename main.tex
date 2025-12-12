@@ -61,15 +61,15 @@ Monetary risk measures have gained popularity in expressing decision-makers' pre
 
 \section{Introduction}\label{sec:intro}
 
-Monetary measures of risk generalize the expectation operator to be able to represent the risk aversion of decision makers in domains that range from robotics~\cite{akella2024risk,majumdar2020should,benrabah2024review} to finance~\cite{Follmer2016} to infrastructure maintenance~\cite{Inzunza2016}, and disaster response~\cite{Barahona2013}. Value-at-Risk~(VaR) and Conditional-Value-at-Risk~(CVaR) are the most popular risk measures and have made inroads in reinforcement learning, machine learning, and decision making~\cite{Petrik2024}. Machine learning and reinforcement learning algorithms typically must compute the risk measures for discrete random variables. Fast algorithms for computing risk measures are necessary in several machine-learning settings. For example, when solving robust or risk-averse MDPs by value iteration, the risk measure must be evaluated in every iteration for every state of the algorithm and can represent a significant computational bottleneck~\cite{Ho2021,Ho2018,Ho2022}. 
+Monetary measures of risk generalize the expectation operator to be able to represent the risk aversion of decision makers in domains that range from robotics~\cite{akella2024risk,majumdar2020should,benrabah2024review} to finance~\cite{Follmer2016} to infrastructure maintenance~\cite{Inzunza2016}, and disaster response~\cite{Barahona2013}. Value-at-Risk~(VaR) and Conditional-Value-at-Risk~(CVaR) are the most popular risk measures and have made inroads in reinforcement learning, machine learning, and decision making~\cite{Petrik2024}. Machine learning and reinforcement learning algorithms typically must compute the risk measures for discrete random variables. Fast algorithms for computing risk measures are necessary in several machine-learning settings. For example, when solving robust or risk-averse MDPs by value iteration, the risk measure must be evaluated in every iteration for every state of the algorithm and can represent a significant computational bottleneck~\cite{Ho2021,Ho2018,Ho2022c,Hau2023a,Hau2025}. 
 
-In this paper, we propose expected linear time algorithms for computing risk measures of discrete random variables. First, we develop \emph{QuickQuantile}, an algorithm that computes VaR in linear time. The QuickQuantile algorithm builds on the WeightedMedian quickselect algorithm. Second, we develop \emph{QuickDivergence}, an algorithm that computes, in linear time,   $\varphi$-divergence risk measures~\cite{Ahmadi-Javid2012} that satisfy a specific piecewise linearity property. The common CVaR risk measure is an example of $\varphi$-divergence risk measure that satisfies the required linearity property. The QuickDivergence algorithm leverages the fact that $\varphi$-divergence risk measures can be represented as linear minimization over polymatroids~\cite{Follmer2016}. While we focus on expected linear time algorithms because they work well in practice, but they can be readily adapted to run in deterministic linear time with a careful pivot selection as we describe below. 
+In this paper, we propose linear time algorithms for computing risk measures of discrete random variables. First, we develop \emph{QuickQuantile}, an algorithm that computes VaR in linear time. The QuickQuantile algorithm builds on the WeightedMedian quickselect algorithm. Second, we develop \emph{QuickDivergence}, an algorithm that computes, in linear time,   $\varphi$-divergence risk measures~\cite{Ahmadi-Javid2012} that satisfy a specific piecewise linearity property. For example, CVaR is a $\varphi$-divergence risk measure that satisfies the required linearity property. The QuickDivergence algorithm leverages the fact that $\varphi$-divergence risk measures can be represented as linear minimization over polymatroids~\cite{Follmer2016}. While we focus on expected linear time algorithms because they work well in practice, but they can be readily adapted to run in deterministic linear time with a careful pivot selection as we describe below. 
 
-We are unaware of prior linear-time algorithms for computing risk measures. The standard algorithms for computing VaR must sort the values of the random variable which requires $\Omega(n \log n)$ operations. Coherent risk measures, like CVaR, can be evaluated by solving convex optimization problems~\cite{Follmer2016, rockefeller1996variational}. Although most of these optimization problems are tractable, their time complexity is too large to be practical for applications where they are most needed. Current practical implementations rely on specific properties of these optimization problems to compute the solution efficiently. For example, all existing CVaR algorithms must sort the values of the random variable to compute its value~\cite{Follmer2016}, as in the case for VaR. The $\Omega(n \log  n)$ time complexity of the sort dominates the time complexity and prevents linear time computation. In this paper, we circumvent the complexity of sorting by developing no-sort algorithms for these risk measures and others. 
+Standard algorithms for computing risk measures of discrete random variables have superlinear time complexity. For instance, VaR algorithms sort the values of the random variable which requires $\Omega(n \log n)$ operations where $n$ is the size of the probability space. Coherent risk measures, like CVaR, can be evaluated by solving convex optimization problems~\cite{Follmer2016, rockefeller1996variational}. Generic convex optimization algorithms, such as the interior point linear program solvers, are no faster than $O(n^3)$~\cite{Ho2021} which may be too slow in practice. However, CVaR and other coherent comotonotonic law-invariant risk measures can be solved using greedy algorithms in $O(n \log  n)$ time~\cite{Follmer2016}. The $\Omega(n \log  n)$ time complexity of the sort dominates the time complexity and prevents linear time computation. In this paper, we circumvent the complexity of sorting by developing no-sort algorithms for these risk measures and others. 
 
-Numerous efficient algorithms have been designed for structured optimization problems that are similar to VaR and CVaR evaluations. Some example of such structured optimization problems are the projection onto the simplex~\cite{adam2019projectionscanonicalsimplexadditional, Wang2013Simplex}, projection on k-capped simplex~\cite{kcapped_ang}, linear optimization on the intersection of $L_p$ or $\varphi$-divergence balls and the probability simplex as arise in robust optimizations~\cite{}, optimization for $\varphi$-divergence risk measures~\cite{}, and on polytopes defined by submodular functions which are known as polymatroids~\cite{}. Many of these algorithms require sorting the input variables, which has $O(n \log  n)$ complexity. There has been mention of the possibility of linear time algorithms however, we could find neither work describing nor studying them. One exception is \cite{Condat2016}, which proposes a linear-time algorithm for computing the projection onto the simplex, which does not leverage QuickSelect. 
+Numerous efficient algorithms have been designed for structured optimization problems that resemble VaR and CVaR evaluations. Some example of such structured optimization problems are the projection onto the simplex~\cite{adam2019projectionscanonicalsimplexadditional, Wang2013Simplex}, projection on k-capped simplex~\cite{kcapped_ang,Lim2016}, linear optimization on the intersection of $L_p$ or $\varphi$-divergence balls and the probability simplex as arise in robust optimizations~\cite{Ho2022}, optimization for $\varphi$-divergence risk measures~\cite{Ahmadi-Javid2012}, and on polytopes defined by submodular functions which are known as polymatroids~\cite{Korte2012}. Many of these algorithms require sorting the input variables, which has $O(n \log  n)$ complexity. While these papers often discuss the possibility of linear-time algorithms, they usually do not study them with a few exceptions~\cite{Condat2016,Lim2016}. 
 
-Our algorithms' time complexity improves on the state of the art by a logarithmic factor. Although this improvement may seem unimportant,  it is an acceleration that is practically meaningful without any serious drawbacks. Our algorithms are simple and easy to implement, with little added complexity compared to the state-of-the-art. Our numerical results show that they can lead to an order of magnitude speed-up for realistic large problems, a significant speed-up for moderately sized problems, and match the performance of existing algorithms for small problems.
+Our algorithms' time complexity improves on the state of the art by a logarithmic factor. Although this improvement may seem unimportant,  it is an acceleration that can be practically meaningful without any serious drawbacks. Our algorithms are simple and easy to implement, with little added complexity compared to the state-of-the-art. Our numerical results show that they can lead to an order of magnitude speed-up for realistic large problems, a significant speed-up for moderately sized problems, and match the performance of existing algorithms for small problems.
 
 The remainder of the paper is organized as follows. \Cref{sec:preliminaries} describes the necessary background on risk measures, $\varphi$-divergence, and polymatroid optimization. Then, \Cref{sec:var-linear} shows the relationship between VaR and the Weighted Median problem, allowing us to trivially adapt algorithms for the Weighted Median Problem to solve VaR. Then, \cref{sec:phi-divergence} builds on this to develop \emph{QuickDivergence}, an algorithm that evaluates certain $\varphi$-divergence risk measures in linear time. We evaluate the algorithms numerically on synthetic and realistic problems in \cref{sec:experiments}. A tested implementation of the algorithms in Julia is available at \url{https://github.com/RiskAverseRL/RiskMeasures.jl}.
 
@@ -87,7 +87,7 @@ First, we consider the \emph{Value-at-Risk}~(VaR)---one of the most popular risk
     \max\; \left\{\tau \in \bar{\Real} \mid \P{\tilde{x} < \tau}  \le \alpha\right\} =
     \max\; \left\{\tau \in \bar{\Real} \mid \P{\tilde{x} \ge  \tau}  \ge 1 - \alpha\right\}.
 \end{equation}
-The first maximum in~\eqref{eq:var-definition} exists because $\tau \mapsto \P{\tilde{x} < \tau}$ is a lower semi-continuous function. It is easy to see that $\varo_0[\tilde{x}] = \ess \inf [\tilde{x}]$, and typically the risk measure is extended as $\varo_{1}[ \tilde{x} ] = \infty$. Our analysis will also require the notion of the \emph{quantile} $\quant_{\alpha}$ for $\tilde{x}$ which is defined as the set
+The first maximum in~\eqref{eq:var-definition} exists because $\tau \mapsto \P{\tilde{x} < \tau}$ is a lower semi-continuous function. One can readily see that $\varo_0[\tilde{x}] = \ess \inf [\tilde{x}]$, and typically the risk measure is extended as $\varo_{1}[ \tilde{x} ] = \infty$. Our analysis will also require the notion of the \emph{quantile} $\quant_{\alpha}$ for $\tilde{x}$ which is defined as the set
 \[
   \quant_{\alpha}[\tilde{x}] := \left\{ z\in \Real \mid  \P{ \tilde{x} \le z } \ge \alpha , \P{ \tilde{x} \ge z } \ge 1-\alpha  \right\}.
 \]
@@ -109,7 +109,7 @@ The lower and upper bounds of the quantile set are denoted by $\quant^+_{\alpha}
          $\tvaro_{\alpha}$     & $|y - 1|$ & $ \begin{cases} x &\text{if } |x| \le 1\\ \infty &\text{otherwise} \end{cases} $& $\sqrt{ 2 \log 2 \cdot \log \frac{1}{\alpha} }$ \\
          \bottomrule
     \end{tabular}
-    \caption{Parameters for selected $\varphi$-divergence risk measures for $\alpha\in (0,1)$.}
+    \caption{Parameters for selected $\varphi$-divergence risk measures for $\alpha\in (0,1)$.} \label{tab:phi-divergence-risk}
 \end{table}
 
 Second, we consider \emph{$\varphi$-divergence risk measures}~\cite{Ahmadi-Javid2012}. A divergence risk measure $\ER_{\varphi, \beta }\colon \mathbb{X} \to  \bar{\Real}$  is defined for a closed, convex function $\varphi\colon \bar{\Real} \to \bar{\Real}$ that satisfies $\varphi(1) = 0$ and $\beta\in \Real_{\ge 0}$ as
@@ -127,19 +127,12 @@ The function $H_{\varphi}$ in~\eqref{eq:fdiv-primal} is a $\varphi$-divergence m
   H_\varphi(\bm{q} \| \bm{p}) := \sum_{\omega \in \Omega} p_{\omega} \cdot \varphi\left(\frac{q_{\omega}}{p_{\omega}}\right),
 \]
 and we adopt the common convention that $1 / 0 = \infty$ and $0 \cdot \infty = 0$~\cite{rockefeller1996variational}. Note that the absolute continuity restriction is not needed for finite probability spaces. 
-The function $\varphi\opt(x)$ is the convex conjugate of $\varphi(y)$ \mm{unfinished?}
-% \begin{proposition}
-\[
-  \cvar{\alpha}{\tilde{x}}
-  \ge
-  \evar{\alpha}{\tilde{x}}
-  \ge
-  \tvar{\alpha}{\tilde{x}}.
-\]
-% \end{proposition}
+The function $\varphi\opt(x)$ is the convex conjugate of $\varphi(y)$.
 
+\mm{the rest of the section needs polish}
 
 Finally, it is important to note that $\varphi$-divergence risk measures are coherent, which means they are convex and positively homogeneous. Any coherent risk measure $\rho\colon \mathbb{X}\to \bar{\Real}$ satisfies for some closed convex non-empty set $\mathcal{Q} \subseteq \Delta^n$ \citep[Prop. 2.84]{Follmer2016}. 
+
 We also consider \emph{Conditional-Value-at-Risk}~(CVaR), a common risk measure, which is defined for a random variable $\tilde{x} \in \mathbb{X}$ and risk level $\alpha \in (0,1]$ as~\cite{Follmer2016}
 \begin{equation} \label{eq:primal_cvar}
     \cvaro_\alpha(\tilde{x})
@@ -148,11 +141,28 @@ We also consider \emph{Conditional-Value-at-Risk}~(CVaR), a common risk measure,
 \end{equation}
 CVaR is usually extended continuously as $\cvaro_0[\tilde{x}] = \ess\inf[\tilde{x}]$.
 
+\mm{introduce this}
+\begin{proposition}
+For each $\alpha\in [0,1]$ and $\tilde{x} \in \mathbb{X}$:
+\[
+  \var{\alpha}{\tilde{x}}
+  \ge
+  \cvar{\alpha}{\tilde{x}}
+  \ge
+  \evar{\alpha}{\tilde{x}}
+  \ge
+  \tvar{\alpha}{\tilde{x}}.
+\]
+\end{proposition}
+\begin{proof}
+\mm{TODO}
+\end{proof}
+
 In the remainder of the paper, we first propose a linear-time algorithm for computing VaR then we build on it to propose a linear time algorithm for certain $\varphi$-divergence risk measures. 
 
 \section{Computing VaR in Linear Time} \label{sec:var-linear}
 
-In this section, we show the equivalence between VaR and the weighted-median problem, which is well known to be solvable in linear time \cite{korte2011combinatorial,cormen2001introduction}.
+In this section, we show the equivalence between VaR and the weighted-median problem, which is well known to be solvable in linear time \cite{Korte2012,cormen2001introduction}.
 
 In order to prove that that VaR and the weighted median problem are equivalent, we first show that $\quant_{\alpha}^+(\tilde{x})$ is an element in the array. 
 \begin{lemma}\label{lem:quantile-in-finite-omega}
@@ -290,12 +300,12 @@ Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite
 
 
 %The above conditions primarily state that each call to the partition scheme performs a partial sorting such that all elements $\leq v_k$ will have an index $< i_k$ , and elements greater than the pivot will have an index $> i_k$.
-Below we present an algorithm for computing VaR in linear time. The algorithm is a highly trivial modification of that in \cite{korte2011combinatorial} and homework problems such as in \cite{cormen2001introduction} to account for the slight alteration in definition.
+Below we present an algorithm for computing VaR in linear time. The algorithm is a highly trivial modification of that in \cite{Korte2012} and homework problems such as in \cite{cormen2001introduction} to account for the slight alteration in definition.
 \begin{lemma} \label{PROOFCORRECTNESS}
   % \Cref{alg:recursive-qvar} returns $\varo_{\alpha}[\tilde{x}]$ for $\alpha\in [0,1)$. 
   % \Cref{alg:recursive-qvar} returns $\varo_{\alpha}[\tilde{x}]$ for $\alpha\in [0,1)$. 
-Algorithm \ref{alg:quick-quantile} returns $\tau\star$ where \[
-  \tau\star \in \argmax \left\{\tau \in \Real \mid   \sum_{m = f}^b p_m \cdot I(x_m < \tau) \leq \alpha \right\},
+Algorithm \ref{alg:quick-quantile} returns $\tau\opt$ where \[
+  \tau\opt  \in \argmax \left\{\tau \in \Real \mid   \sum_{m = f}^b p_m \cdot I(x_m < \tau) \leq \alpha \right\},
 \] \label{INDUCTHYPOTH}
 $\forall \alpha < \sum_{m = f}^{b}p_m$.
 \end{lemma}
@@ -387,9 +397,50 @@ There are three possible cases depending on the pivot value $v$ that is selected
  The proof directly follows from \cref{PROOFCORRECTNESS}.
  \end{proof}
 
-\begin{proposition} \label{TIMECOMPLEXITY}
+\begin{proposition} \label{prop:time-complexity}
 \Cref{alg:recursive-qvar} runs in expected $O(n)$ time when one use uniformly random pivot selection.
 \end{proposition}
+
+
+\begin{lemma}[\cite{}] \label{lem:T-complexity}
+If \(T(1)\le c\) then for every integer \(n\ge 1\),
+\[
+T(n)\le 4 c n.
+\]
+\end{lemma}
+\begin{proof}
+We now prove the lemma by induction. 
+\emph{Base case.}
+For \(n=1\) we have \(T(1)\le c \le 4c\), so the claim holds.
+\emph{Inductive step.}
+Assume the claim holds for all positive integers less than \(n\);
+that is, assume \(T(i)\le 4 c i\) for all \(1\le i\le n-1\).
+Then
+\[
+\sum_{i=1}^{n-1} T(i) \le \sum_{i=1}^{n-1} 4 c i
+= 4c \sum_{i=1}^{n-1} i.
+\]
+Compute the arithmetic sum:
+\[
+\sum_{i=1}^{n-1} i = \frac{(n-1)n}{2}.
+\]
+Hence
+\[
+\sum_{i=1}^{n-1} T(i) \le 4c\cdot\frac{(n-1)n}{2} = 2c\,n(n-1).
+\]
+Substituting this bound into the recurrence \eqref{eq:recurrence} yields
+\[
+T(n) \le c n + \frac{2}{n}\cdot \bigl(2c\,n(n-1)\bigr)
+= c n + 4c(n-1) = 4cn - 3c.
+\]
+Therefore
+\[
+T(n) \le 4cn - 3c \le 4cn,
+\]
+which establishes the inductive step.
+\end{proof}
+
+
 \begin{proof}
 Let $T(n)$ be the expected running time of \Cref{alg:recursive-qvar} for $n := b - f + 1$. 
 
@@ -422,43 +473,6 @@ Thus there exists a constant \(c>0\) such that, for all \(n\ge 2\),
 \begin{equation}\label{eq:recurrence}
 T(n) \le c n + \frac{2}{n}\sum_{i=1}^{n-1} T(i).
 \end{equation}
-
-We now prove by induction that if \(T(1)\le c\) then for every integer \(n\ge 1\),
-\[
-T(n)\le 4 c n.
-\]
-
-\medskip\noindent\textbf{Base case.}
-For \(n=1\) we have \(T(1)\le c \le 4c\), so the claim holds.
-
-\medskip\noindent\textbf{Inductive step.}
-Assume the claim holds for all positive integers less than \(n\);
-that is, assume \(T(i)\le 4 c i\) for all \(1\le i\le n-1\).
-Then
-\[
-\sum_{i=1}^{n-1} T(i) \le \sum_{i=1}^{n-1} 4 c i
-= 4c \sum_{i=1}^{n-1} i.
-\]
-Compute the arithmetic sum:
-\[
-\sum_{i=1}^{n-1} i = \frac{(n-1)n}{2}.
-\]
-Hence
-\[
-\sum_{i=1}^{n-1} T(i) \le 4c\cdot\frac{(n-1)n}{2} = 2c\,n(n-1).
-\]
-Substituting this bound into the recurrence \eqref{eq:recurrence} yields
-\[
-T(n) \le c n + \frac{2}{n}\cdot \bigl(2c\,n(n-1)\bigr)
-= c n + 4c(n-1) = 4cn - 3c.
-\]
-Therefore
-\[
-T(n) \le 4cn - 3c \le 4cn,
-\]
-which establishes the inductive step.
-
-\medskip\noindent\textbf{Conclusion.}
 By induction, \(T(n)\le 4cn\) for all integers \(n\ge 1\). This proves that the expected running time of QVaR is linear in \(n\).
 \end{proof}
 
@@ -478,7 +492,7 @@ Then the $(w_1, \ldots, w_n \mid W)$-weighted median with respect to $(\xi_1, \l
 and a number $W$ with $0 \leq W < \sum_{i=1}^{n} w_i$.
 % \textbf{Task:} Find the $(w_1, \ldots, w_n; W)$-weighted median with respect to $(\ell_1, \ldots, \ell_n)$.
 % \end{definition}
-We note that our definition differs very slightly from the popular definition in \cite{korte2011combinatorial} in that the position of the $\leq$ and $>$ in \cref{WeightedMedianEquality} are swapped.
+We note that our definition differs very slightly from the popular definition in \cite{Korte2012} in that the position of the $\leq$ and $>$ in \cref{WeightedMedianEquality} are swapped.
 \end{remark}.
 
  \begin{proof}
@@ -550,21 +564,11 @@ If $f\colon 2^{\Omega} \to  \Real_{\ge 0}$ is EWS then it is submodular.
 We first note Theorem~4.5.1 in~\cite{Bilmes18} (proof provided in Appendix B.1) states that if $g(x)$ as defined in \cref{asm:submodular-function} is concave , $f$ is submodular. 
 It remains to prove that $g$ is concave.
 
- We first prove concavity for g on the interval $(0, 1]$, where $0$ is not included. On this interval, $g(x)$ is the minimum of two linear functions and is thus also concave.\cite{boyd2004convex}
- %We note on the interval $x > 0$, there exists some $n < 1$ such that $g(n) = 1$.  The function $mx + c$  is twice differentiable such that the $g''(x) = 0$, which implies concavity. The constant function $1$ has a second derivate of $0$, also implying concavity. Since the minimum of two concave functions is also concave and $g(x)$ on this interval is the minimum of these two functions, it follows $g(x)$ must also be concave on this interval.
+We first prove concavity for g on the interval $(0, 1]$, where $0$ is not included. On this interval, $g(x)$ is the minimum of two linear functions and is thus also concave.\cite{boyd2004convex}
 
 We then prove concavity for g on the interval $[0, 1]$, where $0$ is included. If we have value $a$, $b$. and $z$ such that $a = 0$ and thus $g(a) = 0$, $b > 0$, and $z$ in $(0, 1)$ we can shot that $(1 - z)g(a) + z\cdot g(b) = z\cdot g(b) = \min(z\cdot c + m\cdot z\cdot b, z)\leq \min(c + m \cdot z \cdot b, 1) =g(z * b) = g(z*b + (1 - z)*a)$. Thus, $g$ is concave on the interval $[0, b]$ for $b > 0$.
 
 Thus $g$ is concave, and the proof concludes.
-
-%Case 1: $X = \emptyset$
-%If $f(Y) < 1$ and $f(Y \cup x) - f(Y) < 1$,  $f(Y \cup x) - f(Y) = %m*p(x) < c + m*p(x) = f(X \cup x) - f(X)$. 
-%If $f(Y) < 1$ and $f(Y \cup x) - f(Y) = 1$,  $f(Y \cup x) - f(Y) < m*p(x)$. If $f(X \cup x) - f(X) < 1$, then  $f(X \cup x) - f(X) = c + m*p(x)$, else   $f(X \cup x) - f(X) = 1$.   
-%If $f(Y) = 1$ and $f(Y \cup x) - f(Y) = 1$,  $f(Y \cup x) - f(Y) = 0 < c + m*p(x)$. 
-%Case 2: $f(X) > 0$ and $f(X) < 1$ , therefore $f(X \cup x) - f(X) = c + m*p(x)$
-%If $f(Y) < 1$ and $f(Y \cup x) - f(Y) < 1$,  $f(Y \cup x) - f(Y) = m*p(x) < c + m*p(x)$. 
-%If $f(Y) < 1$ and $f(Y \cup x) - f(Y) = 1$,  $f(Y \cup x) - f(Y) > m*p(x) < c + m*p(x)$. 
-%If $f(Y) = 1$ and $f(Y \cup x) - f(Y) = 1$,  $f(Y \cup x) - f(Y) = 0 < c + m*p(x)$. 
 \end{proof}
 
 
@@ -647,7 +651,7 @@ For all other $i$ such that $x_i=z$, since all $q_i$ must sum to 1, it can be se
 \cref{alg:maximum-weight-independent} run with expected complexity $O(N)$.
 \end{proposition}
 \begin{proof}
-The quick quantile call runs in expected linear time complexity as shown in \cref{TIMECOMPLEXITY}. After the call to QuickQuantile, the number of operations is bounded by the number of elements in $x_0$ and $p_0$ and thus is linear time as well. 
+The quick quantile call runs in expected linear time complexity as shown in \cref{prop:time-complexity}. After the call to QuickQuantile, the number of operations is bounded by the number of elements in $x_0$ and $p_0$ and thus is linear time as well. 
 \end{proof}
 
 \subsection{CVaR}
@@ -1150,13 +1154,13 @@ Julia garbage collector, even when running synchronously.
 % \end{algorithm}
 
 \begin{algorithm}
-    \caption{Greedy algorithm from Submodular Functions, Polymatroids, TDI}\label{alg:greedy-polymatroid}
+    \caption{Greedy algorithm from Submodular Functions, Polymatroids, TDI, \mm{rewrite for random variables (and law-invariant risk measure?) Needs more care in terms of bounding $c$ and $f$'s properties.} }\label{alg:greedy-polymatroid}
 
-    \Input{Finite $N = [1 \ldots n]$, non-decreasing submodular function $f \colon  2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$}
-    \Output{$\min \{f(S) : S\subseteq N\}$}
+    \Input{Non-decreasing submodular function $f \colon  2^{\left\{ 1, \dots , n \right\}} \to \Real$ satisfying $f(\emptyset) = 0$ and $f(\left\{ 1, \dots , n \right\}) = 1$, and an objective $\bm{c}\in \Real^n$}
+    \Output{$\min \{f(S) : S\subseteq \left\{ 1, \dots , n \right\}\}$}
 
     Assume that $c_1 \le c_2 \cdots \le c_n$\;
-    Let $S_i := \{1, \dots, i\}$ and $S_0 := \emptyset$\;
+    Let $S_{i+1} := \{1, \dots, i+1\}$ and $S_0 := \emptyset$\;
     Let $x_i :=  \begin{cases}f(S_i) - f(S_{i-1}) & \text{for } i = 1,\dots, r \\ 0 & \text{otherwise} \end{cases}$\;
 \end{algorithm}
 

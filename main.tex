@@ -38,7 +38,7 @@
 \DeclareMathOperator{\KL}{KL}
 \DeclareMathOperator{\ext}{ext}
 \DeclareMathOperator{\conv}{conv}
-\DeclareMathOperator{\qvar}{QVaR}
+\DeclareMathOperator{\qvar}{QuickVaR}
 \newcommand{\quant}{{\mathfrak{q}}}
 
 \renewcommand{\cite}{\citep}
@@ -63,7 +63,7 @@ Monetary risk measures have gained popularity in expressing decision-makers' pre
 
 Monetary measures of risk generalize the expectation operator to be able to represent the risk aversion of decision makers in domains that range from robotics~\cite{akella2024risk,majumdar2020should,benrabah2024review} to finance~\cite{Follmer2016} to infrastructure maintenance~\cite{Inzunza2016}, and disaster response~\cite{Barahona2013}. Value-at-Risk~(VaR) and Conditional-Value-at-Risk~(CVaR) are the most popular risk measures and have made inroads in reinforcement learning, machine learning, and decision making~\cite{Petrik2024}. Machine learning and reinforcement learning algorithms typically must compute the risk measures for discrete random variables. Fast algorithms for computing risk measures are necessary in several machine-learning settings. For example, when solving robust or risk-averse MDPs by value iteration, the risk measure must be evaluated in every iteration for every state of the algorithm and can represent a significant computational bottleneck~\cite{Ho2021,Ho2018,Ho2022c,Hau2023a,Hau2025}. 
 
-In this paper, we propose linear time algorithms for computing risk measures of discrete random variables. First, we develop \emph{QuickQuantile}, an algorithm that computes VaR in linear time. The QuickQuantile algorithm builds on the WeightedMedian quickselect algorithm. Second, we develop \emph{QuickDivergence}, an algorithm that computes, in linear time,   $\varphi$-divergence risk measures~\cite{Ahmadi-Javid2012} that satisfy a specific piecewise linearity property. For example, CVaR is a $\varphi$-divergence risk measure that satisfies the required linearity property. The QuickDivergence algorithm leverages the fact that $\varphi$-divergence risk measures can be represented as linear minimization over polymatroids~\cite{Follmer2016}. While we focus on expected linear time algorithms because they work well in practice, but they can be readily adapted to run in deterministic linear time with a careful pivot selection as we describe below. 
+In this paper, we propose linear time algorithms for computing risk measures of discrete random variables. First, we develop \emph{QuickVaR}, an algorithm that computes VaR in linear time. The QuickQuantile algorithm builds on the WeightedMedian quickselect algorithm. Second, we develop \emph{QuickDivergence}, an algorithm that computes, in linear time,   $\varphi$-divergence risk measures~\cite{Ahmadi-Javid2012} that satisfy a specific piecewise linearity property. For example, CVaR is a $\varphi$-divergence risk measure that satisfies the required linearity property. The QuickDivergence algorithm leverages the fact that $\varphi$-divergence risk measures can be represented as linear minimization over polymatroids~\cite{Follmer2016}. While we focus on expected linear time algorithms because they work well in practice, but they can be readily adapted to run in deterministic linear time with a careful pivot selection as we describe below. 
 
 Standard algorithms for computing risk measures of discrete random variables have superlinear time complexity. For instance, VaR algorithms sort the values of the random variable which requires $\Omega(n \log n)$ operations where $n$ is the size of the probability space. Coherent risk measures, like CVaR, can be evaluated by solving convex optimization problems~\cite{Follmer2016, rockefeller1996variational}. Generic convex optimization algorithms, such as the interior point linear program solvers, are no faster than $O(n^3)$~\cite{Ho2021} which may be too slow in practice. However, CVaR and other coherent comotonotonic law-invariant risk measures can be solved using greedy algorithms in $O(n \log  n)$ time~\cite{Follmer2016}. The $\Omega(n \log  n)$ time complexity of the sort dominates the time complexity and prevents linear time computation. In this paper, we circumvent the complexity of sorting by developing no-sort algorithms for these risk measures and others. 
 
@@ -179,12 +179,12 @@ Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite
 
 
 %We first restate some well-known properties of the Hoare Partition scheme.
-%Our \emph{QVaR} algorithm is described in \cref{alg:quick-quantile}. The algorithm works as follows. It first picks a pivot by taking the middle element between front and back and applies the partition scheme to easily compute the probability of all outcomes smaller than or equal to that of the pivot (Lines \ref{line:pivot_comp} - \ref{line:partion_line}). Note that three partitions are create, one where the elements are all less than the pivot, another containing all elements equal to the pivot, and a third pivot containing all elements greater than the pivot. We refer to these partitions as the left, middle, and right partition from here on. QVaR then determines whether the quantile can exist in the left, middle, or right pivot (lines \ref{line:determine_left}, \ref{line:determine_right}, and \ref{determine_middle} ) and adjusts the $f_k$ and $b_k$ respectively to reduce the search space to one of these partitions. We note that in the case the quantile is determined to exist in the middle partition, the algorithm can terminate since every value in the middle partition is the same. In the case of $\alpha^0 = 0$, we handle this separately and simply find the minimum element. 
+%Our \emph{QuickVaR} algorithm is described in \cref{alg:quick-quantile}. The algorithm works as follows. It first picks a pivot by taking the middle element between front and back and applies the partition scheme to easily compute the probability of all outcomes smaller than or equal to that of the pivot (Lines \ref{line:pivot_comp} - \ref{line:partion_line}). Note that three partitions are create, one where the elements are all less than the pivot, another containing all elements equal to the pivot, and a third pivot containing all elements greater than the pivot. We refer to these partitions as the left, middle, and right partition from here on. QuickVaR then determines whether the quantile can exist in the left, middle, or right pivot (lines \ref{line:determine_left}, \ref{line:determine_right}, and \ref{determine_middle} ) and adjusts the $f_k$ and $b_k$ respectively to reduce the search space to one of these partitions. We note that in the case the quantile is determined to exist in the middle partition, the algorithm can terminate since every value in the middle partition is the same. In the case of $\alpha^0 = 0$, we handle this separately and simply find the minimum element. 
 
 % \begin{algorithm}
 %   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and $\alpha \in [0,1]$}}
 %   \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
-%   \caption{QVaR: Linear-time algorithm for VaR. $\mathds{1}(bool)$ .}\label{alg:quick-quantile}
+%   \caption{QuickVaR: Linear-time algorithm for VaR. $\mathds{1}(bool)$ .}\label{alg:quick-quantile}
 
 %   \begin{algorithmic}[1]
 %     \Require{} \Ensure{}
@@ -205,7 +205,7 @@ Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite
 
 
 % \begin{algorithm}
-%   \caption{QVaR: Linear-time algorithm for VaR}\label{alg:quick-quantile}
+%   \caption{QuickVaR: Linear-time algorithm for VaR}\label{alg:quick-quantile}
 %   \Input{vector $\bm{x}$, pmf $\bm{p}$ and $\alpha \in (0,1)$}
 %   \Output{$\alpha$-quantile of $\tilde{x}$}
 %   $f_0 \gets 1$, $b_0 \gets n$, $\bm{x}^0 = \bm{x}$, $\bm{p}^0 = \bm{p}$, $\alpha_0 = \alpha$, $k=1$ \;
@@ -223,7 +223,7 @@ Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite
 % \end{algorithm}  
 
 \begin{algorithm}
-  \caption{Recursive QVaR: Linear-time recursive algorithm for VaR}\label{alg:recursive-qvar}
+  \caption{Recursive QuickVaR: Linear-time recursive algorithm for VaR}\label{alg:recursive-qvar}
   \Input{vector $\bm{x}$, pmf $\bm{p}$, $\alpha \in (0,1)$, indices $f$, $b$}
   \Output{$\varo_{\alpha}[\tilde{x}]$}
   
@@ -254,7 +254,7 @@ Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite
 
 
 \begin{algorithm}
-  \caption{QVaR: Linear-time algorithm for VaR}\label{alg:quick-quantile}
+  \caption{QuickVaR: Linear-time algorithm for VaR}\label{alg:quick-quantile}
   \Input{vector $\bm{x}^0$, pmf $\bm{p}^0$ and $\alpha^0 \in (0,1)$}
   \Output{$\alpha$-quantile of $\tilde{x}$}
   $f_0 \gets 1$;~~~~$b_0 \gets n$;~~~~$k=1$ \;
@@ -333,7 +333,7 @@ Therefore, the algorithm is correct for $n=1$.
 \paragraph{Inductive step.}
 Consider a call with interval size $j > 1$  and suppose that the inductive hypothesis holds for all n with $1 \le n < j$:
 \[
-  \textsc{QVaR}(\bm{x}, \bm{p}, \alpha, f, b).
+  \textsc{QuickVaR}(\bm{x}, \bm{p}, \alpha, f, b).
 \]
 
 There are three possible cases depending on the pivot value $v$ that is selected:
@@ -473,7 +473,7 @@ Thus there exists a constant \(c>0\) such that, for all \(n\ge 2\),
 \begin{equation}\label{eq:recurrence}
 T(n) \le c n + \frac{2}{n}\sum_{i=1}^{n-1} T(i).
 \end{equation}
-By induction, \(T(n)\le 4cn\) for all integers \(n\ge 1\). This proves that the expected running time of QVaR is linear in \(n\).
+By induction, \(T(n)\le 4cn\) for all integers \(n\ge 1\). This proves that the expected running time of QuickVaR is linear in \(n\).
 \end{proof}
 
 
@@ -579,7 +579,7 @@ We now describe an algorithm for optimizing over polymatroids with this class of
 
   \Output{$q \in \Real^n$}
 
-  $v \gets \operatorname{QVaR}(p, x, \alpha = (1 - c)/m) $ \;
+  $v \gets \operatorname{QuickVaR}(p, x, \alpha = (1 - c)/m) $ \;
   $k_{\min} \gets \min_{i = 1, \dots, n} x_i$  \tcp{Breaking ties arbitrarily}
   $\mathcal{K}_{< v} \gets \{ i = 1, \dots , n \mid x_i < v \}$ \;
   $\mathcal{K}_{= v} \gets \{ i = 1, \dots , n \mid x_i = v \}$ \;
@@ -759,13 +759,13 @@ The computation of risk measures is often done over large random variables where
 Method & Mean (ms) & St. dev. (ms) \\
 \midrule 
 CVaR & 0.3912 & 0.0382 \\ 
-\textbf{QCVaR} & \textbf{0.1426} & \textbf{0.0307} \\ 
+\textbf{QuickCVaR} & \textbf{0.1426} & \textbf{0.0307} \\ 
 \midrule 
 VaR & 0.3733 & 0.0321 \\ 
 \textbf{QVar} & \textbf{0.1199} & \textbf{0.0287} \\ 
 \midrule 
 TVaR & 0.3993 & 0.0414 \\ 
-\textbf{QTVaR} & \textbf{0.1786} & \textbf{0.0356} \\ 
+\textbf{QuickTVaR} & \textbf{0.1786} & \textbf{0.0356} \\ 
 \midrule 
 Expectation & 0.0144 & 0.0124 \\ 
 \bottomrule
@@ -1059,7 +1059,7 @@ Code and results for these experiments as well as the implementations of all con
 \begin{table} 
 \begin{tabular}{lccccccc}
 \toprule
- Size of Prob. & CVaR & QCVaR & VaR & QVaR & TVaR & QTVaR & Expectation \\
+ Size of Prob. & CVaR & QuickCVaR & VaR & QuickVaR & TVaR & QuickTVaR & Expectation \\
 Space (n) &  &  &  &  &  &  &  \\
 \midrule
 1000 & 0.03 ± 0.01 & \textbf{0.01 ± 0.01} & 0.03 ± 0.01 & \textbf{0.01 ± 0.01} & 0.03 ± 0.01 & \textbf{0.02 ± 0.01} & 0.00 ± 0.00 \\
@@ -1114,7 +1114,7 @@ Julia garbage collector, even when running synchronously.
 %   %\floatname{algorithm}{Quick CVaR}
 %   \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ with probability mass function p and $\alpha \in [0,1]$}}
 %   \algrenewcommand\algorithmicensure{\textbf{Output: $CVaR_\alpha(\tilde{X})$}}
-%   \caption{QCVaR}\label{alg:quick_cvar}
+%   \caption{QuickCVaR}\label{alg:quick_cvar}
 %   \begin{algorithmic}[1]
 %     \Require{}
 %     \Ensure{} 
@@ -1168,7 +1168,7 @@ Julia garbage collector, even when running synchronously.
 % \begin{figure}[htbp]
 %   \centering
 %   \includegraphics[width=0.70\textwidth]{./code/plots/cvar_div_qcvar.pdf}
-%   \caption{Linear regression fit of a logarithmic function to the ratio of the time taken to compute $\cvar{0.5}{\tilde{x}}$ by sorting (CVaR) and QuickSelect (QCVaR). \todo{dont like this graph, can we get rid of it?}}
+%   \caption{Linear regression fit of a logarithmic function to the ratio of the time taken to compute $\cvar{0.5}{\tilde{x}}$ by sorting (CVaR) and QuickSelect (QuickCVaR). \todo{dont like this graph, can we get rid of it?}}
 %   \label{fig:cvar_div_qcvar}
 % \end{figure}
 % \begin{algorithm}
@@ -1202,7 +1202,7 @@ Julia garbage collector, even when running synchronously.
 %   %\floatname{algorithm}{Quick CVaR}
 %   \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $\tilde{X}$ as vector $x$ with probability mass function p and $\alpha \in [0,1]$}}
 %   \algrenewcommand\algorithmicensure{\textbf{Output: $CVaR_\alpha(\tilde{X})$}}
-%   \caption{QCVaR}\label{alg:quick_cvar}
+%   \caption{QuickCVaR}\label{alg:quick_cvar}
 %   \begin{algorithmic}[1]
 %     \Require{}
 %     \Ensure{} 

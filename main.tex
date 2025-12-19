@@ -129,11 +129,11 @@ The function $H_{\varphi}$ in~\eqref{eq:fdiv-primal} is a $\varphi$-divergence m
 and we adopt the common convention that $1 / 0 = \infty$ and $0 \cdot \infty = 0$~\cite{rockefeller1996variational}. Note that the absolute continuity restriction is not needed for finite probability spaces. 
 The function $\varphi\opt(x)$ is the convex conjugate of $\varphi(y)$.
 
-\mm{the rest of the section needs polish}
+
 
 Finally, it is important to note that $\varphi$-divergence risk measures are coherent, which means they are convex and positively homogeneous. Any coherent risk measure $\rho\colon \mathbb{X}\to \bar{\Real}$ satisfies for some closed convex non-empty set $\mathcal{Q} \subseteq \Delta^n$ \citep[Prop. 2.84]{Follmer2016}. 
 
-We also consider \emph{Conditional-Value-at-Risk}~(CVaR), a common risk measure, which is defined for a random variable $\tilde{x} \in \mathbb{X}$ and risk level $\alpha \in (0,1]$ as~\cite{Follmer2016}
+One specific $\varphi$-divergence risk measure we consider in this work\emph{Conditional-Value-at-Risk}~(CVaR), a common risk measure, which is defined for a random variable $\tilde{x} \in \mathbb{X}$ and risk level $\alpha \in (0,1]$ as~\cite{Follmer2016}
 \begin{equation} \label{eq:primal_cvar}
     \cvaro_\alpha(\tilde{x})
   := \max_{z \in \Real} \left(z - \frac{1}{\alpha} \cdot \E{[z -\bm{x}]_+}\right) 
@@ -141,7 +141,7 @@ We also consider \emph{Conditional-Value-at-Risk}~(CVaR), a common risk measure,
 \end{equation}
 CVaR is usually extended continuously as $\cvaro_0[\tilde{x}] = \ess\inf[\tilde{x}]$.
 
-\mm{introduce this}
+We also focus on another $\varphi$-divergence risk measure risk measure in which the divergence is the L1 norm. While the risk measure has been studied in prior literature, a proper name has never been given. Thus, we name the risk measure $TVaR_\alpha$, where for a given $\alpha$, $TVaR_\alpha$ can be seen as a lower bound on $CVaR_{\alpha}$ and $EVaR_{\alpha}$ (Entropic Value at Risk).   
 \begin{proposition}
 For each $\alpha\in [0,1]$ and $\tilde{x} \in \mathbb{X}$:
 \[
@@ -155,7 +155,7 @@ For each $\alpha\in [0,1]$ and $\tilde{x} \in \mathbb{X}$:
 \]
 \end{proposition}
 \begin{proof}
-\mm{TODO}
+The proof follows directly from Chapter 2 of \cite{CoverThomas1991Elements} and \cite{Ahmadi-Javid2012}. Note the proof in \cite{Ahmadi-Javid2011} is in terms of costs while our risk measures are in terms of rewards.
 \end{proof}
 
 In the remainder of the paper, we first propose a linear-time algorithm for computing VaR then we build on it to propose a linear time algorithm for certain $\varphi$-divergence risk measures. 

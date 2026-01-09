@@ -133,7 +133,7 @@ The function $\varphi\opt(x)$ is the convex conjugate of $\varphi(y)$.
 
 Finally, it is important to note that $\varphi$-divergence risk measures are coherent, which means they are convex and positively homogeneous. Any coherent risk measure $\rho\colon \mathbb{X}\to \bar{\Real}$ satisfies for some closed convex non-empty set $\mathcal{Q} \subseteq \Delta^n$ \citep[Prop. 2.84]{Follmer2016}. 
 
-One specific $\varphi$-divergence risk measure we consider in this work\emph{Conditional-Value-at-Risk}~(CVaR), a common risk measure, which is defined for a random variable $\tilde{x} \in \mathbb{X}$ and risk level $\alpha \in (0,1]$ as~\cite{Follmer2016}
+One specific $\varphi$-divergence risk measure we consider in this work is \emph{Conditional-Value-at-Risk}~(CVaR), a common risk measure, which is defined for a random variable $\tilde{x} \in \mathbb{X}$ and risk level $\alpha \in (0,1]$ as~\cite{Follmer2016}
 \begin{equation} \label{eq:primal_cvar}
     \cvaro_\alpha(\tilde{x})
   := \max_{z \in \Real} \left(z - \frac{1}{\alpha} \cdot \E{[z -\bm{x}]_+}\right) 
@@ -141,7 +141,7 @@ One specific $\varphi$-divergence risk measure we consider in this work\emph{Con
 \end{equation}
 CVaR is usually extended continuously as $\cvaro_0[\tilde{x}] = \ess\inf[\tilde{x}]$.
 
-We also focus on another $\varphi$-divergence risk measure risk measure in which the divergence is the L1 norm. While the risk measure has been studied in prior literature, a proper name has never been given. Thus, we name the risk measure $TVaR_\alpha$, where for a given $\alpha$, $TVaR_\alpha$ can be seen as a lower bound on $CVaR_{\alpha}$ and $EVaR_{\alpha}$ (Entropic Value at Risk).   
+We also focus on another $\varphi$-divergence risk measure risk measure in which the divergence is the L1 norm. While the risk measure has been studied in prior literature, a proper name has never been given. Thus, we name the risk measure TVaR, where for a given $\alpha$, TVaR$_\alpha$ can be seen as a lower bound on CVaR$_{\alpha}$ and EVaR$_{\alpha}$ (Entropic Value at Risk).   
 \begin{proposition}
 For each $\alpha\in [0,1]$ and $\tilde{x} \in \mathbb{X}$:
 \[
@@ -162,13 +162,14 @@ In the remainder of the paper, we first propose a linear-time algorithm for comp
 
 \section{Computing VaR in Linear Time} \label{sec:var-linear}
 
-In this section, we show the equivalence between VaR and the weighted-median problem, which is well known to be solvable in linear time \cite{Korte2012,cormen2001introduction}.
+In this section, we show derive a linear time algorithm for Value at Risk and show its equivalence between a slightly modifed version of the Weighted Median problem, which is well known to be solvable in linear time.\cite{Korte2012,cormen2001introduction}. The algorithms modify the standard quick select algorithm to one where the values may have varying weights.
 
-In order to prove that that VaR and the weighted median problem are equivalent, we first show that $\quant_{\alpha}^+(\tilde{x})$ is an element in the array. 
+We first show that $\quant_{\alpha}^+(\tilde{x})$ is an element in the array $x$, which will be necessary to establish correctness of the algorithm. 
 \begin{lemma}\label{lem:quantile-in-finite-omega}
 Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite $\Omega$. Then, there exist $\omega_+, \omega_-\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_+)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_-)$ for each $\alpha\in (0,1)$.
 \end{lemma}
 
+We now present our algorithm. While the version here is recursive it can trivially be modified to version with while loops, which is often faster in practice. We refer the readers to the appendix for the non-recursive version, which we also use for our expirimental evaluations.
 % We now define our version of the Weighted Median problem.
 % \begin{definition} \label{WM_Problem}
 
@@ -223,7 +224,7 @@ Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite
 % \end{algorithm}  
 
 \begin{algorithm}
-  \caption{Recursive QuickVaR: Linear-time recursive algorithm for VaR}\label{alg:recursive-qvar}
+  \caption{Recursive QuickVaR: Linear-time recursive algorithm for VaR}\label{alg:quick-quantile}
   \Input{vector $\bm{x}$, pmf $\bm{p}$, $\alpha \in (0,1)$, indices $f$, $b$}
   \Output{$\varo_{\alpha}[\tilde{x}]$}
   
@@ -253,54 +254,11 @@ Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite
 \end{algorithm}
 
 
-\begin{algorithm}
-  \caption{QuickVaR: Linear-time algorithm for VaR}\label{alg:quick-quantile}
-  \Input{vector $\bm{x}^0$, pmf $\bm{p}^0$ and $\alpha^0 \in (0,1)$}
-  \Output{$\alpha$-quantile of $\tilde{x}$}
-  $f_0 \gets 1$;~~~~$b_0 \gets n$;~~~~$k=1$ \;
-  \While{$b_{k-1} > f_{k-1}$} {
-    $i_k \gets f_{k-1} + \lceil\frac{b_{k-1}-f_{k-1}}{2}\rceil$ \label{line:pivot_comp} \tcp*{Pivot index}
-    $v_k \gets x^{k-1}_{i_k}$ \tcp*{Pivot value}
-    %Median-of-medians for $O(b-f)$ runtime}
-     $l_k, g_k, \bm{x}^k, \bm{p}^k \gets \operatorname{partition}(\bm{x}^{k-1}, \bm{p}^{k-1}, v_k, f_{k-1}, b_{k-1})$
-    \tcp*{Alg.~\ref{alg:partition}, \cref{lem:hoare-partition}} \label{line:partion_line}    
-    $t_k \gets \sum_{j=f_{k-1}}^{l_k-1} p^k_j$  \tcp*{$\P{\tilde{x}^k < v_k}$}
-    $e_k \gets \sum_{j = l_k}^{g_k} p^{k}_j $   \tcp*{$\P{\tilde{x}^k = v_k}$}
-    \If{$\alpha_{k-1} < t_k$\label{line:determine_left}}
-    {
-      \tcp{$\alpha_{k-1} < \P{ \tilde{x}^k < v_k }
-        \implies \alpha_{k-1}< 1 - \P{ \tilde{x}^k \ge v_k}$}
-      \tcp{$\implies \P{ \tilde{x}^k \ge v_k } < 1 - \alpha_{k-1}
-        \implies \quant^{+}_{\alpha_{k-1}} < v_k$}
-      $f_k \gets f_{k-1}$;~~~$b_k \gets l_k-1$\;
-      $\alpha_k \gets \alpha_{k-1}$\;
-    }
-    \ElseIf{$t_k + e_k \le  \alpha_{k-1} \label{line:determine_right}$} 
-    {
-      % \tcp{$\P{\tilde{x}^k \le v_k} < \alpha_{k-1} \implies \quant_{\alpha_{k-1}} > v_k$}
-      \tcp{$\P{\tilde{x}^k \le v_k} \le \alpha_{k-1}
-        \implies \P{\tilde{x}^k > v_k} \ge 1 - \alpha_{k-1}$} 
-        \tcp{$\implies \P{\tilde{x}^k \ge v_k+\epsilon} \ge 1 - \alpha_{k-1}
-        \implies \quant_{\alpha_{k-1}}^+ > v_k$}
-      $f_k \gets g_k+1$;~~~$b_k \gets b_{k-1}$\;
-      $\alpha_k \gets \alpha_{k-1} - t_k - e_k$\;
-    }
-    \Else{
-      \tcp{$\alpha_{k-1} \ge \P{ \tilde{x}^k < v_k } \, \wedge\, \P{ \tilde{x}^k \le v_k } > \alpha_{k-1}$} \label{determine_middle}
-      \tcp{$\implies \P{ \tilde{x}^k \ge v_k } \ge 1-\alpha_{k-1}
-        \, \wedge \, \P{ \tilde{x}^k \le v_k } \ge \alpha_{k-1}
-        \, \wedge \, \P{ \tilde{x}^k > v_k } < 1 - \alpha_{k-1}$}
-      \tcp{$\implies \quant^+_{\alpha_{k-1} } = v_k$}
-      $f_k \gets g_k$;~~~$b_k \gets g_k$\;
-    }
-    $k \gets k + 1$\; 
-  }
-  \KwRet{$x^k_{b_k}$}\;    
-\end{algorithm}  
+
 
 
 %The above conditions primarily state that each call to the partition scheme performs a partial sorting such that all elements $\leq v_k$ will have an index $< i_k$ , and elements greater than the pivot will have an index $> i_k$.
-Below we present an algorithm for computing VaR in linear time. The algorithm is a highly trivial modification of that in \cite{Korte2012} and homework problems such as in \cite{cormen2001introduction} to account for the slight alteration in definition.
+We now prove the correctness of our algorithm. We first prove a general condition on the return value of our algorithm which applies for any array $p$, regardless of whether it is a simplex or not. It trivially follows that when $p$ is a valid simplex, the condition simplifies to the \cref{eq:var-definition}. For the partition algorithm and it's proof of correctness, we refer the reader to the appendix.
 \begin{lemma} \label{PROOFCORRECTNESS}
   % \Cref{alg:recursive-qvar} returns $\varo_{\alpha}[\tilde{x}]$ for $\alpha\in [0,1)$. 
   % \Cref{alg:recursive-qvar} returns $\varo_{\alpha}[\tilde{x}]$ for $\alpha\in [0,1)$. 
@@ -397,48 +355,49 @@ There are three possible cases depending on the pivot value $v$ that is selected
  The proof directly follows from \cref{PROOFCORRECTNESS}.
  \end{proof}
 
+The proof of time complexity follows directly from that for the standard quick-select algorithm in \cite{Aho1974}\cite{HorowitzSahni1978}. We note that we have slightly modified the first steps of the proof to allow for the case where multiple elements in the array are equal to the chosen of the pivot. The remainder of the proof is exactly that in \cite{Aho1974} and \cite{HorowitzSahni1978}.
 \begin{proposition} \label{prop:time-complexity}
 \Cref{alg:recursive-qvar} runs in expected $O(n)$ time when one use uniformly random pivot selection.
 \end{proposition}
 
 
-\begin{lemma}[\cite{}] \label{lem:T-complexity}
-If \(T(1)\le c\) then for every integer \(n\ge 1\),
+%\begin{lemma} \label{lem:T-complexity}
+%If \(T(1)\le c\) then for every integer \(n\ge 1\),
 \[
-T(n)\le 4 c n.
+%T(n)\le 4 c n.
+%\]
+%\end{lemma}
+%\begin{proof}
+%We now prove the lemma by induction. 
+%\emph{Base case.}
+%For \(n=1\) we have \(T(1)\le c \le 4c\), so the claim holds.
+%\emph{Inductive step.}
+%Assume the claim holds for all positive integers less than \(n\);
+%that is, assume \(T(i)\le 4 c i\) for all \(1\le i\le n-1\).
+%Then
+%\[
+%\sum_{i=1}^{n-1} T(i) \le \sum_{i=1}^{n-1} 4 c i
+%= 4c \sum_{i=1}^{n-1} i.
+%\]
+%Compute the arithmetic sum:
+%\[
+%\sum_{i=1}^{n-1} i = \frac{(n-1)n}{2}.
 \]
-\end{lemma}
-\begin{proof}
-We now prove the lemma by induction. 
-\emph{Base case.}
-For \(n=1\) we have \(T(1)\le c \le 4c\), so the claim holds.
-\emph{Inductive step.}
-Assume the claim holds for all positive integers less than \(n\);
-that is, assume \(T(i)\le 4 c i\) for all \(1\le i\le n-1\).
-Then
-\[
-\sum_{i=1}^{n-1} T(i) \le \sum_{i=1}^{n-1} 4 c i
-= 4c \sum_{i=1}^{n-1} i.
-\]
-Compute the arithmetic sum:
-\[
-\sum_{i=1}^{n-1} i = \frac{(n-1)n}{2}.
-\]
-Hence
-\[
-\sum_{i=1}^{n-1} T(i) \le 4c\cdot\frac{(n-1)n}{2} = 2c\,n(n-1).
-\]
-Substituting this bound into the recurrence \eqref{eq:recurrence} yields
-\[
-T(n) \le c n + \frac{2}{n}\cdot \bigl(2c\,n(n-1)\bigr)
-= c n + 4c(n-1) = 4cn - 3c.
-\]
-Therefore
-\[
-T(n) \le 4cn - 3c \le 4cn,
-\]
-which establishes the inductive step.
-\end{proof}
+%Hence
+%\[
+%\sum_{i=1}^{n-1} T(i) \le 4c\cdot\frac{(n-1)n}{2} = %2c\,n(n-1).
+%\]
+%Substituting this bound into the recurrence \eqref{eq:recurrence} yields
+%\[
+%T(n) \le c n + \frac{2}{n}\cdot \bigl(2c\,n(n-1)\bigr)
+%= c n + 4c(n-1) = 4cn - 3c.
+%\]
+%Therefore
+%\[
+%T(n) \le 4cn - 3c \le 4cn,
+%\]
+%which establishes the inductive step.
+%\end{proof}
 
 
 \begin{proof}
@@ -476,7 +435,7 @@ T(n) \le c n + \frac{2}{n}\sum_{i=1}^{n-1} T(i).
 By induction, \(T(n)\le 4cn\) for all integers \(n\ge 1\). This proves that the expected running time of QuickVaR is linear in \(n\).
 \end{proof}
 
-
+Finally, we note that with a very slight modification, the weighted median can be seen as a general
 \begin{remark}
 Let $n \in \mathbb{N}$, $\xi_1, \ldots, \xi_n \in \Real$, $w_1, \ldots, w_n \in \Real_{\geq 0}$, and $W \in \Real$ with 
 \[
@@ -487,11 +446,8 @@ Then the $(w_1, \ldots, w_n \mid W)$-weighted median with respect to $(\xi_1, \l
 \sum_{i : \xi_i < \xi^*} w_i \leq W < \sum_{i : \xi_i \leq \xi^*} w_i.
 \label{WeightedMedianEquality}
 \end{equation}
-
-\emph{Weighted Median Problem}:  A natural number $n$, numbers $\ell_1, \ldots, \ell_n \in \Real$, $w_1, \ldots, w_n \in \Real^{\mathbb{C}}$,  
-and a number $W$ with $0 \leq W < \sum_{i=1}^{n} w_i$.
-% \textbf{Task:} Find the $(w_1, \ldots, w_n; W)$-weighted median with respect to $(\ell_1, \ldots, \ell_n)$.
 % \end{definition}
+If $W = \alpha$, then $\xi^* = \quant_{\alpha}[\tilde{x}]$.
 We note that our definition differs very slightly from the popular definition in \cite{Korte2012} in that the position of the $\leq$ and $>$ in \cref{WeightedMedianEquality} are swapped.
 \end{remark}.
 
@@ -640,7 +596,7 @@ Thus, for any $i$ such that $x_i < z$ and $i = j$, $q_i$ must equal $m*p_i + c$.
 
 
 
-For all other $i$ such that $x_i> z$, we note that $P[x < \tau] > \frac{1 - c}{m}$ indicating $f(\mathcal{O}_{i}) - f(\mathcal{O}_{i - 1}) = 1 - 1 = 0$, and thus $q_i = 0$.
+For all other $i$ such that $x_i> z$, we note that $P[x < \tau] > \frac{1 - c}{m}$ indicates $f(\mathcal{O}_{i}) - f(\mathcal{O}_{i - 1}) = 1 - 1 = 0$, and thus $q_i = 0$.
 
 For all other $i$ such that $x_i=z$, since all $q_i$ must sum to 1, it can be seen for all such $i$, $\sum_{k : x_k =  v}p_k$ must equal $y$. The solution of the LP is not affected by which $i$ this sum is distributed, so we set $x_z$ to $y$ and everything else to 0. 
 
@@ -1107,6 +1063,54 @@ We conjecture that this is due to the garbage collector. For this reason, we man
 Julia garbage collector, even when running synchronously.
 
 \section{Algorithms}
+
+\subsection{Non-Recursive QVaR}
+
+\begin{algorithm}
+  \caption{QuickVaR: Linear-time algorithm for VaR}
+  \Input{vector $\bm{x}^0$, pmf $\bm{p}^0$ and $\alpha^0 \in (0,1)$}
+  \Output{$\alpha$-quantile of $\tilde{x}$}
+  $f_0 \gets 1$;~~~~$b_0 \gets n$;~~~~$k=1$ \;
+  \While{$b_{k-1} > f_{k-1}$} {
+    $i_k \gets f_{k-1} + \lceil\frac{b_{k-1}-f_{k-1}}{2}\rceil$ \label{line:pivot_comp} \tcp*{Pivot index}
+    $v_k \gets x^{k-1}_{i_k}$ \tcp*{Pivot value}
+    %Median-of-medians for $O(b-f)$ runtime}
+     $l_k, g_k, \bm{x}^k, \bm{p}^k \gets \operatorname{partition}(\bm{x}^{k-1}, \bm{p}^{k-1}, v_k, f_{k-1}, b_{k-1})$
+    \tcp*{Alg.~\ref{alg:partition}, \cref{lem:hoare-partition}} \label{line:partion_line}    
+    $t_k \gets \sum_{j=f_{k-1}}^{l_k-1} p^k_j$  \tcp*{$\P{\tilde{x}^k < v_k}$}
+    $e_k \gets \sum_{j = l_k}^{g_k} p^{k}_j $   \tcp*{$\P{\tilde{x}^k = v_k}$}
+    \If{$\alpha_{k-1} < t_k$\label{line:determine_left}}
+    {
+      \tcp{$\alpha_{k-1} < \P{ \tilde{x}^k < v_k }
+        \implies \alpha_{k-1}< 1 - \P{ \tilde{x}^k \ge v_k}$}
+      \tcp{$\implies \P{ \tilde{x}^k \ge v_k } < 1 - \alpha_{k-1}
+        \implies \quant^{+}_{\alpha_{k-1}} < v_k$}
+      $f_k \gets f_{k-1}$;~~~$b_k \gets l_k-1$\;
+      $\alpha_k \gets \alpha_{k-1}$\;
+    }
+    \ElseIf{$t_k + e_k \le  \alpha_{k-1} \label{line:determine_right}$} 
+    {
+      % \tcp{$\P{\tilde{x}^k \le v_k} < \alpha_{k-1} \implies \quant_{\alpha_{k-1}} > v_k$}
+      \tcp{$\P{\tilde{x}^k \le v_k} \le \alpha_{k-1}
+        \implies \P{\tilde{x}^k > v_k} \ge 1 - \alpha_{k-1}$} 
+        \tcp{$\implies \P{\tilde{x}^k \ge v_k+\epsilon} \ge 1 - \alpha_{k-1}
+        \implies \quant_{\alpha_{k-1}}^+ > v_k$}
+      $f_k \gets g_k+1$;~~~$b_k \gets b_{k-1}$\;
+      $\alpha_k \gets \alpha_{k-1} - t_k - e_k$\;
+    }
+    \Else{
+      \tcp{$\alpha_{k-1} \ge \P{ \tilde{x}^k < v_k } \, \wedge\, \P{ \tilde{x}^k \le v_k } > \alpha_{k-1}$} \label{determine_middle}
+      \tcp{$\implies \P{ \tilde{x}^k \ge v_k } \ge 1-\alpha_{k-1}
+        \, \wedge \, \P{ \tilde{x}^k \le v_k } \ge \alpha_{k-1}
+        \, \wedge \, \P{ \tilde{x}^k > v_k } < 1 - \alpha_{k-1}$}
+      \tcp{$\implies \quant^+_{\alpha_{k-1} } = v_k$}
+      $f_k \gets g_k$;~~~$b_k \gets g_k$\;
+    }
+    $k \gets k + 1$\; 
+  }
+  \KwRet{$x^k_{b_k}$}\;    
+\end{algorithm}  
+
 
 \subsection{Quick CVaR}
 

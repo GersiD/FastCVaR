@@ -630,24 +630,98 @@ Then $f$ is submodular and the polymatroid $\mathcal{Q}_f$ satisfies
 Moreover $f$ also satisfies Element-Wise-Separabaility with $m = 1/\alpha$ and $c = 0$ 
 \end{proposition}
 \begin{proof}
+\[
+\text{HO:}
+\]
+
+\[
+\min\left\{ \frac{1}{\alpha} I_0^{\top} p,\; 1 \right\}
+=
+\max \left\{ I_0^{\top} q \;\middle|\;
+\begin{array}{l}
+q \ge 0, \\
+I_0^{\top} q = 1, \\
+q \le \frac{1}{\alpha} p
+\end{array}
+\right\}
+\]
+
+\bigskip
+
+$\underline{\text{Case 1:}} \quad I_0^{\top} p \ge \alpha$
+
+\[
+1 = \max \left\{ I_0^{\top} q \;\middle|\;
+\begin{array}{l}
+q \ge 0, \\
+I_0^{\top} q = 1, \\
+q \le \frac{1}{\alpha} p
+\end{array}
+\right\}
+\]
+
+\begin{itemize}
+\item[(a)] $\le$: \quad $I_0^{\top} q = I_0^{\top} q \le 1$
+\item[(b)] $\ge$: by construction of $q$, \quad
+$q = \frac{1}{I_0^{\top} p} \, p \; (\le \frac{1}{\alpha} p)$
+\end{itemize}
+
+\bigskip
+
+$\underline{\text{Case 2:}} \quad I_0^{\top} p < \alpha$
+
+\[
+\frac{1}{\alpha} I_0^{\top} p
+=
+\max \left\{ I_0^{\top} q \;\middle|\;
+\begin{array}{l}
+q \ge 0, \\
+I_0^{\top} q = 1, \\
+q \le \frac{1}{\alpha} p
+\end{array}
+\right\}
+\]
+
+\begin{itemize}
+\item[(a)] $\le$: \quad $I_0^{\top} q \le \frac{1}{\alpha} I_0^{\top} p$
+\item[(b)] $\ge$: \quad
+\end{itemize}
+
+\bigskip
+
+\[
+d = 1 - \frac{1}{2} I_0^{\top} p
+\]
+
+\[
+\text{(b)} \quad
+q = \frac{1}{\alpha} p \otimes \delta
++ \left( 1 - \frac{1}{\alpha} \right) \delta (1 - \delta)
+\]
+
+\begin{itemize}
+\item[(b.1)] $I_0^{\top} q = \frac{1}{\alpha} I_0^{\top} p$
+\item[(b.2)] $q \in \mathcal{Q}$ \quad (check the constraints)
+\end{itemize}
+
 
 % Note: From here on, we will use $\setminus$ to denote the complement of a set.
 
-We first show that for any $q$ in $\mathcal{Q}_f$, $q(\mathcal{O})$ $\leq f(\mathcal{O})$. This directly follows from the constraint set in definition 2 of CVaR where we see that $q_i \leq ((1/\alpha)\cdot p_i)$ for any element $i$ in the distributions $p$ and $q$.
+%We first show that for any $q$ in $\mathcal{Q}_f$, %$q(\mathcal{O})$ $\leq f(\mathcal{O})$. This directly follows %from the constraint set in definition 2 of CVaR where we see that %$q_i \leq ((1/\alpha)\cdot p_i)$ for any element $i$ in the %distributions $p$ and $q$.
   
 
-We also show below, we can construct $q$ such that $q(\mathcal{O}) =\min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\} $ for any $\mathcal{O}$. 
-\item[Case 1]: $\P{\mathcal{O}} \geq \alpha$. 
-In this scenario, we aim to construct $q(\mathcal{O})$ = 1 since $\frac{1}{\alpha}\cdot \P{\mathcal{O}} \geq 1 $. Thus, every $q_i$ such that $i$ represents an element in $\mathcal{O}$ should be set to $p_i \cdot \frac{1}{\P{\mathcal{O}}}$ and all other $q_i$ should be set to 0 . Since  $\P{\mathcal{O}} \geq \alpha$, we can imply the reciprocal $\frac{1}{\P{\mathcal{O}}} \leq \frac{1}{\alpha}$ is also true given $\P{\mathcal{O}} \geq \alpha > 0$. Therefore, every $q_i$ is feasible given definition 2.
+%We also show below, we can construct $q$ such that %$q(\mathcal{O}) =\min\left\{\frac{1}{\alpha} \cdot %\P{\mathcal{O}}, 1\right\} $ for any $\mathcal{O}$. 
+%\item[Case 1]: $\P{\mathcal{O}} \geq \alpha$. 
+%In this scenario, we aim to construct $q(\mathcal{O})$ = 1 since %$\frac{1}{\alpha}\cdot \P{\mathcal{O}} \geq 1 $. Thus, every %$q_i$ such that $i$ represents an element in $\mathcal{O}$ should %be set to $p_i \cdot \frac{1}{\P{\mathcal{O}}}$ and all other %$q_i$ should be set to 0 . Since  $\P{\mathcal{O}} \geq \alpha$, %we can imply the reciprocal $\frac{1}{\P{\mathcal{O}}} \leq %\frac{1}{\alpha}$ is also true given $\P{\mathcal{O}} \geq \alpha %> 0$. Therefore, every $q_i$ is feasible given definition 2.
 
-\item[Case 2]: $\P{\mathcal{O}} < \alpha$. 
-In this scenario, since $\frac{1}{\alpha} \cdot  \P{\mathcal{O}} < 1$ . Then we construct $q$ such that $q(\mathcal{O}) = \frac{1}{\alpha} \cdot  \P{\mathcal{O}}$. 
-  Thus, every $q_i$ such that $i$ represents an element in $\mathcal{O}$ should be set to $\frac{1}{\alpha} \cdot p_i$ and $p_i \cdot  d$ for all other $i$ such that $\frac{1}{1 - \alpha} \cdot \P{\mathcal{O}} + d \cdot \P{\mathcal{O}\setminus} = 1$, where $ \mathcal{O}\setminus$ contains all elements not in $\mathcal{O}$. 
+%\item[Case 2]: $\P{\mathcal{O}} < \alpha$. 
+%In this scenario, since $\frac{1}{\alpha} \cdot  \P{\mathcal{O}} %< 1$ . Then we construct $q$ such that $q(\mathcal{O}) = \frac{1}%{\alpha} \cdot  \P{\mathcal{O}}$. 
+%  Thus, every $q_i$ such that $i$ represents an element in $\mathcal{O}$ should be set to $\frac{1}{\alpha} \cdot p_i$ and $p_i \cdot  d$ for all other $i$ such that $\frac{1}{1 - \alpha} \cdot \P{\mathcal{O}} + d \cdot \P{\mathcal{O}\setminus} = 1$, where $ \mathcal{O}\setminus$ contains all elements not in $\mathcal{O}$. 
   
-  We now show  that $d \leq \frac{1}{\alpha}$, which is required for the constructed $Q$ to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{\alpha} \geq 1$. Since $\P{\mathcal{O}} + \P{ \mathcal{O}\setminus} = 1$,  $d \leq 1$ in order for $\frac{1}{\alpha} \cdot  \P{\mathcal{O}} + d\cdot\P{\mathcal{O}\setminus} = 1$ to hold. Since $1 \leq \frac{1}{\alpha}$, this implies $d \le \frac{1}{\alpha}$.
+  %We now show  that $d \leq \frac{1}{\alpha}$, which is required for the constructed $Q$ to be feasible. For all feasible $\alpha \geq 0$, $\frac{1}{\alpha} \geq 1$. Since $\P{\mathcal{O}} + \P{ \mathcal{O}\setminus} = 1$,  $d \leq 1$ in order for $\frac{1}{\alpha} \cdot  \P{\mathcal{O}} + d\cdot\P{\mathcal{O}\setminus} = 1$ to hold. Since $1 \leq \frac{1}{\alpha}$, this implies $d \le \frac{1}{\alpha}$.
   
   
-  We have now shown that $q( \mathcal{O}) \leq f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$ and it is possible to construct $Q(\mathcal{O})$ such that $Q(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$. Thus by Remark 4.90 in \cite{Follmer2016}, $f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$
+  %We have now shown that $q( \mathcal{O}) \leq f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$ and it is possible to construct $Q(\mathcal{O})$ such that $Q(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$. Thus by Remark 4.90 in \cite{Follmer2016}, $f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$
 \end{proof}
 
 

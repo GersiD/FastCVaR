@@ -348,12 +348,12 @@ There are three possible cases depending on the pivot value $v$ that is selected
 
 \end{proof}
 
- \begin{corollary}
-  \Cref{alg:quick-quantile} computes $\quant_{\alpha}(\tilde{x})$.
- \end{corollary}
- \begin{proof}
- The proof directly follows from \cref{PROOFCORRECTNESS}.
- \end{proof}
+\begin{corollary}
+\Cref{alg:quick-quantile} computes $\quant_{\alpha}(\tilde{x})$.
+\end{corollary}
+\begin{proof}
+The proof directly follows from \cref{PROOFCORRECTNESS}.
+\end{proof}
 
 The proof of time complexity follows directly from that for the standard quick-select algorithm in \cite{Aho1974}\cite{HorowitzSahni1978}. We note that we have slightly modified the first steps of the proof to allow for the case where multiple elements in the array are equal to the chosen of the pivot. The remainder of the proof is exactly that in \cite{Aho1974} and \cite{HorowitzSahni1978}.
 \begin{proposition} \label{prop:time-complexity}

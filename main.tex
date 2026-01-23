@@ -629,7 +629,7 @@ Moreover $f$ also satisfies Element-Wise-Separabaility with $m = 1/\alpha$ and $
 \end{proposition}
 \begin{proof}
 \[
-\text{HO:}
+\forall O:
 \]
 
 \[
@@ -652,16 +652,17 @@ $\underline{\text{Case 1:}} \quad I_0^{\top} p \ge \alpha$
 1 = \max \left\{ I_0^{\top} q \;\middle|\;
 \begin{array}{l}
 q \ge 0, \\
-I_0^{\top} q = 1, \\
+I^{\top} q = 1, \\
 q \le \frac{1}{\alpha} p
 \end{array}
 \right\}
 \]
 
 \begin{itemize}
-\item[(a)] $\le$: \quad $I_0^{\top} q = I_0^{\top} q \le 1$
+\item[(a)] $\le$: \quad $I_0^{\top} q \le I^{\top} q = 1$
 \item[(b)] $\ge$: by construction of $q$, \quad
-$q = \frac{1}{I_0^{\top} p} \, p \; (\le \frac{1}{\alpha} p)$
+$q = \frac{1}{I_0^{\top} p } 
+\, p \odot I_0\; (\le \frac{1}{\alpha} p)$
 \end{itemize}
 
 \bigskip
@@ -685,21 +686,16 @@ q \le \frac{1}{\alpha} p
 \item[(b)] $\ge$: \quad
 \end{itemize}
 
-\bigskip
-
-\[
-d = 1 - \frac{1}{2} I_0^{\top} p
-\]
 
 \[
 \text{(b)} \quad
-q = \frac{1}{\alpha} p \otimes \delta
-+ \left( 1 - \frac{1}{\alpha} \right) \delta (1 - \delta)
+\text{by construction of q,  }q = \frac{1}{\alpha} \cdot p \otimes I_0
++  d \cdot p \otimes (1 - I_0)
 \]
 
 \begin{itemize}
 \item[(b.1)] $I_0^{\top} q = \frac{1}{\alpha} I_0^{\top} p$
-\item[(b.2)] $q \in \mathcal{Q}$ \quad (check the constraints)
+\item[(b.2)] $I_0^{\top} p+ (1 - I_0)^{\top}p = \frac{1}{\alpha} I_0^{\top} p+ d(1 - I_0)^{\top}p = 1 , \text{thus } d \leq 1 \leq 1/\alpha$ \quad (all constraints hold)
 \end{itemize}
 
 

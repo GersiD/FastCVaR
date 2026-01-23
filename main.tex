@@ -621,82 +621,79 @@ Let $f\colon 2^{\Omega} \to \Real_{\ge 0}$ be defined as
   \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\},
 \quad \forall \mathcal{O} \subseteq \Omega .
 \]
-Then $f$ is submodular and the polymatroid $\mathcal{Q}_f$ satisfies
-\[
+Then
+\begin{equation} \label{eq:cvar-correct}
 \cvar{\alpha }{\tilde{x} } = \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}.
-\]
-Moreover $f$ also satisfies Element-Wise-Separabaility with $m = 1/\alpha$ and $c = 0$ 
+\end{equation}
+and $f$ is submodular and satisfies Element-Wise-Separabaility with $m = 1/\alpha$ and $c = 0$. 
 \end{proposition}
 \begin{proof}
-\[
-\forall O:
-\]
-
-\[
-\min\left\{ \frac{1}{\alpha} I_0^{\top} p,\; 1 \right\}
-=
-\max \left\{ I_0^{\top} q \;\middle|\;
-\begin{array}{l}
-q \ge 0, \\
-I_0^{\top} q = 1, \\
-q \le \frac{1}{\alpha} p
-\end{array}
+  \mm{Make sure to define $\tilde{1}$ and $\bm{1}$}
+To prove \eqref{eq:cvar-correct}, it is sufficient by~\citep[remark~4.96]{Follmer2016} to show for each $\mathcal{O} \subseteq \Omega$ that
+\begin{align}
+  \nonumber
+  f(\mathcal{O}) 
+  &= \cvar{\alpha }{\tilde{1}_{\mathcal{O}}} ,\\
+  \label{eq:cvar-eq-submodular}
+  \min\left\{ \frac{1}{\alpha} \bm{1}_{\mathcal{O}}\tr \bm{p},\; 1 \right\}
+&= \min \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \;\middle|\;
+\bm{q} \ge 0, \,
+\bm{1}\tr \bm{q} = 1, \,
+\bm{q} \le \frac{1}{\alpha} \bm{p}
+\right\}.
+\end{align}
+Note that the minimum in the right hand side of~\eqref{eq:cvar-eq-submodular} always exists because it equals to CVaR which is well defined. We analyze the following two cases separately.
+\begin{enumerate}
+\item Suppose that $\bm{1}_{\mathcal{O}}\tr  \bm{p} \ge \alpha$. Then we need to show that 
+\begin{equation}
+  \label{eq:cvar-eq-submodular1}
+  1 
+= \min \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \;\middle|\;
+\bm{q} \ge 0, \,
+\bm{1}\tr \bm{q} = 1, \,
+\bm{q} \le \frac{1}{\alpha} \bm{p}
 \right\}
+\end{equation}
+We prove the equality in \eqref{eq:cvar-eq-submodular1} by reducing it to two inequalities. The inequality $\ge$ follows because there exists a $\bm{q}$ feasible in \eqref{eq:cvar-eq-submodular1} such that
+\[
+  \bm{1}_{\mathcal{O}}\tr \bm{q} \le \bm{1}\tr \bm{q} = 1.
 \]
-
-\bigskip
-
-$\underline{\text{Case 1:}} \quad I_0^{\top} p \ge \alpha$
+To show the inequality $\le$, we show that for each $\bm{q}$ feasible in \eqref{eq:cvar-eq-submodular1} that:
+\[
+  \bm{1}_{\mathcal{O}}\tr \bm{q} \ge 1
+  % \bm{q} = \frac{1}{\bm{1}_{\mathcal{O}}\tr p } 
+  % \, p \odot \bm{1}_{\mathcal{O}}\; (\le \frac{1}{\alpha} p)
+ \]
+\item $\bm{1}_{\mathcal{O}}\tr \bm{p} < \alpha$
 
 \[
-1 = \max \left\{ I_0^{\top} q \;\middle|\;
-\begin{array}{l}
-q \ge 0, \\
-I^{\top} q = 1, \\
-q \le \frac{1}{\alpha} p
-\end{array}
+\frac{1}{\alpha} \bm{1}_{\mathcal{O}}\tr p
+=
+\\min \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \;\middle|\;
+\bm{q} \ge 0, \,
+\bm{1}\tr \bm{q} = 1, \,
+\bm{q} \le \frac{1}{\alpha} \bm{p}
 \right\}
 \]
 
 \begin{itemize}
-\item[(a)] $\le$: \quad $I_0^{\top} q \le I^{\top} q = 1$
-\item[(b)] $\ge$: by construction of $q$, \quad
-$q = \frac{1}{I_0^{\top} p } 
-\, p \odot I_0\; (\le \frac{1}{\alpha} p)$
-\end{itemize}
-
-\bigskip
-
-$\underline{\text{Case 2:}} \quad I_0^{\top} p < \alpha$
-
-\[
-\frac{1}{\alpha} I_0^{\top} p
-=
-\max \left\{ I_0^{\top} q \;\middle|\;
-\begin{array}{l}
-q \ge 0, \\
-I_0^{\top} q = 1, \\
-q \le \frac{1}{\alpha} p
-\end{array}
-\right\}
-\]
-
-\begin{itemize}
-\item[(a)] $\le$: \quad $I_0^{\top} q \le \frac{1}{\alpha} I_0^{\top} p$
+\item[(a)] $\le$: \quad $\bm{1}_{\mathcal{O}}\tr q \le \frac{1}{\alpha} \bm{1}_{\mathcal{O}}\tr p$
 \item[(b)] $\ge$: \quad
 \end{itemize}
 
 
 \[
 \text{(b)} \quad
-\text{by construction of q,  }q = \frac{1}{\alpha} \cdot p \otimes I_0
-+  d \cdot p \otimes (1 - I_0)
+\text{by construction of q,  }q = \frac{1}{\alpha} \cdot p \otimes \bm{1}_{\mathcal{O}}
++  d \cdot p \otimes (1 - \bm{1}_{\mathcal{O}})
 \]
 
 \begin{itemize}
-\item[(b.1)] $I_0^{\top} q = \frac{1}{\alpha} I_0^{\top} p$
-\item[(b.2)] $I_0^{\top} p+ (1 - I_0)^{\top}p = \frac{1}{\alpha} I_0^{\top} p+ d(1 - I_0)^{\top}p = 1 , \text{thus } d \leq 1 \leq 1/\alpha$ \quad (all constraints hold)
+\item[(b.1)] $\bm{1}_{\mathcal{O}}\tr q = \frac{1}{\alpha} \bm{1}_{\mathcal{O}}\tr p$
+\item[(b.2)] $\bm{1}_{\mathcal{O}}\tr p+ (1 - \bm{1}_{\mathcal{O}})\trp = \frac{1}{\alpha} \bm{1}_{\mathcal{O}}\tr p+ d(1 - \bm{1}_{\mathcal{O}})\trp = 1 , \text{thus } d \leq 1 \leq 1/\alpha$ \quad (all constraints hold)
 \end{itemize}
+\end{enumerate}
+
 
 
 % Note: From here on, we will use $\setminus$ to denote the complement of a set.

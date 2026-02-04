@@ -713,8 +713,6 @@ It is easy to verify that $\bm{q} \ge \bm{0}$ and $\bm{1}\tr \bm{q} = 1$. The co
 % \end{itemize}
 \end{enumerate}
 
-
-
 % Note: From here on, we will use $\setminus$ to denote the complement of a set.
 
 %We first show that for any $q$ in $\mathcal{Q}_f$, %$q(\mathcal{O})$ $\leq f(\mathcal{O})$. This directly follows %from the constraint set in definition 2 of CVaR where we see that %$q_i \leq ((1/\alpha)\cdot p_i)$ for any element $i$ in the %distributions $p$ and $q$.
@@ -757,19 +755,77 @@ If $\mathcal{O} \neq \emptyset$, and $0$ otherwise, where $\beta = \sqrt{ 2 \log
 $f_{\beta}$ also satisfy ElementWiseSeparability with $m = 1$ and $c = \beta/2$.
 \end{proposition}
 \begin{proof}
+ To prove \eqref{eq:cvar-correct}, it is sufficient by \citet[theorem~4.88]{Follmer2016} and \citet[remark~4.96]{Follmer2016} to show
+\begin{align}
+  \nonumber
+  f(\mathcal{O}) 
+  &= -\tvar{\alpha }{- \tilde{1}_{\mathcal{O}}} ,\quad \forall \mathcal{O} \subseteq \Omega\\
+  \label{eq:tvar-eq-submodular}
+  \min\left\{ \bm{1}_{\mathcal{O}}\tr \bm{p} + \frac{\beta}{2} ,\; 1 \right\}
+&= \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
+\bm{q} \ge 0, \,
+\bm{1}\tr \bm{q} = 1, \,
+\bm{|p -q|} \le \frac{1}{\alpha} \bm{p}
+\right\}, \quad \forall \mathcal{O} \subseteq \Omega.
+\end{align}
+Note that the maximum in the right hand side of~\eqref{eq:tvar-eq-submodular} always exists because it equals to TVaR which is well defined.
+
+We prove the equality in \eqref{eq:tvar-eq-submodular} as two inequalities. To prove that 
  
-  We first note that $\mathcal{O} = \emptyset$, then $Q(\mathcal{O}) = 0$,   Due to the set of constraints, we know that for all $ \mathcal{O} \text{ such that } \mathcal{O} \neq \emptyset,  q$ must be such that $Q({\mathcal{O}}) \leq {\P{\mathcal{O}}} + \frac{\beta}{2}$ as if $Q(\mathcal{O}) \geq \frac{\beta}{2} +  \P{\mathcal{O}}$ , then $Q(\mathcal{O'})$ must be $< \P{\mathcal{O}} - \frac{\beta}{2}$ in order for the sum constraint of the simplex to equal 1, thus violating the l1 Norm constraint.
+ $\min\left\{ \bm{1}_{\mathcal{O}}\tr \bm{p} + \frac{\beta}{2} ,\; 1 \right\}
+>= \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
+\bm{q} \ge 0, \,
+\bm{1}\tr \bm{q} = 1, \,
+\bm{|p -q|} \le \frac{1}{\alpha} \bm{p}
+\right\}, \quad \forall \mathcal{O} \subseteq \Omega$
+
+observe that the constraints imply that for each $\bm{q} \in \mathcal{Q}_f$
+\[
+  |p - q|  = \bm{1}_{\mathcal{O}}\tr \bm{|p - q|} + (1 - \bm{1}_{\mathcal{O}})\tr \bm{|p - q|} \leq \beta
+\]. Since by the simplex constraint, 
+\[
+  \bm{1}_{\mathcal{O}}\tr \bm{|p - q|} = (1 - \bm{1}_{\mathcal{O}})\tr \bm{|p - q|} \leq \beta/2,
+  \], and 
+  \[
+  \bm{1}_{\mathcal{O}}\tr \bm{q} \leq 1\tr \bm{q}
+  \], the first inequality holds.
+
+  To prove that 
+ 
+ $\min\left\{ \bm{1}_{\mathcal{O}}\tr \bm{p} + \frac{\beta}{2} ,\; 1 \right\}
+<= \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
+\bm{q} \ge 0, \,
+\bm{1}\tr \bm{q} = 1, \,
+\bm{|p -q|} \le \frac{1}{\alpha} \bm{p}
+\right\}, \quad \forall \mathcal{O} \subseteq \Omega$,
+we construct a feasible $\bm{q} \in \mathcal{Q}_f$ for which the inequality holds.
+We now analyze the following two cases separately for each $\mathcal{O} \subseteq \Omega$.
+\begin{enumerate}
+\item Suppose that $\bm{1}_{\mathcal{O}}\tr  \bm{p} + \beta/2 \ge 1$. Then hen we construct $\bm{q}$ as
+\[
+\bm{q} \;:=\;  (\bm{1}_{\mathcal{O}}\tr \bm{p})^{-1} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}},
+\]
+where $\otimes$ is the Hadamard vector product. It is easy to verify that $\bm{q} \in \mathcal{Q}_f$ and $\bm{1}_{\mathcal{O}}\tr \bm{q} \le 1$. 
+\item Suppose that $\bm{1}_{\mathcal{O}}\tr  \bm{p}  + \beta/2 < 1$. Then we construct $\bm{q}$ as
+\[
+\bm{q} \;:=\; \frac{\bm{1}_{\mathcal{O}} \tr {p} + \beta/2}{\bm{1}_{\mathcal{O}} \tr {p}} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}}
++  \frac{(\bm{1} - \bm{1}_{\mathcal{O}}) \tr {p} - \beta/2)}{(\bm{1} - \bm{1}_{\mathcal{O}}) \tr {p}}\cdot \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}}),
+\]
+\end{enumerate}
+
+
+ % We first note that $\mathcal{O} = \emptyset$, then $Q(\mathcal{O}) = 0$,   Due to the set of constraints, we know that for all $ \mathcal{O} \text{ such that } \mathcal{O} \neq \emptyset,  q$ must be such that $Q({\mathcal{O}}) \leq {\P{\mathcal{O}}} + \frac{\beta}{2}$ as if $Q(\mathcal{O}) \geq \frac{\beta}{2} +  \P{\mathcal{O}}$ , then $Q(\mathcal{O'})$ must be $< \P{\mathcal{O}} - \frac{\beta}{2}$ in order for the sum constraint of the simplex to equal 1, thus violating the l1 Norm constraint.
   
-  Furthermore, as we show below, we can construct $q$ such that  for any $\mathcal{O} \neq \emptyset$,   
-  \[f(\mathcal{O}) = \min\left\{\P{\mathcal{O}} + \frac{\beta}{2}, 1\right\}
+ % Furthermore, as we show below, we can construct $q$ such that  for any $\mathcal{O} \neq \emptyset$,   
+%  \[f(\mathcal{O}) = \min\left\{\P{\mathcal{O}} + \frac{\beta}{2}, 1\right\}
     .
-  \].
+%  \].
   
-\item[Case 1]: $\P{\mathcal{O}} + \frac{\beta}{2} \geq 1$. In this scenario, we pick an element in $\mathcal{O}$ and add $1 - \P{\mathcal{O}}$ to it. We set all elements not in $\mathcal{O}$ to 0.
+%\item[Case 1]: $\P{\mathcal{O}} + \frac{\beta}{2} \geq 1$. In this scenario, we pick an element in $\mathcal{O}$ and add $1 - \P{\mathcal{O}}$ to it. We set all elements not in $\mathcal{O}$ to 0.
 
-\item[Case 2]: $\P{\mathcal{O}} + \frac{\beta}{2}< 1$. In this scenario, we pick an element in $\mathcal{O}$ and add $\frac{\beta}{2}$ to it. We set all elements not in $\mathcal{O}$ to 0.
+%\item[Case 2]: $\P{\mathcal{O}} + \frac{\beta}{2}< 1$. In this scenario, we pick an element in $\mathcal{O}$ and add $\frac{\beta}{2}$ to it. We set all elements not in $\mathcal{O}$ to 0.
 
-We have now shown that $Q(\Omega) \leq f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$ and it is possible to construct $Q(\Omega)$ such that $Q(\Omega) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$. Thus by Remark 4.90 in \cite{Follmer2016}, $f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$
+%We have now shown that $Q(\Omega) \leq f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$ and it is possible to construct $Q(\Omega)$ such that $Q(\Omega) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$. Thus by Remark 4.90 in \cite{Follmer2016}, $f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$
 \end{proof}
 
 \section{Experiments}\label{sec:experiments}

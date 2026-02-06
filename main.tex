@@ -520,7 +520,7 @@ If $f\colon 2^{\Omega} \to  \Real_{\ge 0}$ is EWS then it is submodular.
 We first note Theorem~4.5.1 in~\cite{Bilmes18} (proof provided in Appendix B.1) states that if $g(x)$ as defined in \cref{asm:submodular-function} is concave , $f$ is submodular. 
 It remains to prove that $g$ is concave.
 
-We first prove concavity for g on the interval $(0, 1]$, where $0$ is not included. On this interval, $g(x)$ is the minimum of two linear functions and is thus also concave.\cite{boyd2004convex}
+We first prove concavity for $g$ on the interval $(0, 1]$, where $0$ is not included. On this interval, $g(x)$ is the minimum of two linear functions and is thus also concave.\cite{boyd2004convex}
 
 We then prove concavity for g on the interval $[0, 1]$, where $0$ is included. If we have value $a$, $b$. and $z$ such that $a = 0$ and thus $g(a) = 0$, $b > 0$, and $z$ in $(0, 1)$ we can shot that $(1 - z)g(a) + z\cdot g(b) = z\cdot g(b) = \min(z\cdot c + m\cdot z\cdot b, z)\leq \min(c + m \cdot z \cdot b, 1) =g(z * b) = g(z*b + (1 - z)*a)$. Thus, $g$ is concave on the interval $[0, b]$ for $b > 0$.
 
@@ -647,7 +647,7 @@ Note that the maximum in the right hand side of~\eqref{eq:cvar-eq-submodular} al
 We prove the equality in \eqref{eq:cvar-eq-submodular} as two inequalities. To prove that 
 \[
   \min\left\{ \frac{1}{\alpha} \bm{1}_{\mathcal{O}}\tr \bm{p},\; 1 \right\}
-\le \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
+\ge \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
 \bm{q} \ge 0, \,
 \bm{1}\tr \bm{q} = 1, \,
 \bm{q} \le \frac{1}{\alpha} \bm{p}
@@ -664,7 +664,7 @@ and hence the inequality holds.
  To prove that 
 \[
  \min\left\{ \frac{1}{\alpha} \bm{1}_{\mathcal{O}}\tr \bm{p},\; 1 \right\}
-\ge \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
+\le \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
 \bm{q} \ge 0, \,
 \bm{1}\tr \bm{q} = 1, \,
 \bm{q} \le \frac{1}{\alpha} \bm{p}
@@ -762,46 +762,53 @@ $f_{\beta}$ also satisfy ElementWiseSeparability with $m = 1$ and $c = \beta/2$.
   &= -\tvar{\alpha }{- \tilde{1}_{\mathcal{O}}} ,\quad \forall \mathcal{O} \subseteq \Omega\\
   \label{eq:tvar-eq-submodular}
   \min\left\{ \bm{1}_{\mathcal{O}}\tr \bm{p} + \frac{\beta}{2} ,\; 1 \right\}
-&= \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
+  &=
+    \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
 \bm{q} \ge 0, \,
 \bm{1}\tr \bm{q} = 1, \,
-\bm{|p -q|} \le \frac{1}{\alpha} \bm{p}
+\bm{\|p -q\|_1} \le \beta 
 \right\}, \quad \forall \mathcal{O} \subseteq \Omega.
 \end{align}
 Note that the maximum in the right hand side of~\eqref{eq:tvar-eq-submodular} always exists because it equals to TVaR which is well defined.
 
 We prove the equality in \eqref{eq:tvar-eq-submodular} as two inequalities. To prove that 
  
- $\min\left\{ \bm{1}_{\mathcal{O}}\tr \bm{p} + \frac{\beta}{2} ,\; 1 \right\}
->= \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
+\[
+  \min\left\{ \bm{1}_{\mathcal{O}}\tr \bm{p} + \frac{\beta}{2} ,\; 1 \right\}
+\ge \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
 \bm{q} \ge 0, \,
 \bm{1}\tr \bm{q} = 1, \,
-\bm{|p -q|} \le \frac{1}{\alpha} \bm{p}
-\right\}, \quad \forall \mathcal{O} \subseteq \Omega$
-
-observe that the constraints imply that for each $\bm{q} \in \mathcal{Q}_f$
+\|\bm{p} -\bm{q}\|_1 \le \beta 
+\right\}, \quad \forall \mathcal{O} \subseteq \Omega\]
+observe that the constraints imply that for each $\bm{q} \in \mathcal{Q}_f$ that
 \[
-  |p - q|  = \bm{1}_{\mathcal{O}}\tr \bm{|p - q|} + (1 - \bm{1}_{\mathcal{O}})\tr \bm{|p - q|} \leq \beta
-\]. Since by the simplex constraint, 
+  \|\bm{p} - \bm{q}\|_1
+  =
+  \bm{1}_{\mathcal{O}}\tr \bm{|p - q|} + (\bm{1} - \bm{1}_{\mathcal{O}})\tr |\bm{p} - \bm{q}| \leq \beta.
+\]
+Since by the simplex constraint, \mm{this needs a bit more rigor}
 \[
-  \bm{1}_{\mathcal{O}}\tr \bm{|p - q|} = (1 - \bm{1}_{\mathcal{O}})\tr \bm{|p - q|} \leq \beta/2,
-  \], and 
+  \bm{1}_{\mathcal{O}}\tr \bm{|p - q|} = (\bm{1} - \bm{1}_{\mathcal{O}})\tr |\bm{p} - \bm{q}| \leq \beta/2,
+\]
+and 
   \[
-  \bm{1}_{\mathcal{O}}\tr \bm{q} \leq 1\tr \bm{q}
-  \], the first inequality holds.
+  \bm{1}_{\mathcal{O}}\tr \bm{q} \leq 1\tr \bm{q}  = 1,
+\]
+the first inequality holds.
 
-  To prove that 
- 
- $\min\left\{ \bm{1}_{\mathcal{O}}\tr \bm{p} + \frac{\beta}{2} ,\; 1 \right\}
-<= \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
+To prove that 
+\[
+  \min\left\{ \bm{1}_{\mathcal{O}}\tr \bm{p} + \frac{\beta}{2} ,\; 1 \right\}
+\le \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
 \bm{q} \ge 0, \,
 \bm{1}\tr \bm{q} = 1, \,
-\bm{|p -q|} \le \frac{1}{\alpha} \bm{p}
-\right\}, \quad \forall \mathcal{O} \subseteq \Omega$,
+\|\bm{p} -\bm{q}\|_{1} \le \beta 
+\right\}, \quad \forall \mathcal{O} \subseteq \Omega,
+\]
 we construct a feasible $\bm{q} \in \mathcal{Q}_f$ for which the inequality holds.
 We now analyze the following two cases separately for each $\mathcal{O} \subseteq \Omega$.
 \begin{enumerate}
-\item Suppose that $\bm{1}_{\mathcal{O}}\tr  \bm{p} + \beta/2 \ge 1$. Then hen we construct $\bm{q}$ as
+\item Suppose that $\bm{1}_{\mathcal{O}}\tr  \bm{p} + \beta/2 \ge 1$. Then we construct $\bm{q}$ as
 \[
 \bm{q} \;:=\;  (\bm{1}_{\mathcal{O}}\tr \bm{p})^{-1} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}},
 \]
@@ -811,6 +818,7 @@ where $\otimes$ is the Hadamard vector product. It is easy to verify that $\bm{q
 \bm{q} \;:=\; \frac{\bm{1}_{\mathcal{O}} \tr {p} + \beta/2}{\bm{1}_{\mathcal{O}} \tr {p}} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}}
 +  \frac{(\bm{1} - \bm{1}_{\mathcal{O}}) \tr {p} - \beta/2)}{(\bm{1} - \bm{1}_{\mathcal{O}}) \tr {p}}\cdot \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}}),
 \]
+It is easy to verify that $\bm{q} \in \mathcal{Q}_f$ and $\bm{1}_{\mathcal{O}}\tr \bm{q} \le 1$. 
 \end{enumerate}
 
 

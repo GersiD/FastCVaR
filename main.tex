@@ -47,7 +47,7 @@
 % THEOREMS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\title{Evaluating Risk Measures in Linear Time}% and $\varphi$-divergence Risk Measures}
+\title{Computing Risk Measures in Linear Time}% and $\varphi$-divergence Risk Measures}
 %\author{Palash Agrawal, Gersi Doko, Maeve Burwell, Marek Petrik}
 %\date{}
 
@@ -61,37 +61,37 @@ Monetary risk measures have gained popularity in expressing decision-makers' pre
 
 \section{Introduction}\label{sec:intro}
 
-Monetary measures of risk generalize the expectation operator to be able to represent the risk aversion of decision makers in domains that range from robotics~\cite{akella2024risk,majumdar2020should,benrabah2024review} to finance~\cite{Follmer2016} to infrastructure maintenance~\cite{Inzunza2016}, and disaster response~\cite{Barahona2013}. Value-at-Risk~(VaR) and Conditional-Value-at-Risk~(CVaR) are the most popular risk measures and have made inroads in reinforcement learning, machine learning, and decision making~\cite{Petrik2024}. Machine learning and reinforcement learning algorithms typically must compute the risk measures for discrete random variables. Fast algorithms for computing risk measures are necessary in several machine-learning settings. For example, when solving robust or risk-averse MDPs by value iteration, the risk measure must be evaluated in every iteration for every state of the algorithm and can represent a significant computational bottleneck~\cite{Ho2021,Ho2018,Ho2022c,Hau2023a,Hau2025}. 
+Monetary measures of risk generalize the expectation operator to be able to represent the risk aversion of decision makers in domains that range from robotics~\cite{akella2024risk,majumdar2020should,benrabah2024review} to finance~\cite{Follmer2016} to infrastructure maintenance~\cite{Inzunza2016}, and disaster response~\cite{Barahona2013}. Value-at-Risk~(VaR) and Conditional-Value-at-Risk~(CVaR) are the most popular risk measures and have made inroads in reinforcement learning, machine learning, and decision making~\cite{Petrik2024}. Machine learning and reinforcement learning algorithms typically must compute the risk measures quickly for large discrete random variables. For example, in risk-averse reinforcement learning, one must evaluate the risk measure in every iteration of the algorithm which can represent a significant computational bottleneck~\cite{Ho2021,Ho2018,Ho2022c,Hau2023a,Hau2025}. 
 
-In this paper, we propose linear time algorithms for computing risk measures of discrete random variables. First, we develop \emph{QuickVaR}, an algorithm that computes VaR in linear time. The QuickQuantile algorithm builds on the WeightedMedian quickselect algorithm. Second, we develop \emph{QuickDivergence}, an algorithm that computes, in linear time,   $\varphi$-divergence risk measures~\cite{Ahmadi-Javid2012} that satisfy a specific piecewise linearity property. For example, CVaR is a $\varphi$-divergence risk measure that satisfies the required linearity property. The QuickDivergence algorithm leverages the fact that $\varphi$-divergence risk measures can be represented as linear minimization over polymatroids~\cite{Follmer2016}. While we focus on expected linear time algorithms because they work well in practice, but they can be readily adapted to run in deterministic linear time with a careful pivot selection as we describe below. 
+In this paper, we propose linear time algorithms for computing risk measures of discrete random variables. First, we develop \emph{QuickVaR}, an algorithm that computes VaR in linear time and generalizes the well-known quickselect algorithm. Second, we develop \emph{QuickDivergence}, an algorithm that computes, in linear time, $\varphi$-divergence risk measures~\cite{Ahmadi-Javid2012} that satisfy a specific piecewise linearity property. This algorithm reduces $\varphi$-divergence risk measures to linear minimization problems over polymatroids~\cite{Follmer2016}. We illustrate this algorithm for well-known CVaR risk measure and a related TVaR risk measure. Both of this risk measures are in the $\varphi$-divergence family and satisfy the required linearity property.  
 
-Standard algorithms for computing risk measures of discrete random variables have superlinear time complexity. For instance, VaR algorithms sort the values of the random variable which requires $\Omega(n \log n)$ operations where $n$ is the size of the probability space. Coherent risk measures, like CVaR, can be evaluated by solving convex optimization problems~\cite{Follmer2016, rockefeller1996variational}. Generic convex optimization algorithms, such as the interior point linear program solvers, are no faster than $O(n^3)$~\cite{Ho2021} which may be too slow in practice. However, CVaR and other coherent comotonotonic law-invariant risk measures can be solved using greedy algorithms in $O(n \log  n)$ time~\cite{Follmer2016}. The $\Omega(n \log  n)$ time complexity of the sort dominates the time complexity and prevents linear time computation. In this paper, we circumvent the complexity of sorting by developing no-sort algorithms for these risk measures and others. 
+Our algorithms' time complexity improves on the state of the art by a logarithmic factor. Virtually all implementations of VaR and CVaR algorithms require sorting the input arrays. The sort step requires $\Omega(n \log n)$ operations where $n$ is the size of the probability space~\cite{Follmer2016}. Our numerical results show that the logarithmic acceleration can lead to an order of magnitude speed-up for realistic large problems without incurring any penalty for small problems. In addition, our linear-time algorithms have simple implementation with minimal added complexity over standard algorithms.
 
-Numerous efficient algorithms have been designed for structured optimization problems that resemble VaR and CVaR evaluations. Some example of such structured optimization problems are the projection onto the simplex~\cite{adam2019projectionscanonicalsimplexadditional, Wang2013Simplex}, projection on k-capped simplex~\cite{kcapped_ang,Lim2016}, linear optimization on the intersection of $L_p$ or $\varphi$-divergence balls and the probability simplex as arise in robust optimizations~\cite{Ho2022}, optimization for $\varphi$-divergence risk measures~\cite{Ahmadi-Javid2012}, and on polytopes defined by submodular functions which are known as polymatroids~\cite{Korte2012}. Many of these algorithms require sorting the input variables, which has $O(n \log  n)$ complexity. While these papers often discuss the possibility of linear-time algorithms, they usually do not study them with a few exceptions~\cite{Condat2016,Lim2016}. 
+% Coherent risk measures, like CVaR, can be evaluated by solving convex optimization problems~\cite{Follmer2016, rockefeller1996variational}. Generic convex optimization algorithms, such as the interior point linear program solvers, are no faster than $O(n^3)$~\cite{Ho2021}. The $\Omega(n \log  n)$ time complexity of the sort dominates the time complexity and prevents linear time computation. In this paper, we circumvent the complexity of sorting by developing no-sort algorithms for these risk measures and others. 
 
-Our algorithms' time complexity improves on the state of the art by a logarithmic factor. Although this improvement may seem unimportant,  it is an acceleration that can be practically meaningful without any serious drawbacks. Our algorithms are simple and easy to implement, with little added complexity compared to the state-of-the-art. Our numerical results show that they can lead to an order of magnitude speed-up for realistic large problems, a significant speed-up for moderately sized problems, and match the performance of existing algorithms for small problems.
+Linear time algorithms that resemble our QuickVaR and QuickDivergence have been studies in many domains and we summarize some of the most relevant ones. Some example of such structured optimization problems are the projection onto the simplex~\cite{adam2019projectionscanonicalsimplexadditional, Wang2013Simplex}, projection on k-capped simplex~\cite{kcapped_ang,Lim2016}, linear optimization on the intersection of $L_p$ or $\varphi$-divergence balls and the probability simplex in robust optimizations~\cite{Ho2022}, optimization for $\varphi$-divergence risk measures~\cite{Ahmadi-Javid2012}, and on polymatroids~\cite{Korte2012}. While authors often discuss the possibility of linear-time algorithms, they usually do not study them with a few exceptions~\cite{Condat2016,Lim2016}. 
 
-The remainder of the paper is organized as follows. \Cref{sec:preliminaries} describes the necessary background on risk measures, $\varphi$-divergence, and polymatroid optimization. Then, \Cref{sec:var-linear} shows the relationship between VaR and the Weighted Median problem, allowing us to trivially adapt algorithms for the Weighted Median Problem to solve VaR. Then, \cref{sec:phi-divergence} builds on this to develop \emph{QuickDivergence}, an algorithm that evaluates certain $\varphi$-divergence risk measures in linear time. We evaluate the algorithms numerically on synthetic and realistic problems in \cref{sec:experiments}. A tested implementation of the algorithms in Julia is available at \url{https://github.com/RiskAverseRL/RiskMeasures.jl}.
+The remainder of the paper is organized as follows. \Cref{sec:preliminaries} describes the necessary background including risk measures, $\varphi$-divergence, and polymatroid optimization. Then, \Cref{sec:var-linear} proposes \emph{QuickVaR} to compute VaR in linear time. Then, \cref{sec:phi-divergence} builds on QuickVaR to develop \emph{QuickDivergence} that computes certain $\varphi$-divergence risk measures in linear time. We evaluate the algorithms numerically on synthetic and realistic problems in \cref{sec:experiments}. A tested implementation of the algorithms in Julia is available at \url{https://github.com/RiskAverseRL/RiskMeasures.jl}.
 
 \section{Preliminaries}\label{sec:preliminaries}
 
-In this work, we restrict our attention to random variables defined on finite probability spaces $(\Omega, 2^{\Omega}, \bm{p})$ where $\Omega := \left\{ 1, \dots , n \right\}$, $\bm{p} \in \Delta_n$, and $\Delta_n$ is the $n$-dimensional probability simplex. We use a tilde to indicate a random variable, such as $\tilde{x}\colon \Omega \to \Real$. The set of real-valued random variables is denoted by $\mathbb{X}$. Vectors are denoted with a lower-case bold font, such as $\bm{x} \in \Real^n$ and indexed as $\bm{x}_i \text{ for } i = 1, \dots , n$. We use $\tilde{x}$ and $\bm{x}$ interchangeably, such that $\bm{x}_\omega = \tilde{x}(\omega) \text{ for }  \omega \in \Omega$. Sets are denoted with calligraphic letters and $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ denotes the extended real line. 
+We restrict our attention to random variables defined on finite probability spaces $(\Omega, 2^{\Omega}, \bm{p})$ where $\Omega := \left\{ 1, \dots , n \right\}$, $\bm{p} \in \Delta_n$, and $\Delta_n$ is the $n$-dimensional probability simplex. We use a tilde to indicate a random variable, such as $\tilde{x}\colon \Omega \to \Real$. The set of real-valued random variables is denoted by $\mathbb{X}$. Vectors are denoted with a lower-case bold font, such as $\bm{x} \in \Real^n$ and indexed as $\bm{x}_i \text{ for } i = 1, \dots , n$. We use $\tilde{x}$ and $\bm{x}$ interchangeably, such that $x_\omega = \tilde{x}(\omega) \text{ for each }  \omega \in \Omega$. Sets are denoted with calligraphic letters and $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ denotes the extended real line. 
 
-\emph{Monetary risk measures} $\rho\colon \mathbb{X} \to \bar{\Real}$ generalize the expectation operator to account for different notions of uncertainty in the distribution of a random variable~\cite{Follmer2016}. We apply risk measures to rewards and suppose that higher risk values are preferable. 
+\emph{Monetary risk measures} $\rho\colon \mathbb{X} \to \bar{\Real}$ generalize the expectation operator to account for different the uncertainty in the distribution of a random variable~\cite{Follmer2016}. We apply risk measures to rewards and suppose that higher risk values are preferable. 
 
-First, we consider the \emph{Value-at-Risk}~(VaR)---one of the most popular risk measures---that is defined for $\alpha\in [0,1)$ for any $\tilde{x}\in \mathbb{X}$ as~\cite{Follmer2016,Shapiro2014}
+\emph{Value-at-Risk}~(VaR) is a popular risk measure and is defined for $\alpha\in [0,1)$ and $\tilde{x}\in \mathbb{X}$ as~\cite{Follmer2016,Shapiro2014}
 \begin{equation}
   \label{eq:var-definition}
   \var{\alpha}{ \tilde{x} }
   \;:=\;
     \max\; \left\{\tau \in \bar{\Real} \mid \P{\tilde{x} < \tau}  \le \alpha\right\} =
-    \max\; \left\{\tau \in \bar{\Real} \mid \P{\tilde{x} \ge  \tau}  \ge 1 - \alpha\right\}.
+    \max\; \left\{\tau \in \bar{\Real} \mid \P{\tilde{x} \ge  \tau}  \ge 1 - \alpha\right\},
 \end{equation}
-The first maximum in~\eqref{eq:var-definition} exists because $\tau \mapsto \P{\tilde{x} < \tau}$ is a lower semi-continuous function. One can readily see that $\varo_0[\tilde{x}] = \ess \inf [\tilde{x}]$, and typically the risk measure is extended as $\varo_{1}[ \tilde{x} ] = \infty$. Our analysis will also require the notion of the \emph{quantile} $\quant_{\alpha}$ for $\tilde{x}$ which is defined as the set
+where the maximum exists because $\tau \mapsto \P{\tilde{x} < \tau}$ is lower semi-continuous. One can readily see that $\varo_0[\tilde{x}] = \ess \inf [\tilde{x}]$, and typically the risk measure is extended as $\varo_{1}[ \tilde{x} ] = \infty$. Our analysis also requires the \emph{quantile} $\quant_{\alpha}$ for $\tilde{x}$ which is defined as the set
 \[
-  \quant_{\alpha}[\tilde{x}] := \left\{ z\in \Real \mid  \P{ \tilde{x} \le z } \ge \alpha , \P{ \tilde{x} \ge z } \ge 1-\alpha  \right\}.
+  \quant_{\alpha}[\tilde{x}] := \left\{ z\in \Real \mid  \P{ \tilde{x} \le z } \ge \alpha , \P{ \tilde{x} \ge z } \ge 1-\alpha  \right\},
 \]
-The lower and upper bounds of the quantile set are denoted by $\quant^+_{\alpha}[\tilde{x}] := \max \quant_{\alpha}[\tilde{x}] = \var{\alpha }{\tilde{x}}$ and $\quant^-_{\alpha}[\tilde{x}] := \min \quant_{\alpha}[\tilde{x}]$.
+with bounds that exist and are denoted by $\quant^+_{\alpha}[\tilde{x}] := \max \quant_{\alpha}[\tilde{x}]$ and $\quant^-_{\alpha}[\tilde{x}] := \min \quant_{\alpha}[\tilde{x}]$.
 
 \begin{table}
     \centering
@@ -112,36 +112,30 @@ The lower and upper bounds of the quantile set are denoted by $\quant^+_{\alpha}
     \caption{Parameters for selected $\varphi$-divergence risk measures for $\alpha\in (0,1)$.} \label{tab:phi-divergence-risk}
 \end{table}
 
-Second, we consider \emph{$\varphi$-divergence risk measures}~\cite{Ahmadi-Javid2012}. A divergence risk measure $\ER_{\varphi, \beta }\colon \mathbb{X} \to  \bar{\Real}$  is defined for a closed, convex function $\varphi\colon \bar{\Real} \to \bar{\Real}$ that satisfies $\varphi(1) = 0$ and $\beta\in \Real_{\ge 0}$ as
+A \emph{$\varphi$-divergence risk measure} $\ER_{\varphi, \beta }\colon \mathbb{X} \to  \bar{\Real}$ is defined for $\varphi\colon \bar{\Real} \to \bar{\Real}$ and $\beta\in \Real_{\ge 0}$ as~\cite{Ahmadi-Javid2012}
 \begin{align} \label{eq:fdiv-primal}
   \ER_{\varphi, \beta}[ \tilde{x} ]
   &:= \inf \left\{\bm{q}\tr \bm{x} \mid \bm{q}\in \Delta_n, H_{\varphi}(\bm{q} \| \bm{p}) \le \beta
     %, \bm{q} \ll \bm{p}
     \right\} \\
   \label{eq:fdiv-dual}
-  &= \sup \left\{  t \cdot v - t\cdot \E { \varphi\opt \left(- \frac{\tilde{x}}{t} + v + \beta \right)} \mid  t,v \in \Real, \,  > 0 \right\}.
+  &= \sup \left\{  t \cdot v - t\cdot \E { \varphi\opt \left(- \frac{\tilde{x}}{t} + v + \beta \right)} \mid  v \in \Real, \,  t> 0 \right\},
 \end{align}
-% The notation $\bm{q} \ll \bm{p}$ indicates that $\bm{q}$ is absolutely continuous with respect to $\bm{p}$: $p_{\omega} =0 \implies q_{\omega} = 0, \forall  \omega \in \Omega$.
-The function $H_{\varphi}$ in~\eqref{eq:fdiv-primal} is a $\varphi$-divergence measure defined as~\cite{Bayraksan2015}
+where $\varphi\opt(x)$ is the convex conjugate of $\varphi(y)$, $\varphi$ is a closed, convex function that satisfies $\varphi(1) = 0$, and $H_{\varphi}$ is a $\varphi$-divergence measure~\cite{Bayraksan2015}:
 \[
-  H_\varphi(\bm{q} \| \bm{p}) := \sum_{\omega \in \Omega} p_{\omega} \cdot \varphi\left(\frac{q_{\omega}}{p_{\omega}}\right),
+  H_\varphi(\bm{q} \| \bm{p}) := \sum_{\omega \in \Omega} p_{\omega} \cdot \varphi\left(\frac{q_{\omega}}{p_{\omega}}\right).
 \]
-and we adopt the common convention that $1 / 0 = \infty$ and $0 \cdot \infty = 0$~\cite{rockefeller1996variational}. Note that the absolute continuity restriction is not needed for finite probability spaces. 
-The function $\varphi\opt(x)$ is the convex conjugate of $\varphi(y)$.
+We adopt the common convention that $1 / 0 = \infty$ and $0 \cdot \infty = 0$~\cite{rockefeller1996variational} which makes it possible to drop the absolute continuity restriction used in some definitions of $\ER$. It is important to note that $\varphi$-divergence risk measures are coherent, which means they are convex and positively homogeneous. Any coherent risk measure $\rho\colon \mathbb{X}\to \bar{\Real}$ satisfies for some closed convex non-empty set $\mathcal{Q} \subseteq \Delta^n$ \citep[Prop. 2.84]{Follmer2016}. 
 
-
-
-Finally, it is important to note that $\varphi$-divergence risk measures are coherent, which means they are convex and positively homogeneous. Any coherent risk measure $\rho\colon \mathbb{X}\to \bar{\Real}$ satisfies for some closed convex non-empty set $\mathcal{Q} \subseteq \Delta^n$ \citep[Prop. 2.84]{Follmer2016}. 
-
-One specific $\varphi$-divergence risk measure we consider in this work is \emph{Conditional-Value-at-Risk}~(CVaR), a common risk measure, which is defined for a random variable $\tilde{x} \in \mathbb{X}$ and risk level $\alpha \in (0,1]$ as~\cite{Follmer2016}
+\Cref{tab:phi-divergence-risk} summarizes several common $\varphi$-divergence risk measures. In particular, \emph{Conditional-Value-at-Risk}~(CVaR) is a $\varphi$-divergence risk measure and is also defined equivalently for $\tilde{x} \in \mathbb{X}$ and $\alpha \in (0,1]$ as~\cite{Follmer2016}
 \begin{equation} \label{eq:primal_cvar}
     \cvaro_\alpha(\tilde{x})
-  := \max_{z \in \Real} \left(z - \frac{1}{\alpha} \cdot \E{[z -\bm{x}]_+}\right) 
+  := \max_{z \in \Real} \left(z - \frac{1}{\alpha} \cdot \E{[z -\bm{x}]_+}\right),
   % = \min \left\{\bm{q}\tr \bm{x} \mid \bm{q} \leq \alpha^{-1} \bm{p},\, \bm{q}\in \Delta_n \right\},
 \end{equation}
-CVaR is usually extended continuously as $\cvaro_0[\tilde{x}] = \ess\inf[\tilde{x}]$.
+and extended continuously to $\cvaro_0[\tilde{x}] = \ess\inf[\tilde{x}]$.
 
-We also focus on another $\varphi$-divergence risk measure risk measure in which the divergence is the L1 norm. While the risk measure has been studied in prior literature, a proper name has never been given. Thus, we name the risk measure TVaR, where for a given $\alpha$, TVaR$_\alpha$ can be seen as a lower bound on CVaR$_{\alpha}$ and EVaR$_{\alpha}$ (Entropic Value at Risk).   
+We also focus on another $\varphi$-divergence risk measure risk measure in which the divergence is the $L_1$ norm. While the risk measure has been studied in prior literature, a proper name has never been given. Thus, we name the risk measure TVaR, where for a given $\alpha$, TVaR$_\alpha$ can be seen as a lower bound on CVaR$_{\alpha}$ and EVaR$_{\alpha}$ (Entropic Value at Risk).   
 \begin{proposition}
 For each $\alpha\in [0,1]$ and $\tilde{x} \in \mathbb{X}$:
 \[
@@ -158,7 +152,7 @@ For each $\alpha\in [0,1]$ and $\tilde{x} \in \mathbb{X}$:
 The proof follows directly from Chapter 2 of \cite{CoverThomas1991Elements} and \cite{Ahmadi-Javid2012}. Note the proof in \cite{Ahmadi-Javid2011} is in terms of costs while our risk measures are in terms of rewards.
 \end{proof}
 
-In the remainder of the paper, we first propose a linear-time algorithm for computing VaR then we build on it to propose a linear time algorithm for certain $\varphi$-divergence risk measures. 
+% In the remainder of the paper, we first propose a linear-time algorithm for computing VaR then we build on it to propose a linear time algorithm for certain $\varphi$-divergence risk measures. 
 
 \section{Computing VaR in Linear Time} \label{sec:var-linear}
 
@@ -788,7 +782,6 @@ observe that the constraints imply that for each $\bm{q} \in \mathcal{Q}_f$ that
 \]
 Since by the simplex constraint, \mm{this needs a bit more rigor}
 \[
-
 \sum_{i \in \mathcal{O}} (p_i - q_i)
 +
 \sum_{i \in \mathcal{O}^c} (p_i - q_i)
@@ -797,8 +790,6 @@ Since by the simplex constraint, \mm{this needs a bit more rigor}
 =
 -
 \sum_{i \in \mathcal{O}} (p_i - q_i).
-
-
   \bm{1}_{\mathcal{O}}\tr \bm{|p - q|} = (\bm{1} - \bm{1}_{\mathcal{O}})\tr |\bm{p} - \bm{q}| \leq \beta/2,
 \]
 and 

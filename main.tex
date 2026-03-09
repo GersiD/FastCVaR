@@ -94,6 +94,7 @@ where the maximum exists because $\tau \mapsto \P{\tilde{x} < \tau}$ is lower se
 with bounds that exist and are denoted by $\quant^+_{\alpha}[\tilde{x}] := \max \quant_{\alpha}[\tilde{x}]$ and $\quant^-_{\alpha}[\tilde{x}] := \min \quant_{\alpha}[\tilde{x}]$.
 
 \begin{table}
+    \caption{Parameters for selected $\varphi$-divergence risk measures for $\alpha\in (0,1)$.} \label{tab:phi-divergence-risk}
     \centering
     \label{tab:divergences}
     \begin{tabular}{l|c|c|c}
@@ -109,7 +110,6 @@ with bounds that exist and are denoted by $\quant^+_{\alpha}[\tilde{x}] := \max 
          $\tvaro_{\alpha}$     & $|y - 1|$ & $ \begin{cases} x &\text{if } |x| \le 1\\ \infty &\text{otherwise} \end{cases} $& $\sqrt{ 2 \log 2 \cdot \log \frac{1}{\alpha} }$ \\
          \bottomrule
     \end{tabular}
-    \caption{Parameters for selected $\varphi$-divergence risk measures for $\alpha\in (0,1)$.} \label{tab:phi-divergence-risk}
 \end{table}
 
 A \emph{$\varphi$-divergence risk measure} $\ER_{\varphi, \beta }\colon \mathbb{X} \to  \bar{\Real}$ is defined for $\varphi\colon \bar{\Real} \to \bar{\Real}$ and $\beta\in \Real_{\ge 0}$ as~\cite{Ahmadi-Javid2012}
@@ -264,9 +264,8 @@ We now present our algorithm. While the version here is recursive it can trivial
 \begin{algorithm}
   \caption{\texttt{partition}: Dutch national flag algorithm~\cite[chapter 14]{Dijkstra1976}}
   \label{alg:partition}
-  \Input{$\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$, pivot $v\in \Real$, and front and back $f, b \in 1{:}n$}
-  \Output{$l, g \in f{:}b$, $\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$ such that
-    $x_j < v, \, j\in f{:}(l-1),\qquad x_j = v, \, j \in l{:}g, \qquad x_j > v, \, j \in (g+1){:}b $}
+  \Input{$\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$, pivot $v\in \Real$, and front and back $f, b \in 1{:}n$, $f < b$}
+  \Output{$l, g \in f{:}b$, $\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$ such that \cref{lem:hoare-partition} holds.}
   $l_0 \gets e_0 \gets f$; $g_0 \gets b$; $k \gets 0$ \;
   \While{$e_k \leq g_k$}
   {
@@ -286,7 +285,13 @@ We now present our algorithm. While the version here is recursive it can trivial
   \KwRet{$(l_k, g_k, \bm{x}, \bm{p})$}\; 
 \end{algorithm}
 
-
+\begin{lemma} \label{lem:hoare-partition}
+If $(l, g, \bm{x}', \bm{p}') = \operatorname{partition}(\bm{x'}, \bm{p'}, i, f, b)$ in \cref{alg:partition} for $f < b$, then:
+\begin{align} \label{eq:hoare-correspond}
+x_j < v, \, j\in f{:}(l-1),\qquad x_j = v, \, j \in l{:}g, \qquad x_j > v, \, j \in (g+1){:}b.
+\end{align}
+Moreover, $\forall \, j \in 1{:}n, x_j = x'_{\sigma(j)}, p_j = p'_{\sigma(j)}$ for some permutation $\sigma$ and the algorithm runs in $O(b - f)$ time.
+\end{lemma}
 
 \begin{algorithm}
   \caption{\texttt{QuickVaR}: Recursive VaR algorithm} \label{alg:quick-quantile}
@@ -318,26 +323,14 @@ We now present our algorithm. While the version here is recursive it can trivial
 
 %The above conditions primarily state that each call to the partition scheme performs a partial sorting such that all elements $\leq v_k$ will have an index $< i_k$ , and elements greater than the pivot will have an index $> i_k$.
 We now prove the correctness of our algorithm. We first prove a general condition on the return value of our algorithm which applies for any array $p$, regardless of whether it is a simplex or not. It trivially follows that when $p$ is a valid simplex, the condition simplifies to the \cref{eq:var-definition}. For the partition algorithm and it's proof of correctness, we refer the reader to the appendix.
-\begin{lemma} \label{PROOFCORRECTNESS}
-  % \Cref{alg:recursive-qvar} returns $\varo_{\alpha}[\tilde{x}]$ for $\alpha\in [0,1)$. 
-  % \Cref{alg:recursive-qvar} returns $\varo_{\alpha}[\tilde{x}]$ for $\alpha\in [0,1)$. 
-Algorithm \ref{alg:quick-quantile} returns $\tau\opt$ where \[
-  \tau\opt  \in \argmax \left\{\tau \in \Real \mid   \sum_{m = f}^b p_m \cdot I(x_m < \tau) \leq \alpha \right\},
-\] \label{INDUCTHYPOTH}
-$\forall \alpha < \sum_{m = f}^{b}p_m$.
+\begin{lemma} \label{lem:quickvar-correct}
+\Cref{alg:quick-quantile} returns
+\[
+\tau\opt  = \max \left\{\tau \in \Real \mid  \sum_{m = f}^b p_m \cdot I(x_m < \tau) \leq \alpha \right\},
+\] 
 \end{lemma}
 \begin{proof}
-
-We proceed by induction on the number of elements in the recursion interval, 
-$n = b - f + 1$.
-
-% \paragraph{Inductive hypothesis.} \label{GeneralVarDEF}
-% Assume that for all inputs of size less than or equal to $n$, 
-% the algorithm correctly returns the
-% \[
-%   \max \left\{\tau \in \Real \mid  ( \sum_{m = f}^b p_m\right\} \cdot I(x_m < \tau)) \leq \alpha,
-% \]
-% where $\alpha < \sum_{m = f}^{b}$.
+We proceed by induction on $n = b - f + 1$.
 
 \paragraph{Base case ($n = 1$).}
 Since $b = f$, the algorithm returns $x_b$.
@@ -1024,20 +1017,8 @@ Now, suppose that \cref{alg:slow-quantile} terminates with value $q\opt$. Then, 
 
 \subsection{Partition Algorithm}
 
-\mm{We should describe the intuition for the partition algorithm here somewhere}
- 
 
-\begin{lemma} \label{lem:hoare-partition}
-Suppose that for $\bm{x}'\in \Real^n$, $\bm{p}'\in \Delta_n$ and $f, b\in \Nats$ such that $f < b$ $(l, g, \bm{x}, \bm{p}) \gets \operatorname{partition}(\bm{x'}, \bm{p'}, i, f, b)$ is computed using \cref{alg:partition}. Then:
-\begin{align}
-   j \in f{:}(l-1) &\quad\implies \quad x_j < x_i', \label{eq:hoare-less-than}\\
-   j \in l{:}g &\quad\implies \quad x_j = x_i', \label{eq:hoare-equal-to}\\
-   j \in (g+1){:}b &\quad\implies \quad x_j > x_i', \label{eq:hoare-greater-than}\\
-   \forall \; j, j' \in [1\dots n]&\quad x_j = x'_{j'} \iff p_j = p'_{j'}. \label{eq:hoare-correspond}
-\end{align}
-Moreover, the algorithm runs in $O(b - f)$ time.
-\end{lemma}
-\begin{proof}
+\begin{proof}[Proof of \cref{lem:hoare-partition}]
 Let $v$ be an input to \cref{alg:partition} and consider the following invariants.
 \begin{align}
 \label{eq:ho-inv-less}   x_j &< v, & j\in f_k{:}(l_k-1), \\

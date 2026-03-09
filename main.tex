@@ -69,15 +69,15 @@ Our algorithms' time complexity improves on the state of the art by a logarithmi
 
 % Coherent risk measures, like CVaR, can be evaluated by solving convex optimization problems~\cite{Follmer2016, rockefeller1996variational}. Generic convex optimization algorithms, such as the interior point linear program solvers, are no faster than $O(n^3)$~\cite{Ho2021}. The $\Omega(n \log  n)$ time complexity of the sort dominates the time complexity and prevents linear time computation. In this paper, we circumvent the complexity of sorting by developing no-sort algorithms for these risk measures and others. 
 
-Linear time algorithms that resemble our QuickVaR and QuickDivergence have been studies in many domains and we summarize some of the most relevant ones. Some example of such structured optimization problems are the projection onto the simplex~\cite{adam2019projectionscanonicalsimplexadditional, Wang2013Simplex}, projection on k-capped simplex~\cite{kcapped_ang,Lim2016}, linear optimization on the intersection of $L_p$ or $\varphi$-divergence balls and the probability simplex in robust optimizations~\cite{Ho2022}, optimization for $\varphi$-divergence risk measures~\cite{Ahmadi-Javid2012}, and on polymatroids~\cite{Korte2012}. While authors often discuss the possibility of linear-time algorithms, they usually do not study them with a few exceptions~\cite{Condat2016,Lim2016}. 
+Linear time algorithms that resemble our QuickVaR and QuickDivergence have been studies in many domains and we summarize some of the most relevant ones. Some example of such structured optimization problems are the projection onto the simplex~\cite{adam2019projectionscanonicalsimplexadditional, Wang2013Simplex}, projection on k-capped simplex~\cite{kcapped_ang,Lim2016}, linear optimization on the intersection of $L_p$ or $\varphi$-divergence balls and the probability simplex in robust optimizations~\cite{Ho2022}, optimization for $\varphi$-divergence risk measures~\cite{Ahmadi-Javid2012}, and on polymatroids~\cite{Korte2012}. While authors often discuss the possibility of linear-time algorithms, they usually do not study them with a few exceptions~\cite{Condat2016,Lim2016}. Finally, QuickVaR is closely related to the computation weighted quantile but returns the same value only when the quantile is unique~\cite{Korte2012,cormen2001introduction}.
 
-The remainder of the paper is organized as follows. \Cref{sec:preliminaries} describes the necessary background including risk measures, $\varphi$-divergence, and polymatroid optimization. Then, \Cref{sec:var-linear} proposes \emph{QuickVaR} to compute VaR in linear time. Then, \cref{sec:phi-divergence} builds on QuickVaR to develop \emph{QuickDivergence} that computes certain $\varphi$-divergence risk measures in linear time. We evaluate the algorithms numerically on synthetic and realistic problems in \cref{sec:experiments}. A tested implementation of the algorithms in Julia is available at \url{https://github.com/RiskAverseRL/RiskMeasures.jl}.
+The remainder of the paper is organized as follows. \Cref{sec:preliminaries} describes the necessary background including risk measures, $\varphi$-divergence, and polymatroid optimization. Then, \Cref{sec:var-linear} proposes \emph{QuickVaR} to compute VaR in linear time. \cref{sec:phi-divergence} builds on QuickVaR to develop \emph{QuickDivergence} that computes certain $\varphi$-divergence risk measures in linear time. We evaluate the algorithms numerically on synthetic and realistic problems in \cref{sec:experiments}. A tested implementation of the algorithms in Julia is available at \url{https://github.com/RiskAverseRL/RiskMeasures.jl}.
 
 \section{Preliminaries}\label{sec:preliminaries}
 
-We restrict our attention to random variables defined on finite probability spaces $(\Omega, 2^{\Omega}, \bm{p})$ where $\Omega := \left\{ 1, \dots , n \right\}$, $\bm{p} \in \Delta_n$, and $\Delta_n$ is the $n$-dimensional probability simplex. We use a tilde to indicate a random variable, such as $\tilde{x}\colon \Omega \to \Real$. The set of real-valued random variables is denoted by $\mathbb{X}$. Vectors are denoted with a lower-case bold font, such as $\bm{x} \in \Real^n$ and indexed as $\bm{x}_i \text{ for } i = 1, \dots , n$. We use $\tilde{x}$ and $\bm{x}$ interchangeably, such that $x_\omega = \tilde{x}(\omega) \text{ for each }  \omega \in \Omega$. Sets are denoted with calligraphic letters and $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ denotes the extended real line. 
+We restrict our attention to random variables defined on finite probability spaces $(\Omega, 2^{\Omega}, \bm{p})$ where $\Omega := \left\{ 1, \dots , n \right\}$, $\bm{p} \in \Delta_n$, and $\Delta_n$ is the $n$-dimensional probability simplex. We use a tilde to indicate a random variable, such as $\tilde{x}\colon \Omega \to \Real$. The set of real-valued random variables is denoted by $\mathbb{X}$. Vectors are denoted with a lower-case bold font, such as $\bm{x} \in \Real^n$ and indexed as $\bm{x}_i \text{ for } i = 1, \dots , n$. We use $\tilde{x}$ and $\bm{x}$ interchangeably, such that $x_\omega = x(\omega), \forall \,  \omega \in \Omega$. Sets are denoted with calligraphic letters and $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ denotes the extended real line. The symbol $\Nats$ denotes all 0-based natural numbers.
 
-\emph{Monetary risk measures} $\rho\colon \mathbb{X} \to \bar{\Real}$ generalize the expectation operator to account for different the uncertainty in the distribution of a random variable~\cite{Follmer2016}. We apply risk measures to rewards and suppose that higher risk values are preferable. 
+\emph{Monetary risk measures} $\rho\colon \mathbb{X} \to \bar{\Real}$ generalize the expectation operator to account for different the uncertainty in the distribution of a random variable~\cite{Follmer2016}. We apply risk measures to random variables representing rewards and suppose that higher risk values are preferable. 
 
 \emph{Value-at-Risk}~(VaR) is a popular risk measure and is defined for $\alpha\in [0,1)$ and $\tilde{x}\in \mathbb{X}$ as~\cite{Follmer2016,Shapiro2014}
 \begin{equation}
@@ -125,17 +125,14 @@ where $\varphi\opt(x)$ is the convex conjugate of $\varphi(y)$, $\varphi$ is a c
 \[
   H_\varphi(\bm{q} \| \bm{p}) := \sum_{\omega \in \Omega} p_{\omega} \cdot \varphi\left(\frac{q_{\omega}}{p_{\omega}}\right).
 \]
-We adopt the common convention that $1 / 0 = \infty$ and $0 \cdot \infty = 0$~\cite{rockefeller1996variational} which makes it possible to drop the absolute continuity restriction used in some definitions of $\ER$. It is important to note that $\varphi$-divergence risk measures are coherent, which means they are convex and positively homogeneous. Any coherent risk measure $\rho\colon \mathbb{X}\to \bar{\Real}$ satisfies for some closed convex non-empty set $\mathcal{Q} \subseteq \Delta^n$ \citep[Prop. 2.84]{Follmer2016}. 
+We adopt the common convention that $1 / 0 = \infty$ and $0 \cdot \infty = 0$~\cite{rockefeller1996variational} which makes it possible to drop the absolute continuity restriction used in some definitions of $\ER$. It is important to note that $\varphi$-divergence risk measures are coherent, which means they are convex and positively homogeneous. Any coherent risk measure $\rho\colon \mathbb{X}\to \bar{\Real}$ satisfies for some closed convex non-empty set $\mathcal{Q} \subseteq \Delta_n$ \citep[Prop. 2.84]{Follmer2016}. 
 
-\Cref{tab:phi-divergence-risk} summarizes several common $\varphi$-divergence risk measures. In particular, \emph{Conditional-Value-at-Risk}~(CVaR) is a $\varphi$-divergence risk measure and is also defined equivalently for $\tilde{x} \in \mathbb{X}$ and $\alpha \in (0,1]$ as~\cite{Follmer2016}
+\Cref{tab:phi-divergence-risk} summarizes several common $\varphi$-divergence risk measures. We focus on the \emph{Conditional-Value-at-Risk}~(CVaR), which is a $\varphi$-divergence risk measure and defined equivalently for $\tilde{x} \in \mathbb{X}$ and $\alpha \in (0,1]$ as~\cite{Follmer2016}
 \begin{equation} \label{eq:primal_cvar}
     \cvaro_\alpha(\tilde{x})
   := \max_{z \in \Real} \left(z - \frac{1}{\alpha} \cdot \E{[z -\bm{x}]_+}\right),
-  % = \min \left\{\bm{q}\tr \bm{x} \mid \bm{q} \leq \alpha^{-1} \bm{p},\, \bm{q}\in \Delta_n \right\},
 \end{equation}
-and extended continuously to $\cvaro_0[\tilde{x}] = \ess\inf[\tilde{x}]$.
-
-We also focus on another $\varphi$-divergence risk measure risk measure in which the divergence is the $L_1$ norm. While the risk measure has been studied in prior literature, a proper name has never been given. Thus, we name the risk measure TVaR, where for a given $\alpha$, TVaR$_\alpha$ can be seen as a lower bound on CVaR$_{\alpha}$ and EVaR$_{\alpha}$ (Entropic Value at Risk).   
+and extended continuously to $\cvaro_0[\tilde{x}] = \ess\inf[\tilde{x}]$. We also study another $\varphi$-divergence risk measure, which we call \emph{Total-Value-at-Risk}~(TVaR). The importance of TVaR is that it bounds the common Entropic-Value-at-Risk~(EVaR)~\cite{Ahmadi-Javid2012,Hau2023a,Su2024} from below as we show next. 
 \begin{proposition}
 For each $\alpha\in [0,1]$ and $\tilde{x} \in \mathbb{X}$:
 \[
@@ -149,19 +146,66 @@ For each $\alpha\in [0,1]$ and $\tilde{x} \in \mathbb{X}$:
 \]
 \end{proposition}
 \begin{proof}
-The proof follows directly from Chapter 2 of \cite{CoverThomas1991Elements} and \cite{Ahmadi-Javid2012}. Note the proof in \cite{Ahmadi-Javid2011} is in terms of costs while our risk measures are in terms of rewards.
+  \mm{We need a proof for TVaR, the blurb here is not a proof.
+  }The proof follows directly from Chapter 2 of \cite{CoverThomas1991Elements} and \cite{Ahmadi-Javid2012}. Note the proof in \cite{Ahmadi-Javid2011} is in terms of costs while our risk measures are in terms of rewards.
 \end{proof}
 
 % In the remainder of the paper, we first propose a linear-time algorithm for computing VaR then we build on it to propose a linear time algorithm for certain $\varphi$-divergence risk measures. 
 
 \section{Computing VaR in Linear Time} \label{sec:var-linear}
 
-In this section, we show derive a linear time algorithm for Value at Risk and show its equivalence between a slightly modifed version of the Weighted Median problem, which is well known to be solvable in linear time.\cite{Korte2012,cormen2001introduction}. The algorithms modify the standard quick select algorithm to one where the values may have varying weights.
+Our algorithm for computing the VaR in linear time builds on the well-known quickselect algorithm. This approach makes it possible to avoid the full sort of the discrete random variable used in common VaR implementations.
 
-We first show that $\quant_{\alpha}^+(\tilde{x})$ is an element in the array $x$, which will be necessary to establish correctness of the algorithm. 
-\begin{lemma}\label{lem:quantile-in-finite-omega}
-Suppose that $\tilde{x}\colon \Omega \to \Real$ is a random variable with finite $\Omega$. Then, there exist $\omega_+, \omega_-\in \Omega$ such that $\quant_{\alpha}^+(\tilde{x}) = \tilde{x}(\omega_+)$ and $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}(\omega_-)$ for each $\alpha\in (0,1)$.
+
+Before stating and analyzing the algorithm, we establish a few crucial lemmas about probability distributions which facilitate the algorithm. The following lemmas leverage the discreteness of the random variable and do not hold for continuous random variables.
+
+In the lemmas below, we universally assume that $\tilde{x}\in  \mathbb{X}$ and $\alpha\in (0,1)$. We emphasize that $\alpha < 1$ is necessary and the lemmas use the fact that the random variable is discrete.
+
+\begin{lemma}
+  For each $t\in \Real$, the exists $q > t$ such that
+  \[
+   \P{\tilde{x} \le t} = 
+   \P{\tilde{x} < q}.
+  \]
 \end{lemma}
+
+\begin{lemma} \label{lem:prob-lumpy}
+  For each $t\in \Real$:
+  \[
+    \P{\tilde{x} = t} > 0
+    \implies
+    \exists \omega \in \Omega, x(\omega) = t.
+  \]
+\end{lemma}
+
+\begin{lemma}
+  
+\end{lemma}
+
+
+\begin{lemma} \label{lem:var-property}
+  We have that 
+  \[
+    \P{\tilde{x} < \var{\alpha}{\tilde{x}}} \le \alpha,
+      \qquad
+    \P{\tilde{x} \le \var{\alpha}{\tilde{x}}} > \alpha. 
+  \]
+\end{lemma}
+
+\begin{lemma}\label{lem:quantile-in-finite-omega}
+There exists $\omega\in\Omega$ such that
+\[
+ \var{\alpha }{\tilde{x}} = x(\omega). 
+\]
+\end{lemma}
+\begin{proof}
+  From basic probability properties and \cref{lem:var-property}, we have that
+  \[
+    \P{\tilde{x} =
+      \var{\alpha }{\tilde{x}}} = \P{\tilde{x} \le \var{\alpha }{\tilde{x}}}  - \P{\tilde{x} < \var{\alpha }{\tilde{x}}} > \alpha - \alpha = 0.
+  \]
+  The result is then an immediate consequence of \cref{lem:prob-lumpy}.
+\end{proof}
 
 We now present our algorithm. While the version here is recursive it can trivially be modified to version with while loops, which is often faster in practice. We refer the readers to the appendix for the non-recursive version, which we also use for our expirimental evaluations.
 % We now define our version of the Weighted Median problem.
@@ -218,32 +262,53 @@ We now present our algorithm. While the version here is recursive it can trivial
 % \end{algorithm}  
 
 \begin{algorithm}
-  \caption{Recursive QuickVaR: Linear-time recursive algorithm for VaR}\label{alg:quick-quantile}
-  \Input{vector $\bm{x}$, pmf $\bm{p}$, $\alpha \in (0,1)$, indices $f$, $b$}
-  \Output{$\varo_{\alpha}[\tilde{x}]$}
-  
-  \If{$b \le f$}{
-    \KwRet{$x_b$}\;
+  \caption{\texttt{partition}: Dutch national flag algorithm~\cite[chapter 14]{Dijkstra1976}}
+  \label{alg:partition}
+  \Input{$\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$, pivot $v\in \Real$, and front and back $f, b \in 1{:}n$}
+  \Output{$l, g \in f{:}b$, $\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$ such that
+    $x_j < v, \, j\in f{:}(l-1),\qquad x_j = v, \, j \in l{:}g, \qquad x_j > v, \, j \in (g+1){:}b $}
+  $l_0 \gets e_0 \gets f$; $g_0 \gets b$; $k \gets 0$ \;
+  \While{$e_k \leq g_k$}
+  {
+  \label{line:partition-while}
+    \If{$x_{e_k} < v$}{
+      swap: $x_{e_k} \leftrightarrow x_{l_k}$ and $p_{e_k} \leftrightarrow p_{l_k}$\; \label{line:swap1}
+      $l_{k+1} \gets l_k + 1$ ;
+      $e_{k+1} \gets e_k + 1$\; \label{line:partition-e-1-1}
+    }
+    \ElseIf{$x_{e_k} > v$}{
+      swap: $x_{e_k}\leftrightarrow x_{g_k}$ and $p_{e_k} \leftrightarrow p_{g_k}$\; \label{line:swap2}
+      $g_{k+1} \gets g_{k} - 1$\; \label{line:parition-g-1}
+    }
+    \lElse {$e_{k+1} \gets e_{k} + 1$} \label{line:partition-e-1-2}
+    $k \gets k + 1$
   }
+  \KwRet{$(l_k, g_k, \bm{x}, \bm{p})$}\; 
+\end{algorithm}
 
-  $i \gets \operatorname{rand}(\left\{ f, f+1, \dots , b \right\})$ \tcp*{Pivot index}
-  $v \gets x_i$ \tcp*{Pivot value}
+
+
+\begin{algorithm}
+  \caption{\texttt{QuickVaR}: Recursive VaR algorithm} \label{alg:quick-quantile}
+  \Input{$\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$, $\alpha \in (0,1)$, front and back $f, b \in 1{:}n$}
+  \Output{$\varo_{\alpha}[\tilde{x}]$}
+  \lIf{$b \le f$}{
+    \KwRet{$x_b$}
+  }
+  $v \gets x_{\operatorname{rand}(f{:}b)}$ \tcp*{Pivot}
   $l, g, \bm{x}', \bm{p}' \gets \operatorname{partition}(\bm{x}, \bm{p}, v, f, b)$
-  \tcp*{Rearrange elements into $<$, $=$, and $>$ groups}
+  \tcp*{~\cref{alg:partition}}
   $t \gets \sum_{j=f}^{l-1} p'_j$ \tcp*{$\P{\tilde{x}' < v}$}
   $e \gets \sum_{j=l}^{g} p'_j$  \tcp*{$\P{\tilde{x}' = v}$}
 
-  \If{$\alpha < t$}{
-    \tcp{Quantile lies to the left of the pivot}
-    \KwRet{$\qvar(\bm{x}', \bm{p}', \alpha, f, l-1)$}\;
+  \lIf{$\alpha < t$}{
+    \KwRet{$\qvar(\bm{x}', \bm{p}', \alpha, f, l-1)$}
   }
-  \ElseIf{$\alpha \ge t + e$}{
-    \tcp{Quantile lies to the right of the pivot}
-    \KwRet{$\qvar(\bm{x}', \bm{p}', \alpha - t - e, g+1, b)$}\;
+  \lElseIf{$\alpha \ge t + e$}{
+    \KwRet{$\qvar(\bm{x}', \bm{p}', \alpha - t - e, g+1, b)$}
   }
-  \Else{
-    \tcp{Quantile equals pivot value}
-    \KwRet{$v$}\;
+  \lElse{
+    \KwRet{$v$}
   }
 \end{algorithm}
 
@@ -891,7 +956,7 @@ This speed up is significant in the context of risk measures as they are often u
 \section{Proofs and Details for \cref{sec:var-linear}}
 
 % \begin{algorithm}
-% \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $x \in \Real^n$ with probability mass function $p \in \Delta^n$ and $f, b \in \Real$}}
+% \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $x \in \Real^n$ with probability mass function $p \in \Delta_n$ and $f, b \in \Real$}}
 % \algrenewcommand\algorithmicensure{\textbf{Output: indices of partition $i, j \in \Real$}}
 % \caption{Hoare's partition scheme}\label{alg:partition}
 %   \begin{algorithmic}[1]
@@ -919,40 +984,6 @@ This speed up is significant in the context of risk measures as they are often u
 %
 
 \subsection{Proof of \cref{lem:quantile-in-finite-omega}}
-\begin{proof}
-Recall the definition:
- \begin{align} \label{eq:var-definition-close}
-  \quant_{\alpha}^+(\tilde{x})
-  \;:=\;
-    \max\; \left\{\tau \in \Real \mid \P{ \tilde{x} < \tau } \le \alpha\right\},
- \end{align}
-
-Let $x[\omega_1] \leq x[\omega_2] \leq \dots \leq x[\omega_n]$ without loss of generality. Suppose for the sake of contradiction that there is no $\omega\in \Omega $ such that $\quant^+_{\alpha}(\tilde{x}) = \tilde{x}[\omega]$. Then since $\quant^+_{\alpha}(\tilde{x}), x[\omega] \in \Real$ and $\Omega$ is finite, there are only 3 cases to consider.
-
-\begin{enumerate}
-\item[Case 1]: $\quant^+_{\alpha}(\tilde{x}) = \tau\opt \in (x[\omega_i], x[\omega_{i + 1}])$.
-Since there are no $\omega\in \Omega$ such that $x[\omega] \in  [\tau\opt , x[\omega_{i+1}])$:
-
-  \[
-    \P{\tilde{x} < x[\omega_{i+1}]} = \P{\tilde{x} <\tau\opt} \le \alpha.
-  \]
-Therefore, $x[\omega_{i+1}] > \tau\opt$ is feasible in \eqref{eq:var-definition-close} contradicting the optimality of $\tau\opt$.
-\item[Case 2]: $\quant^+_{\alpha}(\tilde{x}) = \tau\opt < x[\omega_1]$. Since there is no $\omega\in \Omega$ such that $x[\omega] \in (-\infty, x[\omega_1])$:
-  \[
-    \P{\tilde{x} < x[\omega_{1}]} = \P{\tilde{x} <\tau\opt} = 0 \le \alpha.
-  \]
-  Therefore, $x[\omega_1] > \tau\opt$ is feasible in \eqref{eq:var-definition-close} contradicting the optimality of $\tau\opt$.
-
-\item[Case 3]: $\quant^+_{\alpha}(\tilde{x}) = \tau\opt > x[\omega_n]$.
-  For all $\tau \ge \tau\opt$
-  \[
-    \P{\tilde{x} < \tau } \ge  \P{\tilde{x} < \tau\opt } = 1 > \alpha.
-  \]
-  Therefore, $\tau\opt$ cannot be optimal in~\eqref{eq:var-definition-close} since $\alpha < 1$. %, which contradicts the hypothesis.
-  
-\end{enumerate}
-By similar reasopning one can show that $\quant_{\alpha}^-(\tilde{x})$ is also in the set of values of $\tilde{x}$, i.e. there exists $\omega\in \Omega$ such that $\quant_{\alpha}^-(\tilde{x}) = \tilde{x}[\omega]$.
-\end{proof}
 
 
 \subsection{Standard VaR Algorithm} \label{sec:stand-var-algor}
@@ -995,41 +1026,9 @@ Now, suppose that \cref{alg:slow-quantile} terminates with value $q\opt$. Then, 
 
 \mm{We should describe the intuition for the partition algorithm here somewhere}
  
-\begin{algorithm}
-  \caption{\texttt{partition}: Dutch national flag algorithm ~\cite[chapter 14]{Dijkstra1976}}
-  \label{alg:partition}
-  \Input{Random variable $\bm{x} \in \Real^n$ with probability mass function $\bm{p} \in \Delta^n$, pivot value $v\in \Real$, and front and back indices $f, b \in \Nats$}
-  \Output{indices $l$, $g$ and $\bm{x}$ and $\bm{p}$ such that
-    $x_j < v, \, j\in f{:}(l-1), \quad x_j = v, \, j \in l{:}g, \quad x_j > v, \, j \in (g+1){:}b $}
-  % $i \gets f + \lceil\frac{b-f}{2}\rceil$ \tcp*{Pivot: Median-of-medians for $O(b-f)$ runtime}
-  $l_0 \gets f$ \tcp*{invariant: less: $x_j < v, \, j\in f{:}(l-1)$}
-  $e_0 \gets f$ \tcp*{invariant: equal: $x_j = v, \, j \in l{:}(e-1)$ }
-  $g_0 \gets b$ \tcp*{invariant: greater: $x_j > v, \, j \in (g+1){:}b$}
-  $k \gets 0$ \;
-  
-  \While{$e_k \leq g_k$}
-  {
-  \label{line:partition-while}
-    \tcp{invariants hold here}
-    \If{$x_{e_k} < v$}{
-      swap: $x_{e_k} \leftrightarrow x_{l_k}$ and $p_{e_k} \leftrightarrow p_{l_k}$\; \label{line:swap1}
-      $l_{k+1} \gets l_k + 1$ \;
-      $e_{k+1} \gets e_k + 1$\; \label{line:partition-e-1-1}
-    }
-    \ElseIf{$x_{e_k} > v$}{
-      swap: $x_{e_k}\leftrightarrow x_{g_k}$ and $p_{e_k} \leftrightarrow p_{g_k}$\; \label{line:swap2}
-      $g_{k+1} \gets g_{k} - 1$\; \label{line:parition-g-1}
-    }
-    \lElse {$e_{k+1} \gets e_{k} + 1$} \label{line:partition-e-1-2}
-    $k \gets k + 1$
-  }
-  \KwRet{$(l_k, g_k, \bm{x}, \bm{p})$}\; 
-  %\tcp{last element less than the pivot, first element greater than the pivot}
-\end{algorithm}
-
 
 \begin{lemma} \label{lem:hoare-partition}
-Suppose that for $\bm{x}'\in \Real^n$, $\bm{p}'\in \Delta^n$ and $f, b\in \Nats$ such that $f < b$ $(l, g, \bm{x}, \bm{p}) \gets \operatorname{partition}(\bm{x'}, \bm{p'}, i, f, b)$ is computed using \cref{alg:partition}. Then:
+Suppose that for $\bm{x}'\in \Real^n$, $\bm{p}'\in \Delta_n$ and $f, b\in \Nats$ such that $f < b$ $(l, g, \bm{x}, \bm{p}) \gets \operatorname{partition}(\bm{x'}, \bm{p'}, i, f, b)$ is computed using \cref{alg:partition}. Then:
 \begin{align}
    j \in f{:}(l-1) &\quad\implies \quad x_j < x_i', \label{eq:hoare-less-than}\\
    j \in l{:}g &\quad\implies \quad x_j = x_i', \label{eq:hoare-equal-to}\\
@@ -1377,7 +1376,7 @@ Julia garbage collector, even when running synchronously.
 % \end{algorithm}
 
 % \begin{algorithm}
-% \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $x \in \Real^n$ with probability mass function $p \in \Delta^n$ and $f, b \in \Real$}}
+% \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $x \in \Real^n$ with probability mass function $p \in \Delta_n$ and $f, b \in \Real$}}
 % \algrenewcommand\algorithmicensure{\textbf{Output: indices of partion $i, j \in \Real$}}
 % \caption{Hoare's partition scheme}\label{alg:partition}
 %   \begin{algorithmic}[1]

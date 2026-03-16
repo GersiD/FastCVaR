@@ -69,7 +69,7 @@ Our algorithms' time complexity improves on the state of the art by a logarithmi
 
 % Coherent risk measures, like CVaR, can be evaluated by solving convex optimization problems~\cite{Follmer2016, rockefeller1996variational}. Generic convex optimization algorithms, such as the interior point linear program solvers, are no faster than $O(n^3)$~\cite{Ho2021}. The $\Omega(n \log  n)$ time complexity of the sort dominates the time complexity and prevents linear time computation. In this paper, we circumvent the complexity of sorting by developing no-sort algorithms for these risk measures and others. 
 
-Linear time algorithms that resemble our QuickVaR and QuickDivergence have been studies in many domains and we summarize some of the most relevant ones. Some example of such structured optimization problems are the projection onto the simplex~\cite{adam2019projectionscanonicalsimplexadditional, Wang2013Simplex}, projection on k-capped simplex~\cite{kcapped_ang,Lim2016}, linear optimization on the intersection of $L_p$ or $\varphi$-divergence balls and the probability simplex in robust optimizations~\cite{Ho2022}, optimization for $\varphi$-divergence risk measures~\cite{Ahmadi-Javid2012}, and on polymatroids~\cite{Korte2012}. While authors often discuss the possibility of linear-time algorithms, they usually do not study them with a few exceptions~\cite{Condat2016,Lim2016}. Finally, QuickVaR is closely related to the computation weighted quantile but returns the same value only when the quantile is unique~\cite{Korte2012,cormen2001introduction}.
+Linear time algorithms that resemble our QuickVaR and QuickDivergence have been studies in many domains and we summarize some of the most relevant ones. Some example of such structured optimization problems are the projection onto the simplex~\cite{adam2019projectionscanonicalsimplexadditional, Wang2013Simplex}, projection on k-capped simplex~\cite{kcapped_ang,Lim2016}, linear optimization on the intersection of $L_p$ or $\varphi$-divergence balls and the probability simplex in robust optimizations~\cite{Ho2022}, optimization for $\varphi$-divergence risk measures~\cite{Ahmadi-Javid2012}, and on polymatroids~\cite{Korte2012}. While some of these papers discuss the possibility of designing linear-time algorithms, they usually do not study them with a few exceptions~\cite{Condat2016,Lim2016}. Finally, QuickVaR is closely related to the computation weighted quantile but returns the same value only when the quantile is unique~\cite{Korte2012,cormen2001introduction}.
 
 The remainder of the paper is organized as follows. \Cref{sec:preliminaries} describes the necessary background including risk measures, $\varphi$-divergence, and polymatroid optimization. Then, \Cref{sec:var-linear} proposes \emph{QuickVaR} to compute VaR in linear time. \cref{sec:phi-divergence} builds on QuickVaR to develop \emph{QuickDivergence} that computes certain $\varphi$-divergence risk measures in linear time. We evaluate the algorithms numerically on synthetic and realistic problems in \cref{sec:experiments}. A tested implementation of the algorithms in Julia is available at \url{https://github.com/RiskAverseRL/RiskMeasures.jl}.
 
@@ -87,11 +87,12 @@ We restrict our attention to random variables defined on finite probability spac
     \max\; \left\{\tau \in \bar{\Real} \mid \P{\tilde{x} < \tau}  \le \alpha\right\} =
     \max\; \left\{\tau \in \bar{\Real} \mid \P{\tilde{x} \ge  \tau}  \ge 1 - \alpha\right\},
 \end{equation}
-where the maximum exists because $\tau \mapsto \P{\tilde{x} < \tau}$ is lower semi-continuous. One can readily see that $\varo_0[\tilde{x}] = \ess \inf [\tilde{x}]$, and typically the risk measure is extended as $\varo_{1}[ \tilde{x} ] = \infty$. Our analysis also requires the \emph{quantile} $\quant_{\alpha}$ for $\tilde{x}$ which is defined as the set
-\[
-  \quant_{\alpha}[\tilde{x}] := \left\{ z\in \Real \mid  \P{ \tilde{x} \le z } \ge \alpha , \P{ \tilde{x} \ge z } \ge 1-\alpha  \right\},
-\]
-with bounds that exist and are denoted by $\quant^+_{\alpha}[\tilde{x}] := \max \quant_{\alpha}[\tilde{x}]$ and $\quant^-_{\alpha}[\tilde{x}] := \min \quant_{\alpha}[\tilde{x}]$.
+where the maximum exists because $\tau \mapsto \P{\tilde{x} < \tau}$ is lower semi-continuous. One can readily see that $\varo_0[\tilde{x}] = \ess \inf [\tilde{x}]$, and typically the risk measure is extended as $\varo_{1}[ \tilde{x} ] = \infty$.
+%Our analysis also requires the \emph{quantile} $\quant_{\alpha}$ for $\tilde{x}$ which is defined as the set
+%\[
+%  \quant_{\alpha}[\tilde{x}] := \left\{ z\in \Real \mid  \P{ \tilde{x} \le z } \ge \alpha , \P{ \tilde{x} \ge z } \ge 1-\alpha  \right\},
+%\]
+%with bounds that exist and are denoted by $\quant^+_{\alpha}[\tilde{x}] := \max \quant_{\alpha}[\tilde{x}]$ and $\quant^-_{\alpha}[\tilde{x}] := \min \quant_{\alpha}[\tilde{x}]$.
 
 \begin{table}
     \caption{Parameters for selected $\varphi$-divergence risk measures for $\alpha\in (0,1)$.} \label{tab:phi-divergence-risk}
@@ -161,13 +162,6 @@ Before stating and analyzing the algorithm, we establish a few crucial lemmas ab
 
 In the lemmas below, we universally assume that $\tilde{x}\in  \mathbb{X}$ and $\alpha\in (0,1)$. We emphasize that $\alpha < 1$ is necessary and the lemmas use the fact that the random variable is discrete.
 
-\begin{lemma}
-  For each $t\in \Real$, the exists $q > t$ such that
-  \[
-   \P{\tilde{x} \le t} = 
-   \P{\tilde{x} < q}.
-  \]
-\end{lemma}
 
 \begin{lemma} \label{lem:prob-lumpy}
   For each $t\in \Real$:
@@ -177,20 +171,35 @@ In the lemmas below, we universally assume that $\tilde{x}\in  \mathbb{X}$ and $
     \exists \omega \in \Omega, x(\omega) = t.
   \]
 \end{lemma}
+\begin{proof}
+  The result follows by induction on the size of the probability space $|\Omega|$ after generalizing the statement to drop the constraint $\bm{1}\tr \bm{p} = 1$.
+\end{proof}
 
 \begin{lemma}
-  
+  For each $t\in \Real$, the exists $q > t$ such that
+  \[
+   \P{\tilde{x} \le t} = 
+   \P{\tilde{x} < q}.
+ \]
+ Moreover, if $t < \max_{\omega \in \Omega } x_{\omega }$, then $q$ can be chosen such that $q= x_{\omega}$ for some $\omega\in \Omega$.
 \end{lemma}
+\begin{proof}
+  First, assume that $t < \max_{\omega \in \Omega } x_{\omega }$ and let $\mathcal{Y} := \left\{ x_{\omega} \mid x_{\omega} > t, \omega \in \Omega  \right\}$ which is nonempty by the assumption. Then, $q := \min \mathcal{Y}$ exists because $\mathcal{Y}$ is finite and nonempty. The properties $q > t$ and $\exists \,\omega \in \Omega, \, q = x_{\omega}$ hold from $q\in \mathcal{Y}$. Next, for each $\omega \in \Omega$, $x_{\omega}\le t \Rightarrow x_{\omega} < q$ follows from transitivity of $\le$ and $<$.  Finally, we can prove $x_{\omega} < q \Rightarrow x_{\omega} < t$ by contradiction from the fact the $q$ is the minimum of $\mathcal{Y}$.
+
+ Second, if  $t \ge \max_{\omega \in \Omega } x_{\omega }$, let $q := 1 + \max_{\omega \in \Omega } x_{\omega }$ which satisfies the required property by algebraic manipulation.
+\end{proof}
 
 
 \begin{lemma} \label{lem:var-property}
-  We have that 
+  VaR satisfies the following inequalities:
   \[
-    \P{\tilde{x} < \var{\alpha}{\tilde{x}}} \le \alpha,
-      \qquad
-    \P{\tilde{x} \le \var{\alpha}{\tilde{x}}} > \alpha. 
+    \P{\tilde{x} < \var{\alpha}{\tilde{x}}} \le \alpha <
+    \P{\tilde{x} \le \var{\alpha}{\tilde{x}}}. 
   \]
 \end{lemma}
+\begin{proof}
+  
+\end{proof}
 
 \begin{lemma}\label{lem:quantile-in-finite-omega}
 There exists $\omega\in\Omega$ such that

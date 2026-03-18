@@ -1,17 +1,7 @@
 \documentclass{article}
-% if you need to pass options to natbib, use, e.g.:
 
 \PassOptionsToPackage{numbers, sort&compress}{natbib}
-% before loading neurips_2025
-% ready for submission
 \usepackage{neurips_2025}
-% to compile a preprint version, e.g., for submission to arXiv, add add the
-% [preprint] option:
-%     \usepackage[preprint]{neurips_2025}
-% to compile a camera-ready version, add the [final] option, e.g.:
-%     \usepackage[final]{neurips_2025}
-% to avoid loading the natbib package, add option nonatbib:
-%    \usepackage[nonatbib]{neurips_2025}
 
 \usepackage[colorlinks=true,citecolor=BlueViolet]{hyperref} % For hyperlinks in the PDF like citations
 \usepackage{mpemath}
@@ -157,123 +147,95 @@ For each $\alpha\in [0,1]$ and $\tilde{x} \in \mathbb{X}$:
 
 Our algorithm for computing the VaR in linear time builds on the well-known quickselect algorithm. This approach makes it possible to avoid the full sort of the discrete random variable used in common VaR implementations.
 
-
-Before stating and analyzing the algorithm, we establish a few crucial lemmas about probability distributions which facilitate the algorithm. The following lemmas leverage the discreteness of the random variable and do not hold for continuous random variables.
-
-In the lemmas below, we universally assume that $\tilde{x}\in  \mathbb{X}$ and $\alpha\in (0,1)$. We emphasize that $\alpha < 1$ is necessary and the lemmas use the fact that the random variable is discrete.
-
-
-\begin{lemma} \label{lem:prob-lumpy}
-  For each $t\in \Real$:
-  \[
-    \P{\tilde{x} = t} > 0
-    \implies
-    \exists \omega \in \Omega, x(\omega) = t.
-  \]
-\end{lemma}
-\begin{proof}
-  The result follows by induction on the size of the probability space $|\Omega|$ after generalizing the statement to drop the constraint $\bm{1}\tr \bm{p} = 1$.
-\end{proof}
-
-\begin{lemma}
-  For each $t\in \Real$, the exists $q > t$ such that
-  \[
-   \P{\tilde{x} \le t} = 
-   \P{\tilde{x} < q}.
- \]
- Moreover, if $t < \max_{\omega \in \Omega } x_{\omega }$, then $q$ can be chosen such that $q= x_{\omega}$ for some $\omega\in \Omega$.
-\end{lemma}
-\begin{proof}
-  First, assume that $t < \max_{\omega \in \Omega } x_{\omega }$ and let $\mathcal{Y} := \left\{ x_{\omega} \mid x_{\omega} > t, \omega \in \Omega  \right\}$ which is nonempty by the assumption. Then, $q := \min \mathcal{Y}$ exists because $\mathcal{Y}$ is finite and nonempty. The properties $q > t$ and $\exists \,\omega \in \Omega, \, q = x_{\omega}$ hold from $q\in \mathcal{Y}$. Next, for each $\omega \in \Omega$, $x_{\omega}\le t \Rightarrow x_{\omega} < q$ follows from transitivity of $\le$ and $<$.  Finally, we can prove $x_{\omega} < q \Rightarrow x_{\omega} < t$ by contradiction from the fact the $q$ is the minimum of $\mathcal{Y}$.
-
- Second, if  $t \ge \max_{\omega \in \Omega } x_{\omega }$, let $q := 1 + \max_{\omega \in \Omega } x_{\omega }$ which satisfies the required property by algebraic manipulation.
-\end{proof}
-
-
-\begin{lemma} \label{lem:var-property}
-  VaR satisfies the following inequalities:
-  \[
-    \P{\tilde{x} < \var{\alpha}{\tilde{x}}} \le \alpha <
-    \P{\tilde{x} \le \var{\alpha}{\tilde{x}}}. 
-  \]
-\end{lemma}
-\begin{proof}
-  
-\end{proof}
-
-\begin{lemma}\label{lem:quantile-in-finite-omega}
-There exists $\omega\in\Omega$ such that
+The main idea is this theorem.
+\begin{theorem}\label{thm:quantile-in-finite-omega}
+Assuming $\alpha\in [0,1)$ and a discrete $\tilde{x}$, there exists $\omega\in\Omega$ with $\var{\alpha }{\tilde{x}} = x(\omega)$ and
 \[
- \var{\alpha }{\tilde{x}} = x(\omega). 
+  \P{\tilde{x} < v} \le \alpha < \P{\tilde{x} \le v}}. 
 \]
+\end{theorem}
+
+
+The \emph{QuickVaR} algorithm is described in \cref{alg:quick-quantile}. The algorithm works as follows. It first picks a pivot by taking the middle element between front and back and applies the partition scheme to easily compute the probability of all outcomes smaller than or equal to that of the pivot (Lines \ref{line:pivot_comp} - \ref{line:partion_line}). Note that three partitions are create, one where the elements are all less than the pivot, another containing all elements equal to the pivot, and a third pivot containing all elements greater than the pivot. We refer to these partitions as the left, middle, and right partition from here on. QuickVaR then determines whether the quantile can exist in the left, middle, or right pivot (lines \ref{line:determine_left}, \ref{line:determine_right}, and \ref{determine_middle} ) and adjusts the $f_k$ and $b_k$ respectively to reduce the search space to one of these partitions. We note that in the case the quantile is determined to exist in the middle partition, the algorithm can terminate since every value in the middle partition is the same. In the case of $\alpha^0 = 0$, we handle this separately and simply find the minimum element. 
+
+While the version here is recursive it can trivially be modified to version with while loops, which is often faster in practice. We refer the readers to the appendix for the non-recursive version, which we also use for our experimental evaluations.
+
+\begin{algorithm}
+  \caption{\texttt{QuickVaR}: Recursive VaR algorithm} \label{alg:quick-quantile}
+  \Input{$\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$, $\alpha \in [0,1)$, $f, b \in 1{:}n$ such that $f \le  b$ and $\sum_{j=f}^b p_j > \alpha$.}
+  \Output{$\varo_{\alpha}[\tilde{x}]$}
+  $v \gets x_{\operatorname{rand}(f{:}b)}$ \tcp*{Pivot}
+  $l, g, \bm{x}', \bm{p}' \gets \operatorname{partition}(\bm{x}, \bm{p}, v, f, b)$
+  \tcp*{~\cref{alg:partition}}
+  $t \gets \sum_{j=f}^{l-1} p'_j$ \tcp*{$t = \P{\tilde{x} < v} - \P{\tilde{x} < x'_f}$}
+  $e \gets \sum_{j=l}^{g} p'_j$  \tcp*{$e = \P{\tilde{x} = v}$}
+  \If(\tcp*[f]{$\alpha + \P{\tilde{x} < x'_f} < \P{\tilde{x} < v}$}){$\alpha < t$}{ 
+    \KwRet{$\qvar(\bm{x}', \bm{p}', \alpha, f, l-1)$}
+  }
+  \ElseIf(\tcp*[f]{$\P{\tilde{x} \le v} \le \alpha + \P{\tilde{x} < x'_f}$}){$t + e \le \alpha$}{
+    \KwRet{$\qvar(\bm{x}', \bm{p}', \alpha - t - e, g+1, b)$}
+  }
+  \lElse{
+    \KwRet{$v$}
+  }
+\end{algorithm}
+
+
+We now prove the correctness of our algorithm. We first prove a general condition on the return value of our algorithm which applies for any array $p$, regardless of whether it is a simplex or not. It trivially follows that when $p$ is a valid simplex, the condition simplifies to the \cref{eq:var-definition}. 
+\begin{lemma} \label{lem:quickvar-correct}
+ Suppose that \cref{alg:quick-quantile} input conditions hold and $\bm{x} \in \Real^n$ satisfies for all $j\in 1{:}n$:
+ \begin{equation} \label{eq:qvar-precondition}
+  j\in 1{:}(f-1) \Rightarrow x_j < x_f, \qquad
+  j \in f{:}b \Rightarrow x_f \le x_j \le x_b,  \qquad
+  j \in (b+1){:}n \Rightarrow x_b < x_j.
+\end{equation} 
+  Then \cref{alg:quick-quantile} returns $x_{\omega}$ with $\omega\in 1{:}n$ such that
+\begin{equation} \label{eq:qvar-postcondition}
+  \P{\tilde{x} < x_{\omega}}
+  \quad \le \quad
+  \alpha + \P{\tilde{x} < x_f}
+  \quad < \quad \P{\tilde{x} \le x_{\omega}}}. 
+\end{equation}
 \end{lemma}
 \begin{proof}
-  From basic probability properties and \cref{lem:var-property}, we have that
-  \[
-    \P{\tilde{x} =
-      \var{\alpha }{\tilde{x}}} = \P{\tilde{x} \le \var{\alpha }{\tilde{x}}}  - \P{\tilde{x} < \var{\alpha }{\tilde{x}}} > \alpha - \alpha = 0.
-  \]
-  The result is then an immediate consequence of \cref{lem:prob-lumpy}.
+It can be readily seen from the \eqref{eq:qvar-precondition} and \cref{lem:hoare-partition} that
+\begin{equation} \label{eq:te-equivalence}
+  t = \P{\tilde{x} < v} - \P{\tilde{x} < x'_f}, \qquad e = \P{\tilde{x} = v}
+\end{equation}
+  We proceed by induction on $k = b - f$.
+
+\emph{Base case}: $k = 0$. Since $b = f$, we have that $v = x_b$ and $l = g = b$. Then $t = 0$ and $e = p_b$. Then, $\alpha  \ge t$ and, from the input condition, $t + e = p_b > \alpha$, and therefore the algorithm returns $v$, which satisfies:
+\[
+ \P{\tilde{x} < v} \le \alpha + \P{\tilde{x} < x_f} < \P{\tilde{x} \le v}. 
+\]
+Above, the first inequality holds from $x = x_f$ and $0 \le \alpha$. The second inequality holds from the algorithm's input condition.  
+
+\emph{Inductive step}. Suppose that $k>0$ and that the lemma holds for all $k' < k$. We now analyze the following three cases.
+
+(i) If $\alpha < t$, the algorithm executes the first if statement. Because $0 \le \alpha  < t$, the recursive call satisfies the required input conditions: $f \le l-1$ and $\sum_{j=f}^{l-1} p_j = t > l$. In addition, \cref{lem:hoare-partition} guarantees that \eqref{eq:qvar-precondition} holds. The result then holds from the inductive hypothesis because $l-1 - f \le b-1 -f \le k$.
+
+(ii) If $t + e \le \alpha$, the algorithm executes the second if statement. We now check whether the recursive call preconditions are met. Because $t + e = \sum_{j = f}^g p_j \le \alpha < \sum_{j=f}^b p_j$, where the second inequality is the input condition, it must be that $g < b$ and therefore $g+1 \le b$. Also, by the precondition and algebraic manipulation we get that
+\[
+ \sum_{j=g+1}^b p_j = \sum_{j=f}^b - t -e > \alpha  -t -e,  
+\]
+and the recursive precondition holds. In addition, \cref{lem:hoare-partition} guarantees that \eqref{eq:qvar-precondition} holds. We can then use the inductive hypothesis, since $b - g - 1 \le b-f-1 \le k$, to return $x_{\omega}$ such that
+\[
+  \P{\tilde{x} < x_{\omega}}
+  \quad \le \quad
+  (\alpha - t - e) + \P{\tilde{x} \le v}
+  \quad < \quad \P{\tilde{x} \le x_{\omega}}}. 
+\]
+Inequality \eqref{eq:qvar-postcondition} follows by substituting $t,e$ from \eqref{eq:te-equivalence}.
+
+(iii) If $t \le \alpha < t + e$, inequality \eqref{eq:qvar-postcondition} holds immediately by substituting $t,e$ from \eqref{eq:te-equivalence}.
 \end{proof}
 
-We now present our algorithm. While the version here is recursive it can trivially be modified to version with while loops, which is often faster in practice. We refer the readers to the appendix for the non-recursive version, which we also use for our expirimental evaluations.
-% We now define our version of the Weighted Median problem.
-% \begin{definition} \label{WM_Problem}
 
-% We now show that we can cast VaR as an instance of the Weighted Median problem
-% \begin{lemma}
-% The weighted median problem defined in \cref{WM_Problem} is equivalent to solving VaR when $W = \alpha$ for a discrete random variable $\tilde{x}\colon \Omega \to \Real$ with finite $\Omega$ such that the outcomes of the random variable $\xi_1, \ldots, \xi_n \in \Real$ and the weights $w_1, \ldots, w_n \in \Real^{\mathbb{C}}$ correspond to the probabilities of each outcome .
-% \end{lemma}
-
-
-%We first restate some well-known properties of the Hoare Partition scheme.
-%Our \emph{QuickVaR} algorithm is described in \cref{alg:quick-quantile}. The algorithm works as follows. It first picks a pivot by taking the middle element between front and back and applies the partition scheme to easily compute the probability of all outcomes smaller than or equal to that of the pivot (Lines \ref{line:pivot_comp} - \ref{line:partion_line}). Note that three partitions are create, one where the elements are all less than the pivot, another containing all elements equal to the pivot, and a third pivot containing all elements greater than the pivot. We refer to these partitions as the left, middle, and right partition from here on. QuickVaR then determines whether the quantile can exist in the left, middle, or right pivot (lines \ref{line:determine_left}, \ref{line:determine_right}, and \ref{determine_middle} ) and adjusts the $f_k$ and $b_k$ respectively to reduce the search space to one of these partitions. We note that in the case the quantile is determined to exist in the middle partition, the algorithm can terminate since every value in the middle partition is the same. In the case of $\alpha^0 = 0$, we handle this separately and simply find the minimum element. 
-
-% \begin{algorithm}
-%   \algrenewcommand\algorithmicrequire{\textbf{Input: vector $x$, pmf $p$ and $\alpha \in [0,1]$}}
-%   \algrenewcommand\algorithmicensure{\textbf{Output: $\alpha$-quantile of $\tilde{X}$}}
-%   \caption{QuickVaR: Linear-time algorithm for VaR. $\mathds{1}(bool)$ .}\label{alg:quick-quantile}
-
-%   \begin{algorithmic}[1]
-%     \Require{} \Ensure{}
-%     \State{$f_0 \gets 1$, $b_0 \gets n$, $x^0 = x$, $p^0 = p$, $k=1$, $\alpha_0 = \alpha$ } \Comment{Init front $f_0$ and back $b_0$}
-%     \While{$b_k - f_k \geq 1$}
-%       \State{$i_k, x^k, p^k \gets \operatorname{partition}(x^{k-1}, p^{k-1}, f_{k-1}, b_{k-1})$} %\Comment{Hoares partition scheme}
-%     \State{$t_k \gets \sum_{j=f_{k-1}}^{i_k} p^k_j$}
-%       \If{$\alpha_k < t_k$}
-%       \State{$b_k \gets i_k$, $\alpha_k \gets \alpha_{k-1}$}
-%       \Else{}
-%       \State{$f_k \gets i_k + 1$, $\alpha_k \gets \alpha_{k-1} - t_k$}
-%     \EndIf{}
-%     \State $k \gets k + 1$
-%     \EndWhile{}
-%     \State{\Return{$x^k_{b_k}$}}
-%   \end{algorithmic}
-% \end{algorithm}
-
-
-% \begin{algorithm}
-%   \caption{QuickVaR: Linear-time algorithm for VaR}\label{alg:quick-quantile}
-%   \Input{vector $\bm{x}$, pmf $\bm{p}$ and $\alpha \in (0,1)$}
-%   \Output{$\alpha$-quantile of $\tilde{x}$}
-%   $f_0 \gets 1$, $b_0 \gets n$, $\bm{x}^0 = \bm{x}$, $\bm{p}^0 = \bm{p}$, $\alpha_0 = \alpha$, $k=1$ \;
-%   \While{$b_{k-1} - f_{k-1} \geq 1$} {
-%      $i' \gets f_{k-1} + \lceil\frac{b_{k-1}- f_{k-1}}{2}\rceil$ \tcp*{Pivot: Median-of-medians for $O(b-f)$ runtime}
-%      $l_k, g_k, \bm{x}^k, \bm{p}^k \gets \operatorname{partition}(\bm{x}^{k-1}, \bm{p}^{k-1}, x_{i'}, f_{k-1}, b_{k-1})$
-%     \tcp*{Alg.~\ref{alg:partition}, \cref{lem:hoare-partition}}
-    
-%     $t_k \gets \sum_{j=f_{k-1}}^{g_k} p^k_j$ \;
-%     \lIf{$\alpha_{k-1} < t_k$} {$f_k \gets f_{k-1}$, $b_k \gets g_k$, $\alpha_k \gets \alpha_{k-1}$}
-%     \lElse {$f_k \gets g_k + 1$, $b_k \gets b_{k-1}$, $\alpha_k \gets \alpha_{k-1} - t_k$}
-%     $k \gets k + 1$\; 
-%   }
-%   \KwRet{$x^k_{b_k}$}\;    
-% \end{algorithm}  
 
 \begin{algorithm}
   \caption{\texttt{partition}: Dutch national flag algorithm~\cite[chapter 14]{Dijkstra1976}}
   \label{alg:partition}
-  \Input{$\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$, pivot $v\in \Real$, and front and back $f, b \in 1{:}n$, $f < b$}
+  \Input{$\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$, pivot $v\in \Real$, and front and back $f, b \in 1{:}n$, $f \le b$}
   \Output{$l, g \in f{:}b$, $\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$ such that \cref{lem:hoare-partition} holds.}
   $l_0 \gets e_0 \gets f$; $g_0 \gets b$; $k \gets 0$ \;
   \While{$e_k \leq g_k$}
@@ -294,179 +256,20 @@ We now present our algorithm. While the version here is recursive it can trivial
   \KwRet{$(l_k, g_k, \bm{x}, \bm{p})$}\; 
 \end{algorithm}
 
-\begin{lemma} \label{lem:hoare-partition}
-If $(l, g, \bm{x}', \bm{p}') = \operatorname{partition}(\bm{x'}, \bm{p'}, i, f, b)$ in \cref{alg:partition} for $f < b$, then:
-\begin{align} \label{eq:hoare-correspond}
-x_j < v, \, j\in f{:}(l-1),\qquad x_j = v, \, j \in l{:}g, \qquad x_j > v, \, j \in (g+1){:}b.
-\end{align}
-Moreover, $\forall \, j \in 1{:}n, x_j = x'_{\sigma(j)}, p_j = p'_{\sigma(j)}$ for some permutation $\sigma$ and the algorithm runs in $O(b - f)$ time.
-\end{lemma}
-
-\begin{algorithm}
-  \caption{\texttt{QuickVaR}: Recursive VaR algorithm} \label{alg:quick-quantile}
-  \Input{$\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$, $\alpha \in (0,1)$, front and back $f, b \in 1{:}n$}
-  \Output{$\varo_{\alpha}[\tilde{x}]$}
-  \lIf{$b \le f$}{
-    \KwRet{$x_b$}
-  }
-  $v \gets x_{\operatorname{rand}(f{:}b)}$ \tcp*{Pivot}
-  $l, g, \bm{x}', \bm{p}' \gets \operatorname{partition}(\bm{x}, \bm{p}, v, f, b)$
-  \tcp*{~\cref{alg:partition}}
-  $t \gets \sum_{j=f}^{l-1} p'_j$ \tcp*{$\P{\tilde{x}' < v}$}
-  $e \gets \sum_{j=l}^{g} p'_j$  \tcp*{$\P{\tilde{x}' = v}$}
-
-  \lIf{$\alpha < t$}{
-    \KwRet{$\qvar(\bm{x}', \bm{p}', \alpha, f, l-1)$}
-  }
-  \lElseIf{$\alpha \ge t + e$}{
-    \KwRet{$\qvar(\bm{x}', \bm{p}', \alpha - t - e, g+1, b)$}
-  }
-  \lElse{
-    \KwRet{$v$}
-  }
-\end{algorithm}
-
-
-
-
-
-%The above conditions primarily state that each call to the partition scheme performs a partial sorting such that all elements $\leq v_k$ will have an index $< i_k$ , and elements greater than the pivot will have an index $> i_k$.
-We now prove the correctness of our algorithm. We first prove a general condition on the return value of our algorithm which applies for any array $p$, regardless of whether it is a simplex or not. It trivially follows that when $p$ is a valid simplex, the condition simplifies to the \cref{eq:var-definition}. For the partition algorithm and it's proof of correctness, we refer the reader to the appendix.
-\begin{lemma} \label{lem:quickvar-correct}
-\Cref{alg:quick-quantile} returns
-\[
-\tau\opt  = \max \left\{\tau \in \Real \mid  \sum_{m = f}^b p_m \cdot I(x_m < \tau) \leq \alpha \right\},
-\] 
-\end{lemma}
+\begin{theorem}
+For $\bm{x}\in \Real^n$, \cref{alg:quick-quantile} executed with $b = 1$ and $e = n$ returns $\varo_{\alpha}(\tilde{x})$.
+\end{theorem}
 \begin{proof}
-We proceed by induction on $n = b - f + 1$.
-
-\paragraph{Base case ($n = 1$).}
-Since $b = f$, the algorithm returns $x_b$.
-Since there is only one possible outcome, we have $\sum_{m = f}^b p_m \cdot I(x_m < x_b)  =  0 \le \alpha \textbf{ } \forall \alpha < p_b $ and $\sum_{m = f}^b p_m \cdot I(x_m \leq x_b) > \alpha \textbf {}\forall \alpha < p_b. $ by the inductive hypothesis.
-Hence, by definition, $x_b$ is the optimal $\tau$ for . 
-Therefore, the algorithm is correct for $n=1$.
-
-
-
-\paragraph{Inductive step.}
-Consider a call with interval size $j > 1$  and suppose that the inductive hypothesis holds for all n with $1 \le n < j$:
-\[
-  \textsc{QuickVaR}(\bm{x}, \bm{p}, \alpha, f, b).
-\]
-
-There are three possible cases depending on the pivot value $v$ that is selected:
-\begin{enumerate}
-  \item[\textbf{(i)}] \textbf{Case 1 $\bm{\alpha < t}$.}
-    We can also, show by contradiction that $\tau\opt$ optimal in \cref{INDUCTHYPOTH} must satisfy that
-    \[
-     \tau\opt < v,
-   \]
-   because 
-    \[
-      \alpha  < t = \sum_{m = f}^{l-1} p'_m  = \sum_{m = f}^b p'_m I(x'_m < v),
-    \]
-  % implying that the optimal $\tau\opt \in f{:}(l-1)$.
-    Moreover, $x'_m < v, \forall m \in f{:}(l-1)$ from the partition function. 
-  By the inductive hypothesis,
-  \begin{align*}
-    \qvar(\bm{x}', \bm{p}', \alpha, f, l-1)
-    &= \max \left\{\tau \in \Real \mid  \sum_{m = f}^{l - 1} p'_m \cdot I(x'_m < \tau) \leq \alpha \right\} \\
-    &= \max \left\{\tau \in (-\infty, v) \mid  \sum_{m = f}^{l - 1} p'_m \cdot I(x'_m < \tau) \leq \alpha \right\} \\
-    &\stackrel{\text(a)}{=} \max \left\{\tau \in (-\infty, v)  \mid  \sum_{m = f}^{b} p'_m \cdot I(x'_m < \tau) \leq \alpha \right\} \\
-    &= \max \left\{\tau \in (-\infty, v)  \mid  \sum_{m = f}^{b} p_m \cdot I(x_m < \tau) \leq \alpha \right\} \\
-    &= \max \left\{\tau \in \Real  \mid  \sum_{m = f}^{b} p_m \cdot I(x_m < \tau) \leq \alpha \right\} \\
-    &= \tau\opt.
-  \end{align*}
-  The equality \emph{(a)} holds because we just add 0.
-
-  \item[\textbf{(ii)}] \textbf{Case 2 $\bm{\alpha > t + e}$.}
-  We can also, show by contradiction that $\tau\opt$ optimal in \cref{INDUCTHYPOTH} must satisfy that
-    \[
-     \tau\opt > v,
-   \]
-   because 
-    \[
-      \alpha  > t + e = \sum_{m = f}^{g} p'_m  = \sum_{m = f}^b p'_m I(x'_m \le v),
-    \]
-  % implying that the optimal $\tau\opt \in f{:}(l-1)$.
-    Moreover, $x'_m > v, \forall m \in g + 1{:}(b)$ from the partition function. 
-  By the inductive hypothesis,
-  \begin{align*}
-    \qvar(\bm{x}', \bm{p}', \alpha - (t + e), g + 1, b)
-    &= \max \left\{\tau \in \Real \mid  \sum_{m = g + 1}^{b} p'_m \cdot I(x'_m < \tau) \leq \alpha - (t + e) \right\} \\
-    &= \max \left\{\tau \in \Real \mid  t + e + \sum_{m = g + 1}^{b} p'_m \cdot I(x'_m < \tau) \leq \alpha \right\} \\
-    &\stackrel{\text(a)}{=} \max \left\{\tau \in \Real  \mid  \sum_{m = f}^{b} p'_m \cdot I(x'_m < \tau) \leq \alpha \right\} \\
-    &= \tau\opt.
-  \end{align*}
-  The equality \emph{(a)} holds because we just add 0.
-  \item[\textbf{(iii)}] \textbf{Case 3 $\bm{t \le \alpha < t + e}$.}
-  Then $\sum_{m = f}^b p_m \cdot I(x_m < v) = t \le \alpha$ and 
-  $\sum_{m = f}^b p_m \cdot I(x_m \le v) = t + e > \alpha$, 
-  which implies that $v$ itself is the optimal $\tau$ that satisfies $\cref{INDUCTHYPOTH}$
-  The algorithm correctly returns $v$ in this case.
-\end{enumerate}
-
+  With $b = 1$ and $e = n$, \eqref{eq:qvar-precondition} becomes vacuous and \cref{lem:quickvar-correct} shows that the computed value satisfies \cref{thm:quantile-in-finite-omega}, which suffices for it to be equal to VaR. 
 \end{proof}
 
-\begin{corollary}
-\Cref{alg:quick-quantile} computes $\quant_{\alpha}(\tilde{x})$.
-\end{corollary}
-\begin{proof}
-The proof directly follows from \cref{PROOFCORRECTNESS}.
-\end{proof}
-
-The proof of time complexity follows directly from that for the standard quick-select algorithm in \cite{Aho1974}\cite{HorowitzSahni1978}. We note that we have slightly modified the first steps of the proof to allow for the case where multiple elements in the array are equal to the chosen of the pivot. The remainder of the proof is exactly that in \cite{Aho1974} and \cite{HorowitzSahni1978}.
 \begin{proposition} \label{prop:time-complexity}
-\Cref{alg:recursive-qvar} runs in expected $O(n)$ time when one use uniformly random pivot selection.
+\Cref{alg:quick-quantile} runs in expected $O(n)$ time when using a uniformly random pivot selection.
 \end{proposition}
 
-
-%\begin{lemma} \label{lem:T-complexity}
-%If \(T(1)\le c\) then for every integer \(n\ge 1\),
-\[
-%T(n)\le 4 c n.
-%\]
-%\end{lemma}
-%\begin{proof}
-%We now prove the lemma by induction. 
-%\emph{Base case.}
-%For \(n=1\) we have \(T(1)\le c \le 4c\), so the claim holds.
-%\emph{Inductive step.}
-%Assume the claim holds for all positive integers less than \(n\);
-%that is, assume \(T(i)\le 4 c i\) for all \(1\le i\le n-1\).
-%Then
-%\[
-%\sum_{i=1}^{n-1} T(i) \le \sum_{i=1}^{n-1} 4 c i
-%= 4c \sum_{i=1}^{n-1} i.
-%\]
-%Compute the arithmetic sum:
-%\[
-%\sum_{i=1}^{n-1} i = \frac{(n-1)n}{2}.
-\]
-%Hence
-%\[
-%\sum_{i=1}^{n-1} T(i) \le 4c\cdot\frac{(n-1)n}{2} = %2c\,n(n-1).
-%\]
-%Substituting this bound into the recurrence \eqref{eq:recurrence} yields
-%\[
-%T(n) \le c n + \frac{2}{n}\cdot \bigl(2c\,n(n-1)\bigr)
-%= c n + 4c(n-1) = 4cn - 3c.
-%\]
-%Therefore
-%\[
-%T(n) \le 4cn - 3c \le 4cn,
-%\]
-%which establishes the inductive step.
-%\end{proof}
-
-
+The proof of \cref{prop:time-complexity} is analogous to the standard quick-select algorithm in \cite{Aho1974,HorowitzSahni1978} with the main difference that we allow for multiple elements to be equal to the pivot. 
 \begin{proof}
-Let $T(n)$ be the expected running time of \Cref{alg:recursive-qvar} for $n := b - f + 1$. 
-
-Suppose $\qvar_{\alpha}(\tilde{x}, \bm{p}, \alpha, f, b)$ returns the \(k\)-th smallest element in $x_f, \dots, x_b$ (i.e. there are \(k-1\) smaller elements and \(n - k - d\) elements larger, where $d$ is the number of elements equal to $\qvar(\bm{x}, \bm{p}, \alpha, f, b)$.
-
-Furthermore let $v$ be the \(i\)-th smallest element in $x$ (i.e. there are \(i-1\) smaller elements and \(n - i - s\) elements larger, where $s$ is the number of elements equal to $v$
+Let $T(l)$ be the expected running time of \Cref{alg:quick-quantile} for $l := b - f$. Suppose that $\qvar_{\alpha}(\bm{x}, \bm{p}, \alpha, f, b)$ returns the \(k\)-th smallest element in $x_f, \dots, x_b$; that is there are \(k-1\) smaller elements, \(l - k - d\) elements greater, and $d$ elements equal to $\qvar(\bm{x}, \bm{p}, \alpha, f, b)$. Furthermore let $v$ be the \(i\)-th smallest element in $x$ (i.e. there are \(i-1\) smaller elements and \(n - i - s\) elements larger, where $s$ is the number of elements equal to $v$
 
 Since the pivot is chosen uniformly, each element with probability \(1/n\).
 
@@ -496,26 +299,76 @@ T(n) \le c n + \frac{2}{n}\sum_{i=1}^{n-1} T(i).
 By induction, \(T(n)\le 4cn\) for all integers \(n\ge 1\). This proves that the expected running time of QuickVaR is linear in \(n\).
 \end{proof}
 
-Finally, we note that with a very slight modification, the weighted median can be seen as a general
 \begin{remark}
-Let $n \in \mathbb{N}$, $\xi_1, \ldots, \xi_n \in \Real$, $w_1, \ldots, w_n \in \Real_{\geq 0}$, and $W \in \Real$ with 
+Note that the VaR computation resembles closely the computation of the weighted median~\cite{Korte2012}. One can readily see that a quantile computation can be easily reduced to computing a weighted median with appropriately chosen weights. However, these algorithms do not automatically compute the VaR. The main difficulty is that the quantile is not unique as discussed in the introduction. VaR is not just any arbitrary quantile, but standard definitions require that it is the largest quantile. As a result, our QuickVaR algorithms differs from weighted median algorithms in subtle but substantive ways.
+\end{remark}
+
+ \subsection{Proof of Correctness}
+
+We first establish a few crucial lemmas about probability distributions which facilitate the algorithm. The following lemmas leverage the discreteness of the random variable and do not hold for continuous random variables.
+
+\begin{lemma} \label{lem:prob-lumpy}
+  For each $t\in \Real$:
+  \[
+    \P{\tilde{x} = t} > 0
+    \implies
+    \exists \omega \in \Omega, x(\omega) = t.
+  \]
+\end{lemma}
+\begin{proof}
+  The result follows by induction on the size of the probability space $|\Omega|$ after generalizing the statement to drop the constraint $\bm{1}\tr \bm{p} = 1$.
+\end{proof}
+
+% \begin{lemma} \label{lem:prob-increase}
+%   For each $t\in \Real$, the exists $q > t$ such that
+%   \[
+%    \P{\tilde{x} \le t} = 
+%    \P{\tilde{x} < q}.
+%  \]
+%  Moreover, if $t < \max_{\omega \in \Omega } x_{\omega }$, then $q$ can be chosen such that $q= x_{\omega}$ for some $\omega\in \Omega$.
+% \end{lemma}
+% \begin{proof}
+%   First, assume that $t < \max_{\omega \in \Omega } x_{\omega }$ and let $\mathcal{Y} := \left\{ x_{\omega} \mid x_{\omega} > t, \omega \in \Omega  \right\}$ which is nonempty by the assumption. Then, $q := \min \mathcal{Y}$ exists because $\mathcal{Y}$ is finite and nonempty. The properties $q > t$ and $\exists \,\omega \in \Omega, \, q = x_{\omega}$ hold from $q\in \mathcal{Y}$. Next, for each $\omega \in \Omega$, $x_{\omega}\le t \Rightarrow x_{\omega} < q$ follows from transitivity of $\le$ and $<$.  Finally, we can prove $x_{\omega} < q \Rightarrow x_{\omega} < t$ by contradiction from the fact the $q$ is the minimum of $\mathcal{Y}$.
+
+%  Second, if  $t \ge \max_{\omega \in \Omega } x_{\omega }$, let $q := 1 + \max_{\omega \in \Omega } x_{\omega }$ which satisfies the required property by algebraic manipulation.
+% \end{proof}
+
+
+\begin{lemma} \label{lem:var-property}
+A VaR value $v := \var{\alpha}{\tilde{x}}$ for $\alpha\in [0,1)$ and discrete $\tilde{x}$ satisfies that
 \[
-0 < W < \sum_{i=1}^n w_i.
+  \P{\tilde{x} < v} \le \alpha < \P{\tilde{x} \le v}}. 
 \]
-Then the $(w_1, \ldots, w_n \mid W)$-weighted median with respect to $(\xi_1, \ldots, \xi_n)$ is defined to be the unique number $\xi^*$ for which
-\begin{equation}
-\sum_{i : \xi_i < \xi^*} w_i \leq W < \sum_{i : \xi_i \leq \xi^*} w_i.
-\label{WeightedMedianEquality}
-\end{equation}
-% \end{definition}
-If $W = \alpha$, then $\xi^* = \quant_{\alpha}[\tilde{x}]$.
-We note that our definition differs very slightly from the popular definition in \cite{Korte2012} in that the position of the $\leq$ and $>$ in \cref{WeightedMedianEquality} are swapped.
-\end{remark}.
+\end{lemma}
+\begin{proof}
+  We decompose the proof into two parts. \emph{First}, the implication $\PP[\tilde{x} < v] \le \alpha \implies v \in \left\{ t \in \Real \mid  \PP[\tilde{x} < t] \le \alpha \right\}$ follows immediately from the definition. \emph{Second}, to prove  $\alpha < \PP[\tilde{x} \le v] \implies \forall t \in \left\{ t \in \Real \mid  \PP[\tilde{x} < t] \le \alpha \right\}, v \ge t$ by contradiction, suppose that $\exists t \in \left\{ t \in \Real \mid  \PP[\tilde{x} < t] \le \alpha \right\}, v < t$. Then, by the monotonicity of the probability operator we get a contradiction as
+ \[
+   \alpha
+   < \PP \left[ \tilde{x} \le v \right]
+   \le \PP \left[ \tilde{x} < t \right]
+   \le \alpha.
+ \]
+\end{proof}
 
- \begin{proof}
- Let $\xi^*$ be the optimal solution to the weighted median problem and let $W = \alpha$. Then $\P{\tilde{x} < \xi^*} \leq \alpha$ and thus $\xi^*$ is feasible for \eqref{eq:var-definition}. Since $\alpha < \P{\tilde{x} \leq \xi^*}$, $\alpha < \P{\tilde{x} \leq \xi^*}$ $\forall \xi > \xi^*$ .Thus $\xi^*$ is optimal for \eqref{eq:var-definition}. Since the optimal value for VaR must be an outcome of $\tilde{x}$ by \cref{lem:quantile-in-finite-omega}, $\xi^*$ then must equal $\quant_{\alpha}[\tilde{x}]$ and the proof concludes.
- \end{proof}
+\begin{proof}[Proof of \cref{thm:quantile-in-finite-omega}]
+The condition on $x(\omega)$ follows from \cref{lem:var-property}. In addition, using basic probability properties and \cref{lem:var-property} gives that
+  \[
+    \P{\tilde{x} =
+      \var{\alpha }{\tilde{x}}} = \P{\tilde{x} \le \var{\alpha }{\tilde{x}}}  - \P{\tilde{x} < \var{\alpha }{\tilde{x}}} > \alpha - \alpha = 0.
+  \]
+  Then existence of $\omega$ then follows from \cref{lem:prob-lumpy}.
+\end{proof}
 
+
+\begin{lemma} \label{lem:hoare-partition}
+If $(l, g, \bm{x}', \bm{p}') = \operatorname{partition}(\bm{x'}, \bm{p'}, i, f, b)$ in \cref{alg:partition} for $f < b$, then for each $j\in 1{:}n$:
+\begin{align} \label{eq:hoare-correspond}
+  j\in f{:}(l-1) \Rightarrow x_j < v, \qquad
+  j \in l{:}g, \Rightarrow x_j = v,  \qquad
+  j \in (g+1){:}b \Rightarrow x_j > v.
+\end{align}
+Moreover, $\forall \, j \in 1{:}n, x_j = x'_{\sigma(j)}, p_j = p'_{\sigma(j)}$ for some permutation $\sigma$ and the algorithm runs in $O(b - f)$ time.
+\end{lemma}
 
 
 
@@ -551,7 +404,7 @@ Polymatroids are important for our purpose because many risk measures can be for
 \begin{equation}\label{eq:comontonic-optimization}
    \rho[\tilde{x}] = \min_{\bm{q}\in \mathcal{Q}_c} \bm{q}\tr  \bm{x},
 \end{equation}
-where $\mathcal{Q}_c$ is the polymatroid in \cref{def:polymatroid} for $c(\mathcal{A}) := -\rho(-\one_{\mathcal{A}})$ for each $\mathcal{A} \subseteq \Omega$. \mm{Missing a negative sign?}
+where $\mathcal{Q}_c$ is the polymatroid in \cref{def:polymatroid} for $c(\mathcal{A}) := -\rho(-\one_{\mathcal{A}})$ for each $\mathcal{A} \subseteq \Omega$. 
 \end{proposition}
 \begin{proof}
   The result is an immediate consequence of \cite[Corollary 4.89]{Follmer2016}
@@ -1249,6 +1102,9 @@ Julia garbage collector, even when running synchronously.
   }
   \KwRet{$x^k_{b_k}$}\;    
 \end{algorithm}  
+
+
+
 
 
 \subsection{Quick CVaR}

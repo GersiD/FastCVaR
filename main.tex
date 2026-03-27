@@ -34,7 +34,7 @@
 
 \renewcommand{\cite}{\citep}
 
-\IncMargin{em}
+\IncMargin{2em}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % THEOREMS
@@ -149,18 +149,23 @@ For each $\alpha\in [0,1]$ and $\tilde{x} \in \mathbb{X}$:
 
 \section{Computing VaR in Linear Time} \label{sec:var-linear}
 
-Our algorithm for computing the VaR in linear time builds on the well-known quickselect algorithm for finding the $k$-th element of an array in linear time. Unlike naive algorithms, quickselect sorts the input array only partially which makes it possible 
+We now describe the QuickVaR algorithm, show that it computes VaR and runs in average linear time. 
 
-\begin{theorem}\label{thm:quantile-in-finite-omega}
-Assuming $\alpha\in [0,1)$ and a discrete $\tilde{x}$, there exists $\omega\in\Omega$ with $\var{\alpha }{\tilde{x}} = x(\omega)$ and
+The standard VaR algorithm for a discrete random variable $\bm{x}\in \Real^n$ with distribution $\bm{p}\in \Delta_n$ and risk level $\alpha$ proceeds as follows~(e.g.,~listing~6.25 in \cite{privault2026notes}). It sorts the entries of $X$ to get a permutation $\sigma \colon 1{:}n \to 1{:}n$ such that $i \mapsto x_{\sigma(i)}$ is non-decreasing. Then, it finds an index $i \in 1{:}n$ such that 
 \[
-  \P{\tilde{x} < v} \le \alpha < \P{\tilde{x} \le v}. 
+  \sum_{j = 1}^{i-1} p_{\sigma(j)} 
+  \; <\;
+  \alpha
+  \; \le\;
+  \sum_{j = 1}^i p_{\sigma(j)}.
 \]
-\end{theorem}
+The value $x_{\sigma(i)}$ is the optimal solution in~\eqref{eq:var-definition} by  \cref{thm:quantile-in-finite-omega} below. The computational complexity of this algorithm is $O(n \log  n)$ because its runtime is dominated by the need to sort the entries of $\bm{x}$. For sake of completeness, we give a formal definition of the standard algorithm in \cref{alg:slow-quantile} in the appendix.
 
-The \emph{QuickVaR} algorithm is described in \cref{alg:quick-quantile}. The algorithm works as follows. It first picks a pivot by taking the middle element between front and back and applies the partition scheme to easily compute the probability of all outcomes smaller than or equal to that of the pivot (Lines \ref{line:pivot_comp} - \ref{line:partion_line}). Note that three partitions are create, one where the elements are all less than the pivot, another containing all elements equal to the pivot, and a third pivot containing all elements greater than the pivot. We refer to these partitions as the left, middle, and right partition from here on. QuickVaR then determines whether the quantile can exist in the left, middle, or right pivot (lines \ref{line:determine_left}, \ref{line:determine_right}, and \ref{determine_middle} ) and adjusts the $f_k$ and $b_k$ respectively to reduce the search space to one of these partitions. We note that in the case the quantile is determined to exist in the middle partition, the algorithm can terminate since every value in the middle partition is the same. In the case of $\alpha^0 = 0$, we handle this separately and simply find the minimum element. 
+Our \emph{QuickVaR} algorithm, described in \cref{alg:quick-quantile}, computes the VaR in $O(n)$ time by avoiding the need to sort the elements of the input random variable $\bm{x}$. In particular, QuickVaR sorts the indexes of $\bm{x}$ on partially analogously to the Quickselect algorithm~\cite{horowitz1998computer}. 
 
-While the version here is recursive it can trivially be modified to version with while loops, which is often faster in practice. We refer the readers to the appendix for the non-recursive version, which we also use for our experimental evaluations.
+\Cref{alg:quick-quantile} is a recursive algorithm that works for a random variable $\bm{x}$ with a distribution $\bm{p}\in \Delta_n$ as follows. In addition to the random variable, the input is $f$ (front) and $b$ (back) which delimit the indices of $\bm{x}$ it manipulated.  The algorithm  first picks a pivot element $v$ randomly between $b$ and $e$. Choosing the pivot randomly is essential in order to obtain an average linear time complexity. Given a pivot, we use $\operatorname{partition}$ in \cref{alg:partition} to partially sort the entries of $\bm{x}$ into three groups: 1. less than $v$: $\bm{x}_{b{:}(l-1)} < v$, 2. equal to $v$: $\bm{x}_{l{:}g} = v$, and 3. greater than $v$: $\bm{x}_{(g+1){:}e} > v$. Then, the algorithm checks for the conditions of \cref{thm:quantile-in-finite-omega} to determine which of the three groups contains the VaR value. Finally, if VaR value is in groups 1 or 3, the algorithm calls itself recursively with adjusted $b,e$ and $\alpha$.
+
+\Cref{alg:quick-quantile} is recursive which makes its analysis more convenient. However, an equivalent non-recursive implementation that uses loops instead is likely to perform better in most imperative programming languages. We refer the reader to \cref{alg:quickvar-nonrecursive} for an equivalent non-recursive version of \cref{alg:quick-quantile}.
 
 \begin{algorithm}
   \caption{\texttt{QuickVaR}: Recursive VaR algorithm} \label{alg:quick-quantile}
@@ -216,11 +221,11 @@ Above, the first inequality holds from $x = x_f$ and $0 \le \alpha$. The second 
 
 (i) If $\alpha < t$, the algorithm executes the first if statement. Because $0 \le \alpha  < t$, the recursive call satisfies the required input conditions: $f \le l-1$ and $\sum_{j=f}^{l-1} p_j = t > l$. In addition, \cref{lem:hoare-partition} guarantees that \eqref{eq:qvar-precondition} holds. The result then holds from the inductive hypothesis because $l-1 - f \le b-1 -f \le k$.
 
-(ii) If $t + e \le \alpha$, the algorithm executes the second if statement. We now check whether the recursive call preconditions are met. Because $t + e = \sum_{j = f}^g p_j \le \alpha < \sum_{j=f}^b p_j$, where the second inequality is the input condition, it must be that $g < b$ and therefore $g+1 \le b$. Also, by the precondition and algebraic manipulation we get that
+(ii) If $t + e \le \alpha$, the algorithm executes the second if statement. We now check whether the recursive call's input conditions are met. Because $t + e = \sum_{j = f}^g p_j \le \alpha < \sum_{j=f}^b p_j$, where the second inequality is the input condition, it must be that $g < b$ and therefore $g+1 \le b$. Also, by the algorithm's input condition and algebraic manipulation we get that
 \[
  \sum_{j=g+1}^b p_j = \sum_{j=f}^b - t -e > \alpha  -t -e,  
 \]
-and the recursive precondition holds. In addition, \cref{lem:hoare-partition} guarantees that \eqref{eq:qvar-precondition} holds. We can then use the inductive hypothesis, since $b - g - 1 \le b-f-1 \le k$, to return $x_{\omega}$ such that
+and the input condition holds. In addition, \cref{lem:hoare-partition} guarantees that \eqref{eq:qvar-precondition} holds. We can then use the inductive hypothesis, since $b - g - 1 \le b-f-1 \le k$, to return $x_{\omega}$ such that
 \[
   \P{\tilde{x} < x_{\omega}}
   \quad \le \quad
@@ -325,7 +330,13 @@ A VaR value $v := \var{\alpha}{\tilde{x}}$ for $\alpha\in [0,1)$ and discrete $\
  \]
 \end{proof}
 
-\begin{proof}[Proof of \cref{thm:quantile-in-finite-omega}]
+\begin{theorem}\label{thm:quantile-in-finite-omega}
+Assuming $\alpha\in [0,1)$ and a discrete $\tilde{x}$, there exists $\omega\in\Omega$ with $\var{\alpha }{\tilde{x}} = x(\omega)$ and
+\[
+  \P{\tilde{x} < v} \le \alpha < \P{\tilde{x} \le v}. 
+\]
+\end{theorem}
+\begin{proof}
 The condition on $x(\omega)$ follows from \cref{lem:var-property}. In addition, using basic probability properties and \cref{lem:var-property} gives that
   \[
     \P{\tilde{x} =
@@ -420,29 +431,24 @@ Thus $g$ is concave, and the proof concludes.
 
 We now describe an algorithm for optimizing over polymatroids with this class of submodular function. We then show that both CVaR and TVaR can be computed by solving this optimization problem for particular EWS functions.
 \begin{algorithm}
-  \caption{Linear-time Algorithm for optimizing linear function on polymatroids} \label{alg:maximum-weight-independent}
-
-  \Output{$q \in \Real^n$}
-
-  $v \gets \operatorname{QuickVaR}(p, x, \alpha = (1 - c)/m) $ \;
-  $k_{\min} \gets \min_{i = 1, \dots, n} x_i$  \tcp{Breaking ties arbitrarily}
-  $\mathcal{K}_{< v} \gets \{ i = 1, \dots , n \mid x_i < v \}$ \;
+  \caption{\texttt{QuickDivergence}: Algorithm for optimizing linear function on polymatroids} \label{alg:maximum-weight-independent}
+  \Input{\mm{???}}
+  \Output{$\bm{q} \in \Real^n$}
+  $k_{\min} \gets \arg\min_{i \in  1{:}n} x_i$ \;
+  $v \gets \operatorname{QuickVaR}(\bm{p}, \bm{x}, \alpha = (1 - c)/m)$ \;
+  $\mathcal{K}_{< v} \gets \{ i = 1, \dots , n \mid x_i < v \}$ ; ~
   $\mathcal{K}_{= v} \gets \{ i = 1, \dots , n \mid x_i = v \}$ \;
   $\theta \gets \left( 1 - c + \sum_{k = \mathcal{K}_{< v}} m\cdot p_k\right) / (\sum_{k \in \mathcal{K}_{=v}} p_k) $   \;
-  \[
-    \forall i\in 1, \dots , n:
-    \qquad
-    q_i \gets
-    \begin{cases}
-      m\cdot p_i + c &\text{if } i = k_{\min} \\
-      m \cdot p_i &\text{if } i \in \mathcal{K}_{< v} \wedge i \ne k_{\min} \\
-      \theta \cdot  p_i  &\text{if } i \in \mathcal{K}_{=v} \\
-      0 &\text{otherwise}.  \\
-    \end{cases}
-  \]
+  \For{$i \in 1{:}n$}{
+   \lIf{$i = k_{\min}$}{$q_i \gets m\cdot p_i + c$}
+   \lElseIf{$ i \in \mathcal{K}_{< v} \wedge i \ne k_{\min} $} {$q_i \gets m \cdot p_i$}
+   \lElseIf{$ i \in \mathcal{K}_{=v} $} {$q_i \gets  \theta \cdot  p_i$}
+   \lElse{$q_i \gets 0$}
+  }
+  \Return{$\bm{q}$}
  \end{algorithm}
 
-We now prove the optimality of the algorithm and it's expected linear time complexity. The proof of optimality is obtained by showing that every value we compute for $q$ is equivalent to what would be obtained by following the computational procedure defined in \cite[Remark 4.86]{Follmer2016}. The proof of the time complexity follows from the expected linear time complexity, and the fact that remaining operations can be computed in linear time, and thus have no impact on the complexity.
+We now prove the optimality of the algorithm and it's expected linear time complexity. The proof of optimality is obtained by showing that every value we compute for $q$ is equivalent to what would be obtained by following the computational procedure defined in \cite[remark~4.86]{Follmer2016}. The proof of the time complexity follows from the expected linear time complexity, and the fact that remaining operations can be computed in linear time, and thus have no impact on the complexity.
 
 \begin{proposition}
   \cref{alg:maximum-weight-independent} returns a optimal solution to the optimization problem defined in \cref{comontonic optimization}. 
@@ -783,52 +789,21 @@ This speed up is significant in the context of risk measures as they are often u
 
 \appendix
 
-\section{Proofs and Details for \cref{sec:var-linear}}
+\section{Properties of Discrete Random Variables} \label{sec:prob-discr-rand}
 
-% \begin{algorithm}
-% \algrenewcommand\algorithmicrequire{\textbf{Input: Random variable $x \in \Real^n$ with probability mass function $p \in \Delta_n$ and $f, b \in \Real$}}
-% \algrenewcommand\algorithmicensure{\textbf{Output: indices of partition $i, j \in \Real$}}
-% \caption{Hoare's partition scheme}\label{alg:partition}
-%   \begin{algorithmic}[1]
-%     \Require{}
-%     \Ensure{} 
-%     \State{$i \gets f + \lceil\frac{b-f}{2}\rceil$}
-%     \State{$\lambda \gets f$} % less than
-%     \State{$\xi \gets f$} % equal to
-%     \State{$\mu \gets b$} % greater than
-%     \While{$\xi \leq \mu$}
-%       \If{$x[\xi] < x[i]$}
-%         \State{swap $x[\xi]$ with $x[\lambda]$}
-%         \State{swap $p[\xi]$ with $p[\lambda]$}
-%         \State{$\lambda \gets \mu + 1$}
-%         \State{$\xi \gets \xi + 1$}
-%       \ElsIf{$x[\xi] > x[i]$}
-%         \State{$\mu \gets \mu - 1$}
-%       \Else{}
-%         \State{$\xi \gets \xi + 1$}
-%       \EndIf{}
-%     \EndWhile{}
-%     \State{\Return{($\lambda - 1$, $\mu$)} \Comment{last element less than the pivot, first element greater than the pivot}}
-%   \end{algorithmic}
-% \end{algorithm}
-%
-
-\subsection{Proof of \cref{lem:quantile-in-finite-omega}}
-
-
-\subsection{Standard VaR Algorithm} \label{sec:stand-var-algor}
+\section{Supplemental VaR Algorithms} \label{sec:stand-var-algor}
 
 \begin{algorithm}
 \caption{VaR: Standard VaR algorithm}
 \label{alg:slow-quantile}
-\Input{vector $\bm{x}$, probability $\bm{p}$, and $\alpha \in [0,1)$}
-\Output{$\alpha$-quantile of $\tilde{X}$}
-Sort $\bm{x}$ indexes to get $\bm{k}\in \Nats^n$ such that $i > j \implies x_{k_i} > x_{k_j}, \; \forall i, j \in 1, \dots , n$\;
-$q_{n+1} \gets 0$ \;
-\For{$i=n, \dots , 1$} {
-    $q_i \gets q_{i+1} + p_{k_i}$
-    \tcp*{$q_i = \P{\tilde{x} \ge x_{k_i}}$ if $x_{k_i}$ unique}
-    \lIf{$q_i \ge 1-\alpha$} {\KwRet{$x_{k_i}$}}
+\Input{$\bm{x}\in \Real^n$, $\bm{p}\in \Delta_n$, and $\alpha \in [0,1)$}
+\Output{$\varo_{\alpha}[\tilde{x}]$}
+Sort $\bm{x}$ indexes to get $\sigma \colon 1{:}n \to 1{:}n$ such that $i > j \implies x_{\sigma(i)} \ge  x_{\sigma(j)}, \; \forall i, j \in 1, \dots , n$\;
+$q_0 \gets 0$
+\tcp*{$q_i = \P{\tilde{x} \ge x_{\sigma (i)}}$ if $x_{\sigma(i)}$ unique}
+\For{$i\in 1{:}n$} {
+    $q_i \gets q_{i-1} + p_{\sigma(i)}$ \;
+    \lIf{$q_i > \alpha$} {\KwRet{$x_{\sigma(i)}$}}
 }
 \end{algorithm}
 
@@ -959,7 +934,7 @@ Julia garbage collector, even when running synchronously.
 \subsection{Non-Recursive QVaR}
 
 \begin{algorithm}
-  \caption{\texttt{QuickVaR}: Linear-time algorithm for VaR}
+  \caption{\texttt{QuickVaR}: Non-recursive adaptation of \cref{alg:quick-quantile}} \label{alg:quickvar-nonrecursive}
   \Input{vector $\bm{x}^0$, pmf $\bm{p}^0$ and $\alpha^0 \in [0,1)$}
   \Output{$\varo_{\alpha}[\tilde{x}]$}
   $f_0 \gets 1$;~~~~$b_0 \gets n$;~~~~$k=1$ \;

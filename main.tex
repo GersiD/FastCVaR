@@ -315,9 +315,12 @@ where $d\cdot k$ is the local runtime of the algorithm for some $d > 0$ and $T(i
 \end{proof}
 
 \begin{remark}
-An attentive reader may notice that QuickVaR resembles closely the algorithm for computing the weighted median~\cite{Korte2012}.  computation can be easily reduced to computing a weighted median with appropriately chosen weights. However, the weighted median algorithm does not compute VaR. Because median is not just any arbitrary quantile, but standard definitions require that it is the largest quantile. As a result, our QuickVaR algorithms differs from weighted median algorithms in subtle but substantive ways.
+  An attentive reader may notice that QuickVaR resembles closely the algorithm for computing the weighted median~\cite[section~17]{Korte2012}. However, the weighted median algorithm does not compute VaR in general. Define the \emph{quantile} $\quant_{\alpha},\alpha \in (0,1)$ for $\tilde{x}$ as the closed set
+\[
+ \quant_{\alpha}[\tilde{x}] := \left\{ z\in \Real \mid  \P{ \tilde{x} \le z } \ge \alpha , \P{ \tilde{x} \ge z } \ge 1-\alpha  \right\},
+\]
+with bounds $\quant^+_{\alpha}[\tilde{x}] := \max \quant_{\alpha}[\tilde{x}]$ and $\quant^-_{\alpha}[\tilde{x}] := \min \quant_{\alpha}[\tilde{x}]$. One can readily show that $\varo_{\alpha }[\tilde{x}] = \quant^+_{\alpha}[\tilde{x}]$. Also, the median is usually defined as $\operatorname{median}[\tilde{x}] := \frac{1}{2} q^+_{\frac{1}{2}}[\tilde{x}] + \frac{1}{2} q^{-}_{\frac{1}{2}}[\tilde{x}]$. Because $q^+_{\alpha}[\tilde{x}] \neq q^{-}_{\alpha}[\tilde{x}]$ in general, VaR also does not equal to the median. A more careful analysis shows that the weighted median algorithm in~\citet[section~17]{Korte2012} shows that it computes $\quant^-_{\alpha }[\tilde{x}]$, which is in general different from both the VaR and the usual definition of a median.
 \end{remark}
-
 
 \section{Computing \texorpdfstring{$\varphi$}{phi}-divergence Risk Measures in Linear Time} \label{sec:phi-divergence}
 

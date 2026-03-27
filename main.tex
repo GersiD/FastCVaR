@@ -1,10 +1,11 @@
-\documentclass{article}
+\documentclass[10pt]{article} % For LaTeX2e
 
 \PassOptionsToPackage{numbers, sort&compress}{natbib}
-\usepackage{neurips_2025}
+\usepackage{tmlr}
 
 \usepackage[colorlinks=true,citecolor=BlueViolet]{hyperref} % For hyperlinks in the PDF like citations
 \usepackage{mpemath}
+\RequirePackage[capitalise]{cleveref}
 \usepackage{graphicx} % Required for inserting images
 \usepackage[dvipsnames]{xcolor} 
 
@@ -33,6 +34,8 @@
 
 \renewcommand{\cite}{\citep}
 
+\IncMargin{em}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % THEOREMS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -46,7 +49,7 @@
 \maketitle
 
 \begin{abstract}
-Monetary risk measures have gained popularity in expressing decision-makers' preferences for risk aversion. Value-at-Risk (VaR) and Conditional-Value-at-Risk (CVaR) in particular are used commonly for this purpose. This paper proposes a novel approach for computing these risk measures as well as others for discrete distributions in linear time. We adapt the Quick Select algorithm and combine it with a general polymathic representation of $\varphi$-divergence risk measures. Numerical results show that our new algorithms offer an order of magnitude speed up for large domains, and a library implementation of the algorithms is available at \url{https://github.com/RiskAverseRL/RiskMeasures.jl}.     
+  Monetary risk measures have gained popularity in expressing decision-makers' preferences for risk aversion. Value-at-Risk (VaR) and Conditional-Value-at-Risk (CVaR) in particular are used commonly for this purpose. This paper proposes a novel approach for computing these risk measures as well as others for discrete distributions in linear time. We adapt the Quick Select algorithm and combine it with a general polymathic representation of $\varphi$-divergence risk measures. Numerical results show that our new algorithms offer an order of magnitude speed up for large domains, and a library implementation of the algorithms is available at \todo{REDACTED for anonymity}.%\url{https://github.com/RiskAverseRL/RiskMeasures.jl}.     
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
@@ -61,11 +64,12 @@ Our algorithms' time complexity improves on the state of the art by a logarithmi
 
 Linear time algorithms that resemble our QuickVaR and QuickDivergence have been studies in many domains and we summarize some of the most relevant ones. Some example of such structured optimization problems are the projection onto the simplex~\cite{adam2019projectionscanonicalsimplexadditional, Wang2013Simplex}, projection on k-capped simplex~\cite{kcapped_ang,Lim2016}, linear optimization on the intersection of $L_p$ or $\varphi$-divergence balls and the probability simplex in robust optimizations~\cite{Ho2022}, optimization for $\varphi$-divergence risk measures~\cite{Ahmadi-Javid2012}, and on polymatroids~\cite{Korte2012}. While some of these papers discuss the possibility of designing linear-time algorithms, they usually do not study them with a few exceptions~\cite{Condat2016,Lim2016}. Finally, QuickVaR is closely related to the computation weighted quantile but returns the same value only when the quantile is unique~\cite{Korte2012,cormen2001introduction}.
 
-The remainder of the paper is organized as follows. \Cref{sec:preliminaries} describes the necessary background including risk measures, $\varphi$-divergence, and polymatroid optimization. Then, \Cref{sec:var-linear} proposes \emph{QuickVaR} to compute VaR in linear time. \cref{sec:phi-divergence} builds on QuickVaR to develop \emph{QuickDivergence} that computes certain $\varphi$-divergence risk measures in linear time. We evaluate the algorithms numerically on synthetic and realistic problems in \cref{sec:experiments}. A tested implementation of the algorithms in Julia is available at \url{https://github.com/RiskAverseRL/RiskMeasures.jl}.
+The remainder of the paper is organized as follows. \Cref{sec:preliminaries} describes the necessary background including risk measures, $\varphi$-divergence, and polymatroid optimization. Then, \Cref{sec:var-linear} proposes \emph{QuickVaR} to compute VaR in linear time. \cref{sec:phi-divergence} builds on QuickVaR to develop \emph{QuickDivergence} that computes certain $\varphi$-divergence risk measures in linear time. We evaluate the algorithms numerically on synthetic and realistic problems in \cref{sec:experiments}.
+%A tested implementation of the algorithms in Julia is available at \url{https://github.com/RiskAverseRL/RiskMeasures.jl}.
 
 \section{Preliminaries}\label{sec:preliminaries}
 
-We restrict our attention to random variables defined on finite probability spaces $(\Omega, 2^{\Omega}, \bm{p})$ where $\Omega := \left\{ 1, \dots , n \right\}$, $\bm{p} \in \Delta_n$, and $\Delta_n$ is the $n$-dimensional probability simplex. We use a tilde to indicate a random variable, such as $\tilde{x}\colon \Omega \to \Real$. The set of real-valued random variables is denoted by $\mathbb{X}$. Vectors are denoted with a lower-case bold font, such as $\bm{x} \in \Real^n$ and indexed as $\bm{x}_i \text{ for } i = 1, \dots , n$. We use $\tilde{x}$ and $\bm{x}$ interchangeably, such that $x_\omega = x(\omega), \forall \,  \omega \in \Omega$. Sets are denoted with calligraphic letters and $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ denotes the extended real line. The symbol $\Nats$ denotes all 0-based natural numbers.
+In this paper, we restrict our attention to random variables defined on finite probability spaces $(\Omega, 2^{\Omega}, \bm{p})$ where $\Omega := \left\{ 1, \dots , n \right\}$, $\bm{p} \in \Delta_n$, and $\Delta_n$ is the $n$-dimensional probability simplex. We use a tilde to indicate a random variable, such as $\tilde{x}\colon \Omega \to \Real$. The set of real-valued random variables is denoted by $\mathbb{X}$. Vectors are denoted with a lower-case bold font, such as $\bm{x} \in \Real^n$ and indexed as $\bm{x}_i \text{ for } i = 1, \dots , n$. We use $\tilde{x}$ and $\bm{x}$ interchangeably, such that $x_\omega = x(\omega), \forall \,  \omega \in \Omega$. Sets are denoted with calligraphic letters and $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ denotes the extended real line. The symbol $\Nats$ denotes all 0-based natural numbers and $a{:}b := a, a+1, \dots , b$ for $a, b \in \mathbb{N}$.
 
 \emph{Monetary risk measures} $\rho\colon \mathbb{X} \to \bar{\Real}$ generalize the expectation operator to account for different the uncertainty in the distribution of a random variable~\cite{Follmer2016}. We apply risk measures to random variables representing rewards and suppose that higher risk values are preferable. 
 
@@ -145,16 +149,14 @@ For each $\alpha\in [0,1]$ and $\tilde{x} \in \mathbb{X}$:
 
 \section{Computing VaR in Linear Time} \label{sec:var-linear}
 
-Our algorithm for computing the VaR in linear time builds on the well-known quickselect algorithm. This approach makes it possible to avoid the full sort of the discrete random variable used in common VaR implementations.
+Our algorithm for computing the VaR in linear time builds on the well-known quickselect algorithm for finding the $k$-th element of an array in linear time. Unlike naive algorithms, quickselect sorts the input array only partially which makes it possible 
 
-The main idea is this theorem.
 \begin{theorem}\label{thm:quantile-in-finite-omega}
 Assuming $\alpha\in [0,1)$ and a discrete $\tilde{x}$, there exists $\omega\in\Omega$ with $\var{\alpha }{\tilde{x}} = x(\omega)$ and
 \[
-  \P{\tilde{x} < v} \le \alpha < \P{\tilde{x} \le v}}. 
+  \P{\tilde{x} < v} \le \alpha < \P{\tilde{x} \le v}. 
 \]
 \end{theorem}
-
 
 The \emph{QuickVaR} algorithm is described in \cref{alg:quick-quantile}. The algorithm works as follows. It first picks a pivot by taking the middle element between front and back and applies the partition scheme to easily compute the probability of all outcomes smaller than or equal to that of the pivot (Lines \ref{line:pivot_comp} - \ref{line:partion_line}). Note that three partitions are create, one where the elements are all less than the pivot, another containing all elements equal to the pivot, and a third pivot containing all elements greater than the pivot. We refer to these partitions as the left, middle, and right partition from here on. QuickVaR then determines whether the quantile can exist in the left, middle, or right pivot (lines \ref{line:determine_left}, \ref{line:determine_right}, and \ref{determine_middle} ) and adjusts the $f_k$ and $b_k$ respectively to reduce the search space to one of these partitions. We note that in the case the quantile is determined to exist in the middle partition, the algorithm can terminate since every value in the middle partition is the same. In the case of $\alpha^0 = 0$, we handle this separately and simply find the minimum element. 
 
@@ -194,7 +196,7 @@ We now prove the correctness of our algorithm. We first prove a general conditio
   \P{\tilde{x} < x_{\omega}}
   \quad \le \quad
   \alpha + \P{\tilde{x} < x_f}
-  \quad < \quad \P{\tilde{x} \le x_{\omega}}}. 
+  \quad < \quad \P{\tilde{x} \le x_{\omega}}. 
 \end{equation}
 \end{lemma}
 \begin{proof}
@@ -223,7 +225,7 @@ and the recursive precondition holds. In addition, \cref{lem:hoare-partition} gu
   \P{\tilde{x} < x_{\omega}}
   \quad \le \quad
   (\alpha - t - e) + \P{\tilde{x} \le v}
-  \quad < \quad \P{\tilde{x} \le x_{\omega}}}. 
+  \quad < \quad \P{\tilde{x} \le x_{\omega}}. 
 \]
 Inequality \eqref{eq:qvar-postcondition} follows by substituting $t,e$ from \eqref{eq:te-equivalence}.
 
@@ -257,46 +259,34 @@ Inequality \eqref{eq:qvar-postcondition} follows by substituting $t,e$ from \eqr
 \end{algorithm}
 
 \begin{theorem}
-For $\bm{x}\in \Real^n$, \cref{alg:quick-quantile} executed with $b = 1$ and $e = n$ returns $\varo_{\alpha}(\tilde{x})$.
+For $\bm{x}\in \Real^n$, \cref{alg:quick-quantile} executed with $b =
+1$ and $e = n$ and $\alpha\in [0,1)$ returns $\varo_{\alpha}[ \tilde{x} ]$.
 \end{theorem}
 \begin{proof}
-  With $b = 1$ and $e = n$, \eqref{eq:qvar-precondition} becomes vacuous and \cref{lem:quickvar-correct} shows that the computed value satisfies \cref{thm:quantile-in-finite-omega}, which suffices for it to be equal to VaR. 
+With $b = 1$ and $e = n$, \eqref{eq:qvar-precondition} holds since $\alpha\in [0,1)$ and \cref{lem:quickvar-correct} shows that the computed value satisfies \cref{thm:quantile-in-finite-omega}, which suffices for it to be equal to VaR. 
 \end{proof}
 
 \begin{proposition} \label{prop:time-complexity}
-\Cref{alg:quick-quantile} runs in expected $O(n)$ time when using a uniformly random pivot selection.
+\Cref{alg:quick-quantile} runs in expected $O(n)$ time.
 \end{proposition}
-
-The proof of \cref{prop:time-complexity} is analogous to the standard quick-select algorithm in \cite{Aho1974,HorowitzSahni1978} with the main difference that we allow for multiple elements to be equal to the pivot. 
 \begin{proof}
-Let $T(l)$ be the expected running time of \Cref{alg:quick-quantile} for $l := b - f$. Suppose that $\qvar_{\alpha}(\bm{x}, \bm{p}, \alpha, f, b)$ returns the \(k\)-th smallest element in $x_f, \dots, x_b$; that is there are \(k-1\) smaller elements, \(l - k - d\) elements greater, and $d$ elements equal to $\qvar(\bm{x}, \bm{p}, \alpha, f, b)$. Furthermore let $v$ be the \(i\)-th smallest element in $x$ (i.e. there are \(i-1\) smaller elements and \(n - i - s\) elements larger, where $s$ is the number of elements equal to $v$
+The proof is analogous to the standard quickselect algorithm, such as \citep[theorem~3.3]{horowitz1998computer} except we need to keep track of the risk level $\alpha$. Fix some $n \in \mathbb{N}$, $\bm{x}$, and $\bm{p}$ and we study the properties. Let $T\colon 1{:}n \to [0,\infty]$ be the \emph{expected} runtime of \cref{alg:quick-quantile} such $T(k)$ is the expected runtime when executed with $k := b - f + 1$. To simplify the notation, we assume without loss of generality in the remainder of the proof that $f = 1$ and $e = k$. Then, let
+\[
+  l := \left| \left\{ i \in 1{:}k \mid  x_i < \varo_{\alpha}[\tilde{x}]\right\}   \right|
+\]
+Note that by the assumption $\sum_{j = f}^b p_j > \alpha$, we have that $k \ge 1$ and $\varo_{\alpha}[\tilde{x}] \le \max_{i\in f{:}b} x_i$. Therefore, $l \in 0{:}(k-1)$. The algorithm terminates in constant time when $k = 1$, and we upper-bound the runtime for the worst-case choice of $l$ for $k > 1$ as
+\begin{align}
+\nonumber
+  T(k)
+  &\le d\cdot k + \max_{l\in 0{:}(k-1)} \frac{1}{k} \sum_{i=0}^{k-1} \left(   T(i) \cdot 1_{l < i} + T(k - i - 1) \cdot 1_{l > i}  \right) \\
+\nonumber
+  &= d\cdot k + \max_{l\in 0{:}(k-1)} \frac{1}{k}  \left(  \sum_{i=l+1}^{k-1} T(i)  + \sum_{i=0}^{l-1} T(k - i - 1)   \right) \\
+\label{eq:quickvar-complexity}
+  &= d\cdot k + \max_{l\in 0{:}(k-1)} \frac{1}{k}  \left(  \sum_{i=l+1}^{k-1} T(i)  + \sum_{i=l}^{k-1} T(i)   \right).
+\end{align}
+where $d\cdot k$ is the local runtime of the algorithm for some $d > 0$ and $T(i)$ and $T(k - i - 1)$ are the average runtimes of the recursive calls. The average over $i$ corresponds to the uniformly-random selection of the pivot with $i = \left| \left\{ j \in 1{:}k \mid x_i < v \right\} \right|$ in the first line of the inequality. The last two equalities follow by algebraic manipulation.   
 
-Since the pivot is chosen uniformly, each element with probability \(1/n\).
-
-Thus, the expected cost of the recursion at line 4 or 6 is 
-\begin{align*}
-  \frac{1}{n} \left( \sum_{i = 1}^{k} T(n - i - s) + \sum_{i = k + 1 + d}^{n} T(i - 1) \right)
-  &\leq
-  \frac{1}{n} \left( \sum_{i = 1}^{k} T(n - i) + \sum_{i = k + 1}^{n} T(i - 1) \right) \\
-  &=
-\frac{1}{n} \left( \sum_{i = n - k + 1}^{n - 1} T(i) + \sum_{i = k}^{n - 1} T(i) \right)
-\end{align*}
-The second equation is an upper bound and focuses on the case when there is a unique element that equals VaR and a unique element that equals the pivot   ($d = 0$ and $s = 0$). We thus focus only on the analysis of this case for the remainder of the proof.
-
-The rest of procedure \textsc{SELECT} requires $cn$ time for some constant $c$,  
-so we have the following inequality for $n \ge 2$:
-\begin{equation}
-T(n) \le cn + \max_{k} 
-\left\{\frac{1}{n} (\sum_{i = n - k + 1}^{n - 1} T(i) + \sum_{i = k}^{n - 1} T(i) ) \right\}.
-\label{eq:select_recurrence}
-\end{equation}
-
-The remaining (non-recursive) work performed by the procedure on an input of size \(n\) is \(\Theta(n)\).
-Thus there exists a constant \(c>0\) such that, for all \(n\ge 2\),
-\begin{equation}\label{eq:recurrence}
-T(n) \le c n + \frac{2}{n}\sum_{i=1}^{n-1} T(i).
-\end{equation}
-By induction, \(T(n)\le 4cn\) for all integers \(n\ge 1\). This proves that the expected running time of QuickVaR is linear in \(n\).
+Finally, \eqref{eq:quickvar-complexity} is equal to equation (3.8) in \cite{horowitz1998computer} and an argument identical to \cite[theorem~3.3]{horowitz1998computer} yields by induction that \(T(k)\le 4\cdot d\cdot k\) for all \(k\ge 1\).
 \end{proof}
 
 \begin{remark}
@@ -319,33 +309,18 @@ We first establish a few crucial lemmas about probability distributions which fa
   The result follows by induction on the size of the probability space $|\Omega|$ after generalizing the statement to drop the constraint $\bm{1}\tr \bm{p} = 1$.
 \end{proof}
 
-% \begin{lemma} \label{lem:prob-increase}
-%   For each $t\in \Real$, the exists $q > t$ such that
-%   \[
-%    \P{\tilde{x} \le t} = 
-%    \P{\tilde{x} < q}.
-%  \]
-%  Moreover, if $t < \max_{\omega \in \Omega } x_{\omega }$, then $q$ can be chosen such that $q= x_{\omega}$ for some $\omega\in \Omega$.
-% \end{lemma}
-% \begin{proof}
-%   First, assume that $t < \max_{\omega \in \Omega } x_{\omega }$ and let $\mathcal{Y} := \left\{ x_{\omega} \mid x_{\omega} > t, \omega \in \Omega  \right\}$ which is nonempty by the assumption. Then, $q := \min \mathcal{Y}$ exists because $\mathcal{Y}$ is finite and nonempty. The properties $q > t$ and $\exists \,\omega \in \Omega, \, q = x_{\omega}$ hold from $q\in \mathcal{Y}$. Next, for each $\omega \in \Omega$, $x_{\omega}\le t \Rightarrow x_{\omega} < q$ follows from transitivity of $\le$ and $<$.  Finally, we can prove $x_{\omega} < q \Rightarrow x_{\omega} < t$ by contradiction from the fact the $q$ is the minimum of $\mathcal{Y}$.
-
-%  Second, if  $t \ge \max_{\omega \in \Omega } x_{\omega }$, let $q := 1 + \max_{\omega \in \Omega } x_{\omega }$ which satisfies the required property by algebraic manipulation.
-% \end{proof}
-
-
 \begin{lemma} \label{lem:var-property}
 A VaR value $v := \var{\alpha}{\tilde{x}}$ for $\alpha\in [0,1)$ and discrete $\tilde{x}$ satisfies that
 \[
-  \P{\tilde{x} < v} \le \alpha < \P{\tilde{x} \le v}}. 
+  \P{\tilde{x} < v} \le \alpha < \P{\tilde{x} \le v}. 
 \]
 \end{lemma}
 \begin{proof}
-  We decompose the proof into two parts. \emph{First}, the implication $\PP[\tilde{x} < v] \le \alpha \implies v \in \left\{ t \in \Real \mid  \PP[\tilde{x} < t] \le \alpha \right\}$ follows immediately from the definition. \emph{Second}, to prove  $\alpha < \PP[\tilde{x} \le v] \implies \forall t \in \left\{ t \in \Real \mid  \PP[\tilde{x} < t] \le \alpha \right\}, v \ge t$ by contradiction, suppose that $\exists t \in \left\{ t \in \Real \mid  \PP[\tilde{x} < t] \le \alpha \right\}, v < t$. Then, by the monotonicity of the probability operator we get a contradiction as
+  We decompose the proof into two parts. \emph{First}, the implication $\P{\tilde{x} < v} \le \alpha \implies v \in \left\{ t \in \Real \mid  \P{ \tilde{x} < t } \le \alpha \right\}$ follows immediately from the definition. \emph{Second}, to prove  $\alpha < \P{ \tilde{x} \le v } \implies \forall t \in \left\{ t \in \Real \mid  \P{ \tilde{x} < t } \le \alpha \right\}, v \ge t$ by contradiction, suppose that $\exists t \in \left\{ t \in \Real \mid  \P{ \tilde{x} < t } \le \alpha \right\}, v < t$. Then, by the monotonicity of the probability operator we get a contradiction as
  \[
    \alpha
-   < \PP \left[ \tilde{x} \le v \right]
-   \le \PP \left[ \tilde{x} < t \right]
+   < \P {  \tilde{x} \le v  }
+   \le \P {  \tilde{x} < t  }
    \le \alpha.
  \]
 \end{proof}
@@ -922,77 +897,7 @@ This lemma is Theorem 4.5.1 from \cite{Bilmes18}: Given a ground set $V$. The fo
 
 \begin{proof}
 Note the proof is not the same provided in \cite{Bilmes18}, but we feel this proof is easier. It is well known that concave functions are subadditive - that is for any concave function $g$ and two values $y$ and $z$, $g(y) + g(z) \geq g(y + z)$ on the interval $[0, \infty)$. Given $A \subseteq B \subseteq E $, it follows $0 \leq a = m(A) \leq b = m(B)$. Therefore it follows that $f(A) + f(B) = g(a) + g(b) \geq g(a + b) = f(A \cup B)$. Thus it follows from the definition of sub-modularity that $f$ is submodular.
-
 \end{proof}
-
-
-% \section{No-sort Polymatroid}
-
-% Our first contribution new algorithm for solving the maximum weight Independent Set without sorting for polymatroids. We note that certain additional assumptions have to be satisfied on the submodular function as follows.
-% \begin{assumption}
-% Assume for $P_f$ that $f(U)$ is such that for all $S_i, S_{ i+1 } \cup E$ where $S_i \cup (i + 1) = S_{ i+1 } $ and $f(S_{ i+1 }) < f(E)$, $f(S_i) + f({i + 1}) = f(S_{ i+1 })$.
-% \end{assumption}
-% We note this assumption essentially state that the submodular function must be a piecewise linear function. 
-% \begin{algorithm}
-%   \todo{fix typos}
-%     \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 
-%     \algrenewcommand\algorithmicensure{\textbf{Output: $\max \{f(S) : S\subseteq N\}$}}
-%   \caption{algorithm}{New algorithm}
-%  \begin{algorithmic}[1]
-%      \Require{}
-%      \Ensure{}
-  
-%     \State{$left \gets 1$}
-%     \State{$right \gets n$}
-%     \While{$right - left \geq 1$}
-    
-%     \State{$mid \gets partition(left, right, c)$}
-%     \If{$f(S_{mid}) = f(N)$}
-%        \State{Let $x_i :=  \begin{cases}0 & \text{if  } f(S_{mid}) = f(N) \text{ for } i \geq mid \\ f(i) \end{cases}$}
-%     \Else
-%           \State{Let $x_i :=  \begin{cases}f(i) & \text{for } i \leq mid \end{cases}$}
-%     \EndIf{}      
-    
-    
-    
-%     \EndWhile{}
-%     \State{$x_{right} \gets f(N) - f(S_{right - 1})$}
-% \end{algorithmic}
-% \end{algorithm}
-% The proof for this algorithm is simple and shows that output is equal to that of Algorithm 4 (the standard greedy algorithm), which has already proved to be both feasible and optimal.
-% \begin{lemma}
-% Algorithm 1 returns a feasible and optimal solution to the maximum weight independent set for polymatroids.
-% \end{lemma}
-% \begin{proof}
-% The optimal solution will always be $f(S_i) - f(S_{i-1})$ assuming the weight $c_i \geq 0$. Our solution is $f(i)$ for $f(S_i) < f(N)$, and by assumption 1 this equals $f(S_i) - f(S_{i - 1})$. If $f(S_i) = f(N)$ and $f(S_{i - 1}) = f(N)$, then $x_i = 0$ by the algorithm.
-% \end{proof}
-
-% \section{Comonotonicity of Risk}
-%
-% \begin{definition}
-% Two random variables $\tilde{x}$ and $\tilde{y}$ are said to be comonotonic if
-%   \begin{align*}
-%     (\tilde{x}(\omega) - \tilde{x}(\omega'))(\tilde{y}(\omega) - \tilde{y}(\omega')) \geq 0 \quad \forall \; \omega, \omega' \in \Omega.
-%   \end{align*}
-% \end{definition}
-% \begin{definition}
-%   A risk measure is said to be comonotonic if given comonotonic random variables $\tilde{x}$ and $\tilde{y}$
-%   \begin{align*}
-%     \rho(\tilde{x} + \tilde{y}) = \rho(\tilde{x}) + \rho(\tilde{y}).
-%   \end{align*}
-% \end{definition}
-%
-% \begin{table}
-% \begin{tabular}{lll}
-%   \textbf{Risk Measure} &  \textbf{Comonotone?} & \\
-%   CVaR &  Yes & \\
-%   VaR &   Yes & \\
-%   TVaR &  Yes & \\
-%   EVaR &  No & \\
-%   Expectile & No &
-% \end{tabular}
-% \caption{\mm{This table is out of place; probably better to just include the information in the text}}
-% \end{table}
 
 \section{Experiments}\label{sec:appendix_experiments}
 \begin{figure}
@@ -1001,7 +906,8 @@ Note the proof is not the same provided in \cite{Bilmes18}, but we feel this pro
   \caption{Comparison of runtime of the algorithms for samples from a \emph{sparse} random variable with linear (left) and logarithmic (right) view.}
   \label{fig:all_sparse}
 \end{figure}
-Code and results for these experiments as well as the implementations of all contained risk measures can be found at\todo{REDACTED}.
+Code and results for these experiments as well as the implementations
+of all contained risk measures can be found at \todo{REDACTED for anonymity}.
 
 
 \begin{table} 
@@ -1027,14 +933,9 @@ Space (n) &  &  &  &  &  &  &  \\
 \end{table}
 
 To assure the reader that our algorithm is indeed faster than the sorting based methods, we present the results of our experiments on small scale problems in \cref{tab:small_results}. 
-We test our algorithm on small scale problems where the difference in runtimes is not as significant,
-however these problems occur frequently in practice. \cref{tab:small_results} is consistent with the experimental
-results obtained in \cref{sec:experiments}, namely our no-sort methods outperform the sorting based methods in runtime.'
-This assures that the algorithms developed here provide improvements in runtime for inputs of varying sizes.
+We test our algorithm on small scale problems where the difference in runtimes is not as significant, however these problems occur frequently in practice. \cref{tab:small_results} is consistent with the experimental results obtained in \cref{sec:experiments}, namely our no-sort methods outperform the sorting based methods in runtime.' This assures that the algorithms developed here provide improvements in runtime for inputs of varying sizes.
 
-The results obtained in \cref{tab:small_results} were generated using a similar process to that of \cref{sec:experiments} 
-where instead of 10 trails per experiment, we used 50 trails per experiment. \cref{tab:small_results} shows the mean
-time in ms $\pm$ the 95\% confidence interval for each method.
+The results obtained in \cref{tab:small_results} were generated using a similar process to that of \cref{sec:experiments} where instead of 10 trails per experiment, we used 50 trails per experiment. \cref{tab:small_results} shows the mean time in ms $\pm$ the 95\% confidence interval for each method.
 
 \cref{tab:small_results} shows that even for smaller settings our method is faster than the sorting based methods. The results are consistent with the theoretical complexity of the algorithms, which is $O(n \log n)$ for the sorting based methods and $O(n)$ for the QuickSelect based methods.
 
@@ -1049,8 +950,7 @@ The results obtained in this work were all generated on a computer with the foll
 
 The activity of other users on the system is minimized to account for scheduling conflicts.
 The presence of multithreading in our language of choice (Julia) is not used in this work, as while
-the runtime of the experiments would be shorter, we observed individual threads ``thrashing'', where 
-they would suddenly take twice or three times as long on one particular iteration. 
+the runtime of the experiments would be shorter, we observed individual threads ``thrashing'', where they would suddenly take twice or three times as long on one particular iteration. 
 We conjecture that this is due to the garbage collector. For this reason, we manually disable the 
 Julia garbage collector, even when running synchronously.
 
@@ -1059,44 +959,27 @@ Julia garbage collector, even when running synchronously.
 \subsection{Non-Recursive QVaR}
 
 \begin{algorithm}
-  \caption{QuickVaR: Linear-time algorithm for VaR}
-  \Input{vector $\bm{x}^0$, pmf $\bm{p}^0$ and $\alpha^0 \in (0,1)$}
-  \Output{$\alpha$-quantile of $\tilde{x}$}
+  \caption{\texttt{QuickVaR}: Linear-time algorithm for VaR}
+  \Input{vector $\bm{x}^0$, pmf $\bm{p}^0$ and $\alpha^0 \in [0,1)$}
+  \Output{$\varo_{\alpha}[\tilde{x}]$}
   $f_0 \gets 1$;~~~~$b_0 \gets n$;~~~~$k=1$ \;
   \While{$b_{k-1} > f_{k-1}$} {
-    $i_k \gets f_{k-1} + \lceil\frac{b_{k-1}-f_{k-1}}{2}\rceil$ \label{line:pivot_comp} \tcp*{Pivot index}
-    $v_k \gets x^{k-1}_{i_k}$ \tcp*{Pivot value}
-    %Median-of-medians for $O(b-f)$ runtime}
+    $v \gets x_{\operatorname{rand}(f{:}b)}$ \tcp*{Pivot}
      $l_k, g_k, \bm{x}^k, \bm{p}^k \gets \operatorname{partition}(\bm{x}^{k-1}, \bm{p}^{k-1}, v_k, f_{k-1}, b_{k-1})$
     \tcp*{Alg.~\ref{alg:partition}, \cref{lem:hoare-partition}} \label{line:partion_line}    
     $t_k \gets \sum_{j=f_{k-1}}^{l_k-1} p^k_j$  \tcp*{$\P{\tilde{x}^k < v_k}$}
     $e_k \gets \sum_{j = l_k}^{g_k} p^{k}_j $   \tcp*{$\P{\tilde{x}^k = v_k}$}
-    \If{$\alpha_{k-1} < t_k$\label{line:determine_left}}
+    \lIf{$\alpha_{k-1} < t_k$\label{line:determine_left}}
     {
-      \tcp{$\alpha_{k-1} < \P{ \tilde{x}^k < v_k }
-        \implies \alpha_{k-1}< 1 - \P{ \tilde{x}^k \ge v_k}$}
-      \tcp{$\implies \P{ \tilde{x}^k \ge v_k } < 1 - \alpha_{k-1}
-        \implies \quant^{+}_{\alpha_{k-1}} < v_k$}
-      $f_k \gets f_{k-1}$;~~~$b_k \gets l_k-1$\;
-      $\alpha_k \gets \alpha_{k-1}$\;
+      $f_k \gets f_{k-1}$;~$b_k \gets l_k-1$;~
+      $\alpha_k \gets \alpha_{k-1}$
     }
-    \ElseIf{$t_k + e_k \le  \alpha_{k-1} \label{line:determine_right}$} 
+    \lElseIf{$t_k + e_k \le  \alpha_{k-1} \label{line:determine_right}$} 
     {
-      % \tcp{$\P{\tilde{x}^k \le v_k} < \alpha_{k-1} \implies \quant_{\alpha_{k-1}} > v_k$}
-      \tcp{$\P{\tilde{x}^k \le v_k} \le \alpha_{k-1}
-        \implies \P{\tilde{x}^k > v_k} \ge 1 - \alpha_{k-1}$} 
-        \tcp{$\implies \P{\tilde{x}^k \ge v_k+\epsilon} \ge 1 - \alpha_{k-1}
-        \implies \quant_{\alpha_{k-1}}^+ > v_k$}
-      $f_k \gets g_k+1$;~~~$b_k \gets b_{k-1}$\;
-      $\alpha_k \gets \alpha_{k-1} - t_k - e_k$\;
+      $f_k \gets g_k+1$;~$b_k \gets b_{k-1}$;~$\alpha_k \gets \alpha_{k-1} - t_k - e_k$
     }
-    \Else{
-      \tcp{$\alpha_{k-1} \ge \P{ \tilde{x}^k < v_k } \, \wedge\, \P{ \tilde{x}^k \le v_k } > \alpha_{k-1}$} \label{determine_middle}
-      \tcp{$\implies \P{ \tilde{x}^k \ge v_k } \ge 1-\alpha_{k-1}
-        \, \wedge \, \P{ \tilde{x}^k \le v_k } \ge \alpha_{k-1}
-        \, \wedge \, \P{ \tilde{x}^k > v_k } < 1 - \alpha_{k-1}$}
-      \tcp{$\implies \quant^+_{\alpha_{k-1} } = v_k$}
-      $f_k \gets g_k$;~~~$b_k \gets g_k$\;
+    \lElse{
+      $f_k \gets g_k$;~~~$b_k \gets g_k$
     }
     $k \gets k + 1$\; 
   }
@@ -1135,9 +1018,6 @@ Julia garbage collector, even when running synchronously.
 
 
 \section{Greedy Algorithm}
-
-\todo{what weights?}
-\mm{Why would we need the weights to be non-negative?}
 
 % \begin{algorithm} \label{alg:greedy-polymatroid}
 %     \algrenewcommand\algorithmicrequire{\textbf{Input: }Finite $N = [1 \ldots n]$, non-decreasing submodular function $f : 2^N \to \Real$ satisfying $f(\emptyset) = 0$ and $f(N) = 1$} 

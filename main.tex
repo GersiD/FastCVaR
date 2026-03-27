@@ -3,11 +3,12 @@
 \PassOptionsToPackage{numbers, sort&compress}{natbib}
 \usepackage{tmlr}
 
-\usepackage[colorlinks=true,citecolor=BlueViolet]{hyperref} % For hyperlinks in the PDF like citations
+\usepackage[colorlinks=true,citecolor=BlueViolet,linkcolor=Blue]{hyperref} % For hyperlinks in the PDF like citations
 \usepackage{mpemath}
 \RequirePackage[capitalise]{cleveref}
 \usepackage{graphicx} % Required for inserting images
 \usepackage[dvipsnames]{xcolor} 
+\usepackage{appendix}
 
 \SetKwInOut{Input}{Input}
 \SetKwInOut{Output}{Output}
@@ -40,7 +41,8 @@
 % THEOREMS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\title{Computing Risk Measures in Linear Time}% and $\varphi$-divergence Risk Measures}
+\title{Linear-time Algorithms for Risk Measures: \\
+  VaR, CVaR, and TVaR}
 %\author{Palash Agrawal, Gersi Doko, Maeve Burwell, Marek Petrik}
 %\date{}
 
@@ -69,9 +71,9 @@ The remainder of the paper is organized as follows. \Cref{sec:preliminaries} des
 
 \section{Preliminaries}\label{sec:preliminaries}
 
-In this paper, we restrict our attention to random variables defined on finite probability spaces $(\Omega, 2^{\Omega}, \bm{p})$ where $\Omega := \left\{ 1, \dots , n \right\}$, $\bm{p} \in \Delta_n$, and $\Delta_n$ is the $n$-dimensional probability simplex. We use a tilde to indicate a random variable, such as $\tilde{x}\colon \Omega \to \Real$. The set of real-valued random variables is denoted by $\mathbb{X}$. Vectors are denoted with a lower-case bold font, such as $\bm{x} \in \Real^n$ and indexed as $\bm{x}_i \text{ for } i = 1, \dots , n$. We use $\tilde{x}$ and $\bm{x}$ interchangeably, such that $x_\omega = x(\omega), \forall \,  \omega \in \Omega$. Sets are denoted with calligraphic letters and $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ denotes the extended real line. The symbol $\Nats$ denotes all 0-based natural numbers and $a{:}b := a, a+1, \dots , b$ for $a, b \in \mathbb{N}$.
+In this paper, we restrict our attention to random variables defined on finite probability spaces $(\Omega, 2^{\Omega}, \bm{p})$ where $\Omega := \left\{ 1, \dots , n \right\}$, $\bm{p} \in \Delta_n$, and $\Delta_n$ is the $n$-dimensional probability simplex. We use a tilde to indicate a random variable, such as $\tilde{x}\colon \Omega \to \Real$. Vectors are denoted with a lower-case bold font, such as $\bm{x} \in \Real^n$ and indexed as $\bm{x}_i \text{ for } i = 1, \dots , n$. We use the function notation $\tilde{x}$ and vector notation $\bm{x}$ interchangeably, such that $x_\omega = x(\omega), \forall \,  \omega \in \Omega$. Sets are denoted with calligraphic letters and $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ denotes the extended real line. The symbol $\Nats$ denotes all 0-based natural numbers and $a{:}b := a, a+1, \dots , b$ for $a < b \in \mathbb{N}$. We use $\bm{x}_{a{:}b}$ to denote a subset of elements of $\bm{x}$ and comparisons such as $\bm{x}_{a{:}b} < y$ are interpreted element-wise. 
 
-\emph{Monetary risk measures} $\rho\colon \mathbb{X} \to \bar{\Real}$ generalize the expectation operator to account for different the uncertainty in the distribution of a random variable~\cite{Follmer2016}. We apply risk measures to random variables representing rewards and suppose that higher risk values are preferable. 
+\emph{Monetary risk measures} $\rho\colon \Delta_n \times \Real^n \to \bar{\Real}$ are functions of probability measure and a random variable. Risk measures generalize the expectation operator to account for different the uncertainty in the distribution of a random variable for a specific distribution~\cite{Follmer2016}. We apply risk measures to random variables representing rewards and suppose that higher risk values are preferable. 
 
 \emph{Value-at-Risk}~(VaR) is a popular risk measure and is defined for $\alpha\in [0,1)$ and $\tilde{x}\in \mathbb{X}$ as~\cite{Follmer2016,Shapiro2014}
 \begin{equation}
@@ -82,11 +84,6 @@ In this paper, we restrict our attention to random variables defined on finite p
     \max\; \left\{\tau \in \bar{\Real} \mid \P{\tilde{x} \ge  \tau}  \ge 1 - \alpha\right\},
 \end{equation}
 where the maximum exists because $\tau \mapsto \P{\tilde{x} < \tau}$ is lower semi-continuous. One can readily see that $\varo_0[\tilde{x}] = \ess \inf [\tilde{x}]$, and typically the risk measure is extended as $\varo_{1}[ \tilde{x} ] = \infty$.
-%Our analysis also requires the \emph{quantile} $\quant_{\alpha}$ for $\tilde{x}$ which is defined as the set
-%\[
-%  \quant_{\alpha}[\tilde{x}] := \left\{ z\in \Real \mid  \P{ \tilde{x} \le z } \ge \alpha , \P{ \tilde{x} \ge z } \ge 1-\alpha  \right\},
-%\]
-%with bounds that exist and are denoted by $\quant^+_{\alpha}[\tilde{x}] := \max \quant_{\alpha}[\tilde{x}]$ and $\quant^-_{\alpha}[\tilde{x}] := \min \quant_{\alpha}[\tilde{x}]$.
 
 \begin{table}
     \caption{Parameters for selected $\varphi$-divergence risk measures for $\alpha\in (0,1)$.} \label{tab:phi-divergence-risk}
@@ -127,16 +124,16 @@ We adopt the common convention that $1 / 0 = \infty$ and $0 \cdot \infty = 0$~\c
     \cvaro_\alpha(\tilde{x})
   := \max_{z \in \Real} \left(z - \frac{1}{\alpha} \cdot \E{[z -\bm{x}]_+}\right),
 \end{equation}
-and extended continuously to $\cvaro_0[\tilde{x}] = \ess\inf[\tilde{x}]$. We also study another $\varphi$-divergence risk measure, which we call \emph{Total-Value-at-Risk}~(TVaR). The importance of TVaR is that it bounds the common Entropic-Value-at-Risk~(EVaR)~\cite{Ahmadi-Javid2012,Hau2023a,Su2024} from below as we show next. 
+and extended continuously to $\cvaro_0[\tilde{x}] = \ess\inf[\tilde{x}]$. We also study another $\varphi$-divergence risk measure, which we call \emph{Total-Value-at-Risk}~(TVaR). The importance of TVaR is that it bounds the common Entropic-Value-at-Risk~(EVaR)~\cite{Ahmadi-Javid2012,Hau2023a,Su2025} from below as we show next. 
 \begin{proposition}
 For each $\alpha\in [0,1]$ and $\tilde{x} \in \mathbb{X}$:
 \[
   \var{\alpha}{\tilde{x}}
-  \ge
+  \; \ge\; 
   \cvar{\alpha}{\tilde{x}}
-  \ge
+  \; \ge\; 
   \evar{\alpha}{\tilde{x}}
-  \ge
+  \; \ge\; 
   \tvar{\alpha}{\tilde{x}}.
 \]
 \end{proposition}
@@ -163,9 +160,11 @@ The value $x_{\sigma(i)}$ is the optimal solution in~\eqref{eq:var-definition} b
 
 Our \emph{QuickVaR} algorithm, described in \cref{alg:quick-quantile}, computes the VaR in $O(n)$ time by avoiding the need to sort the elements of the input random variable $\bm{x}$. In particular, QuickVaR sorts the indexes of $\bm{x}$ on partially analogously to the Quickselect algorithm~\cite{horowitz1998computer}. 
 
-\Cref{alg:quick-quantile} is a recursive algorithm that works for a random variable $\bm{x}$ with a distribution $\bm{p}\in \Delta_n$ as follows. In addition to the random variable, the input is $f$ (front) and $b$ (back) which delimit the indices of $\bm{x}$ it manipulated.  The algorithm  first picks a pivot element $v$ randomly between $b$ and $e$. Choosing the pivot randomly is essential in order to obtain an average linear time complexity. Given a pivot, we use $\operatorname{partition}$ in \cref{alg:partition} to partially sort the entries of $\bm{x}$ into three groups: 1. less than $v$: $\bm{x}_{b{:}(l-1)} < v$, 2. equal to $v$: $\bm{x}_{l{:}g} = v$, and 3. greater than $v$: $\bm{x}_{(g+1){:}e} > v$. Then, the algorithm checks for the conditions of \cref{thm:quantile-in-finite-omega} to determine which of the three groups contains the VaR value. Finally, if VaR value is in groups 1 or 3, the algorithm calls itself recursively with adjusted $b,e$ and $\alpha$.
+\Cref{alg:quick-quantile} is a recursive algorithm that works for a random variable $\bm{x}$ with a distribution $\bm{p}\in \Delta_n$ as follows. In addition to the random variable, the input is $f$ (front) and $b$ (back) which delimit the indices of $\bm{x}$ it manipulated.  The algorithm  first picks a pivot element $v$ randomly between $b$ and $e$. Choosing the pivot randomly is essential in order to obtain an average linear time complexity. Given a pivot, we use $\operatorname{partition}$ to partially sort the entries of $\bm{x}$ into three groups: 1. less than $v$: $\bm{x}_{b{:}(l-1)} < v$, 2. equal to $v$: $\bm{x}_{l{:}g} = v$, and 3. greater than $v$: $\bm{x}_{(g+1){:}e} > v$. Then, the algorithm checks for the conditions of \cref{thm:quantile-in-finite-omega} to determine which of the three groups contains the VaR value. Finally, if VaR value is in groups 1 or 3, the algorithm calls itself recursively with adjusted $b,e$ and $\alpha$.
 
-\Cref{alg:quick-quantile} is recursive which makes its analysis more convenient. However, an equivalent non-recursive implementation that uses loops instead is likely to perform better in most imperative programming languages. We refer the reader to \cref{alg:quickvar-nonrecursive} for an equivalent non-recursive version of \cref{alg:quick-quantile}.
+The $\operatorname{partition}$ procedure in \cref{alg:quick-quantile} uses the Dutch national flag algorithm to partition input array into the three groups. The algorithm runs in linear time and the properties of its output are given in \cref{lem:hoare-partition} below. For sake of completeness we provide the reader with the algorithm in \cref{alg:partition} in \cref{sec:stand-var-algor}. 
+
+We present \cref{alg:quick-quantile} recursively to make its analysis more convenient. However, an equivalent non-recursive implementation that uses loops instead is likely to perform better in most imperative programming languages. We refer the reader to \cref{alg:quickvar-nonrecursive} in \cref{sec:stand-var-algor} for an equivalent non-recursive version of \cref{alg:quick-quantile}.
 
 \begin{algorithm}
   \caption{\texttt{QuickVaR}: Recursive VaR algorithm} \label{alg:quick-quantile}
@@ -174,29 +173,74 @@ Our \emph{QuickVaR} algorithm, described in \cref{alg:quick-quantile}, computes 
   $v \gets x_{\operatorname{rand}(f{:}b)}$ \tcp*{Pivot}
   $l, g, \bm{x}', \bm{p}' \gets \operatorname{partition}(\bm{x}, \bm{p}, v, f, b)$
   \tcp*{~\cref{alg:partition}}
+  \label{ln:t}
   $t \gets \sum_{j=f}^{l-1} p'_j$ \tcp*{$t = \P{\tilde{x} < v} - \P{\tilde{x} < x'_f}$}
+  \label{ln:e}
   $e \gets \sum_{j=l}^{g} p'_j$  \tcp*{$e = \P{\tilde{x} = v}$}
+  \label{ln:firstif}
   \If(\tcp*[f]{$\alpha + \P{\tilde{x} < x'_f} < \P{\tilde{x} < v}$}){$\alpha < t$}{ 
     \KwRet{$\qvar(\bm{x}', \bm{p}', \alpha, f, l-1)$}
   }
+  \label{ln:secondif}
   \ElseIf(\tcp*[f]{$\P{\tilde{x} \le v} \le \alpha + \P{\tilde{x} < x'_f}$}){$t + e \le \alpha$}{
     \KwRet{$\qvar(\bm{x}', \bm{p}', \alpha - t - e, g+1, b)$}
   }
+  \label{ln:thirdif}
   \lElse{
     \KwRet{$v$}
   }
 \end{algorithm}
 
 
-We now prove the correctness of our algorithm. We first prove a general condition on the return value of our algorithm which applies for any array $p$, regardless of whether it is a simplex or not. It trivially follows that when $p$ is a valid simplex, the condition simplifies to the \cref{eq:var-definition}. 
+The following theorem states the correctness of QuickVaR.
+\begin{theorem} \label{thm:var-correct}
+\Cref{alg:quick-quantile} executed with $b =
+1$ and $e = n$ and $\alpha\in [0,1)$ returns $\varo_{\alpha}[ \tilde{x} ]$.
+\end{theorem}
+
+Before proving \cref{thm:var-correct}, we need to show several important lemmas. The following lemma shows that VaR value is one of the probability atoms that satisfies specific probability properties. 
+\begin{lemma}\label{thm:quantile-in-finite-omega}
+Assuming $\alpha\in [0,1)$ and a discrete $\tilde{x}$, there exists $\omega\in\Omega$ with $\var{\alpha }{\tilde{x}} = x_{\omega}$ and
+\begin{equation} \label{eq:var-property-prob}
+  \P{\tilde{x} < v} \le \alpha < \P{\tilde{x} \le v}. 
+\end{equation}
+\end{lemma}
+\begin{proof}
+First, we show that any $v$ that satisfies \eqref{eq:var-property-prob} solves \eqref{eq:var-definition} optimally. The implication $\P{\tilde{x} < v} \le \alpha \implies v \in \left\{ t \in \Real \mid  \P{ \tilde{x} < t } \le \alpha \right\}$ follows immediately. Second, we prove $\alpha < \P{ \tilde{x} \le v } \implies \forall t \in \left\{ t \in \Real \mid  \P{ \tilde{x} < t } \le \alpha \right\}, v \ge t$ by contradiction. Suppose that $\exists t \in \left\{ t \in \Real \mid  \P{ \tilde{x} < t } \le \alpha \right\}, v < t$. Then, by the monotonicity of the probability operator we get a contradiction as
+ \[
+   \alpha
+   < \P {  \tilde{x} \le v  }
+   \le \P {  \tilde{x} < t  }
+   \le \alpha.
+ \]
+Then, the existence of $\omega$ follows from \cref{lem:prob-lumpy} in \cref{sec:prob-discr-rand} because \eqref{eq:var-property-prob} implies that 
+  \[
+    \P{\tilde{x} =
+      \var{\alpha }{\tilde{x}}} = \P{\tilde{x} \le \var{\alpha }{\tilde{x}}}  - \P{\tilde{x} < \var{\alpha }{\tilde{x}}} > \alpha - \alpha = 0.
+  \]
+\end{proof}
+
+The following lemma proves the properties of the $\operatorname{partition}$ operator defined in \cref{alg:partition}. 
+\begin{lemma} \label{lem:hoare-partition}
+If $(l, g, \bm{x}', \bm{p}') = \operatorname{partition}(\bm{x'}, \bm{p'}, v, f, b)$ for $f < b$, then:
+\begin{align} \label{eq:hoare-correspond}
+  \bm{x}_{f{:}(l-1)} < v, \qquad
+  \bm{x}_{l{:}g} = v,  \qquad
+  \bm{x}_{(g+1){:}b} > v.
+\end{align}
+Moreover, $ \bm{x}_{f{:}b} = \bm{x'}_{\sigma(f{:}b)}, \bm{p} = \bm{p'}_{\sigma(f{:}b)}$ for some permutation $\sigma\colon f{:}b \to f{:}b$, and $\bm{x}_{1{:}(b-1)} = \bm{x'}_{1{:}(b-1)}, \bm{p}_{1{:}(b-1)} = \bm{p'}_{1{:}(b-1)}$, and $\bm{x}_{(e+1):n} = \bm{x'}_{(e+1):n}, \bm{p}_{(e+1):n} = \bm{p'}_{(e+1):n}$. The algorithm runs in $O(b - f + 1)$ time.
+\end{lemma}
+\Cref{lem:hoare-partition} is a standard property of the Dutch national flag algorithm and we outline its proof in \cref{sec:stand-var-algor} for the sake of completeness.
+
+The following lemma analyzes the recursive property of QuickVaR and is the main building block of \cref{thm:var-correct}.
 \begin{lemma} \label{lem:quickvar-correct}
- Suppose that \cref{alg:quick-quantile} input conditions hold and $\bm{x} \in \Real^n$ satisfies for all $j\in 1{:}n$:
+If input conditions of \cref{alg:quick-quantile} hold and $\bm{x} \in \Real^n$ satisfies that
  \begin{equation} \label{eq:qvar-precondition}
-  j\in 1{:}(f-1) \Rightarrow x_j < x_f, \qquad
-  j \in f{:}b \Rightarrow x_f \le x_j \le x_b,  \qquad
-  j \in (b+1){:}n \Rightarrow x_b < x_j.
+  \mathbf{x}_{1{:}(f-1)} < x_f, \qquad
+  x_f \le \bm{x}_{f{:}b} \le x_b,  \qquad
+  x_b < \bm{x}_{(b+1){:}n},
 \end{equation} 
-  Then \cref{alg:quick-quantile} returns $x_{\omega}$ with $\omega\in 1{:}n$ such that
+then \cref{alg:quick-quantile} returns $x_{\omega}, \omega\in f{:}b$ such that
 \begin{equation} \label{eq:qvar-postcondition}
   \P{\tilde{x} < x_{\omega}}
   \quad \le \quad
@@ -205,13 +249,11 @@ We now prove the correctness of our algorithm. We first prove a general conditio
 \end{equation}
 \end{lemma}
 \begin{proof}
-It can be readily seen from the \eqref{eq:qvar-precondition} and \cref{lem:hoare-partition} that
+It can be readily seen from the \eqref{eq:qvar-precondition} and \cref{lem:hoare-partition} that on lines~\ref{ln:t} and \ref{ln:e}:
 \begin{equation} \label{eq:te-equivalence}
   t = \P{\tilde{x} < v} - \P{\tilde{x} < x'_f}, \qquad e = \P{\tilde{x} = v}
 \end{equation}
-  We proceed by induction on $k = b - f$.
-
-\emph{Base case}: $k = 0$. Since $b = f$, we have that $v = x_b$ and $l = g = b$. Then $t = 0$ and $e = p_b$. Then, $\alpha  \ge t$ and, from the input condition, $t + e = p_b > \alpha$, and therefore the algorithm returns $v$, which satisfies:
+We proceed by induction on $k = b - f$. \emph{Base case}: $k = 0$. Since $b = f$, we have that $v = x_b$ and $l = g = b$. Then $t = 0$ and $e = p_b$. Then, $\alpha  \ge t$ and, from the input condition, $t + e = p_b > \alpha$, and therefore the algorithm returns $v$, which satisfies:
 \[
  \P{\tilde{x} < v} \le \alpha + \P{\tilde{x} < x_f} < \P{\tilde{x} \le v}. 
 \]
@@ -219,13 +261,13 @@ Above, the first inequality holds from $x = x_f$ and $0 \le \alpha$. The second 
 
 \emph{Inductive step}. Suppose that $k>0$ and that the lemma holds for all $k' < k$. We now analyze the following three cases.
 
-(i) If $\alpha < t$, the algorithm executes the first if statement. Because $0 \le \alpha  < t$, the recursive call satisfies the required input conditions: $f \le l-1$ and $\sum_{j=f}^{l-1} p_j = t > l$. In addition, \cref{lem:hoare-partition} guarantees that \eqref{eq:qvar-precondition} holds. The result then holds from the inductive hypothesis because $l-1 - f \le b-1 -f \le k$.
+(i) If $\alpha < t$, the algorithm executes the first if statement on line~\ref{ln:firstif}. Because $0 \le \alpha  < t$, the recursive call satisfies the required input conditions: $f \le l-1$ and $\sum_{j=f}^{l-1} p_j = t > l$. The recursive call also satisfies \eqref{eq:qvar-precondition} by \cref{lem:hoare-partition}, and we can conclude that \eqref{eq:qvar-postcondition} holds from the inductive hypothesis because $l-1 - f \le b-1 -f \le k$.
 
-(ii) If $t + e \le \alpha$, the algorithm executes the second if statement. We now check whether the recursive call's input conditions are met. Because $t + e = \sum_{j = f}^g p_j \le \alpha < \sum_{j=f}^b p_j$, where the second inequality is the input condition, it must be that $g < b$ and therefore $g+1 \le b$. Also, by the algorithm's input condition and algebraic manipulation we get that
+(ii) If $t + e \le \alpha$, the algorithm executes the second if statement on line~\ref{ln:secondif}. We show that the recursive call's input conditions are met. Because $t + e = \sum_{j = f}^g p_j \le \alpha < \sum_{j=f}^b p_j$  (the second inequality is the input condition) it must be that $g < b$ and therefore $g+1 \le b$. Also, by the algorithm's input condition and algebraic manipulation we get that
 \[
  \sum_{j=g+1}^b p_j = \sum_{j=f}^b - t -e > \alpha  -t -e,  
 \]
-and the input condition holds. In addition, \cref{lem:hoare-partition} guarantees that \eqref{eq:qvar-precondition} holds. We can then use the inductive hypothesis, since $b - g - 1 \le b-f-1 \le k$, to return $x_{\omega}$ such that
+and the input conditions hold.  Because \eqref{eq:qvar-precondition} holds from \cref{lem:hoare-partition}. We can then use the inductive hypothesis, since $b - g - 1 < b-f \le  k$, to return $x_{\omega}$ such that
 \[
   \P{\tilde{x} < x_{\omega}}
   \quad \le \quad
@@ -234,43 +276,14 @@ and the input condition holds. In addition, \cref{lem:hoare-partition} guarantee
 \]
 Inequality \eqref{eq:qvar-postcondition} follows by substituting $t,e$ from \eqref{eq:te-equivalence}.
 
-(iii) If $t \le \alpha < t + e$, inequality \eqref{eq:qvar-postcondition} holds immediately by substituting $t,e$ from \eqref{eq:te-equivalence}.
+(iii) If $t \le \alpha < t + e$, the algorithm executes the else statement on line~\ref{ln:thirdif}, and the inequality \eqref{eq:qvar-postcondition} holds immediately by substituting $t,e$ from \eqref{eq:te-equivalence}.
 \end{proof}
 
-
-
-\begin{algorithm}
-  \caption{\texttt{partition}: Dutch national flag algorithm~\cite[chapter 14]{Dijkstra1976}}
-  \label{alg:partition}
-  \Input{$\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$, pivot $v\in \Real$, and front and back $f, b \in 1{:}n$, $f \le b$}
-  \Output{$l, g \in f{:}b$, $\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$ such that \cref{lem:hoare-partition} holds.}
-  $l_0 \gets e_0 \gets f$; $g_0 \gets b$; $k \gets 0$ \;
-  \While{$e_k \leq g_k$}
-  {
-  \label{line:partition-while}
-    \If{$x_{e_k} < v$}{
-      swap: $x_{e_k} \leftrightarrow x_{l_k}$ and $p_{e_k} \leftrightarrow p_{l_k}$\; \label{line:swap1}
-      $l_{k+1} \gets l_k + 1$ ;
-      $e_{k+1} \gets e_k + 1$\; \label{line:partition-e-1-1}
-    }
-    \ElseIf{$x_{e_k} > v$}{
-      swap: $x_{e_k}\leftrightarrow x_{g_k}$ and $p_{e_k} \leftrightarrow p_{g_k}$\; \label{line:swap2}
-      $g_{k+1} \gets g_{k} - 1$\; \label{line:parition-g-1}
-    }
-    \lElse {$e_{k+1} \gets e_{k} + 1$} \label{line:partition-e-1-2}
-    $k \gets k + 1$
-  }
-  \KwRet{$(l_k, g_k, \bm{x}, \bm{p})$}\; 
-\end{algorithm}
-
-\begin{theorem}
-For $\bm{x}\in \Real^n$, \cref{alg:quick-quantile} executed with $b =
-1$ and $e = n$ and $\alpha\in [0,1)$ returns $\varo_{\alpha}[ \tilde{x} ]$.
-\end{theorem}
-\begin{proof}
+\begin{proof}[Proof of \cref{thm:var-correct}]
 With $b = 1$ and $e = n$, \eqref{eq:qvar-precondition} holds since $\alpha\in [0,1)$ and \cref{lem:quickvar-correct} shows that the computed value satisfies \cref{thm:quantile-in-finite-omega}, which suffices for it to be equal to VaR. 
 \end{proof}
 
+The following proposition establishes the expected linear time computational complexity of QuickVaR.
 \begin{proposition} \label{prop:time-complexity}
 \Cref{alg:quick-quantile} runs in expected $O(n)$ time.
 \end{proposition}
@@ -300,61 +313,7 @@ Note that the VaR computation resembles closely the computation of the weighted 
 
  \subsection{Proof of Correctness}
 
-We first establish a few crucial lemmas about probability distributions which facilitate the algorithm. The following lemmas leverage the discreteness of the random variable and do not hold for continuous random variables.
 
-\begin{lemma} \label{lem:prob-lumpy}
-  For each $t\in \Real$:
-  \[
-    \P{\tilde{x} = t} > 0
-    \implies
-    \exists \omega \in \Omega, x(\omega) = t.
-  \]
-\end{lemma}
-\begin{proof}
-  The result follows by induction on the size of the probability space $|\Omega|$ after generalizing the statement to drop the constraint $\bm{1}\tr \bm{p} = 1$.
-\end{proof}
-
-\begin{lemma} \label{lem:var-property}
-A VaR value $v := \var{\alpha}{\tilde{x}}$ for $\alpha\in [0,1)$ and discrete $\tilde{x}$ satisfies that
-\[
-  \P{\tilde{x} < v} \le \alpha < \P{\tilde{x} \le v}. 
-\]
-\end{lemma}
-\begin{proof}
-  We decompose the proof into two parts. \emph{First}, the implication $\P{\tilde{x} < v} \le \alpha \implies v \in \left\{ t \in \Real \mid  \P{ \tilde{x} < t } \le \alpha \right\}$ follows immediately from the definition. \emph{Second}, to prove  $\alpha < \P{ \tilde{x} \le v } \implies \forall t \in \left\{ t \in \Real \mid  \P{ \tilde{x} < t } \le \alpha \right\}, v \ge t$ by contradiction, suppose that $\exists t \in \left\{ t \in \Real \mid  \P{ \tilde{x} < t } \le \alpha \right\}, v < t$. Then, by the monotonicity of the probability operator we get a contradiction as
- \[
-   \alpha
-   < \P {  \tilde{x} \le v  }
-   \le \P {  \tilde{x} < t  }
-   \le \alpha.
- \]
-\end{proof}
-
-\begin{theorem}\label{thm:quantile-in-finite-omega}
-Assuming $\alpha\in [0,1)$ and a discrete $\tilde{x}$, there exists $\omega\in\Omega$ with $\var{\alpha }{\tilde{x}} = x(\omega)$ and
-\[
-  \P{\tilde{x} < v} \le \alpha < \P{\tilde{x} \le v}. 
-\]
-\end{theorem}
-\begin{proof}
-The condition on $x(\omega)$ follows from \cref{lem:var-property}. In addition, using basic probability properties and \cref{lem:var-property} gives that
-  \[
-    \P{\tilde{x} =
-      \var{\alpha }{\tilde{x}}} = \P{\tilde{x} \le \var{\alpha }{\tilde{x}}}  - \P{\tilde{x} < \var{\alpha }{\tilde{x}}} > \alpha - \alpha = 0.
-  \]
-  Then existence of $\omega$ then follows from \cref{lem:prob-lumpy}.
-\end{proof}
-
-
-\begin{lemma} \label{lem:hoare-partition}
-If $(l, g, \bm{x}', \bm{p}') = \operatorname{partition}(\bm{x'}, \bm{p'}, i, f, b)$ in \cref{alg:partition} for $f < b$, then for each $j\in 1{:}n$:
-\begin{align} \label{eq:hoare-correspond}
-  j\in f{:}(l-1) \Rightarrow x_j < v, \qquad
-  j \in l{:}g, \Rightarrow x_j = v,  \qquad
-  j \in (g+1){:}b \Rightarrow x_j > v.
-\end{align}
-Moreover, $\forall \, j \in 1{:}n, x_j = x'_{\sigma(j)}, p_j = p'_{\sigma(j)}$ for some permutation $\sigma$ and the algorithm runs in $O(b - f)$ time.
-\end{lemma}
 
 
 
@@ -784,14 +743,28 @@ Expectation & 0.0144 & 0.0124 \\
 We have formulated and demonstrated the correctness of a new algorithm for computing the maximum weight independent set for polymatroids without sorting which allows us to solve many common risk measures such as CVaR, VaR, and TVaR in $O(N)$ time.
 This speed up is significant in the context of risk measures as they are often used in large scale applications such as finance, healthcare and robotics.
 
-
 \bibliography{fastcvar.bib}
 
 \appendix
+\crefalias{section}{appendix}
+\crefalias{Section}{Appendix}
 
 \section{Properties of Discrete Random Variables} \label{sec:prob-discr-rand}
+In this section, we summarize some useful properties of discrete random variables which we use in our proofs. 
 
-\section{Supplemental VaR Algorithms} \label{sec:stand-var-algor}
+\begin{lemma} \label{lem:prob-lumpy}
+  For each $t\in \Real$:
+  \[
+    \P{\tilde{x} = t} > 0
+    \implies
+    \exists \omega \in \Omega, x(\omega) = t.
+  \]
+\end{lemma}
+\begin{proof}
+  It follows by induction on the size $|\Omega|$ after generalization that drop the constraint $\bm{1}\tr \bm{p} = 1$.
+\end{proof}
+
+\section{Supplemental VaR Algorithms and Results} \label{sec:stand-var-algor}
 
 \begin{algorithm}
 \caption{VaR: Standard VaR algorithm}
@@ -827,8 +800,58 @@ The base case is immediate. The inductive case for $i-1$ from $i$ follows by alg
 Now, suppose that \cref{alg:slow-quantile} terminates with value $q\opt$. Then, if the algorithm terminates in iteration $i\opt$ then from \eqref{eq:proof-q-j}, we have that $\P{\tilde{x} \ge q\opt} = q_{j\opt} \ge 1-\alpha$ where $j\opt$ is defined as in \eqref{eq:proof-q-j}. Therefore, $q\opt \le \var{\alpha}{\tilde{x}}$. To prove the converse inequality, suppose that $q\opt > \var{\alpha}{\tilde{x}}$, and therefore $\P{\tilde{x} \ge q\opt} < 1-\alpha$. Then, this is a violation since \eqref{eq:proof-q-j} combined with the termination criterion implies that $\P{\tilde{x} \ge q\opt} < 1-\alpha$.
 \end{proof}
 
-\subsection{Partition Algorithm}
+\begin{algorithm}
+  \caption{\texttt{partition}: Dutch national flag algorithm~\cite[chapter 14]{Dijkstra1976}}
+  \label{alg:partition}
+  \Input{$\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$, pivot $v\in \Real$, and front and back $f, b \in 1{:}n$, $f \le b$}
+  \Output{$l, g \in f{:}b$, $\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$ such that \cref{lem:hoare-partition} holds.}
+  $l_0 \gets e_0 \gets f$; $g_0 \gets b$; $k \gets 0$ \;
+  \While{$e_k \leq g_k$}
+  {
+  \label{line:partition-while}
+    \If{$x_{e_k} < v$}{
+      swap: $x_{e_k} \leftrightarrow x_{l_k}$ and $p_{e_k} \leftrightarrow p_{l_k}$\; \label{line:swap1}
+      $l_{k+1} \gets l_k + 1$ ;
+      $e_{k+1} \gets e_k + 1$\; \label{line:partition-e-1-1}
+    }
+    \ElseIf{$x_{e_k} > v$}{
+      swap: $x_{e_k}\leftrightarrow x_{g_k}$ and $p_{e_k} \leftrightarrow p_{g_k}$\; \label{line:swap2}
+      $g_{k+1} \gets g_{k} - 1$\; \label{line:parition-g-1}
+    }
+    \lElse {$e_{k+1} \gets e_{k} + 1$} \label{line:partition-e-1-2}
+    $k \gets k + 1$
+  }
+  \KwRet{$(l_k, g_k, \bm{x}, \bm{p})$}\; 
+\end{algorithm}
 
+
+\begin{algorithm}
+  \caption{\texttt{QuickVaR}: Non-recursive adaptation of \cref{alg:quick-quantile}} \label{alg:quickvar-nonrecursive}
+  \Input{vector $\bm{x}^0$, pmf $\bm{p}^0$ and $\alpha^0 \in [0,1)$}
+  \Output{$\varo_{\alpha}[\tilde{x}]$}
+  $f_0 \gets 1$;~~~~$b_0 \gets n$;~~~~$k=1$ \;
+  \While{$b_{k-1} > f_{k-1}$} {
+    $v \gets x_{\operatorname{rand}(f{:}b)}$ \tcp*{Pivot}
+     $l_k, g_k, \bm{x}^k, \bm{p}^k \gets \operatorname{partition}(\bm{x}^{k-1}, \bm{p}^{k-1}, v_k, f_{k-1}, b_{k-1})$
+    \tcp*{Alg.~\ref{alg:partition}, \cref{lem:hoare-partition}} \label{line:partion_line}    
+    $t_k \gets \sum_{j=f_{k-1}}^{l_k-1} p^k_j$  \tcp*{$\P{\tilde{x}^k < v_k}$}
+    $e_k \gets \sum_{j = l_k}^{g_k} p^{k}_j $   \tcp*{$\P{\tilde{x}^k = v_k}$}
+    \lIf{$\alpha_{k-1} < t_k$\label{line:determine_left}}
+    {
+      $f_k \gets f_{k-1}$;~$b_k \gets l_k-1$;~
+      $\alpha_k \gets \alpha_{k-1}$
+    }
+    \lElseIf{$t_k + e_k \le  \alpha_{k-1} \label{line:determine_right}$} 
+    {
+      $f_k \gets g_k+1$;~$b_k \gets b_{k-1}$;~$\alpha_k \gets \alpha_{k-1} - t_k - e_k$
+    }
+    \lElse{
+      $f_k \gets g_k$;~~~$b_k \gets g_k$
+    }
+    $k \gets k + 1$\; 
+  }
+  \KwRet{$x^k_{b_k}$}\;    
+\end{algorithm}  
 
 \begin{proof}[Proof of \cref{lem:hoare-partition}]
 Let $v$ be an input to \cref{alg:partition} and consider the following invariants.
@@ -932,34 +955,6 @@ Julia garbage collector, even when running synchronously.
 \section{Algorithms}
 
 \subsection{Non-Recursive QVaR}
-
-\begin{algorithm}
-  \caption{\texttt{QuickVaR}: Non-recursive adaptation of \cref{alg:quick-quantile}} \label{alg:quickvar-nonrecursive}
-  \Input{vector $\bm{x}^0$, pmf $\bm{p}^0$ and $\alpha^0 \in [0,1)$}
-  \Output{$\varo_{\alpha}[\tilde{x}]$}
-  $f_0 \gets 1$;~~~~$b_0 \gets n$;~~~~$k=1$ \;
-  \While{$b_{k-1} > f_{k-1}$} {
-    $v \gets x_{\operatorname{rand}(f{:}b)}$ \tcp*{Pivot}
-     $l_k, g_k, \bm{x}^k, \bm{p}^k \gets \operatorname{partition}(\bm{x}^{k-1}, \bm{p}^{k-1}, v_k, f_{k-1}, b_{k-1})$
-    \tcp*{Alg.~\ref{alg:partition}, \cref{lem:hoare-partition}} \label{line:partion_line}    
-    $t_k \gets \sum_{j=f_{k-1}}^{l_k-1} p^k_j$  \tcp*{$\P{\tilde{x}^k < v_k}$}
-    $e_k \gets \sum_{j = l_k}^{g_k} p^{k}_j $   \tcp*{$\P{\tilde{x}^k = v_k}$}
-    \lIf{$\alpha_{k-1} < t_k$\label{line:determine_left}}
-    {
-      $f_k \gets f_{k-1}$;~$b_k \gets l_k-1$;~
-      $\alpha_k \gets \alpha_{k-1}$
-    }
-    \lElseIf{$t_k + e_k \le  \alpha_{k-1} \label{line:determine_right}$} 
-    {
-      $f_k \gets g_k+1$;~$b_k \gets b_{k-1}$;~$\alpha_k \gets \alpha_{k-1} - t_k - e_k$
-    }
-    \lElse{
-      $f_k \gets g_k$;~~~$b_k \gets g_k$
-    }
-    $k \gets k + 1$\; 
-  }
-  \KwRet{$x^k_{b_k}$}\;    
-\end{algorithm}  
 
 
 

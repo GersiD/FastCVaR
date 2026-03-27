@@ -267,26 +267,35 @@ Above, the first inequality holds from $x = x_f$ and $0 \le \alpha$. The second 
 \[
  \sum_{j=g+1}^b p_j = \sum_{j=f}^b - t -e > \alpha  -t -e,  
 \]
-and the input conditions hold.  Because \eqref{eq:qvar-precondition} holds from \cref{lem:hoare-partition}. We can then use the inductive hypothesis, since $b - g - 1 < b-f \le  k$, to return $x_{\omega}$ such that
+and the input conditions hold.  Because \eqref{eq:qvar-precondition} holds from \cref{lem:hoare-partition} and $b - g - 1 < b-f \le  k$, the inductive hypothesis implies that there exists $x_{\omega}$ such that
 \[
   \P{\tilde{x} < x_{\omega}}
   \quad \le \quad
   (\alpha - t - e) + \P{\tilde{x} \le v}
   \quad < \quad \P{\tilde{x} \le x_{\omega}}. 
 \]
-Inequality \eqref{eq:qvar-postcondition} follows by substituting $t,e$ from \eqref{eq:te-equivalence}.
+Then, \eqref{eq:qvar-postcondition} follows by algebraic manipulation after substituting $t,e$ from \eqref{eq:te-equivalence}.
 
 (iii) If $t \le \alpha < t + e$, the algorithm executes the else statement on line~\ref{ln:thirdif}, and the inequality \eqref{eq:qvar-postcondition} holds immediately by substituting $t,e$ from \eqref{eq:te-equivalence}.
 \end{proof}
 
+We are now ready to prove the correctness of QuickVaR.
 \begin{proof}[Proof of \cref{thm:var-correct}]
-With $b = 1$ and $e = n$, \eqref{eq:qvar-precondition} holds since $\alpha\in [0,1)$ and \cref{lem:quickvar-correct} shows that the computed value satisfies \cref{thm:quantile-in-finite-omega}, which suffices for it to be equal to VaR. 
+  With $b = 1$ and $e = n$, the condition in \eqref{eq:qvar-precondition} is satisfied since $\alpha\in [0,1)$. Thefore, \cref{lem:quickvar-correct} shows that QuickVaR returns $x_{\omega}$ that satisfies
+  \[
+  \P{\tilde{x} < x_{\omega}}
+  \quad \le \quad
+  \alpha 
+  \quad < \quad \P{\tilde{x} \le x_{\omega}}, 
+\]
+which satisfies \eqref{eq:var-property-prob} and therefore equals to the VaR value by 
+  \cref{thm:quantile-in-finite-omega}. 
 \end{proof}
 
-The following proposition establishes the expected linear time computational complexity of QuickVaR.
-\begin{proposition} \label{prop:time-complexity}
+With the correctness established above, we are ready to analyze the computational complexity of QuickVaR. 
+\begin{theorem} \label{prop:time-complexity}
 \Cref{alg:quick-quantile} runs in expected $O(n)$ time.
-\end{proposition}
+\end{theorem}
 \begin{proof}
 The proof is analogous to the standard quickselect algorithm, such as \citep[theorem~3.3]{horowitz1998computer} except we need to keep track of the risk level $\alpha$. Fix some $n \in \mathbb{N}$, $\bm{x}$, and $\bm{p}$ and we study the properties. Let $T\colon 1{:}n \to [0,\infty]$ be the \emph{expected} runtime of \cref{alg:quick-quantile} such $T(k)$ is the expected runtime when executed with $k := b - f + 1$. To simplify the notation, we assume without loss of generality in the remainder of the proof that $f = 1$ and $e = k$. Then, let
 \[
@@ -302,19 +311,12 @@ Note that by the assumption $\sum_{j = f}^b p_j > \alpha$, we have that $k \ge 1
 \label{eq:quickvar-complexity}
   &= d\cdot k + \max_{l\in 0{:}(k-1)} \frac{1}{k}  \left(  \sum_{i=l+1}^{k-1} T(i)  + \sum_{i=l}^{k-1} T(i)   \right).
 \end{align}
-where $d\cdot k$ is the local runtime of the algorithm for some $d > 0$ and $T(i)$ and $T(k - i - 1)$ are the average runtimes of the recursive calls. The average over $i$ corresponds to the uniformly-random selection of the pivot with $i = \left| \left\{ j \in 1{:}k \mid x_i < v \right\} \right|$ in the first line of the inequality. The last two equalities follow by algebraic manipulation.   
-
-Finally, \eqref{eq:quickvar-complexity} is equal to equation (3.8) in \cite{horowitz1998computer} and an argument identical to \cite[theorem~3.3]{horowitz1998computer} yields by induction that \(T(k)\le 4\cdot d\cdot k\) for all \(k\ge 1\).
+where $d\cdot k$ is the local runtime of the algorithm for some $d > 0$ and $T(i)$ and $T(k - i - 1)$ are the average runtimes of the recursive calls. The average over $i$ corresponds to the uniformly-random selection of the pivot with $i = \left| \left\{ j \in 1{:}k \mid x_i < v \right\} \right|$ in the first line of the inequality. The last two equalities follow by algebraic manipulation. Then, an argument identical to \cite[theorem~3.3]{horowitz1998computer}, since \eqref{eq:quickvar-complexity} is the same as equation (3.8) in \cite{horowitz1998computer}, shows that \(T(k)\le 4\cdot d\cdot k\) for all \(k\ge 1\).
 \end{proof}
 
 \begin{remark}
-Note that the VaR computation resembles closely the computation of the weighted median~\cite{Korte2012}. One can readily see that a quantile computation can be easily reduced to computing a weighted median with appropriately chosen weights. However, these algorithms do not automatically compute the VaR. The main difficulty is that the quantile is not unique as discussed in the introduction. VaR is not just any arbitrary quantile, but standard definitions require that it is the largest quantile. As a result, our QuickVaR algorithms differs from weighted median algorithms in subtle but substantive ways.
+An attentive reader may notice that QuickVaR resembles closely the algorithm for computing the weighted median~\cite{Korte2012}.  computation can be easily reduced to computing a weighted median with appropriately chosen weights. However, the weighted median algorithm does not compute VaR. Because median is not just any arbitrary quantile, but standard definitions require that it is the largest quantile. As a result, our QuickVaR algorithms differs from weighted median algorithms in subtle but substantive ways.
 \end{remark}
-
- \subsection{Proof of Correctness}
-
-
-
 
 
 \section{Computing \texorpdfstring{$\varphi$}{phi}-divergence Risk Measures in Linear Time} \label{sec:phi-divergence}

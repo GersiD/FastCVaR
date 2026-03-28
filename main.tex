@@ -71,7 +71,7 @@ The remainder of the paper is organized as follows. \Cref{sec:preliminaries} des
 
 \section{Preliminaries}\label{sec:preliminaries}
 
-In this paper, we restrict our attention to random variables defined on finite probability spaces $(\Omega, 2^{\Omega}, \bm{p})$ where $\Omega := \left\{ 1, \dots , n \right\}$, $\bm{p} \in \Delta_n$, and $\Delta_n$ is the $n$-dimensional probability simplex. We use a tilde to indicate a random variable, such as $\tilde{x}\colon \Omega \to \Real$. Vectors are denoted with a lower-case bold font, such as $\bm{x} \in \Real^n$ and indexed as $\bm{x}_i \text{ for } i = 1, \dots , n$. We use the function notation $\tilde{x}$ and vector notation $\bm{x}$ interchangeably, such that $x_\omega = x(\omega), \forall \,  \omega \in \Omega$. Sets are denoted with calligraphic letters and $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ denotes the extended real line. The symbol $\Nats$ denotes all 0-based natural numbers and $a{:}b := a, a+1, \dots , b$ for $a < b \in \mathbb{N}$. We use $\bm{x}_{a{:}b}$ to denote a subset of elements of $\bm{x}$ and comparisons such as $\bm{x}_{a{:}b} < y$ are interpreted element-wise. 
+\emph{Notation}: In this paper, we restrict our attention to random variables defined on finite probability spaces $(\Omega, 2^{\Omega}, \bm{p})$ where $\Omega := \left\{ 1, \dots , n \right\}$, $\bm{p} \in \Delta_n$, and $\Delta_n$ is the $n$-dimensional probability simplex. We use a tilde to indicate a random variable, such as $\tilde{x}\colon \Omega \to \Real$. Vectors are denoted with a lower-case bold font, such as $\bm{x} \in \Real^n$ and indexed as $\bm{x}_i \text{ for } i = 1, \dots , n$. We use the function notation $\tilde{x}$ and vector notation $\bm{x}$ interchangeably, such that $x_\omega = x(\omega), \forall \,  \omega \in \Omega$. Sets are denoted with calligraphic letters, $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ denotes the extended real line, and $\Real_{\ge 0}$ are non-negative reals. The symbol $\Nats$ denotes all 0-based natural numbers and $a{:}b := a, a+1, \dots , b$ for $a < b \in \mathbb{N}$. We use $\bm{x}_{a{:}b}$ to denote a subset of elements of $\bm{x}$ and comparisons such as $\bm{x}_{a{:}b} < y$ are interpreted element-wise. 
 
 \emph{Monetary risk measures} $\rho\colon \Delta_n \times \Real^n \to \bar{\Real}$ are functions of probability measure and a random variable. Risk measures generalize the expectation operator to account for different the uncertainty in the distribution of a random variable for a specific distribution~\cite{Follmer2016}. We apply risk measures to random variables representing rewards and suppose that higher risk values are preferable. 
 
@@ -324,41 +324,37 @@ with bounds $\quant^+_{\alpha}[\tilde{x}] := \max \quant_{\alpha}[\tilde{x}]$ an
 
 \section{Computing \texorpdfstring{$\varphi$}{phi}-divergence Risk Measures in Linear Time} \label{sec:phi-divergence}
 
+In this section, we propose QuickDivergence, and new linear-time algorithmic framework for computing a certain class of $\varphi$-divergence risk measures, such as CVaR and TVaR. We approach this challenge by solving a linear optimization problem over polymatroids. As we show, for certain polymatroids this optimization can be solved in linear time compared to the $O(n \log  n)$ runtime of standard sorting based greedy polymatroid algorithms. 
 
-In this section, we propose new linear-time algorithms for computing $\varphi$-divergence risk measures. We approach this challenge by solving a linear optimization problem over polymatroids . As we show, for certain polymatroids this optimization can be solved in linear time compared to the $O(n \log  n)$ runtime of standard sorting based greedy algorithms. 
-First, recall the standard definition of submodular functions and the related concept of polymatroid~\cite{Korte2012}.
+Before describing our algorithm, we recall the definition of a submodular function~\cite[section~2.1]{Korte2012} and a polymatroid~\cite[definition~14.9]{Korte2012}.
 \begin{definition} \label{def:polymatroid}
-A function $f \colon 2^{\mathcal{E}} \to \Real_{\ge 0}$ for a finite set $\mathcal{E} = \left\{ 1, \dots , E \right\}$ and $E\in \Nats$ is \emph{submodular} if
+A function $f \colon 2^{\mathcal{E}} \to \Real_{\ge 0}$ for a set $\mathcal{E} = 1{:}E$ and $E\in \Nats$ is \emph{submodular} if
 \[ 
   f(\mathcal{A}) + f(\mathcal{B}) \geq f(\mathcal{A} \cup \mathcal{\mathcal{B}}) + f(\mathcal{A} \cap \mathcal{B}),
   \quad
   \forall \mathcal{A}, \mathcal{B} \subseteq \mathcal{E}.
 \]
-A \emph{polymatroid} $\mathcal{Q}_f$ for $f$ is a polytope defined as
+A \emph{polymatroid} $\mathcal{Q}_f$ is a polytope defined as
   \[
-    \mathcal{Q}_f := \left\{ q \in \Real_{\ge 0}^E  \mid   q(\mathcal{U}) \leq f(\mathcal{U}), \, \forall \,  \mathcal{U} \subseteq \mathcal{E} \right\},
+    \mathcal{Q}_f
+    \; :=\;
+    \left\{ \bm{q} \in \Real_{\ge 0}^E  \mid   \bm{1}\tr \bm{q}_{\mathcal{U}} \leq f(\mathcal{U}), \, \forall \,  \mathcal{U} \subseteq \mathcal{E} \right\},
+  \qquad\text{where}\qquad \bm{1}\tr \bm{q}_{\mathcal{U}} := \sum_{e \in \mathcal{U}} q(e). 
   \]
-  where $q(\mathcal{U}) := \sum_{e \in \mathcal{U}} q(e)$. %and $f(\mathcal{U})\rightarrow[0, 1]$. We note that condition $f(\mathcal{U})\rightarrow[0, 1]$ is not necessary in general, but is needed in the context of probability distributions.
-  \mm{Do we need to assume that $f(\emptyset) = 0$?}
 \end{definition}
 
-% marek: we already say this in the preliminaries section
-% This polytope is of special interest for computing risk measures, as we will see later on that all coherent and comonotonic risk measures can be computed by solving
-% \begin{align}\label{eq:polytope}
-%   \max_{\bm{q}\in \Real}\left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}
-% \end{align}
-
-Polymatroids are important for our purpose because many risk measures can be formulated as linear optimization over polymatroids.  
+A broad class of risk measures can be formulated as linear optimizations over polymatroids~\cite[corollary~4.89]{Follmer2016}. A risk measure $\rho$ is coherent if it is concave and positively homogeneous. Two random variables $\tilde{x}, \tilde{y} \in \Real^{1{:}n}$ are \emph{comonotone} if $\tilde{x}(i) \ge \tilde{x}(j) \Leftrightarrow \tilde{y}(i) \ge \tilde{y}(j)$ for each $i,j\in 1{:}n$. A risk measure $\rho$ is \emph{comotonic} is for any comonotone $\tilde{x}, \tilde{y}$: $\rho(\tilde{x} + \tilde{y}) = \rho(\tilde{x}) + \rho(\tilde{y})$.
 \begin{proposition} \label{prop:coherent-polymatroid}
-  Suppose that $\rho\colon \mathbb{X}\to \Real$ is a comonotonic coherent risk measure (defined as $\rho$ such that $\rho(X) +  \rho(Y)= \rho(X + Y)$ when $X$ and $Y$ are comonotone). Then
+Suppose that $\rho\colon \Delta_n \times  \Real^n \to \Real$ is a coherent comotonic risk measure. Then
 \begin{equation}\label{eq:comontonic-optimization}
-   \rho[\tilde{x}] = \min_{\bm{q}\in \mathcal{Q}_c} \bm{q}\tr  \bm{x},
+  \rho[\tilde{x}] = \min_{\bm{q}\in \mathcal{Q}_c} \bm{q}\tr  \bm{x},
+  \qquad
+  \text{where}
+  \qquad
+  c(\mathcal{A}) := -\rho(-\tilde{1}_{\mathcal{A}}), \; \mathcal{A} \subseteq \Omega,
 \end{equation}
-where $\mathcal{Q}_c$ is the polymatroid in \cref{def:polymatroid} for $c(\mathcal{A}) := -\rho(-\one_{\mathcal{A}})$ for each $\mathcal{A} \subseteq \Omega$. 
+where $\tilde{1}$ is an indicator random variable.
 \end{proposition}
-\begin{proof}
-  The result is an immediate consequence of \cite[Corollary 4.89]{Follmer2016}
-\end{proof}
 
 Conventional polymatroid optimization algorithms for risk measures and the closely related maximum weighted independent set (such as \cref{alg:greedy-polymatroid} in the appendix) solve the optimization problem in \cref{prop:coherent-polymatroid} using a greedy approach that requires sorting. We now show that for a special class of submodular functions $f$ as defined below, sorting is not necessary.
 
@@ -882,24 +878,20 @@ Let $v$ be an input to \cref{alg:partition} and consider the following invariant
 
   Notice on the last iteration $g_{t} = e_{t}$, therefore by the same reasoning as above $g_{t+1} - e_{t+1} = -1$ and 
   condition \eqref{eq:ho-inv-equal} holds for $g_{t+1} = e_{t+1} - 1$.
-  
 \end{proof}
-\section{Proofs and Details for \cref{sec:phi-divergence}}
-\begin{lemma}
-This lemma is Theorem 4.5.1 from \cite{Bilmes18}: Given a ground set $V$. The following two are equivalent:
-\begin{enumerate}
-    \item For all modular functions $m \colon  2^V \rightarrow \Real_{\ge 0}$, the function $f\colon  2^V \rightarrow \Real$ defined as
-    \[
-    f(A) = g(m(A))
-    \]
+
+\section{Supplemental Algorithms and Properties for $\varphi$-Divergence Risk Measures }
+
+\begin{lemma}[theorem~4.5.1 in \cite{Bilmes18}] \label{lem:submodular-concave}
+For each $\mathcal{E}:= 1{:}n$ and $g \colon  \Real_{\ge 0} \rightarrow \Real$, the following two statements are equivalent:
+\begin{enumerate}[nosep]
+    \item For each $\bm{m} \in \Real^n_{\ge 0}$, the function $  f(\mathcal{A}) := g(\bm{m}_{\mathcal{A}}), \; \mathcal{A} \subseteq \mathcal{E} $
     is submodular.
-    \item $g \colon  \Real_{\ge 0} \rightarrow \Real$ is concave.
+    \item The function $g$ is concave.
 \end{enumerate}
-
 \end{lemma}
-
 \begin{proof}
-Note the proof is not the same provided in \cite{Bilmes18}, but we feel this proof is easier. It is well known that concave functions are subadditive - that is for any concave function $g$ and two values $y$ and $z$, $g(y) + g(z) \geq g(y + z)$ on the interval $[0, \infty)$. Given $A \subseteq B \subseteq E $, it follows $0 \leq a = m(A) \leq b = m(B)$. Therefore it follows that $f(A) + f(B) = g(a) + g(b) \geq g(a + b) = f(A \cup B)$. Thus it follows from the definition of sub-modularity that $f$ is submodular.
+For completeness, we provide an alternative proof to~\cite{Bilmes18}. Because the concave function $g$ satisfies for each $y, z \ge 0$ that $g(y) + g(z) \geq g(y + z)$. Then, for any $\mathcal{A} \subseteq \mathcal{B} \subseteq \mathcal{E}$, it follows $0 \leq a = \bm{m}_{\mathcal{A}} \le b = \bm{m}_{\mathcal{B}}$. \mm{I am not sure why this would be sufficient to prove submodularity, the condition is supposed to hold for ANY $\mathcal{A}$ and $\mathcal{B}$.}Therefore, it follows that $f(\mathcal{A}) + f(\mathcal{B}) = g(a) + g(b) \geq g(a + b) = f(A \cup B)$. Thus it follows from the definition of sub-modularity that $f$ is submodular.
 \end{proof}
 
 \section{Experiments}\label{sec:appendix_experiments}

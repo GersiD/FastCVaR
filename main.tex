@@ -73,9 +73,9 @@ The remainder of the paper is organized as follows. \Cref{sec:preliminaries} des
 
 \emph{Notation}: In this paper, we restrict our attention to random variables defined on finite probability spaces $(\Omega, 2^{\Omega}, \bm{p})$ where $\Omega := \left\{ 1, \dots , n \right\}$, $\bm{p} \in \Delta_n$, and $\Delta_n$ is the $n$-dimensional probability simplex. We use a tilde to indicate a random variable, such as $\tilde{x}\colon \Omega \to \Real$. Vectors are denoted with a lower-case bold font, such as $\bm{x} \in \Real^n$ and indexed as $\bm{x}_i \text{ for } i = 1, \dots , n$. We use the function notation $\tilde{x}$ and vector notation $\bm{x}$ interchangeably, such that $x_\omega = x(\omega), \forall \,  \omega \in \Omega$. Sets are denoted with calligraphic letters, $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ denotes the extended real line, and $\Real_{\ge 0}$ are non-negative reals. The symbol $\Nats$ denotes all 0-based natural numbers and $a{:}b := a, a+1, \dots , b$ for $a < b \in \mathbb{N}$. We use $\bm{x}_{a{:}b}$ to denote a subset of elements of $\bm{x}$ and comparisons such as $\bm{x}_{a{:}b} < y$ are interpreted element-wise. 
 
-\emph{Monetary risk measures} $\rho\colon \Delta_n \times \Real^n \to \bar{\Real}$ are functions of probability measure and a random variable that are monotone and translation invariant~\cite{Follmer2016}. Risk measures generalize the expectation operator to account for different the uncertainty in the distribution of a random variable for a specific distribution. We apply risk measures to random variables representing rewards and suppose that higher risk values are preferable. 
+\emph{Monetary risk measures} $\rho\colon \Delta_n \times \Real^n \to \bar{\Real}$ are functions of probability measure and a random variable that are monotone and translation invariant~\cite{Follmer2016}. Risk measures generalize the expectation operator to account for different the uncertainty in the distribution of a random variable for a specific distribution. We apply risk measures to random variables representing rewards and suppose that higher risk values are preferable. For the sake of streamlining the notation, we omit the probability measure when it is obvious from the context and only write $\rho[\tilde{x}]$ to compute the risk value.
 
-\emph{Value-at-Risk}~(VaR) is a popular risk measure and is defined for $\alpha\in [0,1)$ and $\tilde{x}\in \mathbb{X}$ as~\cite{Follmer2016,Shapiro2014}
+\emph{Value-at-Risk}~(VaR) is a popular risk measure and is defined for $\alpha\in [0,1)$ and $\tilde{x}\in \mathbb{R}^n$ as~\cite{Follmer2016,Shapiro2014}
 \begin{equation}
   \label{eq:var-definition}
   \var{\alpha}{ \tilde{x} }
@@ -104,7 +104,7 @@ where the maximum exists because $\tau \mapsto \P{\tilde{x} < \tau}$ is lower se
     \end{tabular}
 \end{table}
 
-A \emph{$\varphi$-divergence risk measure} $\ER_{\varphi, \beta }\colon \mathbb{X} \to  \bar{\Real}$ is defined for $\varphi\colon \bar{\Real} \to \bar{\Real}$ and $\beta\in \Real_{\ge 0}$ as~\cite{Ahmadi-Javid2012}
+A \emph{$\varphi$-divergence risk measure} $\ER_{\varphi, \beta }\colon \mathbb{R}^n \to  \bar{\Real}$ is defined for $\varphi\colon \bar{\Real} \to \bar{\Real}$ and $\beta\in \Real_{\ge 0}$ as~\cite{Ahmadi-Javid2012}
 \begin{align} \label{eq:fdiv-primal}
   \ER_{\varphi, \beta}[ \tilde{x} ]
   &:= \inf \left\{\bm{q}\tr \bm{x} \mid \bm{q}\in \Delta_n, H_{\varphi}(\bm{q} \| \bm{p}) \le \beta
@@ -117,16 +117,16 @@ where $\varphi\opt(x)$ is the convex conjugate of $\varphi(y)$, $\varphi$ is a c
 \[
   H_\varphi(\bm{q} \| \bm{p}) := \sum_{\omega \in \Omega} p_{\omega} \cdot \varphi\left(\frac{q_{\omega}}{p_{\omega}}\right).
 \]
-We adopt the common convention that $1 / 0 = \infty$ and $0 \cdot \infty = 0$~\cite{rockefeller1996variational} which makes it possible to drop the absolute continuity restriction used in some definitions of $\ER$. It is important to note that $\varphi$-divergence risk measures are coherent, which means they are convex and positively homogeneous. Any coherent risk measure $\rho\colon \mathbb{X}\to \bar{\Real}$ satisfies for some closed convex non-empty set $\mathcal{Q} \subseteq \Delta_n$ \citep[Prop. 2.84]{Follmer2016}. 
+We adopt the common convention that $1 / 0 = \infty$ and $0 \cdot \infty = 0$~\cite{rockefeller1996variational} which makes it possible to drop the absolute continuity restriction used in some definitions of $\ER$. It is important to note that $\varphi$-divergence risk measures are coherent, which means they are convex and positively homogeneous. Any coherent risk measure $\rho\colon \mathbb{R}^n\to \bar{\Real}$ satisfies for some closed convex non-empty set $\mathcal{Q} \subseteq \Delta_n$ \citep[Prop. 2.84]{Follmer2016}. 
 
-\Cref{tab:phi-divergence-risk} summarizes several common $\varphi$-divergence risk measures. We focus on the \emph{Conditional-Value-at-Risk}~(CVaR), which is a $\varphi$-divergence risk measure and defined equivalently for $\tilde{x} \in \mathbb{X}$ and $\alpha \in (0,1]$ as~\cite{Follmer2016}
+\Cref{tab:phi-divergence-risk} summarizes several common $\varphi$-divergence risk measures. We focus on the \emph{Conditional-Value-at-Risk}~(CVaR), which is a $\varphi$-divergence risk measure and defined equivalently for $\tilde{x} \in \mathbb{R}^n$ and $\alpha \in (0,1]$ as~\cite{Follmer2016}
 \begin{equation} \label{eq:primal_cvar}
     \cvaro_\alpha(\tilde{x})
   := \max_{z \in \Real} \left(z - \frac{1}{\alpha} \cdot \E{[z -\bm{x}]_+}\right),
 \end{equation}
 and extended continuously to $\cvaro_0[\tilde{x}] = \ess\inf[\tilde{x}]$. We also study another $\varphi$-divergence risk measure, which we call \emph{Total-Value-at-Risk}~(TVaR). The importance of TVaR is that it bounds the common Entropic-Value-at-Risk~(EVaR)~\cite{Ahmadi-Javid2012,Hau2023a,Su2025} from below as we show next. 
 \begin{proposition}
-For each $\alpha\in [0,1]$ and $\tilde{x} \in \mathbb{X}$:
+For each $\alpha\in [0,1]$ and $\tilde{x} \in \mathbb{R}^n$:
 \[
   \var{\alpha}{\tilde{x}}
   \; \ge\; 
@@ -148,7 +148,7 @@ For each $\alpha\in [0,1]$ and $\tilde{x} \in \mathbb{X}$:
 
 We now describe the QuickVaR algorithm, show that it computes VaR, and show that it runs in average linear time. 
 
-The standard VaR algorithm for a discrete random variable $\bm{x}\in \Real^n$ with distribution $\bm{p}\in \Delta_n$ and risk level $\alpha$ proceeds as follows~(e.g.,~listing~6.25 in \cite{privault2026notes}). It sorts the entries of $X$ to get a permutation $\sigma \colon 1{:}n \to 1{:}n$ such that $i \mapsto x_{\sigma(i)}$ is non-decreasing. Then, it finds an index $i \in 1{:}n$ such that 
+The standard VaR algorithm for a discrete random variable $\bm{x}\in \Real^n$ with distribution $\bm{p}\in \Delta_n$ and risk level $\alpha$ proceeds as follows~(e.g.,~listing~6.25 in \cite{privault2026notes}). It sorts the entries of $X$ to get a permutation $\sigma \colon 1{:}n \to 1{:}n$ such that $i \mapsto x_{\sigma(i)}$ is monotone. Then, it finds an index $i \in 1{:}n$ such that 
 \[
   \sum_{j = 1}^{i-1} p_{\sigma(j)} 
   \; <\;
@@ -324,8 +324,11 @@ with bounds $\quant^+_{\alpha}[\tilde{x}] := \max \quant_{\alpha}[\tilde{x}]$ an
 
 \section{Computing \texorpdfstring{$\varphi$}{phi}-divergence Risk Measures in Linear Time} \label{sec:phi-divergence}
 
-In this section, we describe and analyze QuickDivergence, and new linear-time algorithmic framework for computing a certain class of $\varphi$-divergence risk measures, such as CVaR and TVaR. QuickDivergence treats risk evaluation as a linear optimization over a polymatroid. Standard polymatroid optimization algorithms must sort their input which requires $O(n \log  n)$ runtime. We identify a structural condition of risk measure polymatroids that makes it possible to avoid sorting and instead use the linear-time QuickVaR algorithm described in \cref{sec:var-linear}.
+In this section, we describe and analyze QuickDivergence, a new linear-time framework for computing a certain class of $\varphi$-divergence risk measures, such as CVaR and TVaR. QuickDivergence treats risk evaluation as a linear optimization over a polymatroid. Standard polymatroid optimization algorithms must sort their input which requires $O(n \log  n)$ runtime. We identify a structural condition of risk measure polymatroids that makes it possible to avoid sorting and instead use the linear-time QuickVaR algorithm described in \cref{sec:var-linear}.
 
+The remainder of the section is organized as follows. \Cref{sec:quickdivergence} describes a general linear-time algorithm suitable for $\varphi$-divergence risk measures that satisfy a EWS property. Then \cref{sec:cvar-tvar-are} shows that both CVaR and TVaR satisfy the EWS property and can be computed in linear time. 
+
+\subsection{QuickDivergence} \label{sec:quickdivergence}
 We first recall the definition of a submodular function~\cite[section~2.1]{Korte2012} and a polymatroid~\cite[definition~14.9]{Korte2012}.
 \begin{definition} \label{def:polymatroid}
 A function $f \colon 2^{\Omega} \to \Real_{\ge 0}$ for a set $\Omega = 1{:}E$ and $E\in \Nats$ is \emph{submodular} if
@@ -334,7 +337,7 @@ A function $f \colon 2^{\Omega} \to \Real_{\ge 0}$ for a set $\Omega = 1{:}E$ an
   \quad
   \forall \mathcal{A}, \mathcal{B} \subseteq \Omega.
 \]
-A \emph{polymatroid} $\mathcal{Q}_f$ is a polytope defined as
+For a submodular $f \colon 2^{\Omega} \to \Real_{\ge 0}$, a \emph{polymatroid} $\mathcal{Q}_f$ is a polytope defined as
   \[
     \mathcal{Q}_f
     \; :=\;
@@ -343,16 +346,16 @@ A \emph{polymatroid} $\mathcal{Q}_f$ is a polytope defined as
   \]
 \end{definition}
 
-Polymatroids are useful in our setting because any coherent, comotonic monetary risk measure can be formulated as linear optimization over a polymatroids~\cite[corollary~4.89]{follmer2016}. A risk measure $\rho$ is \emph{coherent} if it is concave and positively homogeneous.  A risk measure $\rho$ is \emph{comotonic} is for any comonotone $\tilde{x}, \tilde{y}$: $\rho(\tilde{x} + \tilde{y}) = \rho(\tilde{x}) + \rho(\tilde{y})$, where the random variables $\tilde{x}, \tilde{y} \in \Real^{1{:}n}$ are \emph{comonotone} if $\tilde{x}(i) \ge \tilde{x}(j) \Leftrightarrow \tilde{y}(i) \ge \tilde{y}(j)$ for each $i,j\in 1{:}n$.
+Polymatroids are useful in our setting because any coherent, comotonic monetary risk measure can be formulated as linear optimization over a polymatroids~\cite[corollary~4.89]{Follmer2016}. A risk measure $\rho$ is \emph{coherent} if it is concave and positively homogeneous.  A risk measure $\rho$ is \emph{comotonic} is for any comonotone $\tilde{x}, \tilde{y}$: $\rho[ \tilde{x} + \tilde{y} ] = \rho[ \tilde{x} ] + \rho[ \tilde{y} ]$, where the random variables $\tilde{x}, \tilde{y} \in \Real^{1{:}n}$ are \emph{comonotone} if $\tilde{x}(i) \ge \tilde{x}(j) \Leftrightarrow \tilde{y}(i) \ge \tilde{y}(j)$ for each $i,j\in 1{:}n$.
 
-\begin{proposition}[corollary~4.8a in \citet{follmer2016}] \label{prop:coherent-polymatroid}
+\begin{proposition}[corollary~4.8a in \citet{Follmer2016}] \label{prop:coherent-polymatroid}
 Suppose that $\rho\colon \Delta_n \times  \Real^n \to \Real$ is a coherent comotonic risk measure. Then
-\begin{equation}\label{eq:comontonic-optimization}
+\begin{equation}\label{eq:comonotonic-optimization}
   \rho[\tilde{x}] = \min_{\bm{q}\in \mathcal{Q}_c} \bm{q}\tr  \bm{x},
   \qquad
   \text{where}
   \qquad
-  c(\mathcal{A}) := -\rho(-\tilde{1}_{\mathcal{A}}), \; \mathcal{A} \subseteq \Omega,
+  c(\mathcal{A}) := -\rho[ -\tilde{1}_{\mathcal{A}} ], \; \mathcal{A} \subseteq \Omega,
 \end{equation}
 where $\tilde{1}$ is an indicator random variable. Moreover, if the risk measure is law-invariant then there exists $g\colon \Real \to \Real$ such that $c = g(\P{\mathcal{A}})$.
 \end{proposition}
@@ -410,9 +413,9 @@ We now describe an algorithm for optimizing over polymatroids with this class of
 
 We now prove the optimality of the algorithm and it's expected linear time complexity. The proof of optimality is obtained by showing that every value we compute for $q$ is equivalent to what would be obtained by following the computational procedure defined in \cite[remark~4.86]{Follmer2016}. The proof of the time complexity follows from the expected linear time complexity, and the fact that remaining operations can be computed in linear time, and thus have no impact on the complexity.
 
-\begin{proposition}
-\cref{alg:maximum-weight-independent} returns a optimal solution to the optimization problem defined in \cref{comontonic optimization}. 
-\end{proposition}
+\begin{theorem}
+\cref{alg:maximum-weight-independent} solves~\eqref{eq:comonotonic-optimization} in expected $O(n)$ runtime. 
+\end{theorem}
 \begin{proof}
 Assume that $x_1 \le x_2 \le  \dots  \le x_n$ \mm{why could we assume that the elements are sorted? Isn't the whole point that we do not need to sort the elements?}.
   The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal{O}_{i})$ \cite[Remark 4.86]{Follmer2016}, where $\mathcal{O}_i$ is the set of all elements that have only values less than or equal to the i-th largest element:
@@ -453,16 +456,11 @@ Thus, for any $i$ such that $x_i < z$ and $i = j$, $q_i$ must equal $m*p_i + c$.
 For all other $i$ such that $x_i> z$, we note that $P[x < \tau] > \frac{1 - c}{m}$ indicates $f(\mathcal{O}_{i}) - f(\mathcal{O}_{i - 1}) = 1 - 1 = 0$, and thus $q_i = 0$.
 
 For all other $i$ such that $x_i=z$, since all $q_i$ must sum to 1, it can be seen for all such $i$, $\sum_{k : x_k =  v}p_k$ must equal $y$. The solution of the LP is not affected by which $i$ this sum is distributed, so we set $x_z$ to $y$ and everything else to 0. 
-\end{proof}
 
-\begin{proposition}
-\cref{alg:maximum-weight-independent} run with expected complexity $O(N)$.
-\end{proposition}
-\begin{proof}
 The quick quantile call runs in expected linear time complexity as shown in \cref{prop:time-complexity}. After the call to QuickQuantile, the number of operations is bounded by the number of elements in $x_0$ and $p_0$ and thus is linear time as well. 
 \end{proof}
 
-\subsection{CVaR} \label{sec:cvar}
+\subsection{CVaR and TVaR are EWS} \label{sec:cvar-tvar-are} 
 We now prove that CVaR can be represented as a polymatroid with a submodular function that satisfies Element-Wise-Seperability as defined above. Therefore we can provably compute CVaR in expected linear time.
 
 \begin{proposition}
@@ -552,8 +550,6 @@ It is easy to verify that $\bm{q} \ge \bm{0}$ and $\bm{1}\tr \bm{q} = 1$. The co
 \end{enumerate}
 \end{proof}
 
-
-\subsection{TVaR} \label{sec:tvar}
 
 (TVaR)~\cite{Kruse2021}
 
@@ -666,7 +662,8 @@ It is easy to verify that $\bm{q} \in \mathcal{Q}_f$ and $\bm{1}_{\mathcal{O}}\t
 
 \section{Experiments}\label{sec:experiments}
 
-To evaluate the algorithms developed in \cref{alg:quick-quantile} we numerically compare their speed up against their sorting based counterparts. For the remainder of the paper we prefix our implementation of the algorithms with a ``Q'' to denote the quick algorithms. The results obtained in this work were all generated on a computer with the following specifications: AMD Ryzen Threadripper 3970X 32-Core (64) @ 4.55 GHz with 256 GB RAM running Julia 1.11.5. We also manually disable the Julia garbage collector to reduce noise in the timing data.
+To evaluate the algorithms developed in \cref{alg:quick-quantile} we numerically compare their speed up against their sorting based counterparts. For the remainder of the paper we prefix our implementation of the algorithms with a ``Q'' to denote the quick algorithms. 
+The results obtained in this work were all generated on a computer with the following specifications: AMD Ryzen Threadripper 3970X 32-Core (64) @ 4.55 GHz with 256 GB RAM running Julia 1.11.5. We also manually disable the Julia garbage collector to reduce noise in the timing data.
 
 Our experimental design allows us to verify that our implementation performs well in practice rather than only theoretically. \cref{fig:all_uniform} shows the results of our experiments. The random variables were generated from a uniform distribution with $N$ samples, where $N$ is varied from $10^2$ to $10^6$. The algorithms were run for each value of $N$ 10 times, and the average runtime was recorded. For consistency, we used a risk level of $0.95$, however the results are similar for other risk levels save for $\alpha = 0 \text{ or } 1$.
 
@@ -747,7 +744,7 @@ $q_0 \gets 0$
 \end{algorithm}
 
 \begin{proposition}
-For a random variable $\tilde{x} \in \mathbb{X}$ and $\alpha\in [0,1)$, \cref{alg:slow-quantile} returns $\var{\alpha}{\tilde{x}}$.
+For each $\tilde{x} \in \mathbb{R}^n$, $\bm{p}\in \Delta_n$, and $\alpha\in [0,1)$, \cref{alg:slow-quantile} returns $\var{\alpha}{\tilde{x}}$.
 \end{proposition}
 \begin{proof}
 First, we show by induction on $i$ from $n$ to $1$ that
@@ -857,26 +854,58 @@ Let $v$ be an input to \cref{alg:partition} and consider the following invariant
      Let $y_{\sigma(i)} :=  \begin{cases}
        f\left(1{:}i\right) - f\left(1{:}(i-1)\right) & \text{for } i = 1,\dots, r \\ 0 & \text{otherwise} \end{cases}$\;
      }
-    \Return{}
+    \Return{\mm{something}}
 \end{algorithm}
 
 \begin{proposition}
-  Suppose that $f$ is submodular, non-decreasing and satisfies that with $f(\emptyset) = 0$ and $f(\Omega) = 1$. Then, \cref{alg:greedy-polymatroid} computes an optimal solution to
+  Suppose that $f$ is submodular, monotone and satisfies that with $f(\emptyset) = 0$ and $f(\Omega) = 1$. Then, \cref{alg:greedy-polymatroid} computes an optimal solution to
   \[
-    sss
+    \mm{???}
   \]
 \end{proposition}
 
-\begin{lemma}[theorem~4.5.1 in \citet{Bilmes18}] \label{lem:submodular-concave}
-For each $\mathcal{E}:= 1{:}n$ and $g \colon  \Real_{\ge 0} \rightarrow \Real$, the following two statements are equivalent:
-\begin{enumerate}[nosep]
-    \item For each $\bm{m} \in \Real^n_{\ge 0}$, the function $  f(\mathcal{A}) := g(\bm{m}_{\mathcal{A}}), \; \mathcal{A} \subseteq \mathcal{E} $
-    is submodular.
-    \item The function $g$ is concave.
-\end{enumerate}
+The following lemma is a folklore in submodular optimization~\cite[theorem~4.5.1]{Bilmes18}. We state and prove it for completeness.
+\begin{lemma} \label{lem:submodular-concave}
+  Suppose that $\bm{1}\tr\bm{\mu}\in \Real^n_{\ge 0}$ and $g \colon  \Real \to \Real$ is concave and monotone. Then $f(\mathcal{A}) := g(\bm{1}\tr\bm{\mu}_{\mathcal{A}})$ is a submodular monotone function.
 \end{lemma}
 \begin{proof}
-For completeness, we provide an alternative proof to~\cite{Bilmes18}. Because the concave function $g$ satisfies for each $y, z \ge 0$ that $g(y) + g(z) \geq g(y + z)$. Then, for any $\mathcal{A} \subseteq \mathcal{B} \subseteq \mathcal{E}$, it follows $0 \leq a = \bm{m}_{\mathcal{A}} \le b = \bm{m}_{\mathcal{B}}$. \mm{I am not sure why this would be sufficient to prove submodularity, the condition is supposed to hold for ANY $\mathcal{A}$ and $\mathcal{B}$.}Therefore, it follows that $f(\mathcal{A}) + f(\mathcal{B}) = g(a) + g(b) \geq g(a + b) = f(A \cup B)$. Thus it follows from the definition of sub-modularity that $f$ is submodular.
+  The fact that $f$ is monotone follows immediately from the composition of two monotone function. To prove that $f$ is submodular, we use the following properties that hold for each $\mathcal{A}, \mathcal{B} \subseteq 1{:}n$:
+  \begin{align}
+    \label{eq:sets-bounds-nneg}
+    \bm{1}\tr\bm{\mu}_{\mathcal{A} \cup \mathcal{B}}
+    &\le \bm{1}\tr\bm{\mu}_{\mathcal{A}} \le \bm{1}\tr\bm{\mu}_{\mathcal{A} \cup \mathcal{B}},
+    &
+    \bm{1}\tr\bm{\mu}_{\mathcal{A} \cup \mathcal{B}}
+    &\le \bm{1}\tr\bm{\mu}_{\mathcal{B}} \le \bm{1}\tr\bm{\mu}_{\mathcal{A} \cup \mathcal{B}}, \\
+    \label{eq:mu-modular}
+    \bm{1}\tr\bm{\mu}_{\mathcal{A}} + \bm{1}\tr\bm{\mu}_{\mathcal{B}}
+    &= \bm{1}\tr\bm{\mu}_{\mathcal{A} \cup \mathcal{B}} + \bm{1}\tr\bm{\mu}_{\mathcal{A} \cap \mathcal{B}}.
+  \end{align}
+  The inequalities in \eqref{eq:sets-bounds-nneg} holds because $\bm{\mu} \ge  \bm{0}$ and the equality in \eqref{eq:mu-modular} holds because $\mathcal{A} \mapsto \bm{1}\tr\bm{\mu}_{\mathcal{A}}$ is modular. Then, writing $\bm{1}\tr\bm{\mu}_{\mathcal{A}}$ and $\bm{1}\tr\bm{\mu}_{\mathcal{B}}$ as a convex combination of $\bm{1}\tr\bm{\mu}_{\mathcal{A}\cap \mathcal{B}}$ and $\bm{1}\tr\bm{\mu}_{\mathcal{A} \cup \mathcal{B}}$ using \eqref{eq:sets-bounds-nneg} we get that
+  \begin{align}
+  \label{eq:ga-bound}
+    g(\bm{1}\tr\bm{\mu}_{\mathcal{A}})
+    &\ge
+      \frac{\bm{1}\tr\bm{\mu}_{\mathcal{A} \cup \mathcal{B}} - \bm{1}\tr\bm{\mu}_{\mathcal{A}}}{\bm{1}\tr\bm{\mu}_{\mathcal{A} \cup \mathcal{B}} - \bm{1}\tr\bm{\mu}_{\mathcal{A} \cap \mathcal{B}}} g(\bm{1}\tr\bm{\mu}_{\mathcal{A} \cap \mathcal{B}}) + 
+      \frac{\bm{1}\tr\bm{\mu}_{\mathcal{A}} - \bm{1}\tr\bm{\mu}_{\mathcal{A} \cap \mathcal{B}}}{\bm{1}\tr\bm{\mu}_{\mathcal{A} \cup \mathcal{B}} - \bm{1}\tr\bm{\mu}_{\mathcal{A} \cap \mathcal{B}}} g(\bm{1}\tr\bm{\mu}_{\mathcal{A} \cup \mathcal{B}}), \\
+  \label{eq:gb-bound}
+    g(\bm{1}\tr\bm{\mu}_{\mathcal{B}})
+    &\ge
+      \frac{\bm{1}\tr\bm{\mu}_{\mathcal{A} \cup \mathcal{B}} - \bm{1}\tr\bm{\mu}_{\mathcal{B}}}{\bm{1}\tr\bm{\mu}_{\mathcal{A} \cup \mathcal{B}} - \bm{1}\tr\bm{\mu}_{\mathcal{A} \cap \mathcal{B}}} g(\bm{1}\tr\bm{\mu}_{\mathcal{A} \cap \mathcal{B}}) + 
+      \frac{\bm{1}\tr\bm{\mu}_{\mathcal{B}} - \bm{1}\tr\bm{\mu}_{\mathcal{A} \cap \mathcal{B}}}{\bm{1}\tr\bm{\mu}_{\mathcal{A} \cup \mathcal{B}} - \bm{1}\tr\bm{\mu}_{\mathcal{A} \cap \mathcal{B}}} g(\bm{1}\tr\bm{\mu}_{\mathcal{A} \cup \mathcal{B}}).
+  \end{align}
+  The inequalities in \eqref{eq:ga-bound} and \eqref{eq:gb-bound} follow from the concavity of $g$. Then summing \eqref{eq:ga-bound} and \eqref{eq:gb-bound} and algebraic manipulation yields that 
+  \[
+    f(\mathcal{A}) + f(\mathcal{B})
+    = g(\bm{1}\tr\bm{\mu}_{\mathcal{A}}) + g(\bm{1}\tr\bm{\mu}_{\mathcal{B}})
+    \ge
+      g(\bm{1}\tr\bm{\mu}_{\mathcal{A} \cap \mathcal{B}}) + 
+      g(\bm{1}\tr\bm{\mu}_{\mathcal{A} \cup \mathcal{B}})
+     = 
+      f(\mathcal{A} \cap \mathcal{B}) + 
+      f(\mathcal{A} \cup \mathcal{B}),
+    \]
+    which proves that $f$ is submodular. 
 \end{proof}
 
 \section{Experiments}\label{sec:appendix_experiments}

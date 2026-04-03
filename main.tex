@@ -31,6 +31,7 @@
 \DeclareMathOperator{\ext}{ext}
 \DeclareMathOperator{\conv}{conv}
 \DeclareMathOperator{\qvar}{QuickVaR}
+\DeclareMathOperator{\ews}{EWS}
 \newcommand{\quant}{{\mathfrak{q}}}
 
 \renewcommand{\cite}{\citep}
@@ -168,7 +169,7 @@ We present \cref{alg:quick-quantile} recursively to simplify analysis. However, 
 
 \begin{algorithm}
   \caption{\texttt{QuickVaR}: Recursive VaR algorithm} \label{alg:quick-quantile}
-  \Input{$\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$, $\alpha \in [0,1)$, $f, b \in 1{:}n$ such that $f \le  b$ and $\sum_{j=f}^b p_j > \alpha$.}
+  \Input{$\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$, $\alpha \in [0,1)$, $f, b \in 1{:}n$ such that $f \le  b$ and $\sum_{j=f}^b p_j > \alpha$}
   \Output{$\varo_{\alpha}[\tilde{x}]$}
   $v \gets x_{\operatorname{rand}(f{:}b)}$ \tcp*{Pivot}
   $l, g, \bm{x}', \bm{p}' \gets \operatorname{partition}(\bm{x}, \bm{p}, v, f, b)$
@@ -331,19 +332,19 @@ The remainder of the section is organized as follows. \Cref{sec:quickdivergence}
 \subsection{QuickDivergence} \label{sec:quickdivergence}
 We first recall the definition of a submodular function~\cite[section~2.1]{Korte2012} and a polymatroid~\cite[definition~14.9]{Korte2012}.
 \begin{definition} \label{def:polymatroid}
-A function $f \colon 2^{\Omega} \to \Real_{\ge 0}$ for a set $\Omega = 1{:}E$ and $E\in \Nats$ is \emph{submodular} if
+A function $f \colon 2^{1{:}n} \to \Real_{\ge 0}$ is \emph{submodular} if
 \[ 
   f(\mathcal{A}) + f(\mathcal{B}) \geq f(\mathcal{A} \cup \mathcal{\mathcal{B}}) + f(\mathcal{A} \cap \mathcal{B}),
   \quad
-  \forall \mathcal{A}, \mathcal{B} \subseteq \Omega.
+  \forall \mathcal{A}, \mathcal{B} \subseteq 1{:}n.
 \]
-For a submodular $f \colon 2^{\Omega} \to \Real_{\ge 0}$, a \emph{polymatroid} $\mathcal{Q}_f$ is a polytope defined as
+For a submodular $f \colon 2^{1{:}n} \to \Real_{\ge 0}$, a \emph{polymatroid} $\mathcal{Q}_f$ is a polytope defined as
   \[
     \mathcal{Q}_f
-    \; :=\;
-    \left\{ \bm{q} \in \Real_{\ge 0}^E  \mid   \bm{1}\tr \bm{q}_{\mathcal{U}} \leq f(\mathcal{U}), \, \forall \,  \mathcal{U} \subseteq \Omega \right\},
-  \qquad\text{where}\qquad \bm{1}\tr \bm{q}_{\mathcal{U}} := \sum_{e \in \mathcal{U}} q_{e}. 
-  \]
+    \;:=\;
+    \left\{ \bm{q} \in \Real_{\ge 0}^n  \mid   \bm{1}\tr \bm{q}_{\mathcal{U}} \leq f(\mathcal{U}), \, \forall \,  \mathcal{U} \subseteq 1{:}n \right\},
+\]
+and a \emph{normalized polymatroid} is the intersection with the probability simplex: $\widehat{\mathcal{Q}}_f := \mathcal{Q}_f \cap \Delta_n $.
 \end{definition}
 
 Polymatroids are useful in our setting because any coherent, comotonic monetary risk measure can be formulated as linear optimization over a polymatroids~\cite[corollary~4.89]{Follmer2016}. A risk measure $\rho$ is \emph{coherent} if it is concave and positively homogeneous.  A risk measure $\rho$ is \emph{comotonic} is for any comonotone $\tilde{x}, \tilde{y}$: $\rho[ \tilde{x} + \tilde{y} ] = \rho[ \tilde{x} ] + \rho[ \tilde{y} ]$, where the random variables $\tilde{x}, \tilde{y} \in \Real^{1{:}n}$ are \emph{comonotone} if $\tilde{x}(i) \ge \tilde{x}(j) \Leftrightarrow \tilde{y}(i) \ge \tilde{y}(j)$ for each $i,j\in 1{:}n$.
@@ -351,37 +352,33 @@ Polymatroids are useful in our setting because any coherent, comotonic monetary 
 \begin{proposition}[corollary~4.8a in \citet{Follmer2016}] \label{prop:coherent-polymatroid}
 Suppose that $\rho\colon \Delta_n \times  \Real^n \to \Real$ is a coherent comotonic risk measure. Then
 \begin{equation}\label{eq:comonotonic-optimization}
-  \rho[\tilde{x}] = \min_{\bm{q}\in \mathcal{Q}_c} \bm{q}\tr  \bm{x},
+  \rho[\tilde{x}] = \min_{\bm{q}\in \widehat{\mathcal{Q}}_c} \bm{q}\tr  \bm{x},
   \qquad
   \text{where}
   \qquad
-  c(\mathcal{A}) := -\rho[ -\tilde{1}_{\mathcal{A}} ], \; \mathcal{A} \subseteq \Omega,
+  c(\mathcal{A}) := -\rho[ -\tilde{1}_{\mathcal{A}} ], \quad \forall  \mathcal{A} \subseteq 1{:}n,
 \end{equation}
-where $\tilde{1}$ is an indicator random variable. Moreover, if the risk measure is law-invariant then there exists $g\colon \Real \to \Real$ such that $c = g(\P{\mathcal{A}})$.
+where $\tilde{1}$ is an indicator random variable. Moreover, if the risk measure is law-invariant then there exists $g\colon \Real \to \Real$ such that $c(\mathcal{A}) = g(\bm{1}\tr \bm{p}_{\mathcal{A}})$ for each $\mathcal{A} \subseteq 1{:}n$.
 \end{proposition}
 
-Conventional polymatroid optimization algorithms for risk measures solve the optimization problem in \cref{prop:coherent-polymatroid} using a greedy approach that requires sorting. We now show that for a special class of submodular functions $f$ as defined below, sorting is not necessary.
-
-Next, we define an EWS property of sub-modular functions. We show that when a polymatroid is defined in terms of a EWS sub-modular function, then we can minimize a linear function over the polymatroid in linear time. Then, 
+Conventional polymatroid optimization algorithms for risk measures solve the optimization problem in \cref{prop:coherent-polymatroid} using a greedy approach that requires sorting. We now show that for a special class of submodular functions $f$ as defined below, sorting is not necessary.In particular, we show that when a polymatroid is defined in terms of a EWS function---as defined below---then then the optimization over a polymatroid can be computed in linear expected time. 
 
 \begin{definition} \label{asm:submodular-function}
-A \emph{submodular} function $f\colon 2^{\Omega} \to \Real_{\ge 0}$ is \emph{Element-Wise-Separable}~(EWS) if there exists $g\colon [0,1] \to  [0,1]$ such that $f(\mathcal{O}) = g(\P {\mathcal{O}}), \forall \mathcal{O} \subseteq \Omega$ and for some $c \in \Real_{\ge 0}$ and $m\in \Real_{>0}$:
+A function $f\colon 2^{1{:}n} \to \Real_{\ge 0}$ is $\ews(\bm{\mu} ,m, c)$, or \emph{Element-Wise-Separable}, for $c \in \Real_{\ge 0}$,  $m\in \Real_{>0}$, such that $c + m \ge 1$, and  $\bm{\mu}\in \Real^n_{\ge 0}$ if $f(\mathcal{O}) = g(\bm{1}\tr \bm{\mu}_{\mathcal{O}}), \forall \mathcal{O} \subseteq \Omega$ where for each $x \ge 0$:
 \[
-    g(x) =
+    g(x) :=
     \begin{cases}        
     \min \{c + m  \cdot x, 1\} &\text{if } x > 0 \\
     0 &\text{otherwise}.
-    \end{cases}, \quad \forall x\in [0,1]
+    \end{cases}.
 \]
-The values $m$ and $c$ are such that $c + m \ge 1$ and, therefore, $g(1) = 1$. \mm{I think that we also need $m \ge 0$ for the submodular function to be monotone.}
 \end{definition}
 
 \begin{proposition}
-Any EWS function $f\colon 2^{\Omega} \to  \Real_{\ge 0}$ is submodular and monotone.   
+An EWS function $f\colon 2^{\Omega} \to  \Real_{\ge 0}$ is submodular, monotone, $f(\emptyset) = 0$, and $f(\Omega) = 1$.   
 \end{proposition}
 \begin{proof} 
-Since \cite[theorem~4.5.1]{Bilmes18}~(also see \cref{lem:submodular-concave})  if $g(x)$ as defined in \cref{asm:submodular-function} is concave , $f$ is submodular. 
-It remains to prove that $g$ is concave.
+From \cref{lem:submodular-concave}, it is sufficient to show that $g$ is concave to show that  $f$ is submodular.  
 
 We first prove concavity for $g$ on the interval $(0, 1]$, where $0$ is not included. On this interval, $g(x)$ is the minimum of two linear functions and is thus also concave.\cite{boyd2004convex}
 
@@ -390,13 +387,11 @@ We then prove concavity for g on the interval $[0, 1]$, where $0$ is included. I
 Thus $g$ is concave, and the proof concludes.
 \end{proof}
 
-
-
 We now describe an algorithm for optimizing over polymatroids with this class of submodular function. We then show that both CVaR and TVaR can be computed by solving this optimization problem for particular EWS functions.
 \begin{algorithm}
   \caption{\texttt{QuickDivergence}: Algorithm for optimizing linear function on polymatroids} \label{alg:maximum-weight-independent}
-  \Input{\mm{???}}
-  \Output{$\bm{q} \in \Real^n$}
+  \Input{$\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$, $\ews(\bm{p}, m, c)$ function $f \colon 2^{1{:}n} \to \Real_{\ge 0}$}
+  \Output{$\min \left\{ \bm{q}\in \Real^n  \mid  \bm{q} \in \mathcal{Q}_f, \bm{1}\tr \bm{q} = 1\right\}$}
   $k_{\min} \gets \arg\min_{i \in  1{:}n} x_i$ \;
   $v \gets \operatorname{QuickVaR}(\bm{p}, \bm{x}, \alpha = (1 - c)/m)$ \;
   $\mathcal{K}_{< v} \gets \{ i = 1, \dots , n \mid x_i < v \}$ ; ~
@@ -767,7 +762,7 @@ Now, suppose that \cref{alg:slow-quantile} terminates with value $q\opt$. Then, 
   \caption{\texttt{partition}: Dutch national flag algorithm~\cite[chapter 14]{Dijkstra1976}}
   \label{alg:partition}
   \Input{$\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$, pivot $v\in \Real$, and front and back $f, b \in 1{:}n$, $f \le b$}
-  \Output{$l, g \in f{:}b$, $\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$ such that \cref{lem:hoare-partition} holds.}
+  \Output{$l, g \in f{:}b$, $\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$ such that \cref{lem:hoare-partition} holds}
   $l_0 \gets e_0 \gets f$; $g_0 \gets b$; $k \gets 0$ \;
   \While{$e_k \leq g_k$}
   {
@@ -846,27 +841,47 @@ Let $v$ be an input to \cref{alg:partition} and consider the following invariant
 
 
 \begin{algorithm}
-    \caption{Polymatroid greedy algorithm} \label{alg:greedy-polymatroid}
-    \Input{submodular function $f \colon  2^{\Omega} \to \Real$, and an objective $\bm{x}\in \Real^n_+$ with $n:=|\Omega|$}
-    \Output{solution $\bm{y}\in \Real^n$}
-     Sort $\bm{x}$ indexes to get $\sigma \colon 1{:}n \to 1{:}n$ such that $i > j \implies x_{\sigma(i)} \ge  x_{\sigma(j)}, \; \forall i, j \in 1, \dots , n$\;
+    \caption{Polymatroid greedy minimization.} \label{alg:greedy-polymatroid}
+    \Input{submodular monotone function $f \colon  2^{1{:}n} \to \Real$, and an objective $\bm{x}\in \Real^n$}
+    \Output{$\bm{q}\opt \in \arg\min_{\bm{q}\in \widehat{\mathcal{Q}}_f} \bm{x}\tr \bm{q}$}
+    Use sort to get
+    $\sigma \colon 1{:}n \to 1{:}n$ such that
+    $i > j \implies x_{\sigma(i)} \ge  x_{\sigma(j)}, \; \forall i, j \in 1{:}n$\;
      \For{$i\in 1{:}n$}{
-     Let $y_{\sigma(i)} :=  \begin{cases}
-       f\left(1{:}i\right) - f\left(1{:}(i-1)\right) & \text{for } i = 1,\dots, r \\ 0 & \text{otherwise} \end{cases}$\;
-     }
-    \Return{\mm{something}}
+       $q\opt_{\sigma(i)} \gets f\left(1{:}i\right) - f\left(1{:}(i-1)\right) $
+    }
+    \Return{$\bm{q}\opt$}
 \end{algorithm}
 
-\begin{proposition}
-  Suppose that $f$ is submodular, monotone and satisfies that with $f(\emptyset) = 0$ and $f(\Omega) = 1$. Then, \cref{alg:greedy-polymatroid} computes an optimal solution to
-  \[
-    \mm{???}
-  \]
-\end{proposition}
+\cref{alg:greedy-polymatroid} is a the straightforward adaptation of standard polymatroid algorithms, such as \cite[section~14.9]{Korte2012}, to an optimization over normalized polymatroid. 
 
-The following lemma is a folklore in submodular optimization~\cite[theorem~4.5.1]{Bilmes18}. We state and prove it for completeness.
+\begin{proposition}
+  When $f\colon  2^{1{:}n} \to \Real$ is submodular, monotone and $f(\emptyset) = 0$ and $f(1{:}n) = 1$, then \cref{alg:greedy-polymatroid} computes
+  \begin{equation} \label{eq:normalized-poly-opt}
+    \bm{q}\opt  \in  \arg\min_{\bm{q}\in \widehat{\mathcal{Q}}_f}  \bm{x}\tr \bm{q}.
+\end{equation}
+\end{proposition}
+\begin{proof}
+  First, we show that $\bm{q}\opt \in \widehat{\mathcal{Q}}_f$. $f(\emptyset) = 0$, we get that $q\opt_{\sigma(1)} = f(\left\{ 1 \right\}) - f(\emptyset) = f(\left\{ 1 \right\})$ and the construction of $\bm{q}\opt $ matches  proposition~14.10 in \citet{Korte2012}. Therefore $\bm{q}\opt  \in \mathcal{Q}_f$. By its construction, we get that
+  \[
+   \sum_{i=1}^n q\opt_i =  
+   \sum_{i=1}^n q\opt_{\sigma (i)} = f(1{:}n) - f(\emptyset) = 1, 
+  \]
+and therefore $\bm{q}\opt \in \Delta_n$, $\widehat{\mathcal{Q}}_f \neq \emptyset$, and a minimum exists.
+
+To show, that $\bm{q}\opt $ is optimal, we reduce the optimization problem in \eqref{eq:normalized-poly-opt} to the standard linear polymatroid optimization problem with non-negative weights as follows:
+\begin{align*}
+  \arg\min_{\bm{q}\in \widehat{\mathcal{Q}}_f}  \bm{x}\tr \bm{q}
+  &= \arg\min_{\bm{q}\in \widehat{\mathcal{Q}}_f}  (\bm{x} - q_{\min}\cdot \bm{1}) \tr \bm{q} \\
+  &= \arg\max_{\bm{q}\in \widehat{\mathcal{Q}}_f}  (q_{\min}\cdot \bm{1} - \bm{x}) \tr \bm{q} \\
+  &\ni \bm{q}\opt. 
+\end{align*}
+\end{proof}
+
+
+The following lemma is folklore in submodular optimization~\cite[theorem~4.5.1]{Bilmes18}. We state and prove it for completeness.
 \begin{lemma} \label{lem:submodular-concave}
-  Suppose that $\bm{1}\tr\bm{\mu}\in \Real^n_{\ge 0}$ and $g \colon  \Real \to \Real$ is concave and monotone. Then $f(\mathcal{A}) := g(\bm{1}\tr\bm{\mu}_{\mathcal{A}})$ is a submodular monotone function.
+  Suppose that $\bm{1}\tr\bm{\mu}\in \Real^n_{\ge 0}$ and $g \colon \Real_{\ge 0} \to \Real$ is concave and monotone. Then $f(\mathcal{A}) := g(\bm{1}\tr\bm{\mu}_{\mathcal{A}})$ is a submodular monotone function.
 \end{lemma}
 \begin{proof}
   The fact that $f$ is monotone follows immediately from the composition of two monotone function. To prove that $f$ is submodular, we use the following properties that hold for each $\mathcal{A}, \mathcal{B} \subseteq 1{:}n$:

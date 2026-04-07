@@ -361,10 +361,10 @@ Suppose that $\rho\colon \Delta_n \times  \Real^n \to \Real$ is a coherent comot
 where $\tilde{1}$ is an indicator random variable. Moreover, if the risk measure is law-invariant then there exists $g\colon \Real \to \Real$ such that $c(\mathcal{A}) = g(\bm{1}\tr \bm{p}_{\mathcal{A}})$ for each $\mathcal{A} \subseteq 1{:}n$.
 \end{proposition}
 
-Conventional polymatroid optimization algorithms for risk measures solve the optimization problem in \cref{prop:coherent-polymatroid} using a greedy approach that requires sorting. We now show that for a special class of submodular functions $f$ as defined below, sorting is not necessary.In particular, we show that when a polymatroid is defined in terms of a EWS function---as defined below---then then the optimization over a polymatroid can be computed in linear expected time. 
+Conventional polymatroid optimization algorithms for risk measures solve the optimization problem in \cref{prop:coherent-polymatroid} using a greedy approach that requires sorting. We now show that for a special class of submodular functions $f$ as defined below, sorting is not necessary. In particular, we show that when a polymatroid is defined in terms of a EWS function---as defined below---then then the optimization over a polymatroid can be computed in linear expected time. 
 
 \begin{definition} \label{asm:submodular-function}
-A function $f\colon 2^{1{:}n} \to \Real_{\ge 0}$ is $\ews(\bm{\mu} ,m, c)$, or \emph{Element-Wise-Separable}, for $c \in \Real_{\ge 0}$,  $m\in \Real_{>0}$, such that $c + m \ge 1$, and  $\bm{\mu}\in \Real^n_{\ge 0}$ if $f(\mathcal{O}) = g(\bm{1}\tr \bm{\mu}_{\mathcal{O}}), \forall \mathcal{O} \subseteq \Omega$ where for each $x \ge 0$:
+A function $f\colon 2^{1{:}n} \to \Real_{\ge 0}$ is $\ews(\bm{\mu} ,m, c)$, or \emph{Element-Wise-Separable}, for $c \in \Real_{\ge 0}$,  $m\in \Real_{>0}$, such that $c + m \ge 1$, and  $\bm{\mu}\in \Real^n_{\ge 0}$ if $f(\mathcal{O}) = g(\bm{1}\tr \bm{\mu}_{\mathcal{O}}), \forall \mathcal{O} \subseteq \Omega$ where for each $x \in [0,1]$:
 \[
     g(x) :=
     \begin{cases}        
@@ -378,16 +378,18 @@ A function $f\colon 2^{1{:}n} \to \Real_{\ge 0}$ is $\ews(\bm{\mu} ,m, c)$, or \
 An EWS function $f\colon 2^{\Omega} \to  \Real_{\ge 0}$ is submodular, monotone, $f(\emptyset) = 0$, and $f(\Omega) = 1$.   
 \end{proposition}
 \begin{proof} 
-From \cref{lem:submodular-concave}, it is sufficient to show that $g$ is concave to show that  $f$ is submodular.  
-
-We first prove concavity for $g$ on the interval $(0, 1]$, where $0$ is not included. On this interval, $g(x)$ is the minimum of two linear functions and is thus also concave.\cite{boyd2004convex}
-
-We then prove concavity for g on the interval $[0, 1]$, where $0$ is included. If we have value $a$, $b$. and $z$ such that $a = 0$ and thus $g(a) = 0$, $b > 0$, and $z$ in $(0, 1)$ we can shot that $(1 - z)g(a) + z\cdot g(b) = z\cdot g(b) = \min(z\cdot c + m\cdot z\cdot b, z)\leq \min(c + m \cdot z \cdot b, 1) =g(z * b) = g(z*b + (1 - z)*a)$. Thus, $g$ is concave on the interval $[0, b]$ for $b > 0$.
-
-Thus $g$ is concave, and the proof concludes.
+  From \cref{lem:submodular-concave}, it is sufficient to show that $g$ is concave to show that  $f$ is submodular. The function $g$ is concave on the interval $(0, 1]$ because it is the minimum of two linear functions~\cite{boyd2004convex}. The concavity of $g$ on $[0, 1]$ follows from the definition. Since $g(0) = 0$, for each $\lambda \in (0,1]$ and $z \in ( 0, 1]$ we get that
+\begin{align*}
+  (1 - \lambda)g(0) + \lambda \cdot g(b)
+  &= \lambda \cdot g(b)
+  = \min\left\{\lambda  \cdot c + m\cdot \lambda\cdot b, \lambda\right\} \\
+  &\leq \min \left\{ c + m \cdot \lambda \cdot b, 1 \right\}
+  = g(\lambda \cdot  b) = g\left( (1 - \lambda)\cdot 0 + \lambda\cdot b\right).
+\end{align*}
+Because the inequality holds also for $\lambda = 0$, $g$ is concave by the definition. The monotonicity, non-negativity and the boundary value conditions for $f$ follow immediately by algebraic manipulation from the assumptions on $c$ and
+$m$. 
 \end{proof}
 
-We now describe an algorithm for optimizing over polymatroids with this class of submodular function. We then show that both CVaR and TVaR can be computed by solving this optimization problem for particular EWS functions.
 \begin{algorithm}
   \caption{\texttt{QuickDivergence}: Algorithm for optimizing linear function on polymatroids} \label{alg:maximum-weight-independent}
   \Input{$\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$, $\ews(\bm{p}, m, c)$ function $f \colon 2^{1{:}n} \to \Real_{\ge 0}$}
@@ -398,35 +400,32 @@ We now describe an algorithm for optimizing over polymatroids with this class of
   $\mathcal{K}_{= v} \gets \{ i = 1, \dots , n \mid x_i = v \}$ \;
   $\theta \gets \left( 1 - c + \sum_{k = \mathcal{K}_{< v}} m\cdot p_k\right) / (\sum_{k \in \mathcal{K}_{=v}} p_k) $   \;
   \For{$i \in 1{:}n$}{
-   \lIf{$i = k_{\min}$}{$q_i \gets m\cdot p_i + c$}
-   \lElseIf{$ i \in \mathcal{K}_{< v} \wedge i \ne k_{\min} $} {$q_i \gets m \cdot p_i$}
-   \lElseIf{$ i \in \mathcal{K}_{=v} $} {$q_i \gets  \theta \cdot  p_i$}
-   \lElse{$q_i \gets 0$}
+   \lIf{$i = k_{\min}$}{$q\opt_i \gets m\cdot p_i + c$}
+   \lElseIf{$ i \in \mathcal{K}_{< v} \wedge i \ne k_{\min} $} {$q\opt_i \gets m \cdot p_i$}
+   \lElseIf{$ i \in \mathcal{K}_{=v} $} {$q\opt_i \gets  \theta \cdot  p_i$}
+   \lElse{$q\opt_i \gets 0$}
   }
-  \Return{$\bm{q}$}
+  \Return{$\bm{q}\opt$}
  \end{algorithm}
 
-We now prove the optimality of the algorithm and it's expected linear time complexity. The proof of optimality is obtained by showing that every value we compute for $q$ is equivalent to what would be obtained by following the computational procedure defined in \cite[remark~4.86]{Follmer2016}. The proof of the time complexity follows from the expected linear time complexity, and the fact that remaining operations can be computed in linear time, and thus have no impact on the complexity.
-
+\cref{alg:maximum-weight-independent} gives the algorithm for optimizing over polymatroids. The main difference from the standard linear polymatroid algorithm in \cref{alg:greedy-polymatroid} is that it does not require sorting the input vector. Instead, the algorithm is able to use QuickVaR to only sort the input vector partially. The following theorem states the correctness and runtime of \cref{alg:maximum-weight-independent}.
 \begin{theorem}
-\cref{alg:maximum-weight-independent} solves~\eqref{eq:comonotonic-optimization} in expected $O(n)$ runtime. 
+\Cref{alg:maximum-weight-independent} solves~\eqref{eq:comonotonic-optimization} in expected $O(n)$ runtime. 
 \end{theorem}
 \begin{proof}
-Assume that $x_1 \le x_2 \le  \dots  \le x_n$ \mm{why could we assume that the elements are sorted? Isn't the whole point that we do not need to sort the elements?}.
-  The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal{O}_{i})$ \cite[Remark 4.86]{Follmer2016}, where $\mathcal{O}_i$ is the set of all elements that have only values less than or equal to the i-th largest element:
+First, to prove the correctness of \cref{alg:maximum-weight-independent} let $\bm{q}\opt$ be its solution. We show that the objective for $\bm{q}\opt$ coincides with the objective of the solution $\hat{\bm{q}}$ computed by the standard polymatroid optimization in \cref{alg:greedy-polymatroid}. Note that \cref{alg:greedy-polymatroid} solves \eqref{eq:comonotonic-optimization} by \cref{prop:standard-polymatroid-works} (see also \citet[remark~4.86]{Follmer2016}). 
+
+
+  Suppose that $\sigma\colon  1{:}n \to 1{:}n$ is a permutation such that $i \le j \Rightarrow x_{\sigma(i)} \le x_{\sigma(j)}$ for each $i,j\in 1{:}n$.
+The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal{O}_{i})$ \cite[Remark 4.86]{Follmer2016}, where $\mathcal{O}_i$ is the set of all elements that have only values less than or equal to the i-th largest element:
   \[
    \mathcal{O}_i := \left\{1, \dots ,i  \right\}, \quad \forall  i = 1, \dots, n,
  \]
  and $\mathcal{O}_{0 } := \emptyset$. For $f(\mathcal{O}_{i+1}) \leq 1$ and $f(\mathcal{O}_i) < 1$ and $\mathcal{O}_i \neq \emptyset$ \mm{???}
-
-
-
 \begin{align*}
     f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_i) &= c  +m \cdot \sum_{k = 1}^{i + 1}p_{k} - (c  +m \cdot \sum_{k = 1}^{i}p_{i})\\
     &= m \cdot p_{i+1}.
 \end{align*}
-
-
 We know from \eqref{eq:var-definition} that $v$ is the largest $\tau$ such that $P[x < \tau] \leq \frac{1 - c}{m}$. 
 Thus, for any $i$ such that $x_i < z$ and $i \neq j$, $(c  +\sum_{j = 1}^{i}m \cdot p_j) \leq 1$
 and thus $q_i$ must equal $m*p_i$.
@@ -549,7 +548,7 @@ It is easy to verify that $\bm{q} \ge \bm{0}$ and $\bm{1}\tr \bm{q} = 1$. The co
 (TVaR)~\cite{Kruse2021}
 
 We remind the reader that in this work we define TVaR as the $\varphi$-divergence risk that uses the $L_1$ norm divergence. This may not seem very interpretable, however we can show that we can set the divergence constraint, or $\beta$, such that it can be a provable lower bound for a given EVaR with $\alpha$ value between 0 and 1.
-From previous work , we know that the KL divergece is $\leq \frac{1}{2 \log(2)} \, \|p - q\|_1^2$ \cite{Iyengar2005}. Thus, by algebraic manipulation it can be seen that the coherent risk measure TVaR with the divergence constraint $\|p - q\|_1 \leq \sqrt{2 \log(2) *-\log(\alpha)}$  must be $\leq EVaR_\alpha[\tilde{x}]$. 
+From previous work , we know that the KL divergence is $\leq \frac{1}{2 \log(2)} \, \|p - q\|_1^2$ \cite{Iyengar2005}. Thus, by algebraic manipulation it can be seen that the coherent risk measure TVaR with the divergence constraint $\|p - q\|_1 \leq \sqrt{2 \log(2) *-\log(\alpha)}$  must be $\leq EVaR_\alpha[\tilde{x}]$. 
 
 We now prove the submodular function for TVaR and show that it also satisfies ElementWiseSeperability as defined above.
 \begin{proposition}
@@ -635,7 +634,7 @@ where $\otimes$ is the Hadamard vector product. It is easy to verify that $\bm{q
 \item Suppose that $\bm{1}_{\mathcal{O}}\tr  \bm{p}  + \beta/2 < 1$. Then we construct $\bm{q}$ as
 \[
 \bm{q} \;:=\; \frac{\bm{1}_{\mathcal{O}} \tr {p} + \beta/2}{\bm{1}_{\mathcal{O}} \tr {p}} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}}
-+  \frac{(\bm{1} - \bm{1}_{\mathcal{O}}) \tr {p} - \beta/2)}{(\bm{1} - \bm{1}_{\mathcal{O}}) \tr {p}}\cdot \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}}),
++  \frac{(\bm{1} - \bm{1}_{\mathcal{O}}) \tr {p} - \beta/2 )}{(\bm{1} - \bm{1}_{\mathcal{O}}) \tr {p}}\cdot \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}}),
 \]
 It is easy to verify that $\bm{q} \in \mathcal{Q}_f$ and $\bm{1}_{\mathcal{O}}\tr \bm{q} \le 1$. 
 \end{enumerate}
@@ -842,7 +841,7 @@ Let $v$ be an input to \cref{alg:partition} and consider the following invariant
 
 \begin{algorithm}
     \caption{Polymatroid greedy minimization.} \label{alg:greedy-polymatroid}
-    \Input{submodular monotone function $f \colon  2^{1{:}n} \to \Real$, and an objective $\bm{x}\in \Real^n$}
+    \Input{submodular monotone function $f \colon  2^{1{:}n} \to \Real$, and an objective $\bm{x}\in \Real^n_{\ge 0}$}
     \Output{$\bm{q}\opt \in \arg\min_{\bm{q}\in \widehat{\mathcal{Q}}_f} \bm{x}\tr \bm{q}$}
     Use sort to get
     $\sigma \colon 1{:}n \to 1{:}n$ such that
@@ -853,21 +852,20 @@ Let $v$ be an input to \cref{alg:partition} and consider the following invariant
     \Return{$\bm{q}\opt$}
 \end{algorithm}
 
-\cref{alg:greedy-polymatroid} is a the straightforward adaptation of standard polymatroid algorithms, such as \cite[section~14.9]{Korte2012}, to an optimization over normalized polymatroid. 
-
-\begin{proposition}
-  When $f\colon  2^{1{:}n} \to \Real$ is submodular, monotone and $f(\emptyset) = 0$ and $f(1{:}n) = 1$, then \cref{alg:greedy-polymatroid} computes
+\cref{alg:greedy-polymatroid} is a the straightforward adaptation of standard polymatroid algorithms, such as \cite[section~14.9]{Korte2012}, to an optimization over a normalized polymatroid. The following proposition states its correctness. 
+\begin{proposition} \label{prop:standard-polymatroid-works}
+Suppose that $f\colon  2^{1{:}n} \to \Real$ is submodular, monotone, $f(\emptyset) = 0$ and $f(1{:}n) = 1$, and for $\bm{x}\in \Real^n_{\ge 0}$. Then, \cref{alg:greedy-polymatroid} computes $\bm{q}\opt$ such that
   \begin{equation} \label{eq:normalized-poly-opt}
     \bm{q}\opt  \in  \arg\min_{\bm{q}\in \widehat{\mathcal{Q}}_f}  \bm{x}\tr \bm{q}.
 \end{equation}
 \end{proposition}
 \begin{proof}
-  First, we show that $\bm{q}\opt \in \widehat{\mathcal{Q}}_f$. $f(\emptyset) = 0$, we get that $q\opt_{\sigma(1)} = f(\left\{ 1 \right\}) - f(\emptyset) = f(\left\{ 1 \right\})$ and the construction of $\bm{q}\opt $ matches  proposition~14.10 in \citet{Korte2012}. Therefore $\bm{q}\opt  \in \mathcal{Q}_f$. By its construction, we get that
+First, we show that $\bm{q}\opt \in \widehat{\mathcal{Q}}_f$. Note that the construction of $\bm{q}\opt $ in \cref{alg:greedy-polymatroid} matches the construction in proposition~14.10 in \citet{Korte2012} since $f(\emptyset) = 0$ and $q\opt_{\sigma(1)} = f(\left\{ 1 \right\}) - f(\emptyset) = f(\left\{ 1 \right\})$. Therefore, proposition~14.10 in \citet{Korte2012} shows that $\bm{q}\opt  \in \mathcal{Q}_f$. Moreover, by the construction of $\bm{q}\opt$ :
   \[
    \sum_{i=1}^n q\opt_i =  
    \sum_{i=1}^n q\opt_{\sigma (i)} = f(1{:}n) - f(\emptyset) = 1, 
   \]
-and therefore $\bm{q}\opt \in \Delta_n$, $\widehat{\mathcal{Q}}_f \neq \emptyset$, and a minimum exists.
+which implies that $\bm{q}\opt \in \widehat{\mathcal{Q}}_f\Delta_n \cap \mathcal{Q}_f$, $\widehat{\mathcal{Q}}_f \neq \emptyset$, and the minimum \eqref{eq:normalized-poly-opt} exists.
 
 To show, that $\bm{q}\opt $ is optimal, we reduce the optimization problem in \eqref{eq:normalized-poly-opt} to the standard linear polymatroid optimization problem with non-negative weights as follows:
 \begin{align*}

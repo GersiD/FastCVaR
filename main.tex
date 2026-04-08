@@ -157,7 +157,7 @@ The standard VaR algorithm for a discrete random variable $\bm{x}\in \Real^n$ wi
   \; \le\;
   \sum_{j = 1}^i p_{\sigma(j)}.
 \]
-The value $x_{\sigma(i)}$ is the optimal solution in~\eqref{eq:var-definition} by  \cref{thm:quantile-in-finite-omega} below. The computational complexity of this algorithm is $O(n \log  n)$ because its runtime is dominated by the need to sort the entries of $\bm{x}$. For the sake of completeness, we give a formal definition of the standard algorithm in \cref{alg:slow-quantile} in the appendix.
+The value $x_{\sigma(i)}$ is the optimal solution in~\eqref{eq:var-definition} by  \cref{thm:quantile-in-finite-omega} below. The computational complexity of this algorithm is $\Omega(n \log  n)$ because its runtime is dominated by the need to sort the entries of $\bm{x}$. For the sake of completeness, we give a formal definition of the standard algorithm in \cref{alg:slow-quantile} in the appendix.
 
 Our \emph{QuickVaR} algorithm, described in \cref{alg:quick-quantile}, computes the VaR in $O(n)$ time by avoiding the need to sort the elements of the input random variable $\bm{x}$. In particular, QuickVaR partially sorts the indexes of $\bm{x}$, analogous to the Quickselect algorithm~\cite{horowitz1998computer}. 
 
@@ -325,7 +325,7 @@ with bounds $\quant^+_{\alpha}[\tilde{x}] := \max \quant_{\alpha}[\tilde{x}]$ an
 
 \section{Computing \texorpdfstring{$\varphi$}{phi}-divergence Risk Measures in Linear Time} \label{sec:phi-divergence}
 
-In this section, we describe and analyze QuickDivergence, a new linear-time framework for computing a certain class of $\varphi$-divergence risk measures, such as CVaR and TVaR. QuickDivergence treats risk evaluation as a linear optimization over a polymatroid. Standard polymatroid optimization algorithms must sort their input which requires $O(n \log  n)$ runtime. We identify a structural condition of risk measure polymatroids that makes it possible to avoid sorting and instead use the linear-time QuickVaR algorithm described in \cref{sec:var-linear}.
+In this section, we describe and analyze QuickDivergence, a new linear-time framework for computing a certain class of $\varphi$-divergence risk measures, such as CVaR and TVaR. QuickDivergence treats risk evaluation as a linear optimization over a polymatroid. Standard polymatroid optimization algorithms must sort their input which requires $\Omega(n \log  n)$ runtime. We identify a structural condition of risk measure polymatroids that makes it possible to avoid sorting and instead use the linear-time QuickVaR algorithm described in \cref{sec:var-linear}.
 
 The remainder of the section is organized as follows. \Cref{sec:quickdivergence} describes a general linear-time algorithm suitable for $\varphi$-divergence risk measures that satisfy a EWS property. Then \cref{sec:cvar-tvar-are} shows that both CVaR and TVaR satisfy the EWS property and can be computed in linear time. 
 
@@ -361,7 +361,22 @@ Suppose that $\rho\colon \Delta_n \times  \Real^n \to \Real$ is a coherent comot
 where $\tilde{1}$ is an indicator random variable. Moreover, if the risk measure is law-invariant then there exists $g\colon \Real \to \Real$ such that $c(\mathcal{A}) = g(\bm{1}\tr \bm{p}_{\mathcal{A}})$ for each $\mathcal{A} \subseteq 1{:}n$.
 \end{proposition}
 
-Conventional polymatroid optimization algorithms for risk measures solve the optimization problem in \cref{prop:coherent-polymatroid} using a greedy approach that requires sorting. We now show that for a special class of submodular functions $f$ as defined below, sorting is not necessary. In particular, we show that when a polymatroid is defined in terms of a EWS function---as defined below---then then the optimization over a polymatroid can be computed in linear expected time. 
+The standard solution to the polymatroid optimization problem in \eqref{eq:comonotonic-optimization} to use a greedy algorithm, such as \cref{alg:greedy-polymatroid}. This algorithm adapts the standard polymatroid optimization, such as \citet[section~14.9]{Korte2012}, to the normalized polymatroid $\widehat{\mathcal{Q}}_f$. See \cref{prop:standard-polymatroid-works} for the proof of correctness. Note that the greedy approach in \cref{alg:greedy-polymatroid} requires sorting and, therefore, runs in $\Omega(n \log  n)$ time.
+
+\begin{algorithm}
+    \caption{Polymatroid greedy minimization.} \label{alg:greedy-polymatroid}
+    \Input{submodular monotone function $f \colon  2^{1{:}n} \to \Real$, and an objective $\bm{x}\in \Real^n_{\ge 0}$}
+    \Output{$\bm{q}\opt \in \arg\min_{\bm{q}\in \widehat{\mathcal{Q}}_f} \bm{x}\tr \bm{q}$}
+    Use sort to get
+    $\sigma \colon 1{:}n \to 1{:}n$ such that
+    $i > j \implies x_{\sigma(i)} \ge  x_{\sigma(j)}, \; \forall i, j \in 1{:}n$\;
+     \For{$i\in 1{:}n$}{
+       $q\opt_{\sigma(i)} \gets f\left(1{:}i\right) - f\left(1{:}(i-1)\right) $
+    }
+    \Return{$\bm{q}\opt$}
+\end{algorithm}
+
+We now show that for a special class of submodular functions, which we call EWS, sorting is not necessary. In particular, we show that when a polymatroid is defined in terms of a EWS function---as defined below---then then the optimization over a polymatroid can be computed in linear expected time. 
 
 \begin{definition} \label{asm:submodular-function}
 A function $f\colon 2^{1{:}n} \to \Real_{\ge 0}$ is $\ews(\bm{\mu} ,m, c)$, or \emph{Element-Wise-Separable}, for $c \in \Real_{\ge 0}$,  $m\in \Real_{>0}$, such that $c + m \ge 1$, and  $\bm{\mu}\in \Real^n_{\ge 0}$ if $f(\mathcal{O}) = g(\bm{1}\tr \bm{\mu}_{\mathcal{O}}), \forall \mathcal{O} \subseteq \Omega$ where for each $x \in [0,1]$:
@@ -375,7 +390,7 @@ A function $f\colon 2^{1{:}n} \to \Real_{\ge 0}$ is $\ews(\bm{\mu} ,m, c)$, or \
 \end{definition}
 
 \begin{proposition}
-An EWS function $f\colon 2^{\Omega} \to  \Real_{\ge 0}$ is submodular, monotone, $f(\emptyset) = 0$, and $f(\Omega) = 1$.   
+Any EWS function $f\colon 2^{\Omega} \to  \Real_{\ge 0}$ is submodular, monotone, $f(\emptyset) = 0$, and $f(\Omega) = 1$.   
 \end{proposition}
 \begin{proof} 
   From \cref{lem:submodular-concave}, it is sufficient to show that $g$ is concave to show that  $f$ is submodular. The function $g$ is concave on the interval $(0, 1]$ because it is the minimum of two linear functions~\cite{boyd2004convex}. The concavity of $g$ on $[0, 1]$ follows from the definition. Since $g(0) = 0$, for each $\lambda \in (0,1]$ and $z \in ( 0, 1]$ we get that
@@ -394,29 +409,32 @@ $m$.
   \caption{\texttt{QuickDivergence}: Algorithm for optimizing linear function on polymatroids} \label{alg:maximum-weight-independent}
   \Input{$\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$, $\ews(\bm{p}, m, c)$ function $f \colon 2^{1{:}n} \to \Real_{\ge 0}$}
   \Output{$\min \left\{ \bm{q}\in \Real^n  \mid  \bm{q} \in \mathcal{Q}_f, \bm{1}\tr \bm{q} = 1\right\}$}
-  $k_{\min} \gets \arg\min_{i \in  1{:}n} x_i$ \;
+  Choose $k_{\min} \in \arg\min_{i \in  1{:}n} x_i$ breaking ties by choosing the minimal $i$\;
   $v \gets \operatorname{QuickVaR}(\bm{p}, \bm{x}, \alpha = (1 - c)/m)$ \;
-  $\mathcal{K}_{< v} \gets \{ i = 1, \dots , n \mid x_i < v \}$ ; ~
-  $\mathcal{K}_{= v} \gets \{ i = 1, \dots , n \mid x_i = v \}$ \;
-  $\theta \gets \left( 1 - c + \sum_{k = \mathcal{K}_{< v}} m\cdot p_k\right) / (\sum_{k \in \mathcal{K}_{=v}} p_k) $   \;
+  $\mathcal{K}_{< v} \gets \{ i \in  1{:}n \mid x_i < v \}$ ; ~
+  $\mathcal{K}_{= v} \gets \{ i = 1{:}n \mid x_i = v \}$ \;
+  $\theta \gets \left( 1 - c + m\cdot \sum_{k = \mathcal{K}_{< v}}  p_k\right)  $ \;
   \For{$i \in 1{:}n$}{
    \lIf{$i = k_{\min}$}{$q\opt_i \gets m\cdot p_i + c$}
    \lElseIf{$ i \in \mathcal{K}_{< v} \wedge i \ne k_{\min} $} {$q\opt_i \gets m \cdot p_i$}
-   \lElseIf{$ i \in \mathcal{K}_{=v} $} {$q\opt_i \gets  \theta \cdot  p_i$}
+   \lElseIf{$ i \in \mathcal{K}_{=v} \wedge i \neq k_{\min}$} {$q\opt_i \gets \min \left\{  \theta, m \cdot p_i \right\} $; $\theta\gets \theta - q\opt_i$}
    \lElse{$q\opt_i \gets 0$}
   }
   \Return{$\bm{q}\opt$}
  \end{algorithm}
 
-\cref{alg:maximum-weight-independent} gives the algorithm for optimizing over polymatroids. The main difference from the standard linear polymatroid algorithm in \cref{alg:greedy-polymatroid} is that it does not require sorting the input vector. Instead, the algorithm is able to use QuickVaR to only sort the input vector partially. The following theorem states the correctness and runtime of \cref{alg:maximum-weight-independent}.
+\cref{alg:maximum-weight-independent} describes the \emph{QuickDivergence} approach to polymatroid optimization. The main difference from the standard linear polymatroid algorithm in \cref{alg:greedy-polymatroid} is that it does not require sorting the input vector. Instead, the algorithm is able to use QuickVaR to only sort the input vector partially. The following theorem states the correctness and runtime of \cref{alg:maximum-weight-independent}.
 \begin{theorem}
 \Cref{alg:maximum-weight-independent} solves~\eqref{eq:comonotonic-optimization} in expected $O(n)$ runtime. 
 \end{theorem}
 \begin{proof}
-First, to prove the correctness of \cref{alg:maximum-weight-independent} let $\bm{q}\opt$ be its solution. We show that the objective for $\bm{q}\opt$ coincides with the objective of the solution $\hat{\bm{q}}$ computed by the standard polymatroid optimization in \cref{alg:greedy-polymatroid}. Note that \cref{alg:greedy-polymatroid} solves \eqref{eq:comonotonic-optimization} by \cref{prop:standard-polymatroid-works} (see also \citet[remark~4.86]{Follmer2016}). 
+  First, to prove the correctness of \cref{alg:maximum-weight-independent}, assume that it returns $\bm{q}\opt$. We now show that $\bm{q}\opt$ coincides, up to arbitrarily breaking of ties, with $\hat{\bm{q}}$ computed by the standard polymatroid optimization in \cref{alg:greedy-polymatroid}. Suppose that \cref{alg:greedy-polymatroid} chooses a permutation $\sigma\colon  1{:}n \to 1{:}n$ is such that $i \le j \Rightarrow x_{\sigma(i)} \le x_{\sigma(j)}$ and $x_{\sigma(i)} = x_{\sigma(j)} \wedge i \le j \Rightarrow \sigma(i) \le \sigma(j)$ for each $i,j\in 1{:}n$. Intuitively, the conditions on $\sigma$ states that it was generated by a stable sort algorithm. We emphasize that the stability assumption is only needed for our proof technique and the actual implementation does not require it.
 
-
-  Suppose that $\sigma\colon  1{:}n \to 1{:}n$ is a permutation such that $i \le j \Rightarrow x_{\sigma(i)} \le x_{\sigma(j)}$ for each $i,j\in 1{:}n$.
+We now prove that $q\opt_i = \hat{q}_i$ for each $i\in 1{:}n$ by separately analyzing the following three cases.
+  \emph{(i)} Suppose that $i = k_{\min}$. Then the equality holds immediately from the construction: $q\opt_i = f($
+  \emph{(ii)} Suppose that $i \in \mathcal{K}_{<v} \wedge i \neq k_{\min}$.
+  \emph{(iii)} Suppose that $i \in \mathcal{K}_{=v} \wedge i \neq k_{\min}$.
+  
 The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal{O}_{i})$ \cite[Remark 4.86]{Follmer2016}, where $\mathcal{O}_i$ is the set of all elements that have only values less than or equal to the i-th largest element:
   \[
    \mathcal{O}_i := \left\{1, \dots ,i  \right\}, \quad \forall  i = 1, \dots, n,
@@ -828,9 +846,9 @@ Let $v$ be an input to \cref{alg:partition} and consider the following invariant
 
   Condition \eqref{eq:hoare-correspond} remains true for each mutation that may occur as both the $x$ values and $p$ values are swapped at the same indices, see lines \ref{line:swap1} and \ref{line:swap2}.
   
-  \emph{Termination}. During the loop on line \ref{line:partition-while} there are 3 possible paths of execution determined by the conditional logic $x_{e_k} < v$, $x_{e_k} > v$ and $x_{e_k} = v$. Each of these paths of execution decreases $g_k - e_k$ by 1. This occurs on lines \ref{line:partition-e-1-1} and \ref{line:partition-e-1-2} by increasing $e_k$ by 1 and keeping $g_k$ the same. Or on line \ref{line:parition-g-1} by decreasing $g_k$ by 1 and keeping $e_k$ the same.
+  \emph{Termination}. In the loop on line \ref{line:partition-while} there are 3 possible paths of execution determined by the conditional logic $x_{e_k} < v$, $x_{e_k} > v$ and $x_{e_k} = v$. Each of these paths of execution decreases $g_k - e_k$ by 1. This occurs on lines \ref{line:partition-e-1-1} and \ref{line:partition-e-1-2} by increasing $e_k$ by 1 and keeping $g_k$ the same. Or on line \ref{line:parition-g-1} by decreasing $g_k$ by 1 and keeping $e_k$ the same.
   
-  $g_0 - e_0 = b - f$ is positive since $f<b$ by assumption. $g_k-e_k$ decreases by 1 at each iteration, and each iteration requires constant time to complete. The function returns when $g_t - e_t = 0$, therefore this algorithm completes in $O(b-f)$ time. 
+Observe that  $g_0 - e_0 = b - f$ is positive since $f<b$ by assumption. $g_k-e_k$ decreases by 1 at each iteration, and each iteration requires constant time to complete. The function returns when $g_t - e_t = 0$, therefore this algorithm completes in $O(b-f)$ time. 
 
   Notice on the last iteration $g_{t} = e_{t}$, therefore by the same reasoning as above $g_{t+1} - e_{t+1} = -1$ and 
   condition \eqref{eq:ho-inv-equal} holds for $g_{t+1} = e_{t+1} - 1$.
@@ -838,21 +856,7 @@ Let $v$ be an input to \cref{alg:partition} and consider the following invariant
 
 \section{Supplemental $\varphi$-Divergence Algorithms and Properties}
 
-
-\begin{algorithm}
-    \caption{Polymatroid greedy minimization.} \label{alg:greedy-polymatroid}
-    \Input{submodular monotone function $f \colon  2^{1{:}n} \to \Real$, and an objective $\bm{x}\in \Real^n_{\ge 0}$}
-    \Output{$\bm{q}\opt \in \arg\min_{\bm{q}\in \widehat{\mathcal{Q}}_f} \bm{x}\tr \bm{q}$}
-    Use sort to get
-    $\sigma \colon 1{:}n \to 1{:}n$ such that
-    $i > j \implies x_{\sigma(i)} \ge  x_{\sigma(j)}, \; \forall i, j \in 1{:}n$\;
-     \For{$i\in 1{:}n$}{
-       $q\opt_{\sigma(i)} \gets f\left(1{:}i\right) - f\left(1{:}(i-1)\right) $
-    }
-    \Return{$\bm{q}\opt$}
-\end{algorithm}
-
-\cref{alg:greedy-polymatroid} is a the straightforward adaptation of standard polymatroid algorithms, such as \cite[section~14.9]{Korte2012}, to an optimization over a normalized polymatroid. The following proposition states its correctness. 
+The following proposition states the correctness of the polymatroid optimization algorithm. 
 \begin{proposition} \label{prop:standard-polymatroid-works}
 Suppose that $f\colon  2^{1{:}n} \to \Real$ is submodular, monotone, $f(\emptyset) = 0$ and $f(1{:}n) = 1$, and for $\bm{x}\in \Real^n_{\ge 0}$. Then, \cref{alg:greedy-polymatroid} computes $\bm{q}\opt$ such that
   \begin{equation} \label{eq:normalized-poly-opt}

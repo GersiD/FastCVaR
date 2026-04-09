@@ -147,7 +147,7 @@ For each $\alpha\in [0,1]$ and $\tilde{x} \in \mathbb{R}^n$:
 
 \section{Computing VaR in Linear Time} \label{sec:var-linear}
 
-We now describe the QuickVaR algorithm, show that it computes VaR, and show that it runs in average linear time. 
+We now describe the QuickVaR algorithm, show that it computes VaR, and show that it runs in  linear expected time. 
 
 The standard VaR algorithm for a discrete random variable $\bm{x}\in \Real^n$ with distribution $\bm{p}\in \Delta_n$ and risk level $\alpha$ proceeds as follows~(e.g.,~listing~6.25 in \cite{privault2026notes}). It sorts the entries of $X$ to get a permutation $\sigma \colon 1{:}n \to 1{:}n$ such that $i \mapsto x_{\sigma(i)}$ is monotone. Then, it finds an index $i \in 1{:}n$ such that 
 \[
@@ -201,7 +201,7 @@ The following theorem states the correctness of QuickVaR.
 
 Before proving \cref{thm:var-correct}, we need to show several important lemmas. The following lemma shows that the VaR value is the probability atom that satisfies specific probability properties. 
 \begin{lemma}\label{thm:quantile-in-finite-omega}
-Assuming $\alpha\in [0,1)$ and a discrete $\tilde{x}$, there exists $\omega\in\Omega$ with $\var{\alpha }{\tilde{x}} = x_{\omega}$ and
+Assuming $\alpha\in [0,1)$ and a discrete $\tilde{x}$, there exists $\omega\in\Omega$ with $v := \var{\alpha }{\tilde{x}} = x_{\omega}$ and
 \begin{equation} \label{eq:var-property-prob}
   \P{\tilde{x} < v} \le \alpha < \P{\tilde{x} \le v}. 
 \end{equation}
@@ -366,26 +366,26 @@ The standard solution to the polymatroid optimization problem in \eqref{eq:comon
 \begin{algorithm}
     \caption{Polymatroid greedy minimization.} \label{alg:greedy-polymatroid}
     \Input{submodular monotone function $f \colon  2^{1{:}n} \to \Real$, and an objective $\bm{x}\in \Real^n_{\ge 0}$}
-    \Output{$\bm{q}\opt \in \arg\min_{\bm{q}\in \widehat{\mathcal{Q}}_f} \bm{x}\tr \bm{q}$}
+    \Output{$\hat{\bm{q}} \in \arg\min_{\bm{q}\in \widehat{\mathcal{Q}}_f} \bm{x}\tr \bm{q}$}
     Use sort to get
     $\sigma \colon 1{:}n \to 1{:}n$ such that
     $i > j \implies x_{\sigma(i)} \ge  x_{\sigma(j)}, \; \forall i, j \in 1{:}n$\;
-     \For{$i\in 1{:}n$}{
-       $q\opt_{\sigma(i)} \gets f\left(1{:}i\right) - f\left(1{:}(i-1)\right) $
+     \For{$k\in 1{:}n$}{
+       $\hat{q}_{\sigma(k)} \gets f\left(\sigma(1{:}k)\right) - f\left(\sigma(1{:}(k-1))\right) $
     }
-    \Return{$\bm{q}\opt$}
+    \Return{$\hat{\bm{q}}$}
 \end{algorithm}
 
 We now define a special class of submodular functions, which we call EWS, which make sorting is unnecessary when optimizing a linear function over a polymatroid.
 \begin{definition} \label{asm:submodular-function}
 A function $f\colon 2^{1{:}n} \to \Real_{\ge 0}$ is $\ews(\bm{\mu} ,m, c)$, or \emph{Element-Wise-Separable}, for $c \in \Real_{\ge 0}$,  $m\in \Real_{>0}$, such that $c + m \ge 1$, and  $\bm{\mu}\in \Real^n_{\ge 0}$ if $f(\mathcal{O}) = g(\bm{1}\tr \bm{\mu}_{\mathcal{O}}), \forall \mathcal{O} \subseteq \Omega$ where for each $x \in [0,1]$:
-\[
+\begin{equation} \label{eq:def-g}
     g(x) :=
     \begin{cases}        
     \min \{c + m  \cdot x, 1\} &\text{if } x > 0 \\
     0 &\text{otherwise}.
     \end{cases}
-\]
+\end{equation}
 \end{definition}
 
 \begin{proposition}
@@ -408,50 +408,82 @@ $m$.
   \caption{\texttt{QuickDivergence}: Algorithm for optimizing linear function on polymatroids} \label{alg:maximum-weight-independent}
   \Input{$\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$, $\ews(\bm{p}, m, c)$ function $f \colon 2^{1{:}n} \to \Real_{\ge 0}$}
   \Output{$\min \left\{ \bm{q}\in \Real^n  \mid  \bm{q} \in \mathcal{Q}_f, \bm{1}\tr \bm{q} = 1\right\}$}
-  Choose $k_{\min} \in \arg\min_{i \in  1{:}n} x_i$ breaking ties by choosing the minimal $i$\;
+  Choose $k_{\min} \in \arg\min_{i \in  1{:}n} x_i$ breaking ties by choosing the minimal $i$
+  \tcp*{Assume: $p_{k_{\min}} > 0$}
   $v \gets \operatorname{QuickVaR}(\bm{p}, \bm{x}, \alpha = (1 - c)/m)$ \;
   $\mathcal{K}_{< v} \gets \{ i \in  1{:}n \mid x_i < v \}$ ; ~
   $\mathcal{K}_{= v} \gets \{ i = 1{:}n \mid x_i = v \}$ \;
-  $\theta \gets \left( 1 - c + m\cdot \sum_{k = \mathcal{K}_{< v}}  p_k\right)  $ \;
+  $l \gets 1$;~ $\theta_l \gets  1 - c - m\cdot \bm{1}\tr \bm{p}_{\mathcal{K}_{<v }}$ \;
   \For{$i \in 1{:}n$}{
    \lIf{$i = k_{\min}$}{$q\opt_i \gets m\cdot p_i + c$}
-   \lElseIf{$ i \in \mathcal{K}_{< v} \wedge i \ne k_{\min} $} {$q\opt_i \gets m \cdot p_i$}
-   \lElseIf{$ i \in \mathcal{K}_{=v} \wedge i \neq k_{\min}$} {$q\opt_i \gets \min \left\{  \theta, m \cdot p_i \right\} $; $\theta\gets \theta - q\opt_i$}
+   \lElseIf{$i \in \mathcal{K}_{< v} \wedge i \ne k_{\min} $} {$q\opt_i \gets m \cdot p_i$}
+   \lElseIf{$i \in \mathcal{K}_{=v} \wedge i \neq k_{\min}$} {$q\opt_i \gets \min \left\{  \theta_l, m \cdot p_i \right\} $;~ $\theta_{l+1}\gets \theta_l - q\opt_i;~ l \gets l+1$}
    \lElse{$q\opt_i \gets 0$}
   }
   \Return{$\bm{q}\opt$}
  \end{algorithm}
 
-\cref{alg:maximum-weight-independent} describes the \emph{QuickDivergence} approach to polymatroid optimization. The main difference from the standard linear polymatroid algorithm in \cref{alg:greedy-polymatroid} is that it does not require sorting the input vector. Instead, the algorithm is able to use QuickVaR to only sort the input vector partially. The following theorem states the correctness and runtime of \cref{alg:maximum-weight-independent}.
+\cref{alg:maximum-weight-independent} describes \emph{QuickDivergence}, an algorithm for polymatroid optimization. QuickDivergence differs from the standard linear polymatroid algorithm in \cref{alg:greedy-polymatroid} in that it does not require sorting the input vector. Instead, the algorithm is able to use QuickVaR to only sort the input vector partially.
+
+\mm{make sure to add tests to the julia code that check the correctness of the algorithms when the minimum is not supported}
+
+The following theorem states the correctness and runtime of \cref{alg:maximum-weight-independent}. To streamline the exposition, \cref{alg:maximum-weight-independent} requires a mild assumption on its input; see \cref{rem:relax-ess-inf} below on how to relax it. 
 \begin{theorem}
-\Cref{alg:maximum-weight-independent} solves~\eqref{eq:comonotonic-optimization} in expected $O(n)$ runtime. 
+When $p_{k_{\min}} >0$, then \cref{alg:maximum-weight-independent} solves~\eqref{eq:comonotonic-optimization} in expected $O(n)$ runtime. 
 \end{theorem}
 \begin{proof}
-  First, to prove the correctness of \cref{alg:maximum-weight-independent}, assume that it returns $\bm{q}\opt$. We now show that $\bm{q}\opt$ coincides, up to arbitrarily breaking of ties, with $\hat{\bm{q}}$ computed by the standard polymatroid optimization in \cref{alg:greedy-polymatroid}. Suppose that \cref{alg:greedy-polymatroid} chooses a permutation $\sigma\colon  1{:}n \to 1{:}n$ is such that $i \le j \Rightarrow x_{\sigma(i)} \le x_{\sigma(j)}$ and $x_{\sigma(i)} = x_{\sigma(j)} \wedge i \le j \Rightarrow \sigma(i) \le \sigma(j)$ for each $i,j\in 1{:}n$. Intuitively, the conditions on $\sigma$ states that it was generated by a stable sort algorithm. We emphasize that the stability assumption is only needed for our proof technique and the actual implementation does not require it.
+  First, to prove the correctness of \cref{alg:maximum-weight-independent}, assume that it returns $\bm{q}\opt$. We now show that $\bm{q}\opt$ coincides, up to arbitrarily breaking of ties, with $\hat{\bm{q}}$ computed by the standard polymatroid optimization in \cref{alg:greedy-polymatroid}. Suppose that \cref{alg:greedy-polymatroid} chooses a permutation $\sigma\colon  1{:}n \to 1{:}n$ is such that $i \le j \Rightarrow x_{\sigma(i)} \le x_{\sigma(j)}$ and $x_{\sigma(i)} = x_{\sigma(j)} \wedge i \le j \Rightarrow \sigma(i) \le \sigma(j)$ for each $i,j\in 1{:}n$. In other words, the permutation $\sigma$ needs to be generated by a stable sort algorithm. We emphasize that the stability assumption is only needed for our proof technique and the actual implementation does not require it.
 
-We now prove that $q\opt_i = \hat{q}_i$ for each $i\in 1{:}n$ by separately analyzing the following three cases.
-  \emph{(i)} Suppose that $i = k_{\min}$. Then the equality holds immediately from the construction: $q\opt_i = f($ \mm{resume here}
-  \emph{(ii)} Suppose that $i \in \mathcal{K}_{<v} \wedge i \neq k_{\min}$.
-  \emph{(iii)} Suppose that $i \in \mathcal{K}_{=v} \wedge i \neq k_{\min}$.
-  
+We now prove that $q\opt_i = \hat{q}_i$ for each $i\in 1{:}n$ by separately analyzing the following four cases.
+\emph{(i)} Suppose that $i = k_{\min}$. Because $p_i > 0$ by the theorem's hypothesis then 
+\[
+  q\opt_i = m\cdot p_i + c = g(p_i) = f(\{i\}) = f(\{i\}) - f(\emptyset) = \hat{q}_{\sigma(1)} = \hat{q}_i.
+\]
+
+\emph{(ii)} Suppose that $i \in \mathcal{K}_{<v} \wedge i \neq k_{\min}$. From \cref{thm:quantile-in-finite-omega}, we get for each $\mathcal{O} \subseteq \mathcal{K}_{<v}$ that
+\begin{equation} \label{eq:lt-v-prob}
+ \bm{1}\tr \bm{p}_{\mathcal{O}} \le \P{\tilde{x} < v} \le \frac{1-c}{m} ,
+\end{equation}
+and, hence, from \eqref{eq:def-g}:
+\[
+  f(\mathcal{O}) = g\left(\bm{1}\tr \bm{p}_{\mathcal{O}}\right) = c + m \cdot \bm{1}\tr \bm{p}_{\mathcal{O}},
+  \quad\text{when}\quad
+  \bm{1}\tr \bm{p}_{\mathcal{O}} > 0.
+\] 
+Let $k := \sigma^{-1}(i)$ and note that $ \sigma(1{:}k) \subseteq \mathcal{K}_{< v} $ because if $l \in 1{:}k$, then $x_{\sigma(l)} \le x_{\sigma(k)} = x_i < v$ and $\sigma(l) \in \mathcal{K}_{< v}$. Then, since $i \neq k_{\min}$:
+\[
+ \hat{q}_i = \hat{q}_{\sigma(k)} = f(\sigma(1{:}k)) - f(\sigma(1{:}(k-1)))
+= m \cdot \bm{1}\tr \bm{p}_{\sigma(1{:}k) \setminus \sigma(1{:}(k-1)) } = m\cdot p_{\sigma(k)} = m\cdot p_i = q\opt_i. 
+\]
+The third equality follows from $i \neq k_{\min}$ and $p_{k_{\min}} \neq  0$ .
+
+\emph{(iii)} Suppose that $i \in \mathcal{K}_{=v} \wedge i \neq k_{\min}$. Here, we use the assumption that $\sigma$ is a stable sort and prove the claim by induction on $l$ showing also that
+\[
+\theta_l = f(\mathcal{K}_{<v}) \cup \{ j \in \mathcal{K}_{=v} \mid j < \sigma(l) \})  .
+\]
+First, suppose that $l = 1$, let $k := \sigma^{-1}(i)$, then
+\begin{align*}
+  \hat{q}_i = \hat{q}_{\sigma(k)}
+  &= f \left( \left\{ \sigma(k) \right\} \cup \sigma(\mathcal{K}_{<v}) \right)
+  - f \left( \sigma(\mathcal{K}_{<v}) \right)
+  = f \left( \{ \sigma(k) \} \cup \sigma(\mathcal{K}_{<v}) \right)
+    - c - m \cdot \bm{1}\tr \bm{p}_{\mathcal{K}_{<v}} \\
+  &= \min \left\{  1,\; c + m \cdot \bm{1}\tr \bm{p}_{\{ \sigma(k) \} \cup \mathcal{K}_{<v}} \right\} - c - m \cdot \bm{1}\tr \bm{p}_{\mathcal{K} < v} \\
+  &= \min \left\{1  - c - m \cdot \bm{1}\tr \bm{p}_{\mathcal{K} < v}, \; m \cdot p_{\sigma(k)}\right\} \\
+  &= \min \{ \theta_1, m \cdot p_i \} = q_i\opt.
+\end{align*}
+The third equality follows analogously to \eqref{eq:lt-v-prob} from $0 < \bm{1}\tr \bm{p}_{\mathcal{K}_{< v}} \le \frac{1-c}{m}$. The fourth equality follows from the definition of $f$ and from the probability of the set being positive. Note that the derivation above also shows that $\theta_1 = f(\mathcal{K}_{<v})$.
+
+To prove the inductive hypothesis, we suppose that the claim holds for $l$ and we prove it for $l+1$. T
+
+
 The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal{O}_{i})$ \cite[Remark 4.86]{Follmer2016}, where $\mathcal{O}_i$ is the set of all elements that have only values less than or equal to the i-th largest element:
   \[
    \mathcal{O}_i := \left\{1, \dots ,i  \right\}, \quad \forall  i = 1, \dots, n,
  \]
  and $\mathcal{O}_{0 } := \emptyset$. For $f(\mathcal{O}_{i+1}) \leq 1$ and $f(\mathcal{O}_i) < 1$ and $\mathcal{O}_i \neq \emptyset$ \mm{???}
-\begin{align*}
-    f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_i) &= c  +m \cdot \sum_{k = 1}^{i + 1}p_{k} - (c  +m \cdot \sum_{k = 1}^{i}p_{i})\\
-    &= m \cdot p_{i+1}.
-\end{align*}
-We know from \eqref{eq:var-definition} that $v$ is the largest $\tau$ such that $P[x < \tau] \leq \frac{1 - c}{m}$. 
-Thus, for any $i$ such that $x_i < z$ and $i \neq j$, $(c  +\sum_{j = 1}^{i}m \cdot p_j) \leq 1$
-and thus $q_i$ must equal $m*p_i$.
 
-  
-
-
-
-
+ 
 For $f(\mathcal{O}_{i+1}) \leq 1$ and $f(\mathcal{O}_i) = 0$
 
 
@@ -470,6 +502,11 @@ For all other $i$ such that $x_i=z$, since all $q_i$ must sum to 1, it can be se
 
 The quick quantile call runs in expected linear time complexity as shown in \cref{prop:time-complexity}. After the call to QuickQuantile, the number of operations is bounded by the number of elements in $x_0$ and $p_0$ and thus is linear time as well. 
 \end{proof}
+
+
+\begin{remark}\label{rem:relax-ess-inf}
+The assumption $p_{k_{\min}} >0$ in \cref{alg:maximum-weight-independent} is necessary for its correctness by can be lifted using the following modification. Instead of computing $k_{\min}$ as in the algorithm, we need to compute $x_{\min} := \operatorname{QuickVaR}(\bm{p}, \bm{x}, \alpha = 0)$ and define $\mathcal{K}_{< x_{\min}} \gets \{ i \in  1{:}n \mid x_i < x_{\min} \}$ and $\mathcal{K}_{= x_{\min}} \gets \{ i = 1{:}n \mid x_i = x_{\min} \}$. Then, set $q_i\opt = 0$ for each $i \in \mathcal{K}_{<x_{\min}}$ and choose $k_{\min} \in \mathcal{K}_{=x_{\min}}$ arbitrarily. The remaining $q_i\opt $ can be assigned as in the \cref{alg:maximum-weight-independent}.
+\end{remark}
 
 \subsection{CVaR and TVaR are EWS} \label{sec:cvar-tvar-are} 
 We now prove that CVaR can be represented as a polymatroid with a submodular function that satisfies Element-Wise-Seperability as defined above. Therefore we can provably compute CVaR in expected linear time.
@@ -859,24 +896,24 @@ The following proposition states the correctness of the polymatroid optimization
 \begin{proposition} \label{prop:standard-polymatroid-works}
 Suppose that $f\colon  2^{1{:}n} \to \Real$ is submodular, monotone, $f(\emptyset) = 0$ and $f(1{:}n) = 1$, and for $\bm{x}\in \Real^n_{\ge 0}$. Then, \cref{alg:greedy-polymatroid} computes $\bm{q}\opt$ such that
   \begin{equation} \label{eq:normalized-poly-opt}
-    \bm{q}\opt  \in  \arg\min_{\bm{q}\in \widehat{\mathcal{Q}}_f}  \bm{x}\tr \bm{q}.
+    \hat{\bm{q}}  \in  \arg\min_{\bm{q}\in \widehat{\mathcal{Q}}_f}  \bm{x}\tr \bm{q}.
 \end{equation}
 \end{proposition}
 \begin{proof}
-First, we show that $\bm{q}\opt \in \widehat{\mathcal{Q}}_f$. Note that the construction of $\bm{q}\opt $ in \cref{alg:greedy-polymatroid} matches the construction in proposition~14.10 in \citet{Korte2012} since $f(\emptyset) = 0$ and $q\opt_{\sigma(1)} = f(\left\{ 1 \right\}) - f(\emptyset) = f(\left\{ 1 \right\})$. Therefore, proposition~14.10 in \citet{Korte2012} shows that $\bm{q}\opt  \in \mathcal{Q}_f$. Moreover, by the construction of $\bm{q}\opt$ :
+First, we show that $\hat{\bm{q}} \in \widehat{\mathcal{Q}}_f$. Note that the construction of $\hat{\bm{q}}$ in \cref{alg:greedy-polymatroid} matches the construction in proposition~14.10 in \citet{Korte2012} since $f(\emptyset) = 0$ and $\hat{q}_{\sigma(1)} = f(\left\{ 1 \right\}) - f(\emptyset) = f(\left\{ 1 \right\})$. Therefore, proposition~14.10 in \citet{Korte2012} shows that $\hat{\bm{q}}  \in \mathcal{Q}_f$. Moreover, by the construction of $\hat{\bm{q}}$ :
   \[
-   \sum_{i=1}^n q\opt_i =  
-   \sum_{i=1}^n q\opt_{\sigma (i)} = f(1{:}n) - f(\emptyset) = 1, 
+   \sum_{i=1}^n \hat{q}_i =  
+   \sum_{i=1}^n \hat{q}_{\sigma (i)} = f(1{:}n) - f(\emptyset) = 1, 
   \]
-which implies that $\bm{q}\opt \in \widehat{\mathcal{Q}}_f\Delta_n \cap \mathcal{Q}_f$, $\widehat{\mathcal{Q}}_f \neq \emptyset$, and the minimum \eqref{eq:normalized-poly-opt} exists.
+which implies that $\hat{\bm{q}} \in \widehat{\mathcal{Q}}_f\Delta_n \cap \mathcal{Q}_f$, $\widehat{\mathcal{Q}}_f \neq \emptyset$, and the minimum \eqref{eq:normalized-poly-opt} exists.
 
-To show, that $\bm{q}\opt $ is optimal, we reduce the optimization problem in \eqref{eq:normalized-poly-opt} to the standard linear polymatroid optimization problem with non-negative weights as follows:
+To show, that $\hat{\bm{q}} $ is optimal, we reduce the optimization problem in \eqref{eq:normalized-poly-opt} to the standard linear polymatroid optimization problem with non-negative weights as follows:
 \begin{align*}
   \arg\min_{\bm{q}\in \widehat{\mathcal{Q}}_f}  \bm{x}\tr \bm{q}
   &= \arg\min_{\bm{q}\in \widehat{\mathcal{Q}}_f}  (\bm{x} - q_{\min}\cdot \bm{1}) \tr \bm{q} \\
   &= \arg\max_{\bm{q}\in \widehat{\mathcal{Q}}_f}  (q_{\min}\cdot \bm{1} - \bm{x}) \tr \bm{q} \\
   &= \arg\max_{\bm{q}\in \mathcal{Q}_f}  (q_{\min}\cdot \bm{1} - \bm{x}) \tr \bm{q} \\
-  &\ni \bm{q}\opt. 
+  &\ni \hat{\bm{q}}. 
 \end{align*}
 \end{proof}
 

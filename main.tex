@@ -325,7 +325,7 @@ with bounds $\quant^+_{\alpha}[\tilde{x}] := \max \quant_{\alpha}[\tilde{x}]$ an
 
 \section{Computing \texorpdfstring{$\varphi$}{phi}-divergence Risk Measures in Linear Time} \label{sec:phi-divergence}
 
-In this section, we describe and analyze QuickDivergence, a new linear-time framework for computing a certain class of $\varphi$-divergence risk measures, such as CVaR and TVaR. QuickDivergence treats risk evaluation as a linear optimization over a polymatroid. Standard polymatroid optimization algorithms must sort their input which requires $\Omega(n \log  n)$ runtime. We identify a structural condition of risk measure polymatroids that makes it possible to avoid sorting and instead use the linear-time QuickVaR algorithm described in \cref{sec:var-linear}.
+In this section, we describe and analyze QuickDivergence, a new linear-time framework for computing a certain class of $\varphi$-divergence risk measures, such as CVaR and TVaR. QuickDivergence treats risk evaluation as a linear optimization over a polymatroid. Standard polymatroid optimization algorithms must sort their input which requires $\Omega(n \log  n)$ runtime. We identify a structural condition of polymatroid risk measures that allows us to avoid sorting and instead use the QuickVaR algorithm in linear-time described in \cref{sec:var-linear}.
 
 The remainder of the section is organized as follows. \Cref{sec:quickdivergence} describes a general linear-time algorithm suitable for $\varphi$-divergence risk measures that satisfy a EWS property. Then \cref{sec:cvar-tvar-are} shows that both CVaR and TVaR satisfy the EWS property and can be computed in linear time. 
 

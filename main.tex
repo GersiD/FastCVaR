@@ -413,11 +413,11 @@ $m$.
   $v \gets \operatorname{QuickVaR}(\bm{p}, \bm{x}, \alpha = (1 - c)/m)$ \;
   $\mathcal{K}_{< v} \gets \{ i \in  1{:}n \mid x_i < v \}$ ; ~
   $\mathcal{K}_{= v} \gets \{ i = 1{:}n \mid x_i = v \}$ \;
-  $l \gets 1$;~ $\theta_l \gets  1 - c - m\cdot \bm{1}\tr \bm{p}_{\mathcal{K}_{<v }}$ \;
+  $l \gets |\mathcal{K}_{< v}|$;~ $\theta_l \gets  1 - c - m\cdot \bm{1}\tr \bm{p}_{\mathcal{K}_{<v }}$ \;
   \For{$i \in 1{:}n$}{
    \lIf{$i = k_{\min}$}{$q\opt_i \gets m\cdot p_i + c$}
    \lElseIf{$i \in \mathcal{K}_{< v} \wedge i \ne k_{\min} $} {$q\opt_i \gets m \cdot p_i$}
-   \lElseIf{$i \in \mathcal{K}_{=v} \wedge i \neq k_{\min}$} {$q\opt_i \gets \min \left\{  \theta_l, m \cdot p_i \right\} $;~ $\theta_{l+1}\gets \theta_l - q\opt_i;~ l \gets l+1$}
+   \lElseIf{$i \in \mathcal{K}_{=v} \wedge i \neq k_{\min}$} {$q\opt_i \gets \min \left\{  \theta_l, \, m \cdot p_i \right\} $;~ $\theta_{l+1}\gets \theta_l - q\opt_i;~ l \gets l+1$}
    \lElse{$q\opt_i \gets 0$}
   }
   \Return{$\bm{q}\opt$}
@@ -455,50 +455,47 @@ Let $k := \sigma^{-1}(i)$ and note that $ \sigma(1{:}k) \subseteq \mathcal{K}_{<
 \]
 The third equality follows from $i \neq k_{\min}$ and $p_{k_{\min}} \neq  0$ .
 
-\emph{(iii)} Suppose that $i \in \mathcal{K}_{=v} \wedge i \neq k_{\min}$. Here, we use the assumption that $\sigma$ is a stable sort and prove the claim by induction on $l$ showing also that
-\begin{equation} \label{eq:theta-equality}
-\theta_l = 1 - f(\mathcal{K}_{<v} \cup \{ j \in \mathcal{K}_{=v} \mid j < \sigma(l) \})  .
-\end{equation}
-For the base case, suppose that $l = 1$ and let $k := \sigma^{-1}(i)$. The equality in \eqref{eq:theta-equality} holds immediately by algebraic manipulation from \eqref{eq:def-g} and \eqref{eq:lt-v-prob}. Then:
-\begin{align*}
-  \hat{q}_i = \hat{q}_{\sigma(k)}
-  &= f \left( \left\{ \sigma(k) \right\} \cup \sigma(\mathcal{K}_{<v}) \right)
-  - f \left( \sigma(\mathcal{K}_{<v}) \right)
-  = f \left( \{ \sigma(k) \} \cup \sigma(\mathcal{K}_{<v}) \right)
-    - c - m \cdot \bm{1}\tr \bm{p}_{\mathcal{K}_{<v}} \\
-  &= \min \left\{  1,\; c + m \cdot \bm{1}\tr \bm{p}_{\{ \sigma(k) \} \cup \mathcal{K}_{<v}} \right\} - c - m \cdot \bm{1}\tr \bm{p}_{\mathcal{K} < v} \\
-  &= \min \left\{1  - c - m \cdot \bm{1}\tr \bm{p}_{\mathcal{K} < v}, \; m \cdot p_{\sigma(k)}\right\} \\
+\emph{(iii)} Suppose that $i \in \mathcal{K}_{=v} \wedge i \neq k_{\min}$. Here, we use the assumption that $\sigma$ is a stable sort and prove the claim by induction on $l \in |\mathcal{K}_{<v}|, \dots, |\mathcal{K}_{<v}| + |\mathcal{K}_{<v}|$ showing that
+\begin{align}
+ \label{eq:theta-equality-1}
+  \theta_l &= 1 - f(\sigma(1{:}l)) ,  \\
+  \label{eq:theta-equality-2}
+    \hat{q}_{\sigma(l+1)} &= q\opt_{\sigma(l+1)}.
+\end{align}
+To prove the base case, suppose that $l = |\mathcal{K}_{<v}|$. The equality in \eqref{eq:theta-equality-1} holds immediately by algebraic manipulation from \eqref{eq:def-g} and \eqref{eq:lt-v-prob} since $\mathcal{K}_{<v} = \sigma(1{:}l)$. The equality in \eqref{eq:theta-equality-2} holds from \eqref{eq:def-g} and \eqref{eq:lt-v-prob} as
+\begin{equation} \label{eq:q-q-eq}
+  \begin{aligned}
+\hat{q}_{i} = \hat{q}_{\sigma(l+1)}  
+  &= f ( \sigma(1{:}(l+1) )) - f ( \sigma(1{:}l) ) \\
+  &= \min \left\{  1,\; c + m \cdot \bm{1}\tr \bm{p}_{\sigma(1{:}(l+1)} )\right\} - c - m \cdot \bm{1}\tr \bm{p}_{\sigma(1{:}l)} \\
+  &= \min \left\{1  - c - m \cdot \bm{1}\tr \bm{p}_{1{:}l}, \; m \cdot p_{\sigma(l)}\right\} \\
   &= \min \{ \theta_1, m \cdot p_i \} = q_i\opt.
-\end{align*}
-Here, the third equality follows analogously to \eqref{eq:lt-v-prob} from $0 < \bm{1}\tr \bm{p}_{\mathcal{K}_{< v}} \le \frac{1-c}{m}$. The fourth equality follows from the definition of $f$ and from the probability of the set being positive. 
+  \end{aligned}
+\end{equation}
 
-To prove the inductive step, suppose that the claim holds for $l$ and we prove it for $l+1$. 
-
-
-The optimal solution will always be $q_{i+1} = f(\mathcal{O}_{i+1}) - f(\mathcal{O}_{i})$ \cite[Remark 4.86]{Follmer2016}, where $\mathcal{O}_i$ is the set of all elements that have only values less than or equal to the i-th largest element:
-  \[
-   \mathcal{O}_i := \left\{1, \dots ,i  \right\}, \quad \forall  i = 1, \dots, n,
- \]
- and $\mathcal{O}_{0 } := \emptyset$. For $f(\mathcal{O}_{i+1}) \leq 1$ and $f(\mathcal{O}_i) < 1$ and $\mathcal{O}_i \neq \emptyset$ \mm{???}
-
- 
-For $f(\mathcal{O}_{i+1}) \leq 1$ and $f(\mathcal{O}_i) = 0$
-
-
+To prove the inductive case, suppose that \eqref{eq:theta-equality-1} and \eqref{eq:theta-equality-2} hold for $l$, and we prove it for $l+1$. The equality in \eqref{eq:theta-equality-1} can be derived from \eqref{eq:theta-equality-2} and the construction in \cref{alg:greedy-polymatroid} as
 \begin{align*}
-    f(\mathcal{O}_{i + 1}) - f(\mathcal{O}_i) &= c  +\sum_{k = 1}^{i + 1}m\cdot p_{k}
+  \theta_{l+1}
+  &= \theta_l - q\opt_{\sigma(l+1)} \\
+  &= \theta_l - \hat{q}_{\sigma(l+1)} \\
+  &= 1 - f(\sigma(1{:}l)) - \left(  f(\sigma(1{:}(l+1))) - f(\sigma(1{:}l)) \right) \\
+  &= 1 - f(\sigma(1{:}(l+1))).
 \end{align*}
+The equality in \eqref{eq:theta-equality-2} follows analogously to \eqref{eq:q-q-eq} if $\theta_{\sigma(l+2)} > 0$:
+\begin{equation} \label{eq:q-q-eq}
+  \begin{aligned}
+\hat{q}_{i} = \hat{q}_{\sigma(l+2)}  
+  &= f ( \sigma(1{:}(l+2) )) - f(\sigma(1{:}(l+1)) \\
+  &= \min \left\{  1,\; c + m \cdot \bm{1}\tr \bm{p}_{\sigma(1{:}(l+2))} \right\} - (1-\theta_{\sigma(l+1)}) \\
+  &= \min \left\{\theta_{\sigma(l+1)}, \;c + m \cdot \bm{1}\tr \bm{p}_{\sigma(1{:}(l+2))} - f(\sigma(1{:}(l+1)) \right\} \\
+  &= \min \left\{\theta_{\sigma(l+1)}, \; m \cdot p_{\sigma(l+2)}  \right\} \\
+  &= q_i\opt.
+  \end{aligned}
+\end{equation}
+If $\theta_{\sigma(l+2)} = 0$ we get immediately by algebraic manipulation that $\hat{q}_i = 0 = q\opt_i$.
 
-Thus, for any $i$ such that $x_i < z$ and $i = j$, $q_i$ must equal $m*p_i + c$.
+\emph{(iv)} Suppose that $i \in \mathcal{K}_{>v}$ and let $k = \sigma^{-1}(i)$.  For all other $i$ such that $x_i> z$, we note that $P[x < \tau] > \frac{1 - c}{m}$ indicates $f(\mathcal{O}_{i}) - f(\mathcal{O}_{i - 1}) = 1 - 1 = 0$, and thus $q_i = 0$.
 
-
-
-
-For all other $i$ such that $x_i> z$, we note that $P[x < \tau] > \frac{1 - c}{m}$ indicates $f(\mathcal{O}_{i}) - f(\mathcal{O}_{i - 1}) = 1 - 1 = 0$, and thus $q_i = 0$.
-
-For all other $i$ such that $x_i=z$, since all $q_i$ must sum to 1, it can be seen for all such $i$, $\sum_{k : x_k =  v}p_k$ must equal $y$. The solution of the LP is not affected by which $i$ this sum is distributed, so we set $x_z$ to $y$ and everything else to 0. 
-
-The quick quantile call runs in expected linear time complexity as shown in \cref{prop:time-complexity}. After the call to QuickQuantile, the number of operations is bounded by the number of elements in $x_0$ and $p_0$ and thus is linear time as well. 
 \end{proof}
 
 

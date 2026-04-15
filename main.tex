@@ -494,7 +494,21 @@ The equality in \eqref{eq:theta-equality-2} follows analogously to \eqref{eq:q-q
 \end{equation}
 If $\theta_{\sigma(l+2)} = 0$ we get immediately by algebraic manipulation that $\hat{q}_i = 0 = q\opt_i$.
 
-\emph{(iv)} Suppose that $i \in \mathcal{K}_{>v}$ and let $k = \sigma^{-1}(i)$.  For all other $i$ such that $x_i> z$, we note that $P[x < \tau] > \frac{1 - c}{m}$ indicates $f(\mathcal{O}_{i}) - f(\mathcal{O}_{i - 1}) = 1 - 1 = 0$, and thus $q_i = 0$.
+
+\emph{(iv)} Suppose that $i \in \mathcal{K}_{>v}$ and let $k = \sigma^{-1}(i)$. Then, using \eqref{eq:var-property-prob} we have that:
+\begin{align*}
+  1
+  &\ge f(\sigma(\theta(1{:}k))
+  \ge f(\sigma(\theta(1{:}(k-1))) \\
+  &\ge \min \{c + m \cdot \bm{1}\tr \bm{p}_{\sigma (1{:}(k-1)}, 1\}
+  \ge \min \{c + m \cdot \bm{1}\tr \bm{p}_{\sigma (1{:}(k-1)}, 1\} \ge 1, 
+\end{align*}
+since $\bm{1}\tr\bm{p}_{\sigma (1{:}(k-1)} > \frac{1-c}{m}$ from \cref{thm:quantile-in-finite-omega} and the construction of $v$ in \cref{alg:maximum-weight-independent}. Then
+\[
+  \hat{q}_i = \hat{q}_{\sigma(k)}
+  =  f(\sigma(\theta(1{:}k))- f(\sigma(\theta(1{:}(k-1)))
+  = 0 = q\opt_i.
+\]
 
 \end{proof}
 
@@ -502,6 +516,7 @@ If $\theta_{\sigma(l+2)} = 0$ we get immediately by algebraic manipulation that 
 \begin{remark}\label{rem:relax-ess-inf}
 The assumption $p_{k_{\min}} >0$ in \cref{alg:maximum-weight-independent} is necessary for its correctness. Note that it is straightforward to filter out elements with zero probability in linear time. Alternatively, one could relax the assumption by modifying \cref{alg:maximum-weight-independent} as follows. Instead of computing $k_{\min}$ as in the algorithm, we need to compute $x_{\min} := \operatorname{QuickVaR}(\bm{p}, \bm{x}, \alpha = 0)$ and define $\mathcal{K}_{< x_{\min}} \gets \{ i \in  1{:}n \mid x_i < x_{\min} \}$ and $\mathcal{K}_{= x_{\min}} \gets \{ i = 1{:}n \mid x_i = x_{\min} \}$. Then, set $q_i\opt = 0$ for each $i \in \mathcal{K}_{<x_{\min}}$ and choose $k_{\min} \in \mathcal{K}_{=x_{\min}}$ arbitrarily. The remaining $q_i\opt $ can be assigned as in the \cref{alg:maximum-weight-independent}.
 \end{remark}
+
 
 \subsection{CVaR and TVaR are EWS} \label{sec:cvar-tvar-are} 
 We now prove that CVaR can be represented as a polymatroid with a submodular function that satisfies Element-Wise-Seperability as defined above. Therefore we can provably compute CVaR in expected linear time.

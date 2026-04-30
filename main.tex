@@ -18,7 +18,6 @@
 \newcommand{\gersi}[1]{\textcolor{red}{#1}}
 \newcommand{\palash}[1]{\textcolor{green}{#1}}
 \newcommand{\mm}[1]{\textcolor{magenta}{[#1]}}
-\newcommand{\maeve}[1]{\textcolor{blue}{[#1]}}
 
 \bibliographystyle{abbrvnat}
 
@@ -59,22 +58,22 @@ Monetary risk measures have gained popularity in expressing decision-makers' pre
 
 Monetary measures of risk generalize the expectation operator to be able to represent the risk aversion of decision makers in domains that range from robotics~\cite{akella2024risk,majumdar2020should,benrabah2024review} to finance~\cite{Follmer2016} to infrastructure maintenance~\cite{Inzunza2016}, and disaster response~\cite{Barahona2013}. Value-at-Risk~(VaR) and Conditional-Value-at-Risk~(CVaR) are the most popular risk measures and have made inroads in reinforcement learning, machine learning, and decision making~\cite{Petrik2024}. Machine learning and reinforcement learning algorithms typically must compute the risk measures quickly for large discrete random variables. For example, in risk-averse reinforcement learning, one must evaluate the risk measure in every iteration of the algorithm which can represent a significant computational bottleneck~\cite{Ho2021,Ho2018,Ho2022c,Hau2023a,Hau2025}. 
 
-In this paper, we propose linear time algorithms for computing risk measures of discrete random variables. First, we develop \emph{QuickVaR}, an algorithm that computes VaR in linear time and generalizes the well-known quickselect algorithm. Second, we develop \emph{QuickDivergence}, an algorithm that computes, in linear time, $\varphi$-divergence risk measures~\cite{Ahmadi-Javid2012} that satisfy a specific piecewise linearity property. This algorithm reduces $\varphi$-divergence risk measures to linear minimization problems over polymatroids~\cite{Follmer2016}. We illustrate this algorithm for well-known CVaR risk measure and a related TVaR risk measure. Both of this risk measures are in the $\varphi$-divergence family and satisfy the required linearity property.  
+In this paper, we propose linear time algorithms for computing risk measures of discrete random variables. First, we develop \emph{QuickVaR}, an algorithm that computes VaR in linear time and generalizes the well-known quickselect algorithm. Second, we develop \emph{QuickDivergence}, an algorithm that computes, in linear time, $\varphi$-divergence risk measures~\cite{Ahmadi-Javid2012} that satisfy a specific piecewise linearity property. This algorithm reduces $\varphi$-divergence risk measures to linear minimization problems over polymatroids~\cite{Follmer2016}. We illustrate this algorithm for well-known CVaR risk measure and a related TVaR risk measure. Both of these risk measures are in the $\varphi$-divergence family and satisfy the required linearity property.  
 
 Our algorithms' time complexity improves on the state of the art by a logarithmic factor. Virtually all implementations of VaR and CVaR algorithms require sorting the input arrays. The sort step requires $\Omega(n \log n)$ operations where $n$ is the size of the probability space~\cite{Follmer2016}. Our numerical results show that the logarithmic acceleration can lead to an order of magnitude speed-up for realistic large problems without incurring any penalty for small problems. In addition, our linear-time algorithms have simple implementation with minimal added complexity over standard algorithms.
 
 % Coherent risk measures, like CVaR, can be evaluated by solving convex optimization problems~\cite{Follmer2016, rockefeller1996variational}. Generic convex optimization algorithms, such as the interior point linear program solvers, are no faster than $O(n^3)$~\cite{Ho2021}. The $\Omega(n \log  n)$ time complexity of the sort dominates the time complexity and prevents linear time computation. In this paper, we circumvent the complexity of sorting by developing no-sort algorithms for these risk measures and others. 
 
-Linear time algorithms that resemble our QuickVaR and QuickDivergence have been studies in many domains and we summarize some of the most relevant ones. Some example of such structured optimization problems are the projection onto the simplex~\cite{adam2019projectionscanonicalsimplexadditional, Wang2013Simplex}, projection on k-capped simplex~\cite{kcapped_ang,Lim2016}, linear optimization on the intersection of $L_p$ or $\varphi$-divergence balls and the probability simplex in robust optimizations~\cite{Ho2022}, optimization for $\varphi$-divergence risk measures~\cite{Ahmadi-Javid2012}, and on polymatroids~\cite{Korte2012}. While some of these papers discuss the possibility of designing linear-time algorithms, they usually do not study them with a few exceptions~\cite{Condat2016,Lim2016}. Finally, QuickVaR is closely related to the computation weighted quantile but returns the same value only when the quantile is unique~\cite{Korte2012,cormen2001introduction}.
+Linear time algorithms that resemble our QuickVaR and QuickDivergence have been studied in many domains and we summarize some of the most relevant ones. Some example of such structured optimization problems are the projection onto the simplex~\cite{adam2019projectionscanonicalsimplexadditional, Wang2013Simplex}, projection on k-capped simplex~\cite{kcapped_ang,Lim2016}, linear optimization on the intersection of $L_p$ or $\varphi$-divergence balls and the probability simplex in robust optimizations~\cite{Ho2022}, optimization for $\varphi$-divergence risk measures~\cite{Ahmadi-Javid2012}, and on polymatroids~\cite{Korte2012}. While some of these papers discuss the possibility of designing linear-time algorithms, they usually do not study them with a few exceptions~\cite{Condat2016,Lim2016}. Finally, QuickVaR is closely related to the computation weighted quantile but returns the same value only when the quantile is unique~\cite{Korte2012,cormen2001introduction}.
 
 The remainder of the paper is organized as follows. \Cref{sec:preliminaries} describes the necessary background including risk measures, $\varphi$-divergence, and polymatroid optimization. Then, \Cref{sec:var-linear} proposes \emph{QuickVaR} to compute VaR in linear time. \cref{sec:phi-divergence} builds on QuickVaR to develop \emph{QuickDivergence} that computes certain $\varphi$-divergence risk measures in linear time. We evaluate the algorithms numerically on synthetic and realistic problems in \cref{sec:experiments}.
 %A tested implementation of the algorithms in Julia is available at \url{https://github.com/RiskAverseRL/RiskMeasures.jl}.
 
 \section{Preliminaries}\label{sec:preliminaries}
 
-\emph{Notation}: In this paper, we restrict our attention to random variables defined on finite probability spaces $(\Omega, 2^{\Omega}, \bm{p})$ where $\Omega := \left\{ 1, \dots , n \right\}$, $\bm{p} \in \Delta_n$, and $\Delta_n$ is the $n$-dimensional probability simplex. We use a tilde to indicate a random variable, such as $\tilde{x}\colon \Omega \to \Real$. Vectors are denoted with a lower-case bold font, such as $\bm{x} \in \Real^n$ and indexed as $\bm{x}_i \text{ for } i = 1, \dots , n$. We use the function notation $\tilde{x}$ and vector notation $\bm{x}$ interchangeably, such that $x_\omega = x(\omega), \forall \,  \omega \in \Omega$. Sets are denoted with calligraphic letters, $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ denotes the extended real line, and $\Real_{\ge 0}$ are non-negative reals. The symbol $\Nats$ denotes all 0-based natural numbers and $a{:}b := a, a+1, \dots , b$ for $a < b \in \mathbb{N}$. We use $\bm{x}_{a{:}b}$ to denote a subset of elements of $\bm{x}$ and comparisons such as $\bm{x}_{a{:}b} < y$ are interpreted element-wise. 
+\emph{Notation}: In this paper, we restrict our attention to random variables defined on finite probability spaces $(\Omega, 2^{\Omega}, \bm{p})$ where $\Omega := \left\{ 1, \dots , n \right\}$, $\bm{p} \in \Delta_n$, and $\Delta_n$ is the $n$-dimensional probability simplex. We use a tilde to indicate a random variable, such as $\tilde{x}\colon \Omega \to \Real$. Vectors are denoted with a lower-case bold font, such as $\bm{x} \in \Real^n$ and indexed as $\bm{x}_i \text{ for } i = 1, \dots , n$. We use the function notation $\tilde{x}$ and vector notation $\bm{x}$ interchangeably, such that $x_\omega = x(\omega), \forall \,  \omega \in \Omega$. Sets are denoted with calligraphic letters, $\bar{\Real} := \Real \cup \left\{ -\infty, \infty \right\}$ denotes the extended real line, and $\Real_{\ge 0}$ are non-negative reals. The symbol $\Nats$ denotes all 0-based natural numbers and $a{:}b := a, a+1, \dots , b$ for $a < b \in \mathbb{N}$. We use $\bm{x}_{a{:}b}$ to denote a subset of elements of $\bm{x}$ and comparisons such as $\bm{x}_{a{:}b} < y$ are interpreted element-wise. Finally, the symbol $\bm{1} \in \Real^n$ denotes a vector of all ones and $\bm{1}_{\mathcal{O}} \in \Real^n$ for $\mathcal{O} \subseteq \Omega$ is an indicator vector of the set $\mathcal{O}$.
 
-\emph{Monetary risk measures} $\rho\colon \Delta_n \times \Real^n \to \bar{\Real}$ are functions of probability measure and a random variable that are monotone and translation invariant~\cite{Follmer2016}. Risk measures generalize the expectation operator to account for different the uncertainty in the distribution of a random variable for a specific distribution. We apply risk measures to random variables representing rewards and suppose that higher risk values are preferable. For the sake of streamlining the notation, we omit the probability measure when it is obvious from the context and only write $\rho[\tilde{x}]$ to compute the risk value.
+\emph{Monetary risk measures} $\rho\colon \Delta_n \times \Real^n \to \bar{\Real}$ are functions of probability measure and a random variable that are monotone and translation invariant~\cite{Follmer2016}. Risk measures generalize the expectation operator to account for the uncertainty in the distribution of a random variable for a specific distribution. We apply risk measures to random variables representing rewards and suppose that higher risk values are preferable. For the sake of streamlining the notation, we omit the probability measure when it is obvious from the context and only write $\rho[\tilde{x}]$ to compute the risk value.
 
 \emph{Value-at-Risk}~(VaR) is a popular risk measure and is defined for $\alpha\in [0,1)$ and $\tilde{x}\in \mathbb{R}^n$ as~\cite{Follmer2016,Shapiro2014}
 \begin{equation}
@@ -195,8 +194,7 @@ We present \cref{alg:quick-quantile} recursively to simplify analysis. However, 
 
 The following theorem states the correctness of QuickVaR.
 \begin{theorem} \label{thm:var-correct}
-\Cref{alg:quick-quantile} executed with $b =
-1$ and $e = n$ and $\alpha\in [0,1)$ returns $\varo_{\alpha}[ \tilde{x} ]$.
+\Cref{alg:quick-quantile} executed with $f = 1$ and $b = n$ and $\alpha\in [0,1)$ returns $\varo_{\alpha}[ \tilde{x} ]$.
 \end{theorem}
 
 Before proving \cref{thm:var-correct}, we need to show several important lemmas. The following lemma shows that the VaR value is the probability atom that satisfies specific probability properties. 
@@ -229,19 +227,19 @@ If $(l, g, \bm{x}', \bm{p}') = \operatorname{partition}(\bm{x'}, \bm{p'}, v, f, 
   \bm{x}_{l{:}g} = v,  \qquad
   \bm{x}_{(g+1){:}b} > v.
 \end{align}
-Moreover, $ \bm{x}_{f{:}b} = \bm{x'}_{\sigma(f{:}b)}, \bm{p} = \bm{p'}_{\sigma(f{:}b)}$ for some permutation $\sigma\colon f{:}b \to f{:}b$, and $\bm{x}_{1{:}(b-1)} = \bm{x'}_{1{:}(b-1)}, \bm{p}_{1{:}(b-1)} = \bm{p'}_{1{:}(b-1)}$, and $\bm{x}_{(e+1):n} = \bm{x'}_{(e+1):n}, \bm{p}_{(e+1):n} = \bm{p'}_{(e+1):n}$. The algorithm runs in $O(b - f + 1)$ time.
+Moreover, $ \bm{x}_{f{:}b} = \bm{x'}_{\sigma(f{:}b)}, \bm{p} = \bm{p'}_{\sigma(f{:}b)}$ for some permutation $\sigma\colon f{:}b \to f{:}b$, and $\bm{x}_{1{:}(b-1)} = \bm{x'}_{1{:}(b-1)}, \bm{p}_{1{:}(b-1)} = \bm{p'}_{1{:}(b-1)}$, and $\bm{x}_{(e+1):n} = \bm{x'}_{(e+1):n}, \bm{p}_{(e+1):n} = \bm{p'}_{(e+1):n}$. The elements outside of $f{:}b$ range are not modified. The algorithm runs in $O(b - f + 1)$ time.
 \end{lemma}
 \Cref{lem:hoare-partition} is a standard property of the Dutch national flag algorithm, and we outline its proof in \cref{sec:stand-var-algor} for the sake of completeness.
 
 The following lemma analyzes the recursive property of QuickVaR and is the main building block of \cref{thm:var-correct}.
 \begin{lemma} \label{lem:quickvar-correct}
-If input conditions of \cref{alg:quick-quantile} hold and $\bm{x} \in \Real^n$ satisfies that
+Suppose that the input conditions of \cref{alg:quick-quantile} hold and $\bm{x} \in \Real^n$ satisfies that
  \begin{equation} \label{eq:qvar-precondition}
   \mathbf{x}_{1{:}(f-1)} < x_f, \qquad
-  x_f \le \bm{x}_{f{:}b} \le x_b,  \qquad
+  x_{f-1} \le \bm{x}_{f{:}b} \le x_{b+1},  \qquad
   x_b < \bm{x}_{(b+1){:}n},
 \end{equation} 
-then \cref{alg:quick-quantile} returns $x_{\omega}, \omega\in f{:}b$ such that
+where $x_0 = -\infty$ and $x_{n+1} = +\infty$. Then \cref{alg:quick-quantile} returns $x_{\omega}, \omega\in f{:}b$ such that
 \begin{equation} \label{eq:qvar-postcondition}
   \P{\tilde{x} < x_{\omega}}
   \quad \le \quad
@@ -262,7 +260,7 @@ Above, the first inequality holds from $x = x_f$ and $0 \le \alpha$. The second 
 
 \emph{Inductive step}. Suppose that $k>0$ and that the lemma holds for all $k' < k$. We now analyze the following three cases.
 
-(i) If $\alpha < t$, the algorithm executes the first if statement on line~\ref{ln:firstif}. Because $0 \le \alpha  < t$, the recursive call satisfies the required input conditions: $f \le l-1$ and $\sum_{j=f}^{l-1} p_j = t > l$. The recursive call also satisfies \eqref{eq:qvar-precondition} by \cref{lem:hoare-partition}, and we can conclude that \eqref{eq:qvar-postcondition} holds from the inductive hypothesis because $l-1 - f \le b-1 -f \le k$.
+(i) If $\alpha < t$, the algorithm executes the first if statement on line~\ref{ln:firstif}. Because $0 \le \alpha  < t$, the recursive call satisfies the required input conditions: $f \le l-1$ and $\sum_{j=f}^{l-1} p_j = t > \alpha$. The recursive call also satisfies \eqref{eq:qvar-precondition} by \cref{lem:hoare-partition}, and we can conclude that \eqref{eq:qvar-postcondition} holds from the inductive hypothesis because $l-1 - f \le b-1 -f \le k$.
 
 (ii) If $t + e \le \alpha$, the algorithm executes the second if statement on line~\ref{ln:secondif}. We show that the input conditions for the recursive call are met. Because $t + e = \sum_{j = f}^g p_j \le \alpha < \sum_{j=f}^b p_j$  (the second inequality is the input condition), it must be that $g < b$ and therefore $g+1 \le b$. Also, by the algorithm's input condition and algebraic manipulation, we get that
 \[
@@ -282,7 +280,7 @@ Then, \eqref{eq:qvar-postcondition} follows by algebraic manipulation after subs
 
 We are now ready to prove the correctness of QuickVaR.
 \begin{proof}[Proof of \cref{thm:var-correct}]
-  With $b = 1$ and $e = n$, the condition in \eqref{eq:qvar-precondition} is satisfied since $\alpha\in [0,1)$. Thefore, \cref{lem:quickvar-correct} shows that QuickVaR returns $x_{\omega}$ that satisfies
+With $f = 1$ and $b = n$, the condition in \eqref{eq:qvar-precondition} is satisfied since $\alpha\in [0,1)$. Therefore, \cref{lem:quickvar-correct} shows that QuickVaR returns $x_{\omega}$ that satisfies
   \[
   \P{\tilde{x} < x_{\omega}}
   \quad \le \quad
@@ -310,7 +308,7 @@ Note that by the assumption $\sum_{j = f}^b p_j > \alpha$, we have that $k \ge 1
 \nonumber
   &= d\cdot k + \max_{l\in 0{:}(k-1)} \frac{1}{k}  \left(  \sum_{i=l+1}^{k-1} T(i)  + \sum_{i=0}^{l-1} T(k - i - 1)   \right) \\
 \label{eq:quickvar-complexity}
-  &= d\cdot k + \max_{l\in 0{:}(k-1)} \frac{1}{k}  \left(  \sum_{i=l+1}^{k-1} T(i)  + \sum_{i=l}^{k-1} T(i)   \right).
+  &= d\cdot k + \max_{l\in 0{:}(k-1)} \frac{1}{k}  \left(  \sum_{i=l+1}^{k-1} T(i)  + \sum_{i=k-l}^{k-1} T(i)   \right).
 \end{align}
 where $d\cdot k$ is the local runtime of the algorithm for some $d > 0$ and $T(i)$ and $T(k - i - 1)$ are the average runtimes of the recursive calls. The average over $i$ corresponds to the uniformly-random selection of the pivot with $i = \left| \left\{ j \in 1{:}k \mid x_i < v \right\} \right|$ in the first line of the inequality. The last two equalities follow by algebraic manipulation. Then, an argument identical to \cite[theorem~3.3]{horowitz1998computer}, since \eqref{eq:quickvar-complexity} is the same as equation (3.8) in \cite{horowitz1998computer}, shows that \(T(k)\le 4\cdot d\cdot k\) for all \(k\ge 1\).
 \end{proof}
@@ -347,7 +345,7 @@ For a submodular $f \colon 2^{1{:}n} \to \Real_{\ge 0}$, a \emph{polymatroid} $\
 and a \emph{normalized polymatroid} is the intersection with the probability simplex: $\widehat{\mathcal{Q}}_f := \mathcal{Q}_f \cap \Delta_n $.
 \end{definition}
 
-Polymatroids are useful in our setting because any coherent, comotonic monetary risk measure can be formulated as linear optimization over a polymatroids~\cite[corollary~4.89]{Follmer2016}. A risk measure $\rho$ is \emph{coherent} if it is concave and positively homogeneous.  A risk measure $\rho$ is \emph{comotonic} is for any comonotone $\tilde{x}, \tilde{y}$: $\rho[ \tilde{x} + \tilde{y} ] = \rho[ \tilde{x} ] + \rho[ \tilde{y} ]$, where the random variables $\tilde{x}, \tilde{y} \in \Real^{1{:}n}$ are \emph{comonotone} if $\tilde{x}(i) \ge \tilde{x}(j) \Leftrightarrow \tilde{y}(i) \ge \tilde{y}(j)$ for each $i,j\in 1{:}n$.
+Polymatroids are useful in our setting because any coherent, comotonic monetary risk measure can be formulated as linear optimization over a polymatroids~\cite[corollary~4.89]{Follmer2016}. A risk measure $\rho$ is \emph{coherent} if it is concave and positively homogeneous.  A risk measure $\rho$ is \emph{comotonic} if for any comonotone $\tilde{x}, \tilde{y}$: $\rho[ \tilde{x} + \tilde{y} ] = \rho[ \tilde{x} ] + \rho[ \tilde{y} ]$, where the random variables $\tilde{x}, \tilde{y} \in \Real^{1{:}n}$ are \emph{comonotone} if $\tilde{x}(i) \ge \tilde{x}(j) \Leftrightarrow \tilde{y}(i) \ge \tilde{y}(j)$ for each $i,j\in 1{:}n$.
 
 \begin{proposition}[corollary~4.8a in \citet{Follmer2016}] \label{prop:coherent-polymatroid}
 Suppose that $\rho\colon \Delta_n \times  \Real^n \to \Real$ is a coherent comotonic risk measure. Then
@@ -376,7 +374,7 @@ The standard solution to the polymatroid optimization problem in \eqref{eq:comon
     \Return{$\hat{\bm{q}}$}
 \end{algorithm}
 
-We now define a special class of submodular functions, which we call EWS, which make sorting is unnecessary when optimizing a linear function over a polymatroid.
+We now define a special class of submodular functions, which we call EWS, which makes sorting unnecessary when optimizing a linear function over a polymatroid.
 \begin{definition} \label{asm:submodular-function}
 A function $f\colon 2^{1{:}n} \to \Real_{\ge 0}$ is $\ews(\bm{\mu} ,m, c)$, or \emph{Element-Wise-Separable}, for $c \in \Real_{\ge 0}$,  $m\in \Real_{>0}$, such that $c + m \ge 1$, and  $\bm{\mu}\in \Real^n_{\ge 0}$ if $f(\mathcal{O}) = g(\bm{1}\tr \bm{\mu}_{\mathcal{O}}), \forall \mathcal{O} \subseteq \Omega$ where for each $x \in [0,1]$:
 \begin{equation} \label{eq:def-g}
@@ -430,9 +428,10 @@ The following theorem states the correctness and runtime of \cref{alg:maximum-we
 When $p_{k_{\min}} >0$, then \cref{alg:maximum-weight-independent} solves~\eqref{eq:comonotonic-optimization} in expected $O(n)$ runtime. 
 \end{theorem}
 \begin{proof}
-  First, to prove the correctness of \cref{alg:maximum-weight-independent}, assume that it returns $\bm{q}\opt$. We now show that $\bm{q}\opt$ coincides with $\hat{\bm{q}}$ computed by the standard polymatroid optimization in \cref{alg:greedy-polymatroid} up to arbitrarily breaking of ties. Suppose that \cref{alg:greedy-polymatroid} chooses a permutation $\sigma\colon  1{:}n \to 1{:}n$ is such that $i \le j \Rightarrow x_{\sigma(i)} \le x_{\sigma(j)}$ and $x_{\sigma(i)} = x_{\sigma(j)} \wedge i < j \Rightarrow \sigma(i) < \sigma(j)$ for each $i,j\in 1{:}n$. In other words, the permutation $\sigma$ needs to be generated by a stable sort algorithm. We emphasize that the stability assumption is only needed for our proof technique and the actual implementation does not require it.
+First, to prove the correctness of \cref{alg:maximum-weight-independent}, assume that it returns $\bm{q}\opt$. We now show that $\bm{q}\opt$ coincides with $\hat{\bm{q}}$ computed by the standard polymatroid optimization in \cref{alg:greedy-polymatroid} up to arbitrarily breaking of ties. Suppose that \cref{alg:greedy-polymatroid} chooses a permutation $\sigma\colon  1{:}n \to 1{:}n$ is such that $i \le j \Rightarrow x_{\sigma(i)} \le x_{\sigma(j)}$ and $x_{\sigma(i)} = x_{\sigma(j)} \wedge i < j \Rightarrow \sigma(i) < \sigma(j)$ for each $i,j\in 1{:}n$. In other words, the permutation $\sigma$ needs to be generated by a stable sort algorithm. We emphasize that the stability assumption is only needed for our proof technique and the actual implementation does not require it.
 
 We now prove that $q\opt_i = \hat{q}_i$ for each $i\in 1{:}n$ by separately analyzing the following four cases.
+
 \emph{(i)} Suppose that $i = k_{\min}$. Because $p_i > 0$ by the theorem's hypothesis then 
 \[
   q\opt_i = m\cdot p_i + c = g(p_i) = f(\{i\}) = f(\{i\}) - f(\emptyset) = \hat{q}_{\sigma(1)} = \hat{q}_i.
@@ -455,7 +454,7 @@ Let $k := \sigma^{-1}(i)$ and note that $ \sigma(1{:}k) \subseteq \mathcal{K}_{<
 \]
 The third equality follows from $i \neq k_{\min}$ and $p_{k_{\min}} \neq  0$ .
 
-\emph{(iii)} Suppose that $i \in \mathcal{K}_{=v} \wedge i \neq k_{\min}$. Here, we use the assumption that $\sigma$ is a stable sort and prove the claim by induction on $l \in |\mathcal{K}_{<v}|, \dots, |\mathcal{K}_{<v}| + |\mathcal{K}_{<v}|$ showing that
+\emph{(iii)} Suppose that $i \in \mathcal{K}_{=v} \wedge i \neq k_{\min}$. Here, we use the assumption that $\sigma$ is a stable sort and prove the claim by induction on $l \in |\mathcal{K}_{<v}|, \dots, |\mathcal{K}{=v}| + |\mathcal{K}_{<v}|$ showing that
 \begin{align}
  \label{eq:theta-equality-1}
   \theta_l &= 1 - f(\sigma(1{:}l)) ,  \\
@@ -476,8 +475,8 @@ To prove the base case, suppose that $l = |\mathcal{K}_{<v}|$. The equality in \
 To prove the inductive case, suppose that \eqref{eq:theta-equality-1} and \eqref{eq:theta-equality-2} hold for $l$, and we prove it for $l+1$. The equality in \eqref{eq:theta-equality-1} can be derived from \eqref{eq:theta-equality-2} and the construction in \cref{alg:greedy-polymatroid} as
 \begin{align*}
   \theta_{l+1}
-  &= \theta_l - q\opt_{\sigma(l+1)} \\
-  &= \theta_l - \hat{q}_{\sigma(l+1)} \\
+  &= \theta_l - q\opt_{\sigma(l+1)} 
+  = \theta_l - \hat{q}_{\sigma(l+1)} \\
   &= 1 - f(\sigma(1{:}l)) - \left(  f(\sigma(1{:}(l+1))) - f(\sigma(1{:}l)) \right) \\
   &= 1 - f(\sigma(1{:}(l+1))).
 \end{align*}
@@ -514,30 +513,38 @@ since $\bm{1}\tr\bm{p}_{\sigma (1{:}(k-1)} > \frac{1-c}{m}$ from \cref{thm:quant
 
 
 \begin{remark}\label{rem:relax-ess-inf}
-The assumption $p_{k_{\min}} >0$ in \cref{alg:maximum-weight-independent} is necessary for its correctness. Note that it is straightforward to filter out elements with zero probability in linear time. Alternatively, one could relax the assumption by modifying \cref{alg:maximum-weight-independent} as follows. Instead of computing $k_{\min}$ as in the algorithm, we need to compute $x_{\min} := \operatorname{QuickVaR}(\bm{p}, \bm{x}, \alpha = 0)$ and define $\mathcal{K}_{< x_{\min}} \gets \{ i \in  1{:}n \mid x_i < x_{\min} \}$ and $\mathcal{K}_{= x_{\min}} \gets \{ i = 1{:}n \mid x_i = x_{\min} \}$. Then, set $q_i\opt = 0$ for each $i \in \mathcal{K}_{<x_{\min}}$ and choose $k_{\min} \in \mathcal{K}_{=x_{\min}}$ arbitrarily. The remaining $q_i\opt $ can be assigned as in the \cref{alg:maximum-weight-independent}.
+The assumption $p_{k_{\min}} >0$ in \cref{alg:maximum-weight-independent} is necessary for its correctness but is not limiting in practice. Note that it is straightforward to filter out elements with zero probability in linear time. Alternatively, one could relax the assumption by modifying \cref{alg:maximum-weight-independent} as follows. Instead of computing $k_{\min}$ as in the algorithm, we need to compute $x_{\min} := \operatorname{QuickVaR}(\bm{p}, \bm{x}, \alpha = 0)$ and define $\mathcal{K}_{< x_{\min}} := \{ i \in  1{:}n \mid x_i < x_{\min} \}$ and $\mathcal{K}_{= x_{\min}} := \{ i = 1{:}n \mid x_i = x_{\min} \}$. Then, set $q_i\opt := 0$ for each $i \in \mathcal{K}_{<x_{\min}}$ and choose $k_{\min} \in \mathcal{K}_{=x_{\min}}$ arbitrarily. The remaining $q_i\opt $ can be assigned as in the \cref{alg:maximum-weight-independent}.
 \end{remark}
 
 
-\subsection{CVaR and TVaR are EWS} \label{sec:cvar-tvar-are} 
-We now prove that CVaR can be represented as a polymatroid with a submodular function that satisfies Element-Wise-Seperability as defined above. Therefore we can provably compute CVaR in expected linear time.
+\subsection{CVaR and TVaR are EWS} \label{sec:cvar-tvar-are}
 
-\begin{proposition}
-Let $f\colon 2^{\Omega} \to \Real_{\ge 0}$ be defined as
-\[
-  f(\mathcal{O})
-  :=
-  \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\},
-  \quad \forall \mathcal{O} \subseteq \Omega .
-\]
-Then
-\begin{equation} \label{eq:cvar-correct}
-\cvar{\alpha }{\tilde{x} } = \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}.
+We now show that both TVaR and CVaR can be formulated as a polymatroid optimization problems with EWS capacity functions. Define for each $\mathcal{O} \subseteq \Omega$:
+\begin{equation} \label{eq:f-cvat-tvar}
+  \begin{aligned}
+  f_{\alpha}^{\cvaro}(\mathcal{O})
+  &\;:=\; 
+    \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\},
+    &\qquad
+  f^{\tvaro}_{\alpha}(\mathcal{O})
+    &:=
+      \begin{cases}
+        \min\left\{\P{\mathcal{O}} + \frac{\beta}{2}, 1\right\} &\text{if } \P{\mathcal{O}} > 0, \\
+        0 &\text{otherwise}.
+      \end{cases}
+  \end{aligned}
 \end{equation}
-and $f$ is submodular and satisfies Element-Wise-Separabaility with $m = 1/\alpha$ and $c = 0$. 
+The Choquet capacity function for CVaR is well known~\cite{acerbi2002spectral}. We state its correctness below and include the proof in the appendix for the sake of completeness, since we are not aware of a reference that proves the result using elementary tools.
+\begin{proposition} \label{prop:cvar-ews-correct}
+For each $\alpha\in [0,1]$, a random variable $\tilde{x}$ with probability $\bm{p}$, the function $f^{\cvaro}_{\alpha }$ is $\ews(\bm{p}, m, c)$ with $m = 1/\alpha$ and $c = 0$ and 
+\begin{equation} \label{eq:cvar-correct}
+  \cvar{\alpha }{\tilde{x} }
+  \;=\;
+  \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}.
+\end{equation}
 \end{proposition}
-  \mm{Make sure to define $\tilde{1}$ and $\bm{1}$}
-\begin{proof}
-To prove \eqref{eq:cvar-correct}, it is sufficient by \citet[theorem~4.88]{Follmer2016} and \citet[remark~4.96]{Follmer2016} to show
+\begin{proof}[Proof of \cref{prop:cvar-ews-correct}]
+To prove \eqref{eq:cvar-correct}, it is sufficient, by \citet[theorem~4.88]{Follmer2016} and \citet[remark~4.96]{Follmer2016}, to show
 \begin{align}
   \nonumber
   f(\mathcal{O}) 
@@ -552,7 +559,9 @@ To prove \eqref{eq:cvar-correct}, it is sufficient by \citet[theorem~4.88]{Follm
 \end{align}
 Note that the maximum in the right hand side of~\eqref{eq:cvar-eq-submodular} always exists because it equals to CVaR which is well defined.
 
-We prove the equality in \eqref{eq:cvar-eq-submodular} as two inequalities. To prove that 
+We prove the equality in \eqref{eq:cvar-eq-submodular} as two inequalities.
+
+(i) To prove that 
 \[
   \min\left\{ \frac{1}{\alpha} \bm{1}_{\mathcal{O}}\tr \bm{p},\; 1 \right\}
 \ge \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
@@ -569,7 +578,7 @@ observe that the constraints imply that for each $\bm{q} \in \mathcal{Q}_f$
 \]
 and hence the inequality holds. 
 
-To prove that 
+(ii) To prove that 
 \[
  \min\left\{ \frac{1}{\alpha} \bm{1}_{\mathcal{O}}\tr \bm{p},\; 1 \right\}
 \le \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
@@ -578,9 +587,8 @@ To prove that
 \bm{q} \le \frac{1}{\alpha} \bm{p}
 \right\}, \quad \forall \mathcal{O} \subseteq \Omega,
 \]
-we construct a feasible $\bm{q} \in \mathcal{Q}_f$ for which the inequality holds.
-We now analyze the following two cases separately for each $\mathcal{O} \subseteq \Omega$.
-\begin{enumerate}
+we construct a feasible $\bm{q} \in \mathcal{Q}_f$ for which the inequality holds. We now analyze the following two cases separately for each $\mathcal{O} \subseteq \Omega$.
+\begin{enumerate}[nosep]
 \item Suppose that $\bm{1}_{\mathcal{O}}\tr  \bm{p} \ge \alpha$. Then we construct $\bm{q}$ as
 \[
 \bm{q} \;:=\;  (\bm{1}_{\mathcal{O}}\tr \bm{p})^{-1} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}},
@@ -591,7 +599,7 @@ where $\otimes$ is the Hadamard vector product. It is easy to verify that $\bm{q
 \bm{q} \;:=\; \frac{1}{\alpha} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}}
 +  d \cdot \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}}),
 \]
-where $\otimes$ is the Hadamard vector product. Here, $d\in \Real $ solves
+where $\otimes$ is the Hadamard vector product. Here, $d\in \Real $ solves that
 \[
 d \cdot \bm{1}\tr \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}}) = 1 - \frac{1}{\alpha } \bm{1}_{\mathcal{O}} \bm{p},
 \]
@@ -608,25 +616,16 @@ It is easy to verify that $\bm{q} \ge \bm{0}$ and $\bm{1}\tr \bm{q} = 1$. The co
 \end{enumerate}
 \end{proof}
 
-
 (TVaR)~\cite{Kruse2021}
-
-We remind the reader that in this work we define TVaR as the $\varphi$-divergence risk that uses the $L_1$ norm divergence. This may not seem very interpretable, however we can show that we can set the divergence constraint, or $\beta$, such that it can be a provable lower bound for a given EVaR with $\alpha$ value between 0 and 1.
-From previous work , we know that the KL divergence is $\leq \frac{1}{2 \log(2)} \, \|p - q\|_1^2$ \cite{Iyengar2005}. Thus, by algebraic manipulation it can be seen that the coherent risk measure TVaR with the divergence constraint $\|p - q\|_1 \leq \sqrt{2 \log(2) *-\log(\alpha)}$  must be $\leq EVaR_\alpha[\tilde{x}]$. 
-
-We now prove the submodular function for TVaR and show that it also satisfies ElementWiseSeperability as defined above.
-\begin{proposition}
-    
-
+We now prove the submodular function for TVaR and show that it also satisfies ElementWiseSeparability as defined above.
+\begin{proposition} \label{prop:tvar-ews-correct}
 For $\mathcal{O} \subseteq \Omega$, define $f_{\beta}\colon 2^{\Omega} \to \Real_{\ge 0}$:
-  \[
-    f_{\beta}(\mathcal{O}) = \min\left\{\P{\mathcal{O}} + \frac{\beta}{2}, 1\right\}.
-  \]
+
 If $\mathcal{O} \neq \emptyset$, and $0$ otherwise, where $\beta = \sqrt{ 2 \log 2 \cdot \log \frac{1}{\alpha}}$ for $\alpha\in (0,1)$ represent the divergence constraint. Then
 \[
   \tvar{\alpha }{\tilde{x} } = \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_{f_{\beta}}\right\}.
   \]
-$f_{\beta}$ also satisfy ElementWiseSeparability with $m = 1$ and $c = \beta/2$.
+Moreover, $f_{\beta}$ is EWS with $m = 1$ and $c = \beta/2$.
 \end{proposition}
 \begin{proof}
  To prove \eqref{eq:cvar-correct}, it is sufficient by \citet[theorem~4.88]{Follmer2016} and \citet[remark~4.96]{Follmer2016} to show
@@ -1008,9 +1007,9 @@ Space (n) &  &  &  &  &  &  &  \\
 \end{table}
 
 To assure the reader that our algorithm is indeed faster than the sorting based methods, we present the results of our experiments on small scale problems in \cref{tab:small_results}. 
-We test our algorithm on small scale problems where the difference in runtimes is not as significant, however these problems occur frequently in practice. \cref{tab:small_results} is consistent with the experimental results obtained in \cref{sec:experiments}, namely our no-sort methods outperform the sorting based methods in runtime.' This assures that the algorithms developed here provide improvements in runtime for inputs of varying sizes.
+We test our algorithm on small scale problems where the difference in runtimes is not as significant, however these problems occur frequently in practice. \cref{tab:small_results} is consistent with the experimental results obtained in \cref{sec:experiments}, namely our no-sort methods outperform the sorting based methods in runtime. This assures that the algorithms developed here provide improvements in runtime for inputs of varying sizes.
 
-The results obtained in \cref{tab:small_results} were generated using a similar process to that of \cref{sec:experiments} where instead of 10 trails per experiment, we used 50 trails per experiment. \cref{tab:small_results} shows the mean time in ms $\pm$ the 95\% confidence interval for each method.
+The results obtained in \cref{tab:small_results} were generated using a similar process to that of \cref{sec:experiments} where instead of 10 trials per experiment, we used 50 trials per experiment. \cref{tab:small_results} shows the mean time in ms $\pm$ the 95\% confidence interval for each method.
 
 \cref{tab:small_results} shows that even for smaller settings our method is faster than the sorting based methods. The results are consistent with the theoretical complexity of the algorithms, which is $O(n \log n)$ for the sorting based methods and $O(n)$ for the QuickSelect based methods.
 

@@ -51,7 +51,7 @@
 \maketitle
 
 \begin{abstract}
-Monetary risk measures have gained popularity in expressing decision-makers' preferences for risk aversion. Value-at-Risk (VaR) and Conditional-Value-at-Risk (CVaR) in particular are used commonly for this purpose. This paper proposes new efficient algorithms for computing these risk measures for discrete random variable in expected linear time in the size of the discrete random variable. First, we propose a QuickVaR algorithm that computes the VaR of a discrete random variable. Then, we leverage QuickVaR to propose QuickDivergence, an algorithm that can compute a certain class of $\varphi$-divergence risk measures, such as the popular CVaR risk measure. The QuickVaR algorithm adapts the well-known Quickselect algorithm, while QuickDivergence builds on polymatroid optimization algorithms. Numerical results show that our new algorithms offer an order of magnitude speed up for large domains, and a library implementation of the algorithms is available at \todo{REDACTED for anonymity}.%\url{https://github.com/RiskAverseRL/RiskMeasures.jl}.     
+Monetary risk measures have gained popularity in expressing decision-makers' preferences for risk aversion. Value-at-Risk (VaR) and Conditional-Value-at-Risk (CVaR) in particular are used commonly for this purpose. This paper proposes new efficient algorithms for computing these risk measures for a discrete random variable in expected linear time in the size of the discrete random variable. First, we propose a QuickVaR algorithm that computes the VaR of a discrete random variable. Then, we leverage QuickVaR to propose QuickDivergence, an algorithm that can compute a certain class of $\varphi$-divergence risk measures, such as the popular CVaR risk measure. The QuickVaR algorithm adapts the well-known Quickselect algorithm, while QuickDivergence builds on polymatroid optimization algorithms. Numerical results show that our new algorithms offer an order of magnitude speed up for large domains, and a library implementation of the algorithms is available at \todo{REDACTED for anonymity}.%\url{https://github.com/RiskAverseRL/RiskMeasures.jl}.     
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
@@ -64,7 +64,7 @@ Our algorithms' time complexity improves on the state of the art by a logarithmi
 
 % Coherent risk measures, like CVaR, can be evaluated by solving convex optimization problems~\cite{Follmer2016, rockefeller1996variational}. Generic convex optimization algorithms, such as the interior point linear program solvers, are no faster than $O(n^3)$~\cite{Ho2021}. The $\Omega(n \log  n)$ time complexity of the sort dominates the time complexity and prevents linear time computation. In this paper, we circumvent the complexity of sorting by developing no-sort algorithms for these risk measures and others. 
 
-Linear time algorithms that resemble our QuickVaR and QuickDivergence have been studied in many domains and we summarize some of the most relevant ones. Some example of such structured optimization problems are the projection onto the simplex~\cite{adam2019projectionscanonicalsimplexadditional, Wang2013Simplex}, projection on k-capped simplex~\cite{kcapped_ang,Lim2016}, linear optimization on the intersection of $L_p$ or $\varphi$-divergence balls and the probability simplex in robust optimizations~\cite{Ho2022}, optimization for $\varphi$-divergence risk measures~\cite{Ahmadi-Javid2012}, and on polymatroids~\cite{Korte2012}. While some of these papers discuss the possibility of designing linear-time algorithms, they usually do not study them with a few exceptions~\cite{Condat2016,Lim2016}. Finally, QuickVaR is closely related to the computation weighted quantile but returns the same value only when the quantile is unique~\cite{Korte2012,cormen2001introduction}.
+Linear time algorithms that resemble our QuickVaR and QuickDivergence have been studied in many domains and we summarize some of the most relevant ones. Some examples of such structured optimization problems are the projection onto the simplex~\cite{adam2019projectionscanonicalsimplexadditional, Wang2013Simplex}, projection on k-capped simplex~\cite{kcapped_ang,Lim2016}, linear optimization on the intersection of $L_p$ or $\varphi$-divergence balls and the probability simplex in robust optimizations~\cite{Ho2022}, optimization for $\varphi$-divergence risk measures~\cite{Ahmadi-Javid2012}, and on polymatroids~\cite{Korte2012}. While some of these papers discuss the possibility of designing linear-time algorithms, they usually do not study them with a few exceptions~\cite{Condat2016,Lim2016}. Finally, QuickVaR is closely related to the computation of the weighted quantile but returns the same value only when the quantile is unique~\cite{Korte2012,cormen2001introduction}.
 
 The remainder of the paper is organized as follows. \Cref{sec:preliminaries} describes the necessary background including risk measures, $\varphi$-divergence, and polymatroid optimization. Then, \Cref{sec:var-linear} proposes \emph{QuickVaR} to compute VaR in linear time. \cref{sec:phi-divergence} builds on QuickVaR to develop \emph{QuickDivergence} that computes certain $\varphi$-divergence risk measures in linear time. We evaluate the algorithms numerically on synthetic and realistic problems in \cref{sec:experiments}.
 %A tested implementation of the algorithms in Julia is available at \url{https://github.com/RiskAverseRL/RiskMeasures.jl}.
@@ -88,7 +88,6 @@ where the maximum exists because $\tau \mapsto \P{\tilde{x} < \tau}$ is lower se
 \begin{table}
     \caption{Parameters for selected $\varphi$-divergence risk measures for $\alpha\in (0,1)$.} \label{tab:phi-divergence-risk}
     \centering
-    \label{tab:divergences}
     \begin{tabular}{l|c|c|c}
          \toprule
          Risk measure & $\varphi(y)$  & $\varphi\opt(x)$ & $\beta$ \\
@@ -148,7 +147,7 @@ For each $\alpha\in [0,1]$ and $\tilde{x} \in \mathbb{R}^n$:
 
 We now describe the QuickVaR algorithm, show that it computes VaR, and show that it runs in  linear expected time. 
 
-The standard VaR algorithm for a discrete random variable $\bm{x}\in \Real^n$ with distribution $\bm{p}\in \Delta_n$ and risk level $\alpha$ proceeds as follows~(e.g.,~listing~6.25 in \cite{privault2026notes}). It sorts the entries of $X$ to get a permutation $\sigma \colon 1{:}n \to 1{:}n$ such that $i \mapsto x_{\sigma(i)}$ is monotone. Then, it finds an index $i \in 1{:}n$ such that 
+The standard VaR algorithm for a discrete random variable $\bm{x}\in \Real^n$ with distribution $\bm{p}\in \Delta_n$ and risk level $\alpha$ proceeds as follows~(e.g.,~listing~6.25 in \cite{privault2026notes}). It sorts the entries of $\bm{x}$ to get a permutation $\sigma \colon 1{:}n \to 1{:}n$ such that $i \mapsto x_{\sigma(i)}$ is monotone. Then, it finds an index $i \in 1{:}n$ such that 
 \[
   \sum_{j = 1}^{i-1} p_{\sigma(j)} 
   \; <\;
@@ -160,7 +159,7 @@ The value $x_{\sigma(i)}$ is the optimal solution in~\eqref{eq:var-definition} b
 
 Our \emph{QuickVaR} algorithm, described in \cref{alg:quick-quantile}, computes the VaR in $O(n)$ time by avoiding the need to sort the elements of the input random variable $\bm{x}$. In particular, QuickVaR partially sorts the indexes of $\bm{x}$, analogous to the Quickselect algorithm~\cite{horowitz1998computer}. 
 
-\Cref{alg:quick-quantile} is a recursive algorithm that works for a random variable $\bm{x}$ with a distribution $\bm{p}\in \Delta_n$ as follows. In addition to the random variable, the input is $f$ (front) and $b$ (back), which delimit the indices of $\bm{x}$ it manipulates.  The algorithm  first picks a pivot element $v$ randomly between $b$ and $e$. Choosing the pivot randomly is essential to achieve an average linear time complexity. Given a pivot, we use $\operatorname{partition}$ to partially sort the entries of $\bm{x}$ into three groups: 1. less than $v$: $\bm{x}_{b{:}(l-1)} < v$, 2. equal to $v$: $\bm{x}_{l{:}g} = v$, and 3. greater than $v$: $\bm{x}_{(g+1){:}e} > v$. Then, the algorithm checks for the conditions of \cref{thm:quantile-in-finite-omega} to determine which of the three groups contains the VaR value. Finally, if the VaR value is in group 1 or 3, the algorithm calls itself recursively with adjusted $b$, $ e$, and $\alpha$.
+\Cref{alg:quick-quantile} is a recursive algorithm that works for a random variable $\bm{x}$ with a distribution $\bm{p}\in \Delta_n$ as follows. In addition to the random variable, the input is $f$ (front) and $b$ (back), which delimit the indices of $\bm{x}$ it manipulates.  The algorithm  first picks a pivot element $v$ randomly between $f$ and $b$. Choosing the pivot randomly is essential to achieve an average linear time complexity. Given a pivot, we use $\operatorname{partition}$ to partially sort the entries of $\bm{x}$ into three groups: 1. less than $v$: $\bm{x}_{f{:}(l-1)} < v$, 2. equal to $v$: $\bm{x}_{l{:}g} = v$, and 3. greater than $v$: $\bm{x}_{(g+1){:}b} > v$. Then, the algorithm checks for the conditions of \cref{thm:quantile-in-finite-omega} to determine which of the three groups contains the VaR value. Finally, if the VaR value is in group 1 or 3, the algorithm calls itself recursively with adjusted $f$, $b$, and $\alpha$.
 
 The $\operatorname{partition}$ procedure in \cref{alg:quick-quantile} uses the Dutch national flag algorithm to partition the input array into the three groups. The algorithm runs in linear time, and the properties of its output are given in \cref{lem:hoare-partition} below. For the sake of completeness, we provide the reader with the algorithm in \cref{alg:partition} in \cref{sec:stand-var-algor}. 
 
@@ -227,7 +226,7 @@ If $(l, g, \bm{x}', \bm{p}') = \operatorname{partition}(\bm{x'}, \bm{p'}, v, f, 
   \bm{x}_{l{:}g} = v,  \qquad
   \bm{x}_{(g+1){:}b} > v.
 \end{align}
-Moreover, $ \bm{x}_{f{:}b} = \bm{x'}_{\sigma(f{:}b)}, \bm{p} = \bm{p'}_{\sigma(f{:}b)}$ for some permutation $\sigma\colon f{:}b \to f{:}b$, and $\bm{x}_{1{:}(b-1)} = \bm{x'}_{1{:}(b-1)}, \bm{p}_{1{:}(b-1)} = \bm{p'}_{1{:}(b-1)}$, and $\bm{x}_{(e+1):n} = \bm{x'}_{(e+1):n}, \bm{p}_{(e+1):n} = \bm{p'}_{(e+1):n}$. The elements outside of $f{:}b$ range are not modified. The algorithm runs in $O(b - f + 1)$ time.
+Moreover, $ \bm{x}_{f{:}b} = \bm{x'}_{\sigma(f{:}b)}, \bm{p} = \bm{p'}_{\sigma(f{:}b)}$ for some permutation $\sigma\colon f{:}b \to f{:}b$, and $\bm{x}_{1{:}(f-1)} = \bm{x'}_{1{:}(f-1)}, \bm{p}_{1{:}(f-1)} = \bm{p'}_{1{:}(f-1)}$, and $\bm{x}_{(b+1):n} = \bm{x'}_{(b+1):n}, \bm{p}_{(b+1):n} = \bm{p'}_{(b+1):n}$. The elements outside of $f{:}b$ range are not modified. The algorithm runs in $O(b - f + 1)$ time.
 \end{lemma}
 \Cref{lem:hoare-partition} is a standard property of the Dutch national flag algorithm, and we outline its proof in \cref{sec:stand-var-algor} for the sake of completeness.
 
@@ -264,7 +263,7 @@ Above, the first inequality holds from $x = x_f$ and $0 \le \alpha$. The second 
 
 (ii) If $t + e \le \alpha$, the algorithm executes the second if statement on line~\ref{ln:secondif}. We show that the input conditions for the recursive call are met. Because $t + e = \sum_{j = f}^g p_j \le \alpha < \sum_{j=f}^b p_j$  (the second inequality is the input condition), it must be that $g < b$ and therefore $g+1 \le b$. Also, by the algorithm's input condition and algebraic manipulation, we get that
 \[
- \sum_{j=g+1}^b p_j = \sum_{j=f}^b - t -e > \alpha  -t -e,  
+ \sum_{j=g+1}^b p_j = \sum_{j=f}^b p_j - t - e > \alpha - t - e,
 \]
 and the input conditions hold.  Because \eqref{eq:qvar-precondition} holds from \cref{lem:hoare-partition} and $b - g - 1 < b-f \le  k$, the inductive hypothesis implies that there exists $x_{\omega}$ such that
 \[
@@ -296,7 +295,7 @@ With the correctness established above, we are ready to analyze the computationa
 \Cref{alg:quick-quantile} runs in expected $O(n)$ time.
 \end{theorem}
 \begin{proof}
-The proof is analogous to the standard quickselect algorithm, as in \citep[theorem~3.3]{horowitz1998computer}, except that we need to keep track of the risk level $\alpha$. Fix some $n \in \mathbb{N}$, $\bm{x}$, and $\bm{p}$ and we study the properties. Let $T\colon 1{:}n \to [0,\infty]$ be the \emph{expected} runtime of \cref{alg:quick-quantile} such $T(k)$ is the expected runtime when executed with $k := b - f + 1$. To simplify the notation, we assume without loss of generality in the remainder of the proof that $f = 1$ and $e = k$. Then, let
+The proof is analogous to the standard quickselect algorithm, as in \citep[theorem~3.3]{horowitz1998computer}, except that we need to keep track of the risk level $\alpha$. Fix some $n \in \mathbb{N}$, $\bm{x}$, and $\bm{p}$ and we study the properties. Let $T\colon 1{:}n \to [0,\infty]$ be the \emph{expected} runtime of \cref{alg:quick-quantile} such $T(k)$ is the expected runtime when executed with $k := b - f + 1$. To simplify the notation, we assume without loss of generality in the remainder of the proof that $f = 1$ and $b = k$. Then, let
 \[
   l := \left| \left\{ i \in 1{:}k \mid  x_i < \varo_{\alpha}[\tilde{x}]\right\}   \right|
 \]
@@ -310,7 +309,7 @@ Note that by the assumption $\sum_{j = f}^b p_j > \alpha$, we have that $k \ge 1
 \label{eq:quickvar-complexity}
   &= d\cdot k + \max_{l\in 0{:}(k-1)} \frac{1}{k}  \left(  \sum_{i=l+1}^{k-1} T(i)  + \sum_{i=k-l}^{k-1} T(i)   \right).
 \end{align}
-where $d\cdot k$ is the local runtime of the algorithm for some $d > 0$ and $T(i)$ and $T(k - i - 1)$ are the average runtimes of the recursive calls. The average over $i$ corresponds to the uniformly-random selection of the pivot with $i = \left| \left\{ j \in 1{:}k \mid x_i < v \right\} \right|$ in the first line of the inequality. The last two equalities follow by algebraic manipulation. Then, an argument identical to \cite[theorem~3.3]{horowitz1998computer}, since \eqref{eq:quickvar-complexity} is the same as equation (3.8) in \cite{horowitz1998computer}, shows that \(T(k)\le 4\cdot d\cdot k\) for all \(k\ge 1\).
+where $d\cdot k$ is the local runtime of the algorithm for some $d > 0$ and $T(i)$ and $T(k - i - 1)$ are the average runtimes of the recursive calls. The average over $i$ corresponds to the uniformly-random selection of the pivot with $i = \left| \left\{ j \in 1{:}k \mid x_j < v \right\} \right|$ in the first line of the inequality. The last two equalities follow by algebraic manipulation. Then, an argument identical to \cite[theorem~3.3]{horowitz1998computer}, since \eqref{eq:quickvar-complexity} is the same as equation (3.8) in \cite{horowitz1998computer}, shows that \(T(k)\le 4\cdot d\cdot k\) for all \(k\ge 1\).
 \end{proof}
 
 \begin{remark}
@@ -325,7 +324,7 @@ with bounds $\quant^+_{\alpha}[\tilde{x}] := \max \quant_{\alpha}[\tilde{x}]$ an
 
 In this section, we describe and analyze QuickDivergence, a new linear-time framework for computing a certain class of $\varphi$-divergence risk measures, such as CVaR and TVaR. QuickDivergence treats risk evaluation as a linear optimization over a polymatroid. Standard polymatroid optimization algorithms must sort their input which requires $\Omega(n \log  n)$ runtime. We identify a structural condition of polymatroid risk measures that allows us to avoid sorting and instead use the QuickVaR algorithm in linear-time described in \cref{sec:var-linear}.
 
-The remainder of the section is organized as follows. \Cref{sec:quickdivergence} describes a general linear-time algorithm suitable for $\varphi$-divergence risk measures that satisfy a EWS property. Then \cref{sec:cvar-tvar-are} shows that both CVaR and TVaR satisfy the EWS property and can be computed in linear time. 
+The remainder of the section is organized as follows. \Cref{sec:quickdivergence} describes a general linear-time algorithm suitable for $\varphi$-divergence risk measures that satisfy an EWS property. Then \cref{sec:cvar-tvar-are} shows that both CVaR and TVaR satisfy the EWS property and can be computed in linear time. 
 
 \subsection{QuickDivergence} \label{sec:quickdivergence}
 We first recall the definition of a submodular function~\cite[section~2.1]{Korte2012} and a polymatroid~\cite[definition~14.9]{Korte2012}.
@@ -345,7 +344,7 @@ For a submodular $f \colon 2^{1{:}n} \to \Real_{\ge 0}$, a \emph{polymatroid} $\
 and a \emph{normalized polymatroid} is the intersection with the probability simplex: $\widehat{\mathcal{Q}}_f := \mathcal{Q}_f \cap \Delta_n $.
 \end{definition}
 
-Polymatroids are useful in our setting because any coherent, comotonic monetary risk measure can be formulated as linear optimization over a polymatroids~\cite[corollary~4.89]{Follmer2016}. A risk measure $\rho$ is \emph{coherent} if it is concave and positively homogeneous.  A risk measure $\rho$ is \emph{comotonic} if for any comonotone $\tilde{x}, \tilde{y}$: $\rho[ \tilde{x} + \tilde{y} ] = \rho[ \tilde{x} ] + \rho[ \tilde{y} ]$, where the random variables $\tilde{x}, \tilde{y} \in \Real^{1{:}n}$ are \emph{comonotone} if $\tilde{x}(i) \ge \tilde{x}(j) \Leftrightarrow \tilde{y}(i) \ge \tilde{y}(j)$ for each $i,j\in 1{:}n$.
+Polymatroids are useful in our setting because any coherent, comotonic monetary risk measure can be formulated as linear optimization over a polymatroid~\cite[corollary~4.89]{Follmer2016}. A risk measure $\rho$ is \emph{coherent} if it is concave and positively homogeneous.  A risk measure $\rho$ is \emph{comotonic} if for any comonotone $\tilde{x}, \tilde{y}$: $\rho[ \tilde{x} + \tilde{y} ] = \rho[ \tilde{x} ] + \rho[ \tilde{y} ]$, where the random variables $\tilde{x}, \tilde{y} \in \Real^{1{:}n}$ are \emph{comonotone} if $\tilde{x}(i) \ge \tilde{x}(j) \Leftrightarrow \tilde{y}(i) \ge \tilde{y}(j)$ for each $i,j\in 1{:}n$.
 
 \begin{proposition}[corollary~4.8a in \citet{Follmer2016}] \label{prop:coherent-polymatroid}
 Suppose that $\rho\colon \Delta_n \times  \Real^n \to \Real$ is a coherent comotonic risk measure. Then
@@ -454,7 +453,7 @@ Let $k := \sigma^{-1}(i)$ and note that $ \sigma(1{:}k) \subseteq \mathcal{K}_{<
 \]
 The third equality follows from $i \neq k_{\min}$ and $p_{k_{\min}} \neq  0$ .
 
-\emph{(iii)} Suppose that $i \in \mathcal{K}_{=v} \wedge i \neq k_{\min}$. Here, we use the assumption that $\sigma$ is a stable sort and prove the claim by induction on $l \in |\mathcal{K}_{<v}|, \dots, |\mathcal{K}{=v}| + |\mathcal{K}_{<v}|$ showing that
+\emph{(iii)} Suppose that $i \in \mathcal{K}_{=v} \wedge i \neq k_{\min}$. Here, we use the assumption that $\sigma$ is a stable sort and prove the claim by induction on $l \in |\mathcal{K}_{<v}|, \dots, |\mathcal{K}_{<v}| + |\mathcal{K}_{=v}|$ showing that
 \begin{align}
  \label{eq:theta-equality-1}
   \theta_l &= 1 - f(\sigma(1{:}l)) ,  \\
@@ -467,8 +466,8 @@ To prove the base case, suppose that $l = |\mathcal{K}_{<v}|$. The equality in \
 \hat{q}_{i} = \hat{q}_{\sigma(l+1)}  
   &= f ( \sigma(1{:}(l+1) )) - f ( \sigma(1{:}l) ) \\
   &= \min \left\{  1,\; c + m \cdot \bm{1}\tr \bm{p}_{\sigma(1{:}(l+1)} )\right\} - c - m \cdot \bm{1}\tr \bm{p}_{\sigma(1{:}l)} \\
-  &= \min \left\{1  - c - m \cdot \bm{1}\tr \bm{p}_{1{:}l}, \; m \cdot p_{\sigma(l)}\right\} \\
-  &= \min \{ \theta_1, m \cdot p_i \} = q_i\opt.
+  &= \min \left\{1  - c - m \cdot \bm{1}\tr \bm{p}_{1{:}l}, \; m \cdot p_{\sigma(l+1)}\right\} \\
+  &= \min \{ \theta_l, m \cdot p_i \} = q_i\opt.
   \end{aligned}
 \end{equation}
 
@@ -480,32 +479,32 @@ To prove the inductive case, suppose that \eqref{eq:theta-equality-1} and \eqref
   &= 1 - f(\sigma(1{:}l)) - \left(  f(\sigma(1{:}(l+1))) - f(\sigma(1{:}l)) \right) \\
   &= 1 - f(\sigma(1{:}(l+1))).
 \end{align*}
-The equality in \eqref{eq:theta-equality-2} follows analogously to \eqref{eq:q-q-eq} if $\theta_{\sigma(l+2)} > 0$:
+The equality in \eqref{eq:theta-equality-2} follows analogously to \eqref{eq:q-q-eq} if $\theta_{l+1} > 0$:
 \begin{equation} \label{eq:q-q-eq}
   \begin{aligned}
-\hat{q}_{i} = \hat{q}_{\sigma(l+2)}  
-  &= f ( \sigma(1{:}(l+2) )) - f(\sigma(1{:}(l+1)) \\
-  &= \min \left\{  1,\; c + m \cdot \bm{1}\tr \bm{p}_{\sigma(1{:}(l+2))} \right\} - (1-\theta_{\sigma(l+1)}) \\
-  &= \min \left\{\theta_{\sigma(l+1)}, \;c + m \cdot \bm{1}\tr \bm{p}_{\sigma(1{:}(l+2))} - f(\sigma(1{:}(l+1)) \right\} \\
-  &= \min \left\{\theta_{\sigma(l+1)}, \; m \cdot p_{\sigma(l+2)}  \right\} \\
+\hat{q}_{i} = \hat{q}_{\sigma(l+2)}
+  &= f ( \sigma(1{:}(l+2) )) - f(\sigma(1{:}(l+1))) \\
+  &= \min \left\{  1,\; c + m \cdot \bm{1}\tr \bm{p}_{\sigma(1{:}(l+2))} \right\} - (1-\theta_{l+1}) \\
+  &= \min \left\{\theta_{l+1}, \;c + m \cdot \bm{1}\tr \bm{p}_{\sigma(1{:}(l+2))} - f(\sigma(1{:}(l+1))) \right\} \\
+  &= \min \left\{\theta_{l+1}, \; m \cdot p_{\sigma(l+2)}  \right\} \\
   &= q_i\opt.
   \end{aligned}
 \end{equation}
-If $\theta_{\sigma(l+2)} = 0$ we get immediately by algebraic manipulation that $\hat{q}_i = 0 = q\opt_i$.
+If $\theta_{l+2} = 0$ we get immediately by algebraic manipulation that $\hat{q}_i = 0 = q\opt_i$.
 
 
 \emph{(iv)} Suppose that $i \in \mathcal{K}_{>v}$ and let $k = \sigma^{-1}(i)$. Then, using \eqref{eq:var-property-prob} we have that:
 \begin{align*}
   1
-  &\ge f(\sigma(\theta(1{:}k))
-  \ge f(\sigma(\theta(1{:}(k-1))) \\
-  &\ge \min \{c + m \cdot \bm{1}\tr \bm{p}_{\sigma (1{:}(k-1)}, 1\}
-  \ge \min \{c + m \cdot \bm{1}\tr \bm{p}_{\sigma (1{:}(k-1)}, 1\} \ge 1, 
+  &\ge f(\sigma(1{:}k))
+  \ge f(\sigma(1{:}(k-1))) \\
+  &\ge \min \{c + m \cdot \bm{1}\tr \bm{p}_{\sigma(1{:}(k-1))}, 1\}
+  \ge \min \{c + m \cdot \bm{1}\tr \bm{p}_{\sigma(1{:}(k-1))}, 1\} \ge 1,
 \end{align*}
-since $\bm{1}\tr\bm{p}_{\sigma (1{:}(k-1)} > \frac{1-c}{m}$ from \cref{thm:quantile-in-finite-omega} and the construction of $v$ in \cref{alg:maximum-weight-independent}. Then
+since $\bm{1}\tr\bm{p}_{\sigma(1{:}(k-1))} > \frac{1-c}{m}$ from \cref{thm:quantile-in-finite-omega} and the construction of $v$ in \cref{alg:maximum-weight-independent}. Then
 \[
   \hat{q}_i = \hat{q}_{\sigma(k)}
-  =  f(\sigma(\theta(1{:}k))- f(\sigma(\theta(1{:}(k-1)))
+  =  f(\sigma(1{:}k)) - f(\sigma(1{:}(k-1)))
   = 0 = q\opt_i.
 \]
 
@@ -621,7 +620,7 @@ We now prove the submodular function for TVaR and show that it also satisfies El
 \begin{proposition} \label{prop:tvar-ews-correct}
 For $\mathcal{O} \subseteq \Omega$, define $f_{\beta}\colon 2^{\Omega} \to \Real_{\ge 0}$:
 
-If $\mathcal{O} \neq \emptyset$, and $0$ otherwise, where $\beta = \sqrt{ 2 \log 2 \cdot \log \frac{1}{\alpha}}$ for $\alpha\in (0,1)$ represent the divergence constraint. Then
+If $\mathcal{O} \neq \emptyset$, and $0$ otherwise, where $\beta = \sqrt{ 2 \log 2 \cdot \log \frac{1}{\alpha}}$ for $\alpha\in (0,1)$ represents the divergence constraint. Then
 \[
   \tvar{\alpha }{\tilde{x} } = \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_{f_{\beta}}\right\}.
   \]
@@ -639,7 +638,7 @@ Moreover, $f_{\beta}$ is EWS with $m = 1$ and $c = \beta/2$.
     \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
 \bm{q} \ge 0, \,
 \bm{1}\tr \bm{q} = 1, \,
-\bm{\|p -q\|_1} \le \beta 
+\|\bm{p} -\bm{q}\|_1 \le \beta 
 \right\}, \quad \forall \mathcal{O} \subseteq \Omega.
 \end{align}
 Note that the maximum in the right hand side of~\eqref{eq:tvar-eq-submodular} always exists because it equals to TVaR which is well defined.
@@ -673,7 +672,7 @@ Since by the simplex constraint, \mm{this needs a bit more rigor}
 \]
 and 
   \[
-  \bm{1}_{\mathcal{O}}\tr \bm{q} \leq 1\tr \bm{q}  = 1,
+  \bm{1}_{\mathcal{O}}\tr \bm{q} \leq \bm{1}\tr \bm{q}  = 1,
 \]
 the first inequality holds.
 
@@ -781,7 +780,7 @@ In this section, we summarize some useful properties of discrete random variable
   \]
 \end{lemma}
 \begin{proof}
-  It follows by induction on the size $|\Omega|$ after generalization that drop the constraint $\bm{1}\tr \bm{p} = 1$.
+  It follows by induction on the size $|\Omega|$ after generalization that drops the constraint $\bm{1}\tr \bm{p} = 1$.
 \end{proof}
 
 \section{Supplemental VaR Algorithms and Results} \label{sec:stand-var-algor}
@@ -885,7 +884,7 @@ Let $v$ be an input to \cref{alg:partition} and consider the following invariant
   
 \emph{Maintenance}. At each iteration of the loop that starts on line \ref{line:partition-while} of \cref{alg:partition} there are 3 possible branches determined by the conditional logic. $x_{e_k} < v$, $x_{e_k} > v$ and $x_{e_k} = v$. Since $v, x_{e_k} \in \Real$ one of these branches must be executed for each iterate $k$.
 
-  Each time the $x_{e_k} < v$ or $x_{e_k} > v$ branches are executed conditions \eqref{eq:ho-inv-less} and \eqref{eq:ho-inv-more} remain true respectively since in each case we are swapping neccecary elements to preserve each condition. Notice also that $e_k$ is incremented alongside $l_k$ to maintain $e_k - l_k = e_{k+1} - l_{k+1}$ as is necessary for condition \eqref{eq:ho-inv-equal}.
+  Each time the $x_{e_k} < v$ or $x_{e_k} > v$ branches are executed conditions \eqref{eq:ho-inv-less} and \eqref{eq:ho-inv-more} remain true respectively since in each case we are swapping necessary elements to preserve each condition. Notice also that $e_k$ is incremented alongside $l_k$ to maintain $e_k - l_k = e_{k+1} - l_{k+1}$ as is necessary for condition \eqref{eq:ho-inv-equal}.
 
   When $x_{e_k} = v$, $e_k$ is incremented, since $e_0 = l_0$ this creates a difference between $e_{k+1}$ and $l_{k+1}$, the algorithm terminates when $g_t = e_t$, $g_t - l_t = e_t - l_t > 0$ therefore \eqref{eq:ho-inv-equal} remains true.   
 
@@ -914,7 +913,7 @@ First, we show that $\hat{\bm{q}} \in \widehat{\mathcal{Q}}_f$. Note that the co
    \sum_{i=1}^n \hat{q}_i =  
    \sum_{i=1}^n \hat{q}_{\sigma (i)} = f(1{:}n) - f(\emptyset) = 1, 
   \]
-which implies that $\hat{\bm{q}} \in \widehat{\mathcal{Q}}_f\Delta_n \cap \mathcal{Q}_f$, $\widehat{\mathcal{Q}}_f \neq \emptyset$, and the minimum \eqref{eq:normalized-poly-opt} exists.
+which implies that $\hat{\bm{q}} \in \Delta_n \cap \mathcal{Q}_f = \widehat{\mathcal{Q}}_f$, $\widehat{\mathcal{Q}}_f \neq \emptyset$, and the minimum \eqref{eq:normalized-poly-opt} exists.
 
 To show, that $\hat{\bm{q}} $ is optimal, we reduce the optimization problem in \eqref{eq:normalized-poly-opt} to the standard linear polymatroid optimization problem with non-negative weights as follows:
 \begin{align*}
@@ -934,7 +933,7 @@ The following lemma is folklore in submodular optimization~\cite[theorem~4.5.1]{
   Suppose that $\bm{1}\tr\bm{\mu}\in \Real^n_{\ge 0}$ and $g \colon \Real_{\ge 0} \to \Real$ is concave and monotone. Then $f(\mathcal{A}) := g(\bm{1}\tr\bm{\mu}_{\mathcal{A}})$ is a submodular monotone function.
 \end{lemma}
 \begin{proof}
-  The fact that $f$ is monotone follows immediately from the composition of two monotone function. To prove that $f$ is submodular, we use the following properties that hold for each $\mathcal{A}, \mathcal{B} \subseteq 1{:}n$:
+  The fact that $f$ is monotone follows immediately from the composition of two monotone functions. To prove that $f$ is submodular, we use the following properties that hold for each $\mathcal{A}, \mathcal{B} \subseteq 1{:}n$:
   \begin{align}
     \label{eq:sets-bounds-nneg}
     \bm{1}\tr\bm{\mu}_{\mathcal{A} \cup \mathcal{B}}

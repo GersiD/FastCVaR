@@ -19,6 +19,7 @@ bash main.sh
 ```
 
 ## How to run tests
+
 To run the tests, run the following command in the code directory of the project:
 ```bash
 julia --project=./test ./test/runtests.jl
@@ -27,4 +28,4 @@ julia --project=./test ./test/runtests.jl
 ## Notes for the Particular Reader
 You will notice alot of shared code between directories, this code does not follow good software development practices, and is not meant to be used as a library. It is just a collection of scripts that we used to test our ideas.
 
-Please use [this libary developed by our team instead](https://github.com/RiskAverseRL/MDPs.jl).
+Please use [this library developed by our team instead](https://github.com/RiskAverseRL/MDPs.jl).

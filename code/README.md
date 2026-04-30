@@ -12,9 +12,16 @@ The code is organized into the following directories:
 -  stocks/ # Stock market experiments
 -  test/ # Tests for the new methods
 
-## How to run
+## How to run code
+To produce graphs and plots for the paper, run the following command in the code directory of the project:
 ```bash
-julia --project=./ -e 'using Pkg; Pkg.instantiate()'
+bash main.sh
+```
+
+## How to run tests
+To run the tests, run the following command in the code directory of the project:
+```bash
+julia --project=./test ./test/runtests.jl
 ```
 
 ## Notes for the Particular Reader

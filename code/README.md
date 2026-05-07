@@ -25,6 +25,8 @@ To run the tests, run the following command in the code directory of the project
 julia --project=./test ./test/runtests.jl
 ```
 
+To add tests modify the file `./test/runtests.jl` and add your test files to the `./test/` directory.
+
 ## Notes for the Particular Reader
 You will notice alot of shared code between directories, this code does not follow good software development practices, and is not meant to be used as a library. It is just a collection of scripts that we used to test our ideas.
 

@@ -25,22 +25,23 @@ function run_one_experiment(x, p, α)
   tmpx = deepcopy(x)
   tmpp = deepcopy(p)
   local start = time_ns()
-  slow_cvar_result = CVaR(tmpx, tmpp, α, check_inputs=false).value
+  slow_cvar_result = RiskMeasures.CVaR(tmpx, tmpp, α, check_inputs=false, fast=false).value
   slow_time = (time_ns() - start) * 1e-6
   tmpx = deepcopy(x)
   tmpp = deepcopy(p)
   start = time_ns()
-  fast_cvar_result = qCVaR!(tmpx, tmpp, α).value
+  # fast_cvar_result = qCVaR!(tmpx, tmpp, α).value
+  fast_cvar_result = RiskMeasures.CVaR(tmpx, tmpp, α, check_inputs=false, fast=true).value
   fast_time = (time_ns() - start) * 1e-6
   tmpx = deepcopy(x)
   tmpp = deepcopy(p)
   start = time_ns()
-  VaR(tmpx, tmpp, α, check_inputs=false).value
+  RiskMeasures.VaR(tmpx, tmpp, α, check_inputs=false, fast=false).value
   var_time = (time_ns() - start) * 1e-6
   tmpx = deepcopy(x)
   tmpp = deepcopy(p)
   start = time_ns()
-  qql!(tmpx, tmpp, α).value
+  RiskMeasures.VaR(tmpx, tmpp, α, check_inputs=false, fast=true).value
   qvar_time = (time_ns() - start) * 1e-6
   tmpx = deepcopy(x)
   tmpp = deepcopy(p)
@@ -108,7 +109,7 @@ for dist in ["uniform", "sparse"]
     # println("Experiment $i / $len --- n = $n")
     x = rand(Float64, n) .* 100
     p = p_f(n)
-    α = 0.95
+    α = 0.95 + 1e-6
     c, qc, v, qv, t, qt, e = run_one_experiment(x, p, α)
     cvar_results[i] = c
     qcvar_results[i] = qc

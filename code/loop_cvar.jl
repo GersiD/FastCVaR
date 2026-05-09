@@ -96,3 +96,40 @@ function qCVaR!(vals::AbstractVector{<:Real}, p::AbstractVector{<:Real}, α::Rea
   end
   return (value=value, pmf=pc)
 end
+function EWS(vals: AbstractVector{<:Real}, p::AbstractVector{<:Real}, m::Real, c::Real)
+	v = qql!(vals, p, (1 - c) / m)
+	if c != 0 
+     k_min, idx = findmin(vals)
+  end
+	
+	
+    
+    theta = 1 - c
+    value = 0.0;
+    @inbounds for i ∈ 1:qind
+     if vals[i] < v 
+      if i != idx
+        value += m*p[i]
+      else
+        value += m*p[i] + c
+			 
+        theta -= m*p[i]
+      end   
+        
+     else
+      if i != idx
+       q = min(theta, m*p[i])
+       value += q
+       theta -= q
+				
+			
+      else
+       value += m*p[i] + c
+      end
+     end   
+		end	
+			
+		
+    
+    return (value=value)
+end

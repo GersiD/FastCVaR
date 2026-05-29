@@ -118,10 +118,11 @@ where $\varphi\opt(x)$ is the convex conjugate of $\varphi(y)$, $\varphi$ is a c
 \]
 We adopt the common convention that $1 / 0 = \infty$ and $0 \cdot \infty = 0$~\cite{rockefeller1996variational} which makes it possible to drop the absolute continuity restriction used in some definitions of $\ER$. It is important to note that $\varphi$-divergence risk measures are coherent, which means they are convex and positively homogeneous. Any coherent risk measure $\rho\colon \mathbb{R}^n\to \bar{\Real}$ satisfies for some closed convex non-empty set $\mathcal{Q} \subseteq \Delta_n$ \citep[Prop. 2.84]{Follmer2016}. 
 
-\Cref{tab:phi-divergence-risk} summarizes several common $\varphi$-divergence risk measures. We focus on the \emph{Conditional-Value-at-Risk}~(CVaR), which is a $\varphi$-divergence risk measure and defined equivalently for $\tilde{x} \in \mathbb{R}^n$ and $\alpha \in (0,1]$ as~\cite{Follmer2016}
+\Cref{tab:phi-divergence-risk} summarizes several common $\varphi$-divergence risk measures; see \cref{sec:cvar-tvar-are} for the relevant definitions for $\alpha\in [0,1]$. We focus on the \emph{Conditional-Value-at-Risk}~(CVaR), which is a $\varphi$-divergence risk measure and defined equivalently for $\tilde{x} \in \mathbb{R}^n$ and $\alpha \in (0,1]$ as~\cite{Follmer2016}
 \begin{equation} \label{eq:primal_cvar}
     \cvaro_\alpha(\tilde{x})
-  := \max_{z \in \Real} \left(z - \frac{1}{\alpha} \cdot \E{z -\bm{x}}_+\right),
+    \; :=\; 
+    \max_{z \in \Real} \left(z - \frac{1}{\alpha} \cdot \E{z -\bm{x}}_+\right),
 \end{equation}
 and extended continuously to $\cvaro_0[\tilde{x}] = \ess\inf[\tilde{x}]$. We also study another $\varphi$-divergence risk measure, which we call \emph{Total-Value-at-Risk}~(TVaR). The importance of TVaR is that it bounds the common Entropic-Value-at-Risk~(EVaR)~\cite{Ahmadi-Javid2012,Hau2023a,Su2025} from below as we show next. 
 \begin{proposition}
@@ -518,28 +519,32 @@ The assumption $p_{k_{\min}} >0$ in \cref{alg:maximum-weight-independent} is nec
 
 \subsection{CVaR and TVaR are EWS} \label{sec:cvar-tvar-are}
 
-We now show that both TVaR and CVaR can be formulated as a polymatroid optimization problems with EWS capacity functions. Define for each $\mathcal{O} \subseteq \Omega$:
+We now show that both TVaR and CVaR can be formulated as a polymatroid optimization problems with EWS capacity functions. Define for each $\mathcal{O} \subseteq \Omega$ and $\alpha \in [0,1]$:
 \begin{equation} \label{eq:f-cvat-tvar}
   \begin{aligned}
   f_{\alpha}^{\cvaro}(\mathcal{O})
-  &\;:=\; 
-    \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\},
-    &\qquad
+    &\;:=\;
+      \begin{cases}
+        \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}, & \text{if } \alpha \in (0,1] \\
+        0 & \text{if } \alpha = 0 \wedge \P{\mathcal{O} = 0}  \\ 
+        1 & \text{if } \alpha = 0 \wedge \P{\mathcal{O} > 0}  \\ 
+      \end{cases} \\
   f^{\tvaro}_{\alpha}(\mathcal{O})
     &:=
       \begin{cases}
-        \min\left\{\P{\mathcal{O}} + \frac{\beta}{2}, 1\right\} &\text{if } \P{\mathcal{O}} > 0, \\
-        0 &\text{otherwise}.
+        \min\left\{\P{\mathcal{O}} + \sqrt{ \frac{1}{4} \log 2 \cdot \log \frac{1}{\alpha}}, 1\right\} &\text{if } \alpha \in (0,1] \wedge \P{\mathcal{O}} > 0, \\
+        0 & \text{if } \alpha = 0 \wedge \P{\mathcal{O}} = 0, \\
+        1 & \text{if } \alpha = 0 \wedge \P{\mathcal{O}} > 0.
       \end{cases}
   \end{aligned}
 \end{equation}
-The Choquet capacity function for CVaR is well known~\cite{acerbi2002spectral}. We state its correctness below and include the proof in the appendix for the sake of completeness, since we are not aware of a reference that proves the result using elementary tools.
+The Choquet capacity function $f_{\alpha }^{\cvaro}$ for CVaR is well known, but is typically only defined for $\alpha\in (0,1)$~\cite{acerbi2002spectral}. We state its correctness below and include the proof in the appendix for the sake of completeness, since we are not aware of a reference that proves the result using elementary tools.
 \begin{proposition} \label{prop:cvar-ews-correct}
 For each $\alpha\in [0,1]$, a random variable $\tilde{x}$ with probability $\bm{p}$, the function $f^{\cvaro}_{\alpha }$ is $\ews(\bm{p}, m, c)$ with $m = 1/\alpha$ and $c = 0$ and 
 \begin{equation} \label{eq:cvar-correct}
   \cvar{\alpha }{\tilde{x} }
   \;=\;
-  \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_f\right\}.
+  \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_{f_{\alpha }^{\cvaro}}\right\}.
 \end{equation}
 \end{proposition}
 \begin{proof}[Proof of \cref{prop:cvar-ews-correct}]

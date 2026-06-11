@@ -332,7 +332,9 @@ We first recall the definition of a submodular function~\cite[section~2.1]{Korte
 \begin{definition} \label{def:polymatroid}
 A function $f \colon 2^{1{:}n} \to \Real_{\ge 0}$ is \emph{submodular} if
 \[ 
-  f(\mathcal{A}) + f(\mathcal{B}) \geq f(\mathcal{A} \cup \mathcal{\mathcal{B}}) + f(\mathcal{A} \cap \mathcal{B}),
+  f(\mathcal{A}) + f(\mathcal{B})
+  \; \geq\;
+  f(\mathcal{A} \cup \mathcal{\mathcal{B}}) + f(\mathcal{A} \cap \mathcal{B}),
   \quad
   \forall \mathcal{A}, \mathcal{B} \subseteq 1{:}n.
 \]
@@ -342,7 +344,7 @@ For a submodular $f \colon 2^{1{:}n} \to \Real_{\ge 0}$, a \emph{polymatroid} $\
     \;:=\;
     \left\{ \bm{q} \in \Real_{\ge 0}^n  \mid   \bm{1}\tr \bm{q}_{\mathcal{U}} \leq f(\mathcal{U}), \, \forall \,  \mathcal{U} \subseteq 1{:}n \right\},
 \]
-and a \emph{normalized polymatroid} is the intersection with the probability simplex: $\widehat{\mathcal{Q}}_f := \mathcal{Q}_f \cap \Delta_n $.
+and a \emph{normalized polymatroid} is $\widehat{\mathcal{Q}}_f := \mathcal{Q}_f \cap \Delta_n $.
 \end{definition}
 
 Polymatroids are useful in our setting because any coherent, comotonic monetary risk measure can be formulated as linear optimization over a polymatroid~\cite[corollary~4.89]{Follmer2016}. A risk measure $\rho$ is \emph{coherent} if it is concave and positively homogeneous.  A risk measure $\rho$ is \emph{comotonic} if for any comonotone $\tilde{x}, \tilde{y}$: $\rho[ \tilde{x} + \tilde{y} ] = \rho[ \tilde{x} ] + \rho[ \tilde{y} ]$, where the random variables $\tilde{x}, \tilde{y} \in \Real^{1{:}n}$ are \emph{comonotone} if $\tilde{x}(i) \ge \tilde{x}(j) \Leftrightarrow \tilde{y}(i) \ge \tilde{y}(j)$ for each $i,j\in 1{:}n$.
@@ -386,11 +388,12 @@ A function $f\colon 2^{1{:}n} \to \Real_{\ge 0}$ is $\ews(\bm{\mu} ,m, c)$, or \
 \end{equation}
 \end{definition}
 
+The following proposition shows that any EWS function satisfies the properties necessary to use it to define a polymatroid. 
 \begin{proposition}
-Any EWS function $f\colon 2^{\Omega} \to  \Real_{\ge 0}$ is submodular, monotone, $f(\emptyset) = 0$, and $f(\Omega) = 1$.   
+Any EWS function $f\colon 2^{\Omega} \to  \Real_{\ge 0}$ is submodular, monotone, and satisfies that $f(\emptyset) = 0$, and $f(\Omega) = 1$.   
 \end{proposition}
 \begin{proof} 
-  From \cref{lem:submodular-concave}, it is sufficient to show that $g$ is concave to show that  $f$ is submodular. The function $g$ is concave on the interval $(0, 1]$ because it is the minimum of two linear functions~\cite{boyd2004convex}. The concavity of $g$ on $[0, 1]$ follows from the definition. Since $g(0) = 0$, for each $\lambda \in (0,1]$ and $z \in ( 0, 1]$ we get that
+To show that  $f$ is submodular it is sufficient, from \cref{lem:submodular-concave}, to show that $g$ is concave on $[0,1]$. The function $g$ is concave on $(0, 1]$ because it is the minimum of two linear functions~\cite{boyd2004convex}. The concavity of $g$ on $[0, 1]$ follows from the definition. Since $g(0) = 0$, for each $\lambda \in (0,1]$ and $z \in ( 0, 1]$ we get that
 \begin{align*}
   (1 - \lambda)g(0) + \lambda \cdot g(b)
   &= \lambda \cdot g(b)
@@ -398,7 +401,7 @@ Any EWS function $f\colon 2^{\Omega} \to  \Real_{\ge 0}$ is submodular, monotone
   &\leq \min \left\{ c + m \cdot \lambda \cdot b, 1 \right\}
   = g(\lambda \cdot  b) = g\left( (1 - \lambda)\cdot 0 + \lambda\cdot b\right).
 \end{align*}
-Because the inequality holds also for $\lambda = 0$, $g$ is concave by the definition. The monotonicity, non-negativity and the boundary value conditions for $f$ follow immediately by algebraic manipulation from the assumptions on $c$ and
+Because the inequality holds also for $\lambda = 0$, $g$ is concave on $[0,1]$ by the definition. The monotonicity, non-negativity and the boundary value conditions for $f$ follow immediately by algebraic manipulation from the assumptions on $c$ and
 $m$. 
 \end{proof}
 
@@ -516,39 +519,30 @@ since $\bm{1}\tr\bm{p}_{\sigma(1{:}(k-1))} > \frac{1-c}{m}$ from \cref{thm:quant
 The assumption $p_{k_{\min}} >0$ in \cref{alg:maximum-weight-independent} is necessary for its correctness but is not limiting in practice. Note that it is straightforward to filter out elements with zero probability in linear time. Alternatively, one could relax the assumption by modifying \cref{alg:maximum-weight-independent} as follows. Instead of computing $k_{\min}$ as in the algorithm, we need to compute $x_{\min} := \operatorname{QuickVaR}(\bm{p}, \bm{x}, \alpha = 0)$ and define $\mathcal{K}_{< x_{\min}} := \{ i \in  1{:}n \mid x_i < x_{\min} \}$ and $\mathcal{K}_{= x_{\min}} := \{ i = 1{:}n \mid x_i = x_{\min} \}$. Then, set $q_i\opt := 0$ for each $i \in \mathcal{K}_{<x_{\min}}$ and choose $k_{\min} \in \mathcal{K}_{=x_{\min}}$ arbitrarily. The remaining $q_i\opt $ can be assigned as in the \cref{alg:maximum-weight-independent}.
 \end{remark}
 
+\subsection{Solving CVaR and TVaR in Linear Time} \label{sec:cvar-tvar-are}
 
-\subsection{CVaR and TVaR are EWS} \label{sec:cvar-tvar-are}
-
-We now show that both TVaR and CVaR can be formulated as a polymatroid optimization problems with EWS capacity functions. Define for each $\mathcal{O} \subseteq \Omega$ and $\alpha \in [0,1]$:
-\begin{equation} \label{eq:f-cvat-tvar}
-  \begin{aligned}
+We show that CVaR and TVaR are two examples of $\varphi$-divergence risk measures that can be formulated as linear optimization over a polymatroid with an EWS capacity function and, therefore, can be solved in linear time. To formulate the CVaR polymatroid optimization, we define the capacity function $f_{\alpha}^{\cvaro}\colon 2^{\Omega } \to \Real$  for each $\mathcal{O} \subseteq \Omega$ and $\alpha \in [0,1]$ as
+\begin{equation} \label{eq:f-cvar}
   f_{\alpha}^{\cvaro}(\mathcal{O})
-    &\;:=\;
+    \;:=\;
       \begin{cases}
-        \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}, & \text{if } \alpha \in (0,1] \\
-        0 & \text{if } \alpha = 0 \wedge \P{\mathcal{O} = 0}  \\ 
-        1 & \text{if } \alpha = 0 \wedge \P{\mathcal{O} > 0}  \\ 
+        \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}, & \text{if } \alpha \in (0,1], \\
+        0 & \text{if } \alpha = 0 \wedge \P{\mathcal{O} = 0},  \\ 
+        1 & \text{if } \alpha = 0 \wedge \P{\mathcal{O} > 0}. \\ 
       \end{cases} \\
-  f^{\tvaro}_{\alpha}(\mathcal{O})
-    &:=
-      \begin{cases}
-        \min\left\{\P{\mathcal{O}} + \sqrt{ \frac{1}{4} \log 2 \cdot \log \frac{1}{\alpha}}, 1\right\} &\text{if } \alpha \in (0,1] \wedge \P{\mathcal{O}} > 0, \\
-        0 & \text{if } \alpha = 0 \wedge \P{\mathcal{O}} = 0, \\
-        1 & \text{if } \alpha = 0 \wedge \P{\mathcal{O}} > 0.
-      \end{cases}
-  \end{aligned}
 \end{equation}
-The Choquet capacity function $f_{\alpha }^{\cvaro}$ for CVaR is well known, but is typically only defined for $\alpha\in (0,1)$~\cite{acerbi2002spectral}. We state its correctness below and include the proof in the appendix for the sake of completeness, since we are not aware of a reference that proves the result using elementary tools.
+The Choquet capacity function $f_{\alpha }^{\cvaro}$ for CVaR defined in \eqref{eq:f-cvar} is well known, but is usually only restricted to $\alpha\in (0,1)$~\cite{acerbi2002spectral}. The following proposition states its correctness below and include the proof in the appendix for the sake of completeness.
 \begin{proposition} \label{prop:cvar-ews-correct}
-For each $\alpha\in [0,1]$, a random variable $\tilde{x}$ with probability $\bm{p}$, the function $f^{\cvaro}_{\alpha }$ is $\ews(\bm{p}, m, c)$ with $m = 1/\alpha$ and $c = 0$ and 
+For each $\alpha\in [0,1]$, a random variable $\tilde{x}$, and probability $\bm{p} $, the function $f^{\cvaro}_{\alpha }$ is $\ews(\bm{p}, m, c)$ with $m = 1/\alpha$ and $c = 0$, and 
 \begin{equation} \label{eq:cvar-correct}
   \cvar{\alpha }{\tilde{x} }
   \;=\;
   \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_{f_{\alpha }^{\cvaro}}\right\}.
 \end{equation}
 \end{proposition}
+
 \begin{proof}[Proof of \cref{prop:cvar-ews-correct}]
-To prove \eqref{eq:cvar-correct}, it is sufficient, by \citet[theorem~4.88]{Follmer2016} and \citet[remark~4.96]{Follmer2016}, to show
+the function To prove \eqref{eq:cvar-correct}, it is sufficient, by \citet[theorem~4.88]{Follmer2016} and \citet[remark~4.96]{Follmer2016}, to show
 \begin{align}
   \nonumber
   f(\mathcal{O}) 
@@ -561,7 +555,7 @@ To prove \eqref{eq:cvar-correct}, it is sufficient, by \citet[theorem~4.88]{Foll
 \bm{q} \le \frac{1}{\alpha} \bm{p}
 \right\}, \quad \forall \mathcal{O} \subseteq \Omega.
 \end{align}
-Note that the maximum in the right hand side of~\eqref{eq:cvar-eq-submodular} always exists because it equals to CVaR which is well defined.
+Note that the maximum on the right hand side of~\eqref{eq:cvar-eq-submodular} always exists because it equals to CVaR which is well defined.
 
 We prove the equality in \eqref{eq:cvar-eq-submodular} as two inequalities.
 
@@ -620,8 +614,17 @@ It is easy to verify that $\bm{q} \ge \bm{0}$ and $\bm{1}\tr \bm{q} = 1$. The co
 \end{enumerate}
 \end{proof}
 
-(TVaR)~\cite{Kruse2021}
-We now prove the submodular function for TVaR and show that it also satisfies ElementWiseSeparability as defined above.
+To compute TVaR, we define the capacity function $f_{\alpha}^{\tvaro}\colon 2^{\Omega } \to \Real$  for each $\mathcal{O} \subseteq \Omega$ and $\alpha \in [0,1]$ as
+\begin{equation}\label{eq:f-tvar}
+  f^{\tvaro}_{\alpha}(\mathcal{O})
+    \; :=\; 
+      \begin{cases}
+        \min\left\{\P{\mathcal{O}} + \sqrt{ \frac{1}{4} \log 2 \cdot \log \frac{1}{\alpha}}, 1\right\} &\text{if } \alpha \in (0,1] \wedge \P{\mathcal{O}} > 0, \\
+        0 & \text{if } \alpha = 0 \wedge \P{\mathcal{O}} = 0, \\
+        1 & \text{if } \alpha = 0 \wedge \P{\mathcal{O}} > 0.
+      \end{cases}
+\end{equation}
+TVaR was proposed in the context of $\varphi$-divergence risk measures~\cite{Kruse2021} as well as in the context of robust stochastic programming~\cite{Shapiro2017}. TVaR is also very closely related to the $L_1$ ball used in robust Markov decision processes~\cite{Ho2021,Ho2022}. However, we are not aware of prior work that defines or uses the capacity function in~\eqref{eq:f-tvar}. The following proposition shows that this function can be used to correctly formulate the TVaR evaluation using an EWS function. 
 \begin{proposition} \label{prop:tvar-ews-correct}
 For $\mathcal{O} \subseteq \Omega$, define $f_{\beta}\colon 2^{\Omega} \to \Real_{\ge 0}$:
 
@@ -774,10 +777,10 @@ This speed up is significant in the context of risk measures as they are often u
 \crefalias{Section}{Appendix}
 
 \section{Properties of Discrete Random Variables} \label{sec:prob-discr-rand}
-In this section, we summarize some useful properties of discrete random variables which we use in our proofs. 
 
+In this section, we summarize some useful properties of discrete random variables which we use in our proofs. 
 \begin{lemma} \label{lem:prob-lumpy}
-  For each $t\in \Real$:
+For each $t\in \Real$:
   \[
     \P{\tilde{x} = t} > 0
     \implies
@@ -785,10 +788,12 @@ In this section, we summarize some useful properties of discrete random variable
   \]
 \end{lemma}
 \begin{proof}
-  It follows by induction on the size $|\Omega|$ after generalization that drops the constraint $\bm{1}\tr \bm{p} = 1$.
+The result follows by induction on the size $|\Omega|$ after generalization that drops the constraint $\bm{1}\tr \bm{p} = 1$.
 \end{proof}
 
-\section{Supplemental VaR Algorithms and Results} \label{sec:stand-var-algor}
+\section{Supplemental Results for Section~\ref{sec:var-linear}} \label{sec:stand-var-algor}
+
+In this section, we summarize the standard and supporting algorithms for solving VaR. We also include the selected technical proofs for the correctness of the proposed algorithm. 
 
 \begin{algorithm}
 \caption{VaR: Standard VaR algorithm}
@@ -903,9 +908,9 @@ Observe that  $g_0 - e_0 = b - f$ is positive since $f<b$ by assumption. $g_k-e_
   condition \eqref{eq:ho-inv-equal} holds for $g_{t+1} = e_{t+1} - 1$.
 \end{proof}
 
-\section{Supplemental $\varphi$-Divergence Algorithms and Properties}
+\section{Supplemental Results for Section~\ref{sec:phi-divergence}}
 
-The following proposition states the correctness of the polymatroid optimization algorithm. 
+The following proposition states the correctness of the standard polymatroid optimization algorithm when applied to a normalized polymatroid. 
 \begin{proposition} \label{prop:standard-polymatroid-works}
 Suppose that $f\colon  2^{1{:}n} \to \Real$ is submodular, monotone, $f(\emptyset) = 0$ and $f(1{:}n) = 1$, and for $\bm{x}\in \Real^n_{\ge 0}$. Then, \cref{alg:greedy-polymatroid} computes $\bm{q}\opt$ such that
   \begin{equation} \label{eq:normalized-poly-opt}

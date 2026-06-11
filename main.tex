@@ -116,7 +116,7 @@ where $\varphi\opt(x)$ is the convex conjugate of $\varphi(y)$, $\varphi$ is a c
 \[
   H_\varphi(\bm{q} \| \bm{p}) := \sum_{\omega \in \Omega} p_{\omega} \cdot \varphi\left(\frac{q_{\omega}}{p_{\omega}}\right).
 \]
-We adopt the common convention that $1 / 0 = \infty$ and $0 \cdot \infty = 0$~\cite{rockefeller1996variational} which makes it possible to drop the absolute continuity restriction used in some definitions of $\ER$. It is important to note that $\varphi$-divergence risk measures are coherent, which means they are convex and positively homogeneous. Any coherent risk measure $\rho\colon \mathbb{R}^n\to \bar{\Real}$ satisfies for some closed convex non-empty set $\mathcal{Q} \subseteq \Delta_n$ \citep[Prop. 2.84]{Follmer2016}. 
+We adopt the common convention that $1 / 0 = \infty$ and $0 \cdot \infty = 0$~\cite{rockefeller1996variational} which makes it possible to drop the absolute continuity restriction used in some definitions of $\ER$. It is important to note that $\varphi$-divergence risk measures are coherent, which means they are concave and positively homogeneous. \cc{Changed ``convex'' to ``concave'': since we use the reward convention and $\ER_{\varphi,\beta}[\tilde{x}]$ is an infimum of linear functions in~\eqref{eq:fdiv-primal}, it is concave in $\tilde{x}$, consistent with \cref{sec:phi-divergence}.} Any coherent risk measure $\rho\colon \mathbb{R}^n\to \bar{\Real}$ satisfies $\rho[\tilde{x}] = \inf_{\bm{q}\in\mathcal{Q}} \bm{q}\tr\bm{x}$ for some closed convex non-empty set $\mathcal{Q} \subseteq \Delta_n$ \citep[Prop. 2.84]{Follmer2016}. \cc{The sentence was incomplete --- the representation formula was missing; please verify the inserted form against Prop.~2.84.}
 
 \Cref{tab:phi-divergence-risk} summarizes several common $\varphi$-divergence risk measures; see \cref{sec:cvar-tvar-are} for the relevant definitions for $\alpha\in [0,1]$. We focus on the \emph{Conditional-Value-at-Risk}~(CVaR), which is a $\varphi$-divergence risk measure and defined equivalently for $\tilde{x} \in \mathbb{R}^n$ and $\alpha \in (0,1]$ as~\cite{Follmer2016}
 \begin{equation} \label{eq:primal_cvar}
@@ -221,13 +221,13 @@ Then, the existence of $\omega$ follows from \cref{lem:prob-lumpy} in \cref{sec:
 
 The following lemma proves the properties of the $\operatorname{partition}$ operator defined in \cref{alg:partition}. 
 \begin{lemma} \label{lem:hoare-partition}
-If $(l, g, \bm{x}', \bm{p}') = \operatorname{partition}(\bm{x'}, \bm{p'}, v, f, b)$ for $f < b$, then:
+If $(l, g, \bm{x}', \bm{p}') = \operatorname{partition}(\bm{x}, \bm{p}, v, f, b)$ for $f < b$, then:
 \begin{align} \label{eq:hoare-correspond}
   \bm{x}_{f{:}(l-1)} < v, \qquad
   \bm{x}_{l{:}g} = v,  \qquad
   \bm{x}_{(g+1){:}b} > v.
 \end{align}
-Moreover, $ \bm{x}_{f{:}b} = \bm{x'}_{\sigma(f{:}b)}, \bm{p} = \bm{p'}_{\sigma(f{:}b)}$ for some permutation $\sigma\colon f{:}b \to f{:}b$, and $\bm{x}_{1{:}(f-1)} = \bm{x'}_{1{:}(f-1)}, \bm{p}_{1{:}(f-1)} = \bm{p'}_{1{:}(f-1)}$, and $\bm{x}_{(b+1):n} = \bm{x'}_{(b+1):n}, \bm{p}_{(b+1):n} = \bm{p'}_{(b+1):n}$. The elements outside of $f{:}b$ range are not modified. The algorithm runs in $O(b - f + 1)$ time.
+Moreover, $ \bm{x}_{f{:}b} = \bm{x'}_{\sigma(f{:}b)}, \bm{p}_{f{:}b} = \bm{p'}_{\sigma(f{:}b)}$ for some permutation $\sigma\colon f{:}b \to f{:}b$, and $\bm{x}_{1{:}(f-1)} = \bm{x'}_{1{:}(f-1)}, \bm{p}_{1{:}(f-1)} = \bm{p'}_{1{:}(f-1)}$, and $\bm{x}_{(b+1):n} = \bm{x'}_{(b+1):n}, \bm{p}_{(b+1):n} = \bm{p'}_{(b+1):n}$. The elements outside of $f{:}b$ range are not modified. The algorithm runs in $O(b - f + 1)$ time.
 \end{lemma}
 \Cref{lem:hoare-partition} is a standard property of the Dutch national flag algorithm, and we outline its proof in \cref{sec:stand-var-algor} for the sake of completeness.
 
@@ -256,7 +256,7 @@ We proceed by induction on $k = b - f$. \emph{Base case}: $k = 0$. Since $b = f$
 \[
  \P{\tilde{x} < v} \le \alpha + \P{\tilde{x} < x_f} < \P{\tilde{x} \le v}. 
 \]
-Above, the first inequality holds from $x = x_f$ and $0 \le \alpha$. The second inequality holds from the algorithm's input condition.  
+Above, the first inequality holds from $v = x_f$ and $0 \le \alpha$. The second inequality holds from the algorithm's input condition.  
 
 \emph{Inductive step}. Suppose that $k>0$ and that the lemma holds for all $k' < k$. We now analyze the following three cases.
 
@@ -296,7 +296,7 @@ With the correctness of \cref{alg:quick-quantile} established in \cref{lem:quick
 \Cref{alg:quick-quantile} runs in expected $O(n)$ time.
 \end{theorem}
 \begin{proof}
-The proof is analogous to the standard quickselect algorithm, as in \citep[theorem~3.3]{horowitz1998computer}, except that we need to keep track of the risk level $\alpha$. Fix some $n \in \mathbb{N}$, $\bm{x}$, and $\bm{p}$ and we study the properties. Let $T\colon 1{:}n \to [0,\infty]$ be the \emph{expected} runtime of \cref{alg:quick-quantile} such $T(k)$ is the expected runtime when executed with $k := b - f + 1$. To simplify the notation, we assume without loss of generality in the remainder of the proof that $f = 1$ and $b = k$. Then, let
+The proof is analogous to the standard quickselect algorithm, as in \citep[theorem~3.3]{horowitz1998computer}, except that we need to keep track of the risk level $\alpha$. Fix some $n \in \mathbb{N}$, $\bm{x}$, and $\bm{p}$ and we study the properties. Let $T\colon 1{:}n \to [0,\infty]$ be the \emph{expected} runtime of \cref{alg:quick-quantile} such that $T(k)$ is the expected runtime when executed with $k := b - f + 1$. To simplify the notation, we assume without loss of generality in the remainder of the proof that $f = 1$ and $b = k$. Then, let
 \[
   l := \left| \left\{ i \in 1{:}k \mid  x_i < \varo_{\alpha}[\tilde{x}]\right\}   \right|
 \]
@@ -318,7 +318,7 @@ where $d\cdot k$ is the local runtime of the algorithm for some $d > 0$ and $T(i
 \[
  \quant_{\alpha}[\tilde{x}] := \left\{ z\in \Real \mid  \P{ \tilde{x} \le z } \ge \alpha , \P{ \tilde{x} \ge z } \ge 1-\alpha  \right\},
 \]
-with bounds $\quant^+_{\alpha}[\tilde{x}] := \max \quant_{\alpha}[\tilde{x}]$ and $\quant^-_{\alpha}[\tilde{x}] := \min \quant_{\alpha}[\tilde{x}]$. One can readily show that $\varo_{\alpha }[\tilde{x}] = \quant^+_{\alpha}[\tilde{x}]$. Although the precise definition of a weight median varies, it is typically a value in $\quant_{\frac{1}{2}}[\tilde{x}]$. Because $q^+_{\alpha}[\tilde{x}] \neq q^{-}_{\alpha}[\tilde{x}]$, in general, VaR also does not equal the median. A careful analysis shows that the weighted median algorithm in~\citet[section~17]{Korte2012} computes $\quant^-_{\frac{1}{2}}[\tilde{x}]$, it does not equal to $\varo_{\frac{1}{2}}[\tilde{x}]$.
+with bounds $\quant^+_{\alpha}[\tilde{x}] := \max \quant_{\alpha}[\tilde{x}]$ and $\quant^-_{\alpha}[\tilde{x}] := \min \quant_{\alpha}[\tilde{x}]$. One can readily show that $\varo_{\alpha }[\tilde{x}] = \quant^+_{\alpha}[\tilde{x}]$. Although the precise definition of a weighted median varies, it is typically a value in $\quant_{\frac{1}{2}}[\tilde{x}]$. Because $\quant^+_{\alpha}[\tilde{x}] \neq \quant^{-}_{\alpha}[\tilde{x}]$, in general, VaR also does not equal the median. A careful analysis shows that the weighted median algorithm in~\citet[section~17]{Korte2012} computes $\quant^-_{\frac{1}{2}}[\tilde{x}]$, which does not equal $\varo_{\frac{1}{2}}[\tilde{x}]$.
 \end{remark}
 
 \section{Computing \texorpdfstring{$\varphi$}{phi}-divergence Risk Measures in Linear Time} \label{sec:phi-divergence}
@@ -347,10 +347,10 @@ For a submodular $f \colon 2^{1{:}n} \to \Real_{\ge 0}$, a \emph{polymatroid} $\
 and a \emph{normalized polymatroid} is $\widehat{\mathcal{Q}}_f := \mathcal{Q}_f \cap \Delta_n $.
 \end{definition}
 
-Polymatroids are useful in our setting because any coherent, comotonic monetary risk measure can be formulated as linear optimization over a polymatroid~\cite[corollary~4.89]{Follmer2016}. A risk measure $\rho$ is \emph{coherent} if it is concave and positively homogeneous.  A risk measure $\rho$ is \emph{comotonic} if for any comonotone $\tilde{x}, \tilde{y}$: $\rho[ \tilde{x} + \tilde{y} ] = \rho[ \tilde{x} ] + \rho[ \tilde{y} ]$, where the random variables $\tilde{x}, \tilde{y} \in \Real^{1{:}n}$ are \emph{comonotone} if $\tilde{x}(i) \ge \tilde{x}(j) \Leftrightarrow \tilde{y}(i) \ge \tilde{y}(j)$ for each $i,j\in 1{:}n$.
+Polymatroids are useful in our setting because any coherent, comonotonic monetary risk measure can be formulated as linear optimization over a polymatroid~\cite[corollary~4.89]{Follmer2016}. A risk measure $\rho$ is \emph{coherent} if it is concave and positively homogeneous.  A risk measure $\rho$ is \emph{comonotonic} if for any comonotone $\tilde{x}, \tilde{y}$: $\rho[ \tilde{x} + \tilde{y} ] = \rho[ \tilde{x} ] + \rho[ \tilde{y} ]$, where the random variables $\tilde{x}, \tilde{y} \in \Real^{1{:}n}$ are \emph{comonotone} if $\tilde{x}(i) \ge \tilde{x}(j) \Leftrightarrow \tilde{y}(i) \ge \tilde{y}(j)$ for each $i,j\in 1{:}n$.
 
 \begin{proposition} \label{prop:coherent-polymatroid}
-A monetary risk measure $\rho\colon \Delta_n \times  \Real^n \to \Real$ is a coherent comotonic risk measure if and only if
+A monetary risk measure $\rho\colon \Delta_n \times  \Real^n \to \Real$ is a coherent comonotonic risk measure if and only if
 \begin{equation}\label{eq:comonotonic-optimization}
   \rho[\tilde{x}] = \min_{\bm{q}\in \widehat{\mathcal{Q}}_c} \bm{q}\tr  \bm{x},
   \qquad
@@ -393,7 +393,7 @@ Any EWS function satisfies the properties necessary to define a polymatroid as t
 Any EWS function $f\colon 2^{\Omega} \to  \Real_{\ge 0}$ is submodular, monotone, and satisfies that $f(\emptyset) = 0$, and $f(\Omega) = 1$.   
 \end{proposition}
 \begin{proof} 
-To show that  $f$ is submodular it is sufficient, from \cref{lem:submodular-concave}, to show that $g$ is concave on $[0,1]$. The function $g$ is concave on $(0, 1]$ because it is the minimum of two linear functions~\cite{boyd2004convex}. The concavity of $g$ on $[0, 1]$ follows from the definition. Since $g(0) = 0$, for each $\lambda \in (0,1]$ and $z \in ( 0, 1]$ we get that
+To show that  $f$ is submodular it is sufficient, from \cref{lem:submodular-concave}, to show that $g$ is concave on $[0,1]$. The function $g$ is concave on $(0, 1]$ because it is the minimum of two linear functions~\cite{boyd2004convex}. The concavity of $g$ on $[0, 1]$ follows from the definition. Since $g(0) = 0$, for each $\lambda \in (0,1]$ and $b \in ( 0, 1]$ we get that
 \begin{align*}
   (1 - \lambda)g(0) + \lambda \cdot g(b)
   = \lambda \cdot g(b)
@@ -409,12 +409,12 @@ $m$.
 \begin{algorithm}
   \caption{\texttt{QuickDivergence}: Algorithm for optimizing linear function on polymatroids} \label{alg:maximum-weight-independent}
   \Input{$\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$, $\ews(\bm{p}, m, c)$ function $f \colon 2^{1{:}n} \to \Real_{\ge 0}$}
-  \Output{$\min \left\{ \bm{q}\in \Real^n  \mid  \bm{q} \in \mathcal{Q}_f, \bm{1}\tr \bm{q} = 1\right\}$}
+  \Output{$\bm{q}\opt \in \arg\min \left\{ \bm{x}\tr\bm{q}  \mid  \bm{q} \in \widehat{\mathcal{Q}}_f, \bm{1}\tr \bm{q} = 1\right\}$}
   Choose $k_{\min} \in \arg\min_{i \in  1{:}n} x_i$ breaking ties by choosing the minimal $i$
   \tcp*{Assume: $p_{k_{\min}} > 0$}
-  $v \gets \operatorname{QuickVaR}(\bm{p}, \bm{x}, \alpha = (1 - c)/m)$ \;
+  $v \gets \operatorname{QuickVaR}(\bm{x}, \bm{p}, \alpha = (1 - c)/m)$ \;
   $\mathcal{K}_{< v} \gets \{ i \in  1{:}n \mid x_i < v \}$ ; ~
-  $\mathcal{K}_{= v} \gets \{ i = 1{:}n \mid x_i = v \}$ \;
+  $\mathcal{K}_{= v} \gets \{ i \in 1{:}n \mid x_i = v \}$ \;
   $l \gets |\mathcal{K}_{< v}|$;~ $\theta_l \gets  1 - c - m\cdot \bm{1}\tr \bm{p}_{\mathcal{K}_{<v }}$ \;
   \For{$i \in 1{:}n$}{
    \lIf{$i = k_{\min}$}{$q\opt_i \gets m\cdot p_i + c$}
@@ -471,7 +471,7 @@ To prove the base case, suppose that $l = |\mathcal{K}_{<v}|$. The equality in~\
 \hat{q}_{i} = \hat{q}_{\sigma(l+1)}  
   &= f ( \sigma(1{:}(l+1) )) - f ( \sigma(1{:}l) ) \\
   &= \min \left\{  1,\; c + m \cdot \bm{1}\tr \bm{p}_{\sigma(1{:}(l+1)} )\right\} - c - m \cdot \bm{1}\tr \bm{p}_{\sigma(1{:}l)} \\
-  &= \min \left\{1  - c - m \cdot \bm{1}\tr \bm{p}_{1{:}l}, \; m \cdot p_{\sigma(l+1)}\right\} \\
+  &= \min \left\{1  - c - m \cdot \bm{1}\tr \bm{p}_{\sigma(1{:}l)}, \; m \cdot p_{\sigma(l+1)}\right\} \\
   &= \min \{ \theta_l, m \cdot p_i \} = q_i\opt.
   \end{aligned}
 \end{equation}
@@ -485,7 +485,7 @@ To prove the inductive case, suppose that~\eqref{eq:theta-equality-1} and~\eqref
   &= 1 - f(\sigma(1{:}(l+1))).
 \end{align*}
 The equality in~\eqref{eq:theta-equality-2} follows analogously to~\eqref{eq:q-q-eq} if $\theta_{l+1} > 0$:
-\begin{equation} \label{eq:q-q-eq}
+\begin{equation} \label{eq:q-q-eq-2}
   \begin{aligned}
 \hat{q}_{i} = \hat{q}_{\sigma(l+2)}
   &= f ( \sigma(1{:}(l+2) )) - f(\sigma(1{:}(l+1))) \\
@@ -495,7 +495,7 @@ The equality in~\eqref{eq:theta-equality-2} follows analogously to~\eqref{eq:q-q
   &= q_i\opt.
   \end{aligned}
 \end{equation}
-If $\theta_{l+2} = 0$ we get by algebraic manipulation that $\hat{q}_i = 0 = q\opt_i$.
+If $\theta_{l+1} = 0$ we get by algebraic manipulation that $\hat{q}_i = 0 = q\opt_i$.
 
 
 \emph{(iv)} Suppose that $i \in \mathcal{K}_{>v}$ and let $k = \sigma^{-1}(i)$. Then, using~\eqref{eq:var-property-prob} we have that:
@@ -504,7 +504,7 @@ If $\theta_{l+2} = 0$ we get by algebraic manipulation that $\hat{q}_i = 0 = q\o
   &\ge f(\sigma(1{:}k))
   \ge f(\sigma(1{:}(k-1))) \\
   &\ge \min \{c + m \cdot \bm{1}\tr \bm{p}_{\sigma(1{:}(k-1))}, 1\}
-  \ge \min \{c + m \cdot \bm{1}\tr \bm{p}_{\sigma(1{:}(k-1))}, 1\} \ge 1,
+  \ge 1,
 \end{align*}
 since $\bm{1}\tr\bm{p}_{\sigma(1{:}(k-1))} > \frac{1-c}{m}$ from \cref{thm:quantile-in-finite-omega} and the construction of $v$ in \cref{alg:maximum-weight-independent}. Then
 \[
@@ -517,7 +517,7 @@ since $\bm{1}\tr\bm{p}_{\sigma(1{:}(k-1))} > \frac{1-c}{m}$ from \cref{thm:quant
 
 
 \begin{remark}\label{rem:relax-ess-inf}
-The assumption $p_{k_{\min}} >0$ in \cref{alg:maximum-weight-independent} is necessary for its correctness but is not limiting in practice. Note that it is straightforward to filter out elements with zero probability in linear time. Alternatively, one could relax the assumption by modifying \cref{alg:maximum-weight-independent} as follows. Instead of computing $k_{\min}$ as in the algorithm, we need to compute $x_{\min} := \operatorname{QuickVaR}(\bm{p}, \bm{x}, \alpha = 0)$ and define $\mathcal{K}_{< x_{\min}} := \{ i \in  1{:}n \mid x_i < x_{\min} \}$ and $\mathcal{K}_{= x_{\min}} := \{ i = 1{:}n \mid x_i = x_{\min} \}$. Then, set $q_i\opt := 0$ for each $i \in \mathcal{K}_{<x_{\min}}$ and choose $k_{\min} \in \mathcal{K}_{=x_{\min}}$ arbitrarily. The remaining $q_i\opt $ can be assigned as in the \cref{alg:maximum-weight-independent}.
+The assumption $p_{k_{\min}} >0$ in \cref{alg:maximum-weight-independent} is necessary for its correctness but is not limiting in practice. Note that it is straightforward to filter out elements with zero probability in linear time. Alternatively, one could relax the assumption by modifying \cref{alg:maximum-weight-independent} as follows. Instead of computing $k_{\min}$ as in the algorithm, we need to compute $x_{\min} := \operatorname{QuickVaR}(\bm{x}, \bm{p}, \alpha = 0)$ and define $\mathcal{K}_{< x_{\min}} := \{ i \in  1{:}n \mid x_i < x_{\min} \}$ and $\mathcal{K}_{= x_{\min}} := \{ i \in 1{:}n \mid x_i = x_{\min} \}$. Then, set $q_i\opt := 0$ for each $i \in \mathcal{K}_{<x_{\min}}$ and choose $k_{\min} \in \mathcal{K}_{=x_{\min}}$ arbitrarily. The remaining $q_i\opt $ can be assigned as in the \cref{alg:maximum-weight-independent}.
 \end{remark}
 
 \subsection{Solving CVaR and TVaR in Linear Time} \label{sec:cvar-tvar-are}
@@ -528,8 +528,8 @@ We show that CVaR and TVaR are two examples of $\varphi$-divergence risk measure
     \;:=\;
       \begin{cases}
         \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}, & \text{if } \alpha \in (0,1], \\
-        0 & \text{if } \alpha = 0 \wedge \P{\mathcal{O} = 0},  \\ 
-        1 & \text{if } \alpha = 0 \wedge \P{\mathcal{O} > 0}. \\ 
+        0 & \text{if } \alpha = 0 \wedge \P{\mathcal{O}} = 0,  \\
+        1 & \text{if } \alpha = 0 \wedge \P{\mathcal{O}} > 0. \\
       \end{cases} \\
 \end{equation}
 The Choquet capacity function $f_{\alpha }^{\cvaro}$ for CVaR defined in~\eqref{eq:f-cvar} is well known, but is usually restricted to $\alpha\in (0,1)$~\cite{acerbi2002spectral}. The following proposition states its correctness below.
@@ -538,8 +538,9 @@ For each $\alpha\in [0,1]$, $\tilde{x} \colon \Omega \to \Real$, and $\bm{p} \in
 \begin{equation} \label{eq:cvar-correct}
   \cvar{\alpha }{\tilde{x} }
   \;=\;
-  \max_{\bm{q} \in \widehat{\mathcal{Q}}_{f_{\alpha }^{\cvaro}}} \bm{x}\tr \bm{q}.
+  \min_{\bm{q} \in \widehat{\mathcal{Q}}_{f_{\alpha }^{\cvaro}}} \bm{x}\tr \bm{q}.
 \end{equation}
+\cc{Changed $\max$ to $\min$ to match the coherent-risk representation~\eqref{eq:comonotonic-optimization}, which uses $\min$. Sanity check: $\cvaro_0[\tilde{x}]=\ess\inf[\tilde{x}]$ requires the $\min$, since with $\alpha=0$ the feasible set is all of $\Delta_n$ and $\max_{\bm q\in\Delta_n}\bm x\tr\bm q=\max_i x_i\ne\cvaro_0$.}
 \end{proposition}
 \begin{proof}[Proof of \cref{prop:cvar-ews-correct}]
 The fact that $f_{\alpha }^{\cvaro}$ is EWS follows by algebraic manipulation. To prove~\eqref{eq:cvar-correct}, we use \cref{prop:coherent-polymatroid} and show for each $\mathcal{O} \subseteq \Omega$
@@ -551,7 +552,7 @@ which is equivalent to
 \label{eq:cvar-eq-submodular}
   \min\left\{ \frac{1}{\alpha} \bm{1}_{\mathcal{O}}\tr \bm{p},\; 1 \right\}
 = \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
-\bm{q} \in \Delta_{\alpha}, \,
+\bm{q} \in \Delta_{n}, \,
 \bm{q} \le \alpha^{-1} \bm{p}
 \right\}, \quad \forall \mathcal{O} \subseteq \Omega.
 \end{equation}
@@ -622,16 +623,16 @@ To compute TVaR, we define the capacity function $f_{\alpha}^{\tvaro}\colon 2^{\
         1 & \text{if } \alpha = 0 \wedge \P{\mathcal{O}} > 0.
       \end{cases}
 \end{equation}
-TVaR was first proposed in the context of $\varphi$-divergence risk measures~\cite{Kruse2021} as well as in the context of robust stochastic programming~\cite{Shapiro2017}. TVaR is also very closely related to the $L_1$ ball used in robust Markov decision processes~\cite{Ho2021,Ho2022}. However, we are not aware of prior work that defines or uses the capacity function in~\eqref{eq:f-tvar}. The following proposition shows that this function can be used to correctly formulate the TVaR evaluation using an EWS function. 
+TVaR was first proposed in the context of $\varphi$-divergence risk measures~\cite{Kruse2021} as well as in the context of robust stochastic programming~\cite{Shapiro2017}. TVaR is also very closely related to the $L_1$ ball used in robust Markov decision processes~\cite{Ho2021,Ho2022}. However, we are not aware of prior work that defines or uses the capacity function in~\eqref{eq:f-tvar}. The following proposition shows that this function can be used to correctly formulate the TVaR evaluation using an EWS function. \cc{Possible inconsistency in the $\beta$ for TVaR. The capacity~\eqref{eq:f-tvar} uses the additive term $c=\sqrt{\tfrac14\log 2\cdot\log\tfrac1\alpha}$, and the proof~\eqref{eq:tvar-eq-submodular} sets $\beta/2=c$, hence the $\|\bm p-\bm q\|_1$-radius is $\beta=\sqrt{\log 2\cdot\log\tfrac1\alpha}$. But \cref{tab:phi-divergence-risk} lists $\beta=\sqrt{2\log 2\cdot\log\tfrac1\alpha}$, larger by a factor $\sqrt2$. Please reconcile the two (and double-check the $\log 2$ factor against the Pinsker-type bound used for $\evaro\ge\tvaro$).}
 \begin{proposition} \label{prop:tvar-ews-correct}
-For each $\alpha\in [0,1]$, $\tilde{x} \colon \Omega \to \Real$, and $\bm{p} \in \Delta_n$, the function $f^{\tvaro}_{\alpha }$ is $\ews(\bm{p}, m, c)$ with $m = 1/\alpha$ and $c = 0$, and 
-\[
-  \tvar{\alpha}{\tilde{x} } = \max_{\bm{q}\in \widehat{\mathcal{Q}}_{f_{\alpha}^{\tvaro}}} \bm{x}\tr \bm{q}.
-  \]
-Moreover, $f_{\alpha}^{\tvaro}$ is $\ews(\bm{p}, m, c)$ with $m = 1$ and $c = \sqrt{\frac{1}{4} \log 2 \cdot \log \frac{1}{\alpha}}$.
+For each $\alpha\in [0,1]$, $\tilde{x} \colon \Omega \to \Real$, and $\bm{p} \in \Delta_n$, the function $f^{\tvaro}_{\alpha }$ is $\ews(\bm{p}, m, c)$ with $m = 1$ and $c = \sqrt{\frac{1}{4} \log 2 \cdot \log \frac{1}{\alpha}}$, and
+\begin{equation} \label{eq:tvar-correct}
+  \tvar{\alpha}{\tilde{x} } = \min_{\bm{q}\in \widehat{\mathcal{Q}}_{f_{\alpha}^{\tvaro}}} \bm{x}\tr \bm{q}.
+\end{equation}
+\cc{Two fixes here: (1) changed $\max$ to $\min$ as in \cref{prop:cvar-ews-correct}; (2) the original ``$m=1/\alpha$ and $c=0$'' was the CVaR parameters --- for TVaR the capacity is $\min\{\P{\mathcal{O}}+c,1\}$, i.e.\ $m=1$, so I removed the duplicated/incorrect EWS line and kept the correct one.}
 \end{proposition}
 \begin{proof}
- To prove~\eqref{eq:cvar-correct}, it is sufficient by \cref{prop:coherent-polymatroid}, to show for each $\mathcal{O} \subseteq \Omega$ that 
+ To prove \eqref{eq:tvar-correct}, it is sufficient by \cref{prop:coherent-polymatroid}, to show for each $\mathcal{O} \subseteq \Omega$ that
 \begin{equation*}
 f_{\alpha}^{\tvaro}(\mathcal{O}) 
   =
@@ -737,7 +738,7 @@ CVaR & 0.3912 & 0.0382 \\
 \textbf{QuickCVaR} & \textbf{0.1426} & \textbf{0.0307} \\ 
 \midrule 
 VaR & 0.3733 & 0.0321 \\ 
-\textbf{QVar} & \textbf{0.1199} & \textbf{0.0287} \\ 
+\textbf{QuickVaR} & \textbf{0.1199} & \textbf{0.0287} \\
 \midrule 
 TVaR & 0.3993 & 0.0414 \\ 
 \textbf{QuickTVaR} & \textbf{0.1786} & \textbf{0.0356} \\ 

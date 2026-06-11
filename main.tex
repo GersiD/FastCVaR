@@ -540,7 +540,6 @@ For each $\alpha\in [0,1]$, a random variable $\tilde{x}$, and probability $\bm{
   \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_{f_{\alpha }^{\cvaro}}\right\}.
 \end{equation}
 \end{proposition}
-
 \begin{proof}[Proof of \cref{prop:cvar-ews-correct}]
 the function To prove \eqref{eq:cvar-correct}, it is sufficient, by \citet[theorem~4.88]{Follmer2016} and \citet[remark~4.96]{Follmer2016}, to show
 \begin{align}
@@ -898,9 +897,9 @@ Let $v$ be an input to \cref{alg:partition} and consider the following invariant
 
   When $x_{e_k} = v$, $e_k$ is incremented, since $e_0 = l_0$ this creates a difference between $e_{k+1}$ and $l_{k+1}$, the algorithm terminates when $g_t = e_t$, $g_t - l_t = e_t - l_t > 0$ therefore \eqref{eq:ho-inv-equal} remains true.   
 
-  Condition \eqref{eq:hoare-correspond} remains true for each mutation that may occur as both the $x$ values and $p$ values are swapped at the same indices, see lines \ref{line:swap1} and \ref{line:swap2}.
+Condition \eqref{eq:hoare-correspond} remains true for each mutation that may occur as both the $x$ values and $p$ values are swapped at the same indices, see lines \ref{line:swap1} and \ref{line:swap2}.
   
-  \emph{Termination}. In the loop on line \ref{line:partition-while} there are 3 possible paths of execution determined by the conditional logic $x_{e_k} < v$, $x_{e_k} > v$ and $x_{e_k} = v$. Each of these paths of execution decreases $g_k - e_k$ by 1. This occurs on lines \ref{line:partition-e-1-1} and \ref{line:partition-e-1-2} by increasing $e_k$ by 1 and keeping $g_k$ the same. Or on line \ref{line:parition-g-1} by decreasing $g_k$ by 1 and keeping $e_k$ the same.
+\emph{Termination}. In the loop on line \ref{line:partition-while} there are 3 possible paths of execution determined by the conditional logic $x_{e_k} < v$, $x_{e_k} > v$ and $x_{e_k} = v$. Each of these paths of execution decreases $g_k - e_k$ by 1. This occurs on lines \ref{line:partition-e-1-1} and \ref{line:partition-e-1-2} by increasing $e_k$ by 1 and keeping $g_k$ the same. Or on line \ref{line:parition-g-1} by decreasing $g_k$ by 1 and keeping $e_k$ the same.
   
 Observe that  $g_0 - e_0 = b - f$ is positive since $f<b$ by assumption. $g_k-e_k$ decreases by 1 at each iteration, and each iteration requires constant time to complete. The function returns when $g_t - e_t = 0$, therefore this algorithm completes in $O(b-f)$ time. 
 

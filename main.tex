@@ -51,7 +51,7 @@
 \maketitle
 
 \begin{abstract}
-Monetary risk measures have gained popularity in expressing decision-makers' preferences for risk aversion. Value-at-Risk (VaR) and Conditional-Value-at-Risk (CVaR) in particular are used commonly for this purpose. This paper proposes new efficient algorithms for computing these risk measures for a discrete random variable in expected linear time in the size of the discrete random variable. First, we propose a QuickVaR algorithm that computes the VaR of a discrete random variable. Then, we leverage QuickVaR to propose QuickDivergence, an algorithm that can compute a certain class of $\varphi$-divergence risk measures, such as the popular CVaR risk measure. The QuickVaR algorithm adapts the well-known Quickselect algorithm, while QuickDivergence builds on polymatroid optimization algorithms. Numerical results show that our new algorithms offer an order of magnitude speed up for large domains, and a library implementation of the algorithms is available at \todo{REDACTED for anonymity}.%\url{https://github.com/RiskAverseRL/RiskMeasures.jl}.     
+Monetary risk measures have gained popularity in expressing decision-makers' preferences for risk aversion. Value-at-Risk (VaR) and Conditional-Value-at-Risk (CVaR) in particular are used commonly for this purpose. This paper proposes new efficient algorithms for computing these risk measures for a discrete random variable in expected linear time in the size of the discrete random variable. First, we propose a QuickVaR algorithm that computes the VaR of a discrete random variable. Then, we leverage QuickVaR to propose QuickDivergence, an algorithm that can compute a certain class of $\varphi$-divergence risk measures, such as the popular CVaR risk measure. The QuickVaR algorithm adapts the well-known Quickselect algorithm, while QuickDivergence builds on polymatroid optimization algorithms. Numerical results show that our new algorithms offer an order of magnitude speed up for large domains, and a library implementation of the algorithms is available at \url{https://github.com/RiskAverseRL/RiskMeasures.jl}.     
 \end{abstract}
 
 \section{Introduction}\label{sec:intro}
@@ -205,14 +205,14 @@ Assuming $\alpha\in [0,1)$ and a discrete $\tilde{x}$, there exists $\omega\in\O
 \end{equation}
 \end{lemma}
 \begin{proof}
-First, we show that any $v$ that satisfies \eqref{eq:var-property-prob} solves \eqref{eq:var-definition} optimally. The implication $\P{\tilde{x} < v} \le \alpha \implies v \in \left\{ t \in \Real \mid  \P{ \tilde{x} < t } \le \alpha \right\}$ follows immediately. Second, we prove $\alpha < \P{ \tilde{x} \le v } \implies \forall t \in \left\{ t \in \Real \mid  \P{ \tilde{x} < t } \le \alpha \right\}, v \ge t$ by contradiction. Suppose that $\exists t \in \left\{ t \in \Real \mid  \P{ \tilde{x} < t } \le \alpha \right\}, v < t$. Then, by the monotonicity of the probability operator, we get a contradiction as
+First, we show that any $v$ that satisfies~\eqref{eq:var-property-prob} solves~\eqref{eq:var-definition} optimally. The implication $\P{\tilde{x} < v} \le \alpha \implies v \in \left\{ t \in \Real \mid  \P{ \tilde{x} < t } \le \alpha \right\}$ follows immediately. Second, we prove $\alpha < \P{ \tilde{x} \le v } \implies \forall t \in \left\{ t \in \Real \mid  \P{ \tilde{x} < t } \le \alpha \right\}, v \ge t$ by contradiction. Suppose that $\exists t \in \left\{ t \in \Real \mid  \P{ \tilde{x} < t } \le \alpha \right\}, v < t$. Then, by the monotonicity of the probability operator, we get a contradiction as
  \[
    \alpha
    < \P {  \tilde{x} \le v  }
    \le \P {  \tilde{x} < t  }
    \le \alpha.
  \]
-Then, the existence of $\omega$ follows from \cref{lem:prob-lumpy} in \cref{sec:prob-discr-rand} because \eqref{eq:var-property-prob} implies that 
+Then, the existence of $\omega$ follows from \cref{lem:prob-lumpy} in \cref{sec:prob-discr-rand} because~\eqref{eq:var-property-prob} implies that 
   \[
     \P{\tilde{x} =
       \var{\alpha }{\tilde{x}}} = \P{\tilde{x} \le \var{\alpha }{\tilde{x}}}  - \P{\tilde{x} < \var{\alpha }{\tilde{x}}} > \alpha - \alpha = 0.
@@ -231,7 +231,7 @@ Moreover, $ \bm{x}_{f{:}b} = \bm{x'}_{\sigma(f{:}b)}, \bm{p} = \bm{p'}_{\sigma(f
 \end{lemma}
 \Cref{lem:hoare-partition} is a standard property of the Dutch national flag algorithm, and we outline its proof in \cref{sec:stand-var-algor} for the sake of completeness.
 
-The following lemma analyzes the recursive property of QuickVaR and is the main building block of \cref{thm:var-correct}.
+The following lemma shows the recursive property of QuickVaR and is the main building block of \cref{thm:var-correct}.
 \begin{lemma} \label{lem:quickvar-correct}
 Suppose that the input conditions of \cref{alg:quick-quantile} hold and $\bm{x} \in \Real^n$ satisfies that
  \begin{equation} \label{eq:qvar-precondition}
@@ -248,7 +248,7 @@ where $x_0 = -\infty$ and $x_{n+1} = +\infty$. Then \cref{alg:quick-quantile} re
 \end{equation}
 \end{lemma}
 \begin{proof}
-From \eqref{eq:qvar-precondition} and \cref{lem:hoare-partition}, $t$ and $e$ on lines~\ref{ln:t} and \ref{ln:e} satisfy that
+From~\eqref{eq:qvar-precondition} and \cref{lem:hoare-partition}, $t$ and $e$ on lines~\ref{ln:t} and \ref{ln:e} satisfy that
 \begin{equation} \label{eq:te-equivalence}
   t = \P{\tilde{x} < v} - \P{\tilde{x} < x'_f}, \qquad e = \P{\tilde{x} = v}
 \end{equation}
@@ -260,38 +260,38 @@ Above, the first inequality holds from $x = x_f$ and $0 \le \alpha$. The second 
 
 \emph{Inductive step}. Suppose that $k>0$ and that the lemma holds for all $k' < k$. We now analyze the following three cases.
 
-(i) If $\alpha < t$, the algorithm executes the first if statement on line~\ref{ln:firstif}. Because $0 \le \alpha  < t$, the recursive call satisfies the required input conditions: $f \le l-1$ and $\sum_{j=f}^{l-1} p_j = t > \alpha$. The recursive call also satisfies \eqref{eq:qvar-precondition} by \cref{lem:hoare-partition}, and we can conclude that \eqref{eq:qvar-postcondition} holds from the inductive hypothesis because $l-1 - f \le b-1 -f \le k$.
+(i) If $\alpha < t$, the algorithm executes the first if statement on line~\ref{ln:firstif}. Because $0 \le \alpha  < t$, the recursive call satisfies the required input conditions: $f \le l-1$ and $\sum_{j=f}^{l-1} p_j = t > \alpha$. The recursive call also satisfies~\eqref{eq:qvar-precondition} by \cref{lem:hoare-partition}, and we can conclude that~\eqref{eq:qvar-postcondition} holds from the inductive hypothesis because $l-1 - f \le b-1 -f \le k$.
 
 (ii) If $t + e \le \alpha$, the algorithm executes the second if statement on line~\ref{ln:secondif}. We show that the input conditions for the recursive call are met. Because $t + e = \sum_{j = f}^g p_j \le \alpha < \sum_{j=f}^b p_j$  (the second inequality is the input condition), it must be that $g < b$ and therefore $g+1 \le b$. Also, by the algorithm's input condition and algebraic manipulation, we get that
 \[
  \sum_{j=g+1}^b p_j = \sum_{j=f}^b p_j - t - e > \alpha - t - e,
 \]
-and the input conditions hold.  Because \eqref{eq:qvar-precondition} holds from \cref{lem:hoare-partition} and $b - g - 1 < b-f \le  k$, the inductive hypothesis implies that there exists $x_{\omega}$ such that
+and the input conditions hold.  Because~\eqref{eq:qvar-precondition} holds from \cref{lem:hoare-partition} and $b - g - 1 < b-f \le  k$, the inductive hypothesis implies that there exists $x_{\omega}$ such that
 \[
   \P{\tilde{x} < x_{\omega}}
   \quad \le \quad
   (\alpha - t - e) + \P{\tilde{x} \le v}
   \quad < \quad \P{\tilde{x} \le x_{\omega}}. 
 \]
-Then, \eqref{eq:qvar-postcondition} follows by algebraic manipulation after substituting $t,e$ from \eqref{eq:te-equivalence}.
+Then,~\eqref{eq:qvar-postcondition} follows by algebraic manipulation after substituting $t,e$ from~\eqref{eq:te-equivalence}.
 
-(iii) If $t \le \alpha < t + e$, the algorithm executes the else statement on line~\ref{ln:thirdif}, and the inequality \eqref{eq:qvar-postcondition} holds immediately by substituting $t,e$ from \eqref{eq:te-equivalence}.
+(iii) If $t \le \alpha < t + e$, the algorithm executes the else statement on line~\ref{ln:thirdif}, and the inequality~\eqref{eq:qvar-postcondition} holds by substituting $t,e$ from~\eqref{eq:te-equivalence}.
 \end{proof}
 
 We are now ready to prove the correctness of QuickVaR.
 \begin{proof}[Proof of \cref{thm:var-correct}]
-With $f = 1$ and $b = n$, the condition in \eqref{eq:qvar-precondition} is satisfied since $\alpha\in [0,1)$. Therefore, \cref{lem:quickvar-correct} shows that QuickVaR returns $x_{\omega}$ that satisfies
+With $f = 1$ and $b = n$, the condition in~\eqref{eq:qvar-precondition} is satisfied since $\alpha\in [0,1)$. Therefore, \cref{lem:quickvar-correct} shows that QuickVaR returns $x_{\omega}$ that satisfies
   \[
   \P{\tilde{x} < x_{\omega}}
   \quad \le \quad
   \alpha 
   \quad < \quad \P{\tilde{x} \le x_{\omega}}, 
 \]
-which satisfies \eqref{eq:var-property-prob} and therefore equals to the VaR value by 
+which satisfies~\eqref{eq:var-property-prob} and therefore equals to the VaR value by 
   \cref{thm:quantile-in-finite-omega}. 
 \end{proof}
 
-With the correctness established above, we are ready to analyze the computational complexity of QuickVaR. 
+With the correctness of \cref{alg:quick-quantile} established in \cref{lem:quickvar-correct}, we now show its computational complexity. 
 \begin{theorem} \label{prop:time-complexity}
 \Cref{alg:quick-quantile} runs in expected $O(n)$ time.
 \end{theorem}
@@ -310,7 +310,7 @@ Note that by the assumption $\sum_{j = f}^b p_j > \alpha$, we have that $k \ge 1
 \label{eq:quickvar-complexity}
   &= d\cdot k + \max_{l\in 0{:}(k-1)} \frac{1}{k}  \left(  \sum_{i=l+1}^{k-1} T(i)  + \sum_{i=k-l}^{k-1} T(i)   \right).
 \end{align}
-where $d\cdot k$ is the local runtime of the algorithm for some $d > 0$ and $T(i)$ and $T(k - i - 1)$ are the average runtimes of the recursive calls. The average over $i$ corresponds to the uniformly-random selection of the pivot with $i = \left| \left\{ j \in 1{:}k \mid x_j < v \right\} \right|$ in the first line of the inequality. The last two equalities follow by algebraic manipulation. Then, an argument identical to \cite[theorem~3.3]{horowitz1998computer}, since \eqref{eq:quickvar-complexity} is the same as equation (3.8) in \cite{horowitz1998computer}, shows that \(T(k)\le 4\cdot d\cdot k\) for all \(k\ge 1\).
+where $d\cdot k$ is the local runtime of the algorithm for some $d > 0$ and $T(i)$ and $T(k - i - 1)$ are the average runtimes of the recursive calls. The average over $i$ corresponds to the uniformly-random selection of the pivot with $i = \left| \left\{ j \in 1{:}k \mid x_j < v \right\} \right|$ in the first line of the inequality. The last two equalities follow by algebraic manipulation. Then, an argument identical to \cite[theorem~3.3]{horowitz1998computer}, since~\eqref{eq:quickvar-complexity} is the same as equation (3.8) in \cite{horowitz1998computer}, shows that \(T(k)\le 4\cdot d\cdot k\) for all \(k\ge 1\).
 \end{proof}
 
 \begin{remark}
@@ -349,8 +349,8 @@ and a \emph{normalized polymatroid} is $\widehat{\mathcal{Q}}_f := \mathcal{Q}_f
 
 Polymatroids are useful in our setting because any coherent, comotonic monetary risk measure can be formulated as linear optimization over a polymatroid~\cite[corollary~4.89]{Follmer2016}. A risk measure $\rho$ is \emph{coherent} if it is concave and positively homogeneous.  A risk measure $\rho$ is \emph{comotonic} if for any comonotone $\tilde{x}, \tilde{y}$: $\rho[ \tilde{x} + \tilde{y} ] = \rho[ \tilde{x} ] + \rho[ \tilde{y} ]$, where the random variables $\tilde{x}, \tilde{y} \in \Real^{1{:}n}$ are \emph{comonotone} if $\tilde{x}(i) \ge \tilde{x}(j) \Leftrightarrow \tilde{y}(i) \ge \tilde{y}(j)$ for each $i,j\in 1{:}n$.
 
-\begin{proposition}[corollary~4.8a in \citet{Follmer2016}] \label{prop:coherent-polymatroid}
-Suppose that $\rho\colon \Delta_n \times  \Real^n \to \Real$ is a coherent comotonic risk measure. Then
+\begin{proposition} \label{prop:coherent-polymatroid}
+A monetary risk measure $\rho\colon \Delta_n \times  \Real^n \to \Real$ is a coherent comotonic risk measure if and only if
 \begin{equation}\label{eq:comonotonic-optimization}
   \rho[\tilde{x}] = \min_{\bm{q}\in \widehat{\mathcal{Q}}_c} \bm{q}\tr  \bm{x},
   \qquad
@@ -360,8 +360,9 @@ Suppose that $\rho\colon \Delta_n \times  \Real^n \to \Real$ is a coherent comot
 \end{equation}
 where $\tilde{1}$ is an indicator random variable. Moreover, if the risk measure is law-invariant then there exists $g\colon \Real \to \Real$ such that $c(\mathcal{A}) = g(\bm{1}\tr \bm{p}_{\mathcal{A}})$ for each $\mathcal{A} \subseteq 1{:}n$.
 \end{proposition}
+\Cref{prop:coherent-polymatroid} follows immediately from \citep[corollary~4.88, theorem~4.94]{Follmer2016}.
 
-The standard solution to the polymatroid optimization problem in \eqref{eq:comonotonic-optimization} is to use a greedy algorithm, such as \cref{alg:greedy-polymatroid}. This algorithm adapts the standard polymatroid optimization, such as \citet[section~14.9]{Korte2012}, to the normalized polymatroid $\widehat{\mathcal{Q}}_f$. See \cref{prop:standard-polymatroid-works} for the proof of correctness. Note that the greedy approach in \cref{alg:greedy-polymatroid} requires sorting and, therefore, runs in $\Omega(n \log  n)$ time.
+The standard solution to the polymatroid optimization problem in~\eqref{eq:comonotonic-optimization} is to use a greedy algorithm, such as \cref{alg:greedy-polymatroid}. This algorithm adapts the standard polymatroid optimization, such as \citet[section~14.9]{Korte2012}, to the normalized polymatroid $\widehat{\mathcal{Q}}_f$. See \cref{prop:standard-polymatroid-works} for the proof of correctness. Note that the greedy approach in \cref{alg:greedy-polymatroid} requires sorting and, therefore, runs in $\Omega(n \log  n)$ time.
 
 \begin{algorithm}
     \caption{Polymatroid greedy minimization.} \label{alg:greedy-polymatroid}
@@ -387,8 +388,7 @@ A function $f\colon 2^{1{:}n} \to \Real_{\ge 0}$ is $\ews(\bm{\mu} ,m, c)$, or \
     \end{cases}
 \end{equation}
 \end{definition}
-
-The following proposition shows that any EWS function satisfies the properties necessary to use it to define a polymatroid. 
+Any EWS function satisfies the properties necessary to define a polymatroid as the following proposition shows. 
 \begin{proposition}
 Any EWS function $f\colon 2^{\Omega} \to  \Real_{\ge 0}$ is submodular, monotone, and satisfies that $f(\emptyset) = 0$, and $f(\Omega) = 1$.   
 \end{proposition}
@@ -396,12 +396,13 @@ Any EWS function $f\colon 2^{\Omega} \to  \Real_{\ge 0}$ is submodular, monotone
 To show that  $f$ is submodular it is sufficient, from \cref{lem:submodular-concave}, to show that $g$ is concave on $[0,1]$. The function $g$ is concave on $(0, 1]$ because it is the minimum of two linear functions~\cite{boyd2004convex}. The concavity of $g$ on $[0, 1]$ follows from the definition. Since $g(0) = 0$, for each $\lambda \in (0,1]$ and $z \in ( 0, 1]$ we get that
 \begin{align*}
   (1 - \lambda)g(0) + \lambda \cdot g(b)
-  &= \lambda \cdot g(b)
-  = \min\left\{\lambda  \cdot c + m\cdot \lambda\cdot b, \lambda\right\} \\
-  &\leq \min \left\{ c + m \cdot \lambda \cdot b, 1 \right\}
-  = g(\lambda \cdot  b) = g\left( (1 - \lambda)\cdot 0 + \lambda\cdot b\right).
+  = \lambda \cdot g(b)
+  = \min\left\{\lambda  \cdot c + m\cdot \lambda\cdot b, \lambda\right\} 
+  \leq \min \left\{ c + m \cdot \lambda \cdot b, 1 \right\}
+  % = g(\lambda \cdot  b)
+  = g\left( (1 - \lambda)\cdot 0 + \lambda\cdot b\right).
 \end{align*}
-Because the inequality holds also for $\lambda = 0$, $g$ is concave on $[0,1]$ by the definition. The monotonicity, non-negativity and the boundary value conditions for $f$ follow immediately by algebraic manipulation from the assumptions on $c$ and
+Because the inequality holds also for $\lambda = 0$, $g$ is concave on $[0,1]$ by the definition. The monotonicity, non-negativity and the boundary value conditions for $f$ follow by algebraic manipulation from the assumptions on $c$ and
 $m$. 
 \end{proof}
 
@@ -444,7 +445,7 @@ We now prove that $q\opt_i = \hat{q}_i$ for each $i\in 1{:}n$ by separately anal
 \begin{equation} \label{eq:lt-v-prob}
  \bm{1}\tr \bm{p}_{\mathcal{O}} \le \P{\tilde{x} < v} \le \frac{1-c}{m} ,
 \end{equation}
-and, hence, from \eqref{eq:def-g}:
+and, hence, from~\eqref{eq:def-g}:
 \[
   f(\mathcal{O}) = g\left(\bm{1}\tr \bm{p}_{\mathcal{O}}\right) = c + m \cdot \bm{1}\tr \bm{p}_{\mathcal{O}},
   \quad\text{when}\quad
@@ -464,7 +465,7 @@ The third equality follows from $i \neq k_{\min}$ and $p_{k_{\min}} \neq  0$ .
   \label{eq:theta-equality-2}
     \hat{q}_{\sigma(l+1)} &= q\opt_{\sigma(l+1)}.
 \end{align}
-To prove the base case, suppose that $l = |\mathcal{K}_{<v}|$. The equality in \eqref{eq:theta-equality-1} holds immediately by algebraic manipulation from \eqref{eq:def-g} and \eqref{eq:lt-v-prob} since $\mathcal{K}_{<v} = \sigma(1{:}l)$. The equality in \eqref{eq:theta-equality-2} holds from \eqref{eq:def-g} and \eqref{eq:lt-v-prob} as
+To prove the base case, suppose that $l = |\mathcal{K}_{<v}|$. The equality in~\eqref{eq:theta-equality-1} holds by algebraic manipulation from~\eqref{eq:def-g} and~\eqref{eq:lt-v-prob} since $\mathcal{K}_{<v} = \sigma(1{:}l)$. The equality in~\eqref{eq:theta-equality-2} holds from~\eqref{eq:def-g} and~\eqref{eq:lt-v-prob} as
 \begin{equation} \label{eq:q-q-eq}
   \begin{aligned}
 \hat{q}_{i} = \hat{q}_{\sigma(l+1)}  
@@ -475,7 +476,7 @@ To prove the base case, suppose that $l = |\mathcal{K}_{<v}|$. The equality in \
   \end{aligned}
 \end{equation}
 
-To prove the inductive case, suppose that \eqref{eq:theta-equality-1} and \eqref{eq:theta-equality-2} hold for $l$, and we prove it for $l+1$. The equality in \eqref{eq:theta-equality-1} can be derived from \eqref{eq:theta-equality-2} and the construction in \cref{alg:greedy-polymatroid} as
+To prove the inductive case, suppose that~\eqref{eq:theta-equality-1} and~\eqref{eq:theta-equality-2} hold for $l$, and we prove it for $l+1$. The equality in~\eqref{eq:theta-equality-1} can be derived from~\eqref{eq:theta-equality-2} and the construction in \cref{alg:greedy-polymatroid} as
 \begin{align*}
   \theta_{l+1}
   &= \theta_l - q\opt_{\sigma(l+1)} 
@@ -483,7 +484,7 @@ To prove the inductive case, suppose that \eqref{eq:theta-equality-1} and \eqref
   &= 1 - f(\sigma(1{:}l)) - \left(  f(\sigma(1{:}(l+1))) - f(\sigma(1{:}l)) \right) \\
   &= 1 - f(\sigma(1{:}(l+1))).
 \end{align*}
-The equality in \eqref{eq:theta-equality-2} follows analogously to \eqref{eq:q-q-eq} if $\theta_{l+1} > 0$:
+The equality in~\eqref{eq:theta-equality-2} follows analogously to~\eqref{eq:q-q-eq} if $\theta_{l+1} > 0$:
 \begin{equation} \label{eq:q-q-eq}
   \begin{aligned}
 \hat{q}_{i} = \hat{q}_{\sigma(l+2)}
@@ -494,10 +495,10 @@ The equality in \eqref{eq:theta-equality-2} follows analogously to \eqref{eq:q-q
   &= q_i\opt.
   \end{aligned}
 \end{equation}
-If $\theta_{l+2} = 0$ we get immediately by algebraic manipulation that $\hat{q}_i = 0 = q\opt_i$.
+If $\theta_{l+2} = 0$ we get by algebraic manipulation that $\hat{q}_i = 0 = q\opt_i$.
 
 
-\emph{(iv)} Suppose that $i \in \mathcal{K}_{>v}$ and let $k = \sigma^{-1}(i)$. Then, using \eqref{eq:var-property-prob} we have that:
+\emph{(iv)} Suppose that $i \in \mathcal{K}_{>v}$ and let $k = \sigma^{-1}(i)$. Then, using~\eqref{eq:var-property-prob} we have that:
 \begin{align*}
   1
   &\ge f(\sigma(1{:}k))
@@ -531,32 +532,30 @@ We show that CVaR and TVaR are two examples of $\varphi$-divergence risk measure
         1 & \text{if } \alpha = 0 \wedge \P{\mathcal{O} > 0}. \\ 
       \end{cases} \\
 \end{equation}
-The Choquet capacity function $f_{\alpha }^{\cvaro}$ for CVaR defined in \eqref{eq:f-cvar} is well known, but is usually only restricted to $\alpha\in (0,1)$~\cite{acerbi2002spectral}. The following proposition states its correctness below and include the proof in the appendix for the sake of completeness.
+The Choquet capacity function $f_{\alpha }^{\cvaro}$ for CVaR defined in~\eqref{eq:f-cvar} is well known, but is usually restricted to $\alpha\in (0,1)$~\cite{acerbi2002spectral}. The following proposition states its correctness below.
 \begin{proposition} \label{prop:cvar-ews-correct}
-For each $\alpha\in [0,1]$, a random variable $\tilde{x}$, and probability $\bm{p} $, the function $f^{\cvaro}_{\alpha }$ is $\ews(\bm{p}, m, c)$ with $m = 1/\alpha$ and $c = 0$, and 
+For each $\alpha\in [0,1]$, $\tilde{x} \colon \Omega \to \Real$, and $\bm{p} \in \Delta_n$, the function $f^{\cvaro}_{\alpha }$ is $\ews(\bm{p}, m, c)$ with $m = 1/\alpha$ and $c = 0$, and 
 \begin{equation} \label{eq:cvar-correct}
   \cvar{\alpha }{\tilde{x} }
   \;=\;
-  \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_{f_{\alpha }^{\cvaro}}\right\}.
+  \max_{\bm{q} \in \widehat{\mathcal{Q}}_{f_{\alpha }^{\cvaro}}} \bm{x}\tr \bm{q}.
 \end{equation}
 \end{proposition}
 \begin{proof}[Proof of \cref{prop:cvar-ews-correct}]
-the function To prove \eqref{eq:cvar-correct}, it is sufficient, by \citet[theorem~4.88]{Follmer2016} and \citet[remark~4.96]{Follmer2016}, to show
-\begin{align}
-  \nonumber
-  f(\mathcal{O}) 
-  &= -\cvar{\alpha }{- \tilde{1}_{\mathcal{O}}} ,\quad \forall \mathcal{O} \subseteq \Omega\\
-  \label{eq:cvar-eq-submodular}
+The fact that $f_{\alpha }^{\cvaro}$ is EWS follows by algebraic manipulation. To prove~\eqref{eq:cvar-correct}, we use \cref{prop:coherent-polymatroid} and show for each $\mathcal{O} \subseteq \Omega$
+\[
+  f_{\alpha}^{\cvaro}(\mathcal{O}) = -\cvar{\alpha }{- \tilde{1}_{\mathcal{O}}} ,
+\]
+which is equivalent to
+\begin{equation}
+\label{eq:cvar-eq-submodular}
   \min\left\{ \frac{1}{\alpha} \bm{1}_{\mathcal{O}}\tr \bm{p},\; 1 \right\}
-&= \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
-\bm{q} \ge 0, \,
-\bm{1}\tr \bm{q} = 1, \,
-\bm{q} \le \frac{1}{\alpha} \bm{p}
+= \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
+\bm{q} \in \Delta_{\alpha}, \,
+\bm{q} \le \alpha^{-1} \bm{p}
 \right\}, \quad \forall \mathcal{O} \subseteq \Omega.
-\end{align}
-Note that the maximum on the right hand side of~\eqref{eq:cvar-eq-submodular} always exists because it equals to CVaR which is well defined.
-
-We prove the equality in \eqref{eq:cvar-eq-submodular} as two inequalities.
+\end{equation}
+Note that the maximum on the right hand side of~\eqref{eq:cvar-eq-submodular} always exists because it equals to CVaR which is well defined. We prove~\eqref{eq:cvar-eq-submodular} as two inequalities.
 
 (i) To prove that 
 \[
@@ -567,7 +566,7 @@ We prove the equality in \eqref{eq:cvar-eq-submodular} as two inequalities.
 \bm{q} \le \frac{1}{\alpha} \bm{p}
 \right\}, \quad \forall \mathcal{O} \subseteq \Omega,
 \]
-observe that the constraints imply that for each $\bm{q} \in \mathcal{Q}_f$
+observe that the constraints imply that for each $\bm{q} \in \widehat{\mathcal{Q}}_{f_{\alpha}^{\cvaro}}$ 
 \[
   \bm{1}_{\mathcal{O}}\tr \bm{q} \le \bm{1}\tr \bm{q} = 1,
   \qquad
@@ -584,13 +583,13 @@ and hence the inequality holds.
 \bm{q} \le \frac{1}{\alpha} \bm{p}
 \right\}, \quad \forall \mathcal{O} \subseteq \Omega,
 \]
-we construct a feasible $\bm{q} \in \mathcal{Q}_f$ for which the inequality holds. We now analyze the following two cases separately for each $\mathcal{O} \subseteq \Omega$.
+we construct a feasible $\bm{q} \in \widehat{\mathcal{Q}}_{f^{\cvaro}_{\alpha}}$ for which the inequality holds. We now analyze the following two cases separately for each $\mathcal{O} \subseteq \Omega$.
 \begin{enumerate}[nosep]
 \item Suppose that $\bm{1}_{\mathcal{O}}\tr  \bm{p} \ge \alpha$. Then we construct $\bm{q}$ as
 \[
 \bm{q} \;:=\;  (\bm{1}_{\mathcal{O}}\tr \bm{p})^{-1} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}},
 \]
-where $\otimes$ is the Hadamard vector product. It is easy to verify that $\bm{q} \in \mathcal{Q}_f$ and $\bm{1}_{\mathcal{O}}\tr \bm{q} \le 1$. 
+where $\otimes$ is the Hadamard vector product. It is easy to verify that $\bm{q} \in \widehat{\mathcal{Q}}_{f^{\cvaro}_{\alpha}}$ and $\bm{1}_{\mathcal{O}}\tr \bm{q} \le 1$. 
 \item Suppose that $\bm{1}_{\mathcal{O}}\tr  \bm{p} < \alpha$. Then we construct $\bm{q}$ as
 \[
 \bm{q} \;:=\; \frac{1}{\alpha} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}}
@@ -618,45 +617,43 @@ To compute TVaR, we define the capacity function $f_{\alpha}^{\tvaro}\colon 2^{\
   f^{\tvaro}_{\alpha}(\mathcal{O})
     \; :=\; 
       \begin{cases}
-        \min\left\{\P{\mathcal{O}} + \sqrt{ \frac{1}{4} \log 2 \cdot \log \frac{1}{\alpha}}, 1\right\} &\text{if } \alpha \in (0,1] \wedge \P{\mathcal{O}} > 0, \\
+        \min\left\{\P{\mathcal{O}} + \sqrt{\frac{1}{4} \log 2 \cdot \log \frac{1}{\alpha}}, 1\right\} &\text{if } \alpha \in (0,1] \wedge \P{\mathcal{O}} > 0, \\
         0 & \text{if } \alpha = 0 \wedge \P{\mathcal{O}} = 0, \\
         1 & \text{if } \alpha = 0 \wedge \P{\mathcal{O}} > 0.
       \end{cases}
 \end{equation}
-TVaR was proposed in the context of $\varphi$-divergence risk measures~\cite{Kruse2021} as well as in the context of robust stochastic programming~\cite{Shapiro2017}. TVaR is also very closely related to the $L_1$ ball used in robust Markov decision processes~\cite{Ho2021,Ho2022}. However, we are not aware of prior work that defines or uses the capacity function in~\eqref{eq:f-tvar}. The following proposition shows that this function can be used to correctly formulate the TVaR evaluation using an EWS function. 
+TVaR was first proposed in the context of $\varphi$-divergence risk measures~\cite{Kruse2021} as well as in the context of robust stochastic programming~\cite{Shapiro2017}. TVaR is also very closely related to the $L_1$ ball used in robust Markov decision processes~\cite{Ho2021,Ho2022}. However, we are not aware of prior work that defines or uses the capacity function in~\eqref{eq:f-tvar}. The following proposition shows that this function can be used to correctly formulate the TVaR evaluation using an EWS function. 
 \begin{proposition} \label{prop:tvar-ews-correct}
-For $\mathcal{O} \subseteq \Omega$, define $f_{\beta}\colon 2^{\Omega} \to \Real_{\ge 0}$:
-
-If $\mathcal{O} \neq \emptyset$, and $0$ otherwise, where $\beta = \sqrt{ 2 \log 2 \cdot \log \frac{1}{\alpha}}$ for $\alpha\in (0,1)$ represents the divergence constraint. Then
+For each $\alpha\in [0,1]$, $\tilde{x} \colon \Omega \to \Real$, and $\bm{p} \in \Delta_n$, the function $f^{\tvaro}_{\alpha }$ is $\ews(\bm{p}, m, c)$ with $m = 1/\alpha$ and $c = 0$, and 
 \[
-  \tvar{\alpha }{\tilde{x} } = \max \left\{\bm{x}\tr \bm{q} \mid  \bm{q} \in \mathcal{Q}_{f_{\beta}}\right\}.
+  \tvar{\alpha}{\tilde{x} } = \max_{\bm{q}\in \widehat{\mathcal{Q}}_{f_{\alpha}^{\tvaro}}} \bm{x}\tr \bm{q}.
   \]
-Moreover, $f_{\beta}$ is EWS with $m = 1$ and $c = \beta/2$.
+Moreover, $f_{\alpha}^{\tvaro}$ is $\ews(\bm{p}, m, c)$ with $m = 1$ and $c = \sqrt{\frac{1}{4} \log 2 \cdot \log \frac{1}{\alpha}}$.
 \end{proposition}
 \begin{proof}
- To prove \eqref{eq:cvar-correct}, it is sufficient by \citet[theorem~4.88]{Follmer2016} and \citet[remark~4.96]{Follmer2016} to show
-\begin{align}
-  \nonumber
-  f(\mathcal{O}) 
-  &= -\tvar{\alpha }{- \tilde{1}_{\mathcal{O}}} ,\quad \forall \mathcal{O} \subseteq \Omega\\
+ To prove~\eqref{eq:cvar-correct}, it is sufficient by \cref{prop:coherent-polymatroid}, to show for each $\mathcal{O} \subseteq \Omega$ that 
+\begin{equation*}
+f_{\alpha}^{\tvaro}(\mathcal{O}) 
+  =
+  -\tvar{\alpha }{- \tilde{1}_{\mathcal{O}}},
+\end{equation*}
+which is equivalent to 
+\begin{equation}
   \label{eq:tvar-eq-submodular}
   \min\left\{ \bm{1}_{\mathcal{O}}\tr \bm{p} + \frac{\beta}{2} ,\; 1 \right\}
-  &=
-    \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
-\bm{q} \ge 0, \,
-\bm{1}\tr \bm{q} = 1, \,
+  =
+\max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
+\bm{q} \in \Delta_n, \,
 \|\bm{p} -\bm{q}\|_1 \le \beta 
-\right\}, \quad \forall \mathcal{O} \subseteq \Omega.
-\end{align}
+\right\}.
+\end{equation}
 Note that the maximum in the right hand side of~\eqref{eq:tvar-eq-submodular} always exists because it equals to TVaR which is well defined.
 
-We prove the equality in \eqref{eq:tvar-eq-submodular} as two inequalities. To prove that 
- 
+We prove the equality in~\eqref{eq:tvar-eq-submodular} as two inequalities. To prove that 
 \[
   \min\left\{ \bm{1}_{\mathcal{O}}\tr \bm{p} + \frac{\beta}{2} ,\; 1 \right\}
 \ge \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
-\bm{q} \ge 0, \,
-\bm{1}\tr \bm{q} = 1, \,
+\bm{q} \in \Delta_n, \,
 \|\bm{p} -\bm{q}\|_1 \le \beta 
 \right\}, \quad \forall \mathcal{O} \subseteq \Omega\]
 observe that the constraints imply that for each $\bm{q} \in \mathcal{Q}_f$ that
@@ -681,20 +678,20 @@ and
   \[
   \bm{1}_{\mathcal{O}}\tr \bm{q} \leq \bm{1}\tr \bm{q}  = 1,
 \]
-the first inequality holds.
+and the first inequality holds.  
 
 To prove that 
 \[
   \min\left\{ \bm{1}_{\mathcal{O}}\tr \bm{p} + \frac{\beta}{2} ,\; 1 \right\}
 \le \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
-\bm{q} \ge 0, \,
-\bm{1}\tr \bm{q} = 1, \,
+\bm{q} \in \Delta_n, \,
 \|\bm{p} -\bm{q}\|_{1} \le \beta 
 \right\}, \quad \forall \mathcal{O} \subseteq \Omega,
 \]
-we construct a feasible $\bm{q} \in \mathcal{Q}_f$ for which the inequality holds.
+we construct a feasible $\bm{q} \in \widehat{\mathcal{Q}}_{f^{\tvaro}_{\alpha}}$ for which the inequality holds.
+
 We now analyze the following two cases separately for each $\mathcal{O} \subseteq \Omega$.
-\begin{enumerate}
+\begin{enumerate}[nosep]
 \item Suppose that $\bm{1}_{\mathcal{O}}\tr  \bm{p} + \beta/2 \ge 1$. Then we construct $\bm{q}$ as
 \[
 \bm{q} \;:=\;  (\bm{1}_{\mathcal{O}}\tr \bm{p})^{-1} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}},
@@ -705,22 +702,8 @@ where $\otimes$ is the Hadamard vector product. It is easy to verify that $\bm{q
 \bm{q} \;:=\; \frac{\bm{1}_{\mathcal{O}} \tr {p} + \beta/2}{\bm{1}_{\mathcal{O}} \tr {p}} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}}
 +  \frac{(\bm{1} - \bm{1}_{\mathcal{O}}) \tr {p} - \beta/2 )}{(\bm{1} - \bm{1}_{\mathcal{O}}) \tr {p}}\cdot \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}}),
 \]
-It is easy to verify that $\bm{q} \in \mathcal{Q}_f$ and $\bm{1}_{\mathcal{O}}\tr \bm{q} \le 1$. 
+Then, it is easy to verify that $\bm{q} \in \mathcal{Q}_f$ and $\bm{1}_{\mathcal{O}}\tr \bm{q} \le 1$. 
 \end{enumerate}
-
-
- % We first note that $\mathcal{O} = \emptyset$, then $Q(\mathcal{O}) = 0$,   Due to the set of constraints, we know that for all $ \mathcal{O} \text{ such that } \mathcal{O} \neq \emptyset,  q$ must be such that $Q({\mathcal{O}}) \leq {\P{\mathcal{O}}} + \frac{\beta}{2}$ as if $Q(\mathcal{O}) \geq \frac{\beta}{2} +  \P{\mathcal{O}}$ , then $Q(\mathcal{O'})$ must be $< \P{\mathcal{O}} - \frac{\beta}{2}$ in order for the sum constraint of the simplex to equal 1, thus violating the l1 Norm constraint.
-  
- % Furthermore, as we show below, we can construct $q$ such that  for any $\mathcal{O} \neq \emptyset$,   
-%  \[f(\mathcal{O}) = \min\left\{\P{\mathcal{O}} + \frac{\beta}{2}, 1\right\}
-    .
-%  \].
-  
-%\item[Case 1]: $\P{\mathcal{O}} + \frac{\beta}{2} \geq 1$. In this scenario, we pick an element in $\mathcal{O}$ and add $1 - \P{\mathcal{O}}$ to it. We set all elements not in $\mathcal{O}$ to 0.
-
-%\item[Case 2]: $\P{\mathcal{O}} + \frac{\beta}{2}< 1$. In this scenario, we pick an element in $\mathcal{O}$ and add $\frac{\beta}{2}$ to it. We set all elements not in $\mathcal{O}$ to 0.
-
-%We have now shown that $Q(\Omega) \leq f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$ and it is possible to construct $Q(\Omega)$ such that $Q(\Omega) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$. Thus by Remark 4.90 in \cite{Follmer2016}, $f(\mathcal{O}) = \min\left\{\frac{1}{\alpha} \cdot \P{\mathcal{O}}, 1\right\}$
 \end{proof}
 
 \section{Experiments}\label{sec:experiments}
@@ -825,7 +808,7 @@ The base case is immediate. The inductive case for $i-1$ from $i$ follows by alg
  = \P{\tilde{x} = x_{k_{i-1}}} + \P{\tilde{x} \ge x_{k_{i}}} \\
  &= \P{\tilde{x} = x_{k_{i-1}}} + q_i = \sum_{l=j}^{i-1} q_{k_j} + q_{k_i} = q_{k_{i-1}}.
 \end{align*}
-Now, suppose that \cref{alg:slow-quantile} terminates with value $q\opt$. Then, if the algorithm terminates in iteration $i\opt$ then from \eqref{eq:proof-q-j}, we have that $\P{\tilde{x} \ge q\opt} = q_{j\opt} \ge 1-\alpha$ where $j\opt$ is defined as in \eqref{eq:proof-q-j}. Therefore, $q\opt \le \var{\alpha}{\tilde{x}}$. To prove the converse inequality, suppose that $q\opt > \var{\alpha}{\tilde{x}}$, and therefore $\P{\tilde{x} \ge q\opt} < 1-\alpha$. Then, this is a violation since \eqref{eq:proof-q-j} combined with the termination criterion implies that $\P{\tilde{x} \ge q\opt} < 1-\alpha$.
+Now, suppose that \cref{alg:slow-quantile} terminates with value $q\opt$. Then, if the algorithm terminates in iteration $i\opt$ then from~\eqref{eq:proof-q-j}, we have that $\P{\tilde{x} \ge q\opt} = q_{j\opt} \ge 1-\alpha$ where $j\opt$ is defined as in~\eqref{eq:proof-q-j}. Therefore, $q\opt \le \var{\alpha}{\tilde{x}}$. To prove the converse inequality, suppose that $q\opt > \var{\alpha}{\tilde{x}}$, and therefore $\P{\tilde{x} \ge q\opt} < 1-\alpha$. Then, this is a violation since~\eqref{eq:proof-q-j} combined with the termination criterion implies that $\P{\tilde{x} \ge q\opt} < 1-\alpha$.
 \end{proof}
 
 \begin{algorithm}
@@ -889,22 +872,21 @@ Let $v$ be an input to \cref{alg:partition} and consider the following invariant
 \label{eq:ho-inv-more}   x_j &> v, & j \in (g_k+1){:}b_k.
 \end{align}
   
-\emph{Initialization}. For $k=0$, conditions \eqref{eq:ho-inv-less}, \eqref{eq:ho-inv-equal}, \eqref{eq:ho-inv-more} are true because the intervals are empty. 
+\emph{Initialization}. For $k=0$, conditions~\eqref{eq:ho-inv-less},~\eqref{eq:ho-inv-equal},~\eqref{eq:ho-inv-more} are true because the intervals are empty. 
   
 \emph{Maintenance}. At each iteration of the loop that starts on line \ref{line:partition-while} of \cref{alg:partition} there are 3 possible branches determined by the conditional logic. $x_{e_k} < v$, $x_{e_k} > v$ and $x_{e_k} = v$. Since $v, x_{e_k} \in \Real$ one of these branches must be executed for each iterate $k$.
 
-  Each time the $x_{e_k} < v$ or $x_{e_k} > v$ branches are executed conditions \eqref{eq:ho-inv-less} and \eqref{eq:ho-inv-more} remain true respectively since in each case we are swapping necessary elements to preserve each condition. Notice also that $e_k$ is incremented alongside $l_k$ to maintain $e_k - l_k = e_{k+1} - l_{k+1}$ as is necessary for condition \eqref{eq:ho-inv-equal}.
+Each time the $x_{e_k} < v$ or $x_{e_k} > v$ branches are executed conditions~\eqref{eq:ho-inv-less} and~\eqref{eq:ho-inv-more} remain true respectively since in each case we are swapping necessary elements to preserve each condition. Notice also that $e_k$ is incremented alongside $l_k$ to maintain $e_k - l_k = e_{k+1} - l_{k+1}$ as is necessary for condition~\eqref{eq:ho-inv-equal}.
 
-  When $x_{e_k} = v$, $e_k$ is incremented, since $e_0 = l_0$ this creates a difference between $e_{k+1}$ and $l_{k+1}$, the algorithm terminates when $g_t = e_t$, $g_t - l_t = e_t - l_t > 0$ therefore \eqref{eq:ho-inv-equal} remains true.   
+When $x_{e_k} = v$, $e_k$ is incremented, since $e_0 = l_0$ this creates a difference between $e_{k+1}$ and $l_{k+1}$, the algorithm terminates when $g_t = e_t$, $g_t - l_t = e_t - l_t > 0$ therefore~\eqref{eq:ho-inv-equal} remains true.   
 
-Condition \eqref{eq:hoare-correspond} remains true for each mutation that may occur as both the $x$ values and $p$ values are swapped at the same indices, see lines \ref{line:swap1} and \ref{line:swap2}.
+The conditions in~\eqref{eq:hoare-correspond} remain true for each mutation that may occur as both the $\bm{x}$ values and $\bm{p}$ values are swapped at the same indices, see lines \ref{line:swap1} and \ref{line:swap2}.
   
 \emph{Termination}. In the loop on line \ref{line:partition-while} there are 3 possible paths of execution determined by the conditional logic $x_{e_k} < v$, $x_{e_k} > v$ and $x_{e_k} = v$. Each of these paths of execution decreases $g_k - e_k$ by 1. This occurs on lines \ref{line:partition-e-1-1} and \ref{line:partition-e-1-2} by increasing $e_k$ by 1 and keeping $g_k$ the same. Or on line \ref{line:parition-g-1} by decreasing $g_k$ by 1 and keeping $e_k$ the same.
   
 Observe that  $g_0 - e_0 = b - f$ is positive since $f<b$ by assumption. $g_k-e_k$ decreases by 1 at each iteration, and each iteration requires constant time to complete. The function returns when $g_t - e_t = 0$, therefore this algorithm completes in $O(b-f)$ time. 
 
-  Notice on the last iteration $g_{t} = e_{t}$, therefore by the same reasoning as above $g_{t+1} - e_{t+1} = -1$ and 
-  condition \eqref{eq:ho-inv-equal} holds for $g_{t+1} = e_{t+1} - 1$.
+On the last iteration $g_{t} = e_{t}$, therefore by the same reasoning as above $g_{t+1} - e_{t+1} = -1$ and condition~\eqref{eq:ho-inv-equal} holds for $g_{t+1} = e_{t+1} - 1$.
 \end{proof}
 
 \section{Supplemental Results for Section~\ref{sec:phi-divergence}}
@@ -922,9 +904,9 @@ First, we show that $\hat{\bm{q}} \in \widehat{\mathcal{Q}}_f$. Note that the co
    \sum_{i=1}^n \hat{q}_i =  
    \sum_{i=1}^n \hat{q}_{\sigma (i)} = f(1{:}n) - f(\emptyset) = 1, 
   \]
-which implies that $\hat{\bm{q}} \in \Delta_n \cap \mathcal{Q}_f = \widehat{\mathcal{Q}}_f$, $\widehat{\mathcal{Q}}_f \neq \emptyset$, and the minimum \eqref{eq:normalized-poly-opt} exists.
+which implies that $\hat{\bm{q}} \in \Delta_n \cap \mathcal{Q}_f = \widehat{\mathcal{Q}}_f$, $\widehat{\mathcal{Q}}_f \neq \emptyset$, and the minimum~\eqref{eq:normalized-poly-opt} exists.
 
-To show, that $\hat{\bm{q}} $ is optimal, we reduce the optimization problem in \eqref{eq:normalized-poly-opt} to the standard linear polymatroid optimization problem with non-negative weights as follows:
+To show, that $\hat{\bm{q}} $ is optimal, we reduce the optimization problem in~\eqref{eq:normalized-poly-opt} to the standard linear polymatroid optimization problem with non-negative weights as follows:
 \begin{align*}
   \min_{\bm{q}\in \widehat{\mathcal{Q}}_f}  \bm{x}\tr \bm{q}
   &= \min_{\bm{q}\in \widehat{\mathcal{Q}}_f}  (\bm{x} - x_{\min}\cdot \bm{1}) \tr \bm{q} +  x_{\min}\\
@@ -942,7 +924,7 @@ The following lemma is folklore in submodular optimization~\cite[theorem~4.5.1]{
   Suppose that $\bm{1}\tr\bm{\mu}\in \Real^n_{\ge 0}$ and $g \colon \Real_{\ge 0} \to \Real$ is concave and monotone. Then $f(\mathcal{A}) := g(\bm{1}\tr\bm{\mu}_{\mathcal{A}})$ is a submodular monotone function.
 \end{lemma}
 \begin{proof}
-  The fact that $f$ is monotone follows immediately from the composition of two monotone functions. To prove that $f$ is submodular, we use the following properties that hold for each $\mathcal{A}, \mathcal{B} \subseteq 1{:}n$:
+  The fact that $f$ is monotone follows from the composition of two monotone functions. To prove that $f$ is submodular, we use the following properties that hold for each $\mathcal{A}, \mathcal{B} \subseteq 1{:}n$:
   \begin{align}
     \label{eq:sets-bounds-nneg}
     \bm{1}\tr\bm{\mu}_{\mathcal{A} \cup \mathcal{B}}
@@ -954,7 +936,7 @@ The following lemma is folklore in submodular optimization~\cite[theorem~4.5.1]{
     \bm{1}\tr\bm{\mu}_{\mathcal{A}} + \bm{1}\tr\bm{\mu}_{\mathcal{B}}
     &= \bm{1}\tr\bm{\mu}_{\mathcal{A} \cup \mathcal{B}} + \bm{1}\tr\bm{\mu}_{\mathcal{A} \cap \mathcal{B}}.
   \end{align}
-  The inequalities in \eqref{eq:sets-bounds-nneg} holds because $\bm{\mu} \ge  \bm{0}$ and the equality in \eqref{eq:mu-modular} holds because $\mathcal{A} \mapsto \bm{1}\tr\bm{\mu}_{\mathcal{A}}$ is modular. Then, writing $\bm{1}\tr\bm{\mu}_{\mathcal{A}}$ and $\bm{1}\tr\bm{\mu}_{\mathcal{B}}$ as a convex combination of $\bm{1}\tr\bm{\mu}_{\mathcal{A}\cap \mathcal{B}}$ and $\bm{1}\tr\bm{\mu}_{\mathcal{A} \cup \mathcal{B}}$ using \eqref{eq:sets-bounds-nneg} we get that
+  The inequalities in~\eqref{eq:sets-bounds-nneg} holds because $\bm{\mu} \ge  \bm{0}$ and the equality in~\eqref{eq:mu-modular} holds because $\mathcal{A} \mapsto \bm{1}\tr\bm{\mu}_{\mathcal{A}}$ is modular. Then, writing $\bm{1}\tr\bm{\mu}_{\mathcal{A}}$ and $\bm{1}\tr\bm{\mu}_{\mathcal{B}}$ as a convex combination of $\bm{1}\tr\bm{\mu}_{\mathcal{A}\cap \mathcal{B}}$ and $\bm{1}\tr\bm{\mu}_{\mathcal{A} \cup \mathcal{B}}$ using~\eqref{eq:sets-bounds-nneg} we get that
   \begin{align}
   \label{eq:ga-bound}
     g(\bm{1}\tr\bm{\mu}_{\mathcal{A}})
@@ -967,7 +949,7 @@ The following lemma is folklore in submodular optimization~\cite[theorem~4.5.1]{
       \frac{\bm{1}\tr\bm{\mu}_{\mathcal{A} \cup \mathcal{B}} - \bm{1}\tr\bm{\mu}_{\mathcal{B}}}{\bm{1}\tr\bm{\mu}_{\mathcal{A} \cup \mathcal{B}} - \bm{1}\tr\bm{\mu}_{\mathcal{A} \cap \mathcal{B}}} g(\bm{1}\tr\bm{\mu}_{\mathcal{A} \cap \mathcal{B}}) + 
       \frac{\bm{1}\tr\bm{\mu}_{\mathcal{B}} - \bm{1}\tr\bm{\mu}_{\mathcal{A} \cap \mathcal{B}}}{\bm{1}\tr\bm{\mu}_{\mathcal{A} \cup \mathcal{B}} - \bm{1}\tr\bm{\mu}_{\mathcal{A} \cap \mathcal{B}}} g(\bm{1}\tr\bm{\mu}_{\mathcal{A} \cup \mathcal{B}}).
   \end{align}
-  The inequalities in \eqref{eq:ga-bound} and \eqref{eq:gb-bound} follow from the concavity of $g$. Then summing \eqref{eq:ga-bound} and \eqref{eq:gb-bound} and algebraic manipulation yields that 
+  The inequalities in~\eqref{eq:ga-bound} and~\eqref{eq:gb-bound} follow from the concavity of $g$. Then summing~\eqref{eq:ga-bound} and~\eqref{eq:gb-bound} and algebraic manipulation yields that 
   \[
     f(\mathcal{A}) + f(\mathcal{B})
     = g(\bm{1}\tr\bm{\mu}_{\mathcal{A}}) + g(\bm{1}\tr\bm{\mu}_{\mathcal{B}})
@@ -988,9 +970,7 @@ The following lemma is folklore in submodular optimization~\cite[theorem~4.5.1]{
   \caption{Comparison of runtime of the algorithms for samples from a \emph{sparse} random variable with linear (left) and logarithmic (right) view.}
   \label{fig:all_sparse}
 \end{figure}
-Code and results for these experiments as well as the implementations
-of all contained risk measures can be found at \todo{REDACTED for anonymity}.
-
+Code and results for these experiments as well as the implementations of all contained risk measures can be found at \url{https://github.com/RiskAverseRL/RiskMeasures.jl}.
 
 \begin{table} 
 \begin{tabular}{lccccccc}

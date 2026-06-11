@@ -116,7 +116,7 @@ where $\varphi\opt(x)$ is the convex conjugate of $\varphi(y)$, $\varphi$ is a c
 \[
   H_\varphi(\bm{q} \| \bm{p}) := \sum_{\omega \in \Omega} p_{\omega} \cdot \varphi\left(\frac{q_{\omega}}{p_{\omega}}\right).
 \]
-We adopt the common convention that $1 / 0 = \infty$ and $0 \cdot \infty = 0$~\cite{rockefeller1996variational} which makes it possible to drop the absolute continuity restriction used in some definitions of $\ER$. It is important to note that $\varphi$-divergence risk measures are coherent, which means they are concave and positively homogeneous. \cc{Changed ``convex'' to ``concave'': since we use the reward convention and $\ER_{\varphi,\beta}[\tilde{x}]$ is an infimum of linear functions in~\eqref{eq:fdiv-primal}, it is concave in $\tilde{x}$, consistent with \cref{sec:phi-divergence}.} Any coherent risk measure $\rho\colon \mathbb{R}^n\to \bar{\Real}$ satisfies $\rho[\tilde{x}] = \inf_{\bm{q}\in\mathcal{Q}} \bm{q}\tr\bm{x}$ for some closed convex non-empty set $\mathcal{Q} \subseteq \Delta_n$ \citep[Prop. 2.84]{Follmer2016}. \cc{The sentence was incomplete --- the representation formula was missing; please verify the inserted form against Prop.~2.84.}
+We adopt the common convention that $1 / 0 = \infty$ and $0 \cdot \infty = 0$~\cite{rockefeller1996variational} which makes it possible to drop the absolute continuity restriction used in some definitions of $\ER$. It is important to note that $\varphi$-divergence risk measures are coherent, which means they are concave and positively homogeneous. Any coherent risk measure $\rho\colon \mathbb{R}^n\to \bar{\Real}$ satisfies that $\rho[\tilde{x}] = \inf_{\bm{q}\in\mathcal{Q}} \bm{q}\tr\bm{x}$ for some closed convex non-empty set $\mathcal{Q} \subseteq \Delta_n$ \citep[Prop. 2.84]{Follmer2016}. 
 
 \Cref{tab:phi-divergence-risk} summarizes several common $\varphi$-divergence risk measures; see \cref{sec:cvar-tvar-are} for the relevant definitions for $\alpha\in [0,1]$. We focus on the \emph{Conditional-Value-at-Risk}~(CVaR), which is a $\varphi$-divergence risk measure and defined equivalently for $\tilde{x} \in \mathbb{R}^n$ and $\alpha \in (0,1]$ as~\cite{Follmer2016}
 \begin{equation} \label{eq:primal_cvar}
@@ -540,7 +540,6 @@ For each $\alpha\in [0,1]$, $\tilde{x} \colon \Omega \to \Real$, and $\bm{p} \in
   \;=\;
   \min_{\bm{q} \in \widehat{\mathcal{Q}}_{f_{\alpha }^{\cvaro}}} \bm{x}\tr \bm{q}.
 \end{equation}
-\cc{Changed $\max$ to $\min$ to match the coherent-risk representation~\eqref{eq:comonotonic-optimization}, which uses $\min$. Sanity check: $\cvaro_0[\tilde{x}]=\ess\inf[\tilde{x}]$ requires the $\min$, since with $\alpha=0$ the feasible set is all of $\Delta_n$ and $\max_{\bm q\in\Delta_n}\bm x\tr\bm q=\max_i x_i\ne\cvaro_0$.}
 \end{proposition}
 \begin{proof}[Proof of \cref{prop:cvar-ews-correct}]
 The fact that $f_{\alpha }^{\cvaro}$ is EWS follows by algebraic manipulation. To prove~\eqref{eq:cvar-correct}, we use \cref{prop:coherent-polymatroid} and show for each $\mathcal{O} \subseteq \Omega$
@@ -629,7 +628,6 @@ For each $\alpha\in [0,1]$, $\tilde{x} \colon \Omega \to \Real$, and $\bm{p} \in
 \begin{equation} \label{eq:tvar-correct}
   \tvar{\alpha}{\tilde{x} } = \min_{\bm{q}\in \widehat{\mathcal{Q}}_{f_{\alpha}^{\tvaro}}} \bm{x}\tr \bm{q}.
 \end{equation}
-\cc{Two fixes here: (1) changed $\max$ to $\min$ as in \cref{prop:cvar-ews-correct}; (2) the original ``$m=1/\alpha$ and $c=0$'' was the CVaR parameters --- for TVaR the capacity is $\min\{\P{\mathcal{O}}+c,1\}$, i.e.\ $m=1$, so I removed the duplicated/incorrect EWS line and kept the correct one.}
 \end{proposition}
 \begin{proof}
  To prove \eqref{eq:tvar-correct}, it is sufficient by \cref{prop:coherent-polymatroid}, to show for each $\mathcal{O} \subseteq \Omega$ that

@@ -5,7 +5,7 @@
 
 \usepackage[colorlinks=true,citecolor=BlueViolet,linkcolor=Blue]{hyperref} % For hyperlinks in the PDF like citations
 \usepackage{mpemath}
-\RequirePackage[capitalise]{cleveref}
+\RequirePackage[capitalise,noabbrev]{cleveref}
 \usepackage{graphicx} % Required for inserting images
 \usepackage[dvipsnames]{xcolor} 
 \usepackage{appendix}
@@ -558,62 +558,6 @@ For each $\alpha\in [0,1]$, $\tilde{x} \colon \Omega \to \Real$, and $\bm{p} \in
   \min_{\bm{q} \in \widehat{\mathcal{Q}}_{f_{\alpha }^{\cvaro}}} \bm{x}\tr \bm{q}.
 \end{equation}
 \end{proposition}
-\begin{proof}[Proof of \cref{prop:cvar-ews-correct}]
-The function $f_{\alpha }^{\cvaro}$ is EWS by algebraic manipulation. The equality~\eqref{eq:cvar-correct} for $\alpha = 0$ follows by algebraic manipulation. To prove~\eqref{eq:cvar-correct} for $\alpha > 0$, we use \cref{prop:coherent-polymatroid} and show for each $\mathcal{O} \subseteq \Omega$ that
-\begin{equation}
-\label{eq:cvar-eq-submodular}
-  f_{\alpha}^{\cvaro}(\mathcal{O})
-  =
-  \min\left\{ \alpha^{-1} \bm{1}_{\mathcal{O}}\tr \bm{p},\; 1 \right\}
-= \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
-\bm{q} \in \Delta_{n}, \,
-\bm{q} \le \alpha^{-1} \bm{p}
-\right\}
-=
-  -\cvar{\alpha }{- \tilde{1}_{\mathcal{O}}} ,
-\end{equation}
-using the dual CVaR formulation in \eqref{eq:primal_cvar}. We prove~\eqref{eq:cvar-eq-submodular} as two inequalities.
-
-(i) The inequality 
-\[
-\min\left\{ \alpha^{-1} \bm{1}_{\mathcal{O}}\tr \bm{p},\; 1 \right\}
-\ge \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid \bm{q} \in \Delta_{n}, \, \bm{q} \le \alpha^{-1} \bm{p}
-\right\},
-\]
-holds because $\bm{q}$ feasible in the right-hand side satisfies that 
-\(  \bm{1}_{\mathcal{O}}\tr \bm{q} \le \alpha^{-1} \bm{1}_{\mathcal{O}}\tr \bm{p},
- \text{ and }
-  \bm{1}_{\mathcal{O}}\tr \bm{q} \le \bm{1}\tr \bm{q} = 1.
-\)
-
-(ii) To prove that 
-\begin{equation} \label{eq:cvar-proof-le}
-\min\left\{ \alpha^{-1} \bm{1}_{\mathcal{O}}\tr \bm{p},\; 1 \right\}
-\le \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid \bm{q} \in \Delta_{n}, \, \bm{q} \le \alpha^{-1} \bm{p}
-\right\},
-\end{equation}
-we analyze the following two cases.
-\begin{enumerate}[nosep]
-\item[(a)] When $\bm{1}_{\mathcal{O}}\tr  \bm{p} \ge \alpha$, let \(\bm{q} :=  (\bm{1}_{\mathcal{O}}\tr \bm{p})^{-1} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}},
-\) which is
-feasible in the right-hand side of \eqref{eq:cvar-proof-le} and $\otimes$ is the Hadamard vector product. 
-\item[(b)] When that $\bm{1}_{\mathcal{O}}\tr  \bm{p} < \alpha$, let construct \(\bm{q} := \alpha^{-1} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}}
-+  d \cdot \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}}), \) which is
-feasible in the right-hand side of \eqref{eq:cvar-proof-le} and $d\in \Real $ solves that
-\(d \cdot \bm{1}\tr \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}}) = 1 - \alpha^{-1} \bm{1}_{\mathcal{O}} \bm{p}.
-\)
-Such $d$ always exists because \(\bm{1}\tr \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}}) = 1 - \bm{1}_{\mathcal{O}}\tr \bm{p}  > 1 - \alpha \ge 0.
-\)
-It is easy to verify that $\bm{q} \ge \bm{0}$ and $\bm{1}\tr \bm{q} = 1$. The condition $\bm{q} \le \alpha^{-1} \bm{p}$ holds because $d \le \alpha^{-1}$ is satisfied by multiplying both sides of the inequality by $\bm{1}\tr \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}})$:
-\[
-  d \cdot \bm{1}\tr \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}})
-  \; \le\; 
-  1 - \frac{1}{\alpha } \bm{1}_{\mathcal{O}} \bm{p}
-  \; \le\; 
-  \frac{1}{\alpha } \cdot \bm{1}\tr \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}}).
-\]
-\end{enumerate}
-\end{proof}
 
 To compute TVaR, we define the capacity function $f_{\alpha}^{\tvaro}\colon 2^{\Omega } \to \Real$  for each $\mathcal{O} \subseteq \Omega$ and $\alpha \in [0,1]$ as
 \begin{equation}\label{eq:f-tvar}
@@ -632,63 +576,6 @@ For each $\alpha\in [0,1]$, $\tilde{x} \colon \Omega \to \Real$, and $\bm{p} \in
   \tvar{\alpha}{\tilde{x} } = \min_{\bm{q}\in \widehat{\mathcal{Q}}_{f_{\alpha}^{\tvaro}}} \bm{x}\tr \bm{q}.
 \end{equation}
 \end{proposition}
-\begin{proof}
-The function $f_{\alpha }^{\tvaro}$ is EWS by algebraic manipulation. The equality~\eqref{eq:tvar-correct} for $\alpha = 0$ follows by algebraic manipulation. To prove \eqref{eq:tvar-correct} for $\alpha > 0$, we use \cref{prop:coherent-polymatroid} and show for each $\mathcal{O} \subseteq \Omega$ that
-\begin{equation}\label{eq:tvar-eq-submodular}
-  \begin{aligned}
-f_{\alpha}^{\tvaro}(\mathcal{O}) 
-  &=
-\min\left\{ \bm{1}_{\mathcal{O}}\tr \bm{p} + \sqrt{\frac{1}{2} \log \frac{1}{\alpha}} ,\; 1 \right\} \\
-  &=
-\max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
-\bm{q} \in \Delta_n, \,
-\|\bm{p} -\bm{q}\|_1 \le \sqrt{2 \log \frac{1}{\alpha}} 
-\right\}
-=
-  -\tvar{\alpha }{- \tilde{1}_{\mathcal{O}}},
-  \end{aligned}
-\end{equation}
-using the TVaR formulation in~\eqref{eq:tvar-correct}. We prove~\eqref{eq:tvar-eq-submodular} as two inequalities.
-
-(i) To prove that 
-\[
-  \min\left\{ \bm{1}_{\mathcal{O}}\tr \bm{p} + \sqrt{\frac{1}{2} \log \frac{1}{\alpha}}  ,\; 1 \right\}
-  \ge \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
-\bm{q} \in \Delta_n, \,
-\|\bm{p} -\bm{q}\|_1 \le \sqrt{2 \log \frac{1}{\alpha}}  
-\right\},
-\]
-observe that $\bm{q}$ feasible in the right-hand side imply that \(  \|\bm{p} - \bm{q}\|_1 = \bm{1}_{\mathcal{O}}\tr \bm{|p - q|} + (\bm{1} - \bm{1}_{\mathcal{O}})\tr |\bm{p} - \bm{q}|
-  \leq \sqrt{2 \log \frac{1}{\alpha }} \) and $(\bm{1} - \bm{1}_{\mathcal{O}}) (\bm{p} - \bm{q}) = \bm{1}_{\mathcal{O}} (\bm{q} - \bm{p})$ since $\bm{p},\bm{q}\in \Delta_n$. Then
-\begin{align*}
-  \bm{1}_{\mathcal{O}}\tr \bm{q}
-  &= \bm{1}_{\mathcal{O}}\tr (\bm{q} - \bm{p}) + \bm{1}_{\mathcal{O}}\tr  \bm{p} 
-  = \frac{1}{2}\left(  \bm{1}_{\mathcal{O}}\tr (\bm{q} - \bm{p})  + (\bm{1} - \bm{1}_{\mathcal{O}}) (\bm{p} - \bm{q}) \right)+ \bm{1}_{\mathcal{O}}\tr  \bm{p} \\
-  &\le \frac{1}{2}\left(  \bm{1}_{\mathcal{O}}\tr |\bm{q} - \bm{p}|  + (\bm{1} - \bm{1}_{\mathcal{O}}) |\bm{p} - \bm{q}| \right)+ \bm{1}_{\mathcal{O}}\tr  \bm{p} 
-  = \sqrt{\frac{1}{2} \log \frac{1}{\alpha }} + \bm{1}_{\mathcal{O}}\tr  \bm{p} ,
-\end{align*}
-and  \(  \bm{1}_{\mathcal{O}}\tr \bm{q} \leq \bm{1}\tr \bm{q}  = 1.\)
-
-(ii) To prove that 
-\[
-  \min\left\{ \bm{1}_{\mathcal{O}}\tr \bm{p} + \sqrt{\frac{1}{2} \log \frac{1}{\alpha }},\; 1 \right\}
-\le \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
-\bm{q} \in \Delta_n, \,
-\|\bm{p} -\bm{q}\|_{1} \le  \sqrt{2 \log \frac{1}{\alpha }}
-\right\},
-\]
-we analyze the following two cases:
-\begin{enumerate}[nosep]
-\item When $\bm{1}_{\mathcal{O}}\tr  \bm{p} +  \sqrt{\frac{1}{2} \log \frac{1}{\alpha }} \ge 1$, let \(\bm{q} \;:=\;  (\bm{1}_{\mathcal{O}}\tr \bm{p})^{-1} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}}, \)
-  where $\otimes$ is the Hadamard vector product. This $\bm{q}$ is feasible in the right-hand side and satisfies the inequality. 
-\item When $\bm{1}_{\mathcal{O}}\tr  \bm{p}  + \sqrt{\frac{1}{2} \log \frac{1}{\alpha }}< 1$, let
-\[
-\bm{q} \;:=\; \frac{\bm{1}_{\mathcal{O}} \tr {p} + \sqrt{\frac{1}{2} \log \frac{1}{\alpha }}}{\bm{1}_{\mathcal{O}} \tr {p}} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}}
-+  \frac{(\bm{1} - \bm{1}_{\mathcal{O}}) \tr {p} - \sqrt{\frac{1}{2} \log \frac{1}{\alpha }} )}{(\bm{1} - \bm{1}_{\mathcal{O}}) \tr {p}}\cdot \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}}),
-\]
-which is feasible in the right-hand side and satisfies the inequality. 
-\end{enumerate}
-\end{proof}
 
 \section{Experiments}\label{sec:experiments}
 
@@ -945,6 +832,123 @@ The following lemma is folklore in submodular optimization~\cite[theorem~4.5.1]{
     \]
     which proves that $f$ is submodular. 
 \end{proof}
+
+
+\begin{proof}[Proof of \cref{prop:cvar-ews-correct}]
+The function $f_{\alpha }^{\cvaro}$ is EWS by algebraic manipulation. The equality~\eqref{eq:cvar-correct} for $\alpha = 0$ follows by algebraic manipulation. To prove~\eqref{eq:cvar-correct} for $\alpha > 0$, we use \cref{prop:coherent-polymatroid} and show for each $\mathcal{O} \subseteq \Omega$ that
+\begin{equation}
+\label{eq:cvar-eq-submodular}
+  f_{\alpha}^{\cvaro}(\mathcal{O})
+  =
+  \min\left\{ \alpha^{-1} \bm{1}_{\mathcal{O}}\tr \bm{p},\; 1 \right\}
+= \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
+\bm{q} \in \Delta_{n}, \,
+\bm{q} \le \alpha^{-1} \bm{p}
+\right\}
+=
+  -\cvar{\alpha }{- \tilde{1}_{\mathcal{O}}} ,
+\end{equation}
+using the dual CVaR formulation in \eqref{eq:primal_cvar}. We prove~\eqref{eq:cvar-eq-submodular} as two inequalities.
+
+(i) The inequality 
+\[
+\min\left\{ \alpha^{-1} \bm{1}_{\mathcal{O}}\tr \bm{p},\; 1 \right\}
+\ge \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid \bm{q} \in \Delta_{n}, \, \bm{q} \le \alpha^{-1} \bm{p}
+\right\},
+\]
+holds because $\bm{q}$ feasible in the right-hand side satisfies that 
+\(  \bm{1}_{\mathcal{O}}\tr \bm{q} \le \alpha^{-1} \bm{1}_{\mathcal{O}}\tr \bm{p},
+ \text{ and }
+  \bm{1}_{\mathcal{O}}\tr \bm{q} \le \bm{1}\tr \bm{q} = 1.
+\)
+
+(ii) To prove that 
+\begin{equation} \label{eq:cvar-proof-le}
+\min\left\{ \alpha^{-1} \bm{1}_{\mathcal{O}}\tr \bm{p},\; 1 \right\}
+\le \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid \bm{q} \in \Delta_{n}, \, \bm{q} \le \alpha^{-1} \bm{p}
+\right\},
+\end{equation}
+we analyze the following two cases.
+\begin{enumerate}[nosep]
+\item[(a)] When $\bm{1}_{\mathcal{O}}\tr  \bm{p} \ge \alpha$, let \(\bm{q} :=  (\bm{1}_{\mathcal{O}}\tr \bm{p})^{-1} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}},
+\) which is
+feasible in the right-hand side of \eqref{eq:cvar-proof-le} and $\otimes$ is the Hadamard vector product. 
+\item[(b)] When that $\bm{1}_{\mathcal{O}}\tr  \bm{p} < \alpha$, let construct \(\bm{q} := \alpha^{-1} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}}
++  d \cdot \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}}), \) which is
+feasible in the right-hand side of \eqref{eq:cvar-proof-le} and $d\in \Real $ solves that
+\(d \cdot \bm{1}\tr \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}}) = 1 - \alpha^{-1} \bm{1}_{\mathcal{O}} \bm{p}.
+\)
+Such $d$ always exists because \(\bm{1}\tr \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}}) = 1 - \bm{1}_{\mathcal{O}}\tr \bm{p}  > 1 - \alpha \ge 0.
+\)
+It is easy to verify that $\bm{q} \ge \bm{0}$ and $\bm{1}\tr \bm{q} = 1$. The condition $\bm{q} \le \alpha^{-1} \bm{p}$ holds because $d \le \alpha^{-1}$ is satisfied by multiplying both sides of the inequality by $\bm{1}\tr \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}})$:
+\[
+  d \cdot \bm{1}\tr \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}})
+  \; \le\; 
+  1 - \frac{1}{\alpha } \bm{1}_{\mathcal{O}} \bm{p}
+  \; \le\; 
+  \frac{1}{\alpha } \cdot \bm{1}\tr \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}}).
+\]
+\end{enumerate}
+\end{proof}
+
+\begin{proof}[Proof of \cref{prop:tvar-ews-correct}]
+The function $f_{\alpha }^{\tvaro}$ is EWS by algebraic manipulation. The equality~\eqref{eq:tvar-correct} for $\alpha = 0$ follows by algebraic manipulation. To prove \eqref{eq:tvar-correct} for $\alpha > 0$, we use \cref{prop:coherent-polymatroid} and show for each $\mathcal{O} \subseteq \Omega$ that
+\begin{equation}\label{eq:tvar-eq-submodular}
+  \begin{aligned}
+f_{\alpha}^{\tvaro}(\mathcal{O}) 
+  &=
+\min\left\{ \bm{1}_{\mathcal{O}}\tr \bm{p} + \sqrt{\frac{1}{2} \log \frac{1}{\alpha}} ,\; 1 \right\} \\
+  &=
+\max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
+\bm{q} \in \Delta_n, \,
+\|\bm{p} -\bm{q}\|_1 \le \sqrt{2 \log \frac{1}{\alpha}} 
+\right\}
+=
+  -\tvar{\alpha }{- \tilde{1}_{\mathcal{O}}},
+  \end{aligned}
+\end{equation}
+using the TVaR formulation in~\eqref{eq:tvar-correct}. We prove~\eqref{eq:tvar-eq-submodular} as two inequalities.
+
+(i) To prove that 
+\[
+  \min\left\{ \bm{1}_{\mathcal{O}}\tr \bm{p} + \sqrt{\frac{1}{2} \log \frac{1}{\alpha}}  ,\; 1 \right\}
+  \ge \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
+\bm{q} \in \Delta_n, \,
+\|\bm{p} -\bm{q}\|_1 \le \sqrt{2 \log \frac{1}{\alpha}}  
+\right\},
+\]
+observe that $\bm{q}$ feasible in the right-hand side imply that \(  \|\bm{p} - \bm{q}\|_1 = \bm{1}_{\mathcal{O}}\tr \bm{|p - q|} + (\bm{1} - \bm{1}_{\mathcal{O}})\tr |\bm{p} - \bm{q}|
+  \leq \sqrt{2 \log \frac{1}{\alpha }} \) and $(\bm{1} - \bm{1}_{\mathcal{O}}) (\bm{p} - \bm{q}) = \bm{1}_{\mathcal{O}} (\bm{q} - \bm{p})$ since $\bm{p},\bm{q}\in \Delta_n$. Then
+\begin{align*}
+  \bm{1}_{\mathcal{O}}\tr \bm{q}
+  &= \bm{1}_{\mathcal{O}}\tr (\bm{q} - \bm{p}) + \bm{1}_{\mathcal{O}}\tr  \bm{p} 
+  = \frac{1}{2}\left(  \bm{1}_{\mathcal{O}}\tr (\bm{q} - \bm{p})  + (\bm{1} - \bm{1}_{\mathcal{O}}) (\bm{p} - \bm{q}) \right)+ \bm{1}_{\mathcal{O}}\tr  \bm{p} \\
+  &\le \frac{1}{2}\left(  \bm{1}_{\mathcal{O}}\tr |\bm{q} - \bm{p}|  + (\bm{1} - \bm{1}_{\mathcal{O}}) |\bm{p} - \bm{q}| \right)+ \bm{1}_{\mathcal{O}}\tr  \bm{p} 
+  = \sqrt{\frac{1}{2} \log \frac{1}{\alpha }} + \bm{1}_{\mathcal{O}}\tr  \bm{p} ,
+\end{align*}
+and  \(  \bm{1}_{\mathcal{O}}\tr \bm{q} \leq \bm{1}\tr \bm{q}  = 1.\)
+
+(ii) To prove that 
+\[
+  \min\left\{ \bm{1}_{\mathcal{O}}\tr \bm{p} + \sqrt{\frac{1}{2} \log \frac{1}{\alpha }},\; 1 \right\}
+\le \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
+\bm{q} \in \Delta_n, \,
+\|\bm{p} -\bm{q}\|_{1} \le  \sqrt{2 \log \frac{1}{\alpha }}
+\right\},
+\]
+we analyze the following two cases:
+\begin{enumerate}[nosep]
+\item When $\bm{1}_{\mathcal{O}}\tr  \bm{p} +  \sqrt{\frac{1}{2} \log \frac{1}{\alpha }} \ge 1$, let \(\bm{q} \;:=\;  (\bm{1}_{\mathcal{O}}\tr \bm{p})^{-1} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}}, \)
+  where $\otimes$ is the Hadamard vector product. This $\bm{q}$ is feasible in the right-hand side and satisfies the inequality. 
+\item When $\bm{1}_{\mathcal{O}}\tr  \bm{p}  + \sqrt{\frac{1}{2} \log \frac{1}{\alpha }}< 1$, let
+\[
+\bm{q} \;:=\; \frac{\bm{1}_{\mathcal{O}} \tr {p} + \sqrt{\frac{1}{2} \log \frac{1}{\alpha }}}{\bm{1}_{\mathcal{O}} \tr {p}} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}}
++  \frac{(\bm{1} - \bm{1}_{\mathcal{O}}) \tr {p} - \sqrt{\frac{1}{2} \log \frac{1}{\alpha }} )}{(\bm{1} - \bm{1}_{\mathcal{O}}) \tr {p}}\cdot \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}}),
+\]
+which is feasible in the right-hand side and satisfies the inequality. 
+\end{enumerate}
+\end{proof}
+
 
 \section{Experiments}\label{sec:appendix_experiments}
 \begin{figure}

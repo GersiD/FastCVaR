@@ -129,13 +129,14 @@ We adopt the common convention that $1 / 0 = \infty$ and $0 \cdot \infty = 0$~\c
 \end{equation}
 and extended continuously to $\cvaro_0[\tilde{x}] = \ess\inf[\tilde{x}]$.
 
-We also study another $\varphi$-divergence risk measure, which we call \emph{Total-Value-at-Risk}~(TVaR), and is defined for $\alpha\in [0,1]$ as
-\[
+We also study another $\varphi$-divergence risk measure, which we call \emph{Total-Value-at-Risk}~(TVaR), and is defined for $\alpha\in (0,1]$ as
+\begin{equation} \label{eq:tvar-dual}
   \tvaro_{\alpha}[\tilde{x}]
   \;:=\; 
 \min \left\{ \bm{x}\tr \bm{q} \mid \bm{q} \in \Delta_{n}, \, \|\bm{p} - \bm{q}\|_1 \le \sqrt{2 \log \frac{1}{\alpha }}
-\right\}.
-\]
+\right\},
+\end{equation}
+as extended continuously to $\tvaro_{0}[\tilde{x}] = \ess\inf [\tilde{x}]$.
 
 The importance of TVaR is that it bounds the common Entropic-Value-at-Risk~(EVaR)~\cite{Ahmadi-Javid2012,Hau2023a,Su2025} from below as we show next. 
 \begin{proposition}
@@ -342,7 +343,7 @@ with bounds $\quant^+_{\alpha}[\tilde{x}] := \max \quant_{\alpha}[\tilde{x}]$ an
 
 In this section, we describe and analyze QuickDivergence, a new linear-time framework for computing a certain class of $\varphi$-divergence risk measures, such as CVaR and TVaR. QuickDivergence treats risk evaluation as a linear optimization over a polymatroid. Standard polymatroid optimization algorithms must sort their input which requires $\Omega(n \log  n)$ runtime. We identify a structural condition of polymatroid risk measures that allows us to avoid sorting and instead use the QuickVaR algorithm in linear-time described in \cref{sec:var-linear}.
 
-The remainder of the section is organized as follows. \Cref{sec:quickdivergence} describes a general linear-time algorithm suitable for $\varphi$-divergence risk measures that satisfy an EWS property. Then \cref{sec:cvar-tvar-are} shows that both CVaR and TVaR satisfy the EWS property and can be computed in linear time. 
+The remainder of the section is organized as follows. \Cref{sec:quickdivergence} describes a general linear-time algorithm suitable for $\varphi$-divergence risk measures that satisfy an EWS property. Then \cref{sec:cvar-tvar-are} shows that both CVaR and TVaR satisfy the EWS property and can be computed in linear time. Note that we use a fixed distribution $\bm{p} \in \Delta_n$ and omit it in the notation when obvious from the context.
 
 \subsection{QuickDivergence} \label{sec:quickdivergence}
 We first recall the definition of a submodular function~\cite[section~2.1]{Korte2012} and a polymatroid~\cite[definition~14.9]{Korte2012}.
@@ -558,7 +559,7 @@ For each $\alpha\in [0,1]$, $\tilde{x} \colon \Omega \to \Real$, and $\bm{p} \in
 \end{equation}
 \end{proposition}
 \begin{proof}[Proof of \cref{prop:cvar-ews-correct}]
-The fact that $f_{\alpha }^{\cvaro}$ is EWS follows by algebraic manipulation. The equality~\eqref{eq:cvar-correct} for $\alpha = 0$ follows by algebraic manipulation. To prove~\eqref{eq:cvar-correct} for $\alpha > 0$, we use \cref{prop:coherent-polymatroid} and show for each $\mathcal{O} \subseteq \Omega$ that
+The function $f_{\alpha }^{\cvaro}$ is EWS by algebraic manipulation. The equality~\eqref{eq:cvar-correct} for $\alpha = 0$ follows by algebraic manipulation. To prove~\eqref{eq:cvar-correct} for $\alpha > 0$, we use \cref{prop:coherent-polymatroid} and show for each $\mathcal{O} \subseteq \Omega$ that
 \begin{equation}
 \label{eq:cvar-eq-submodular}
   f_{\alpha}^{\cvaro}(\mathcal{O})
@@ -571,7 +572,7 @@ The fact that $f_{\alpha }^{\cvaro}$ is EWS follows by algebraic manipulation. T
 =
   -\cvar{\alpha }{- \tilde{1}_{\mathcal{O}}} ,
 \end{equation}
-using the dual CVaR formulation in \eqref{eq:primal_cvar} which equivalent to \eqref{eq:fdiv-primal}. We prove~\eqref{eq:cvar-eq-submodular} as two inequalities.
+using the dual CVaR formulation in \eqref{eq:primal_cvar}. We prove~\eqref{eq:cvar-eq-submodular} as two inequalities.
 
 (i) The inequality 
 \[
@@ -580,11 +581,10 @@ using the dual CVaR formulation in \eqref{eq:primal_cvar} which equivalent to \e
 \right\},
 \]
 holds because $\bm{q}$ feasible in the right-hand side satisfies that 
-\[
-  \bm{1}_{\mathcal{O}}\tr \bm{q} \le \alpha^{-1} \bm{1}_{\mathcal{O}}\tr \bm{p},
- \quad\text{and}\quad
+\(  \bm{1}_{\mathcal{O}}\tr \bm{q} \le \alpha^{-1} \bm{1}_{\mathcal{O}}\tr \bm{p},
+ \text{ and}
   \bm{1}_{\mathcal{O}}\tr \bm{q} \le \bm{1}\tr \bm{q} = 1.
-\]
+\)
 
 (ii) To prove that 
 \begin{equation} \label{eq:cvar-proof-le}
@@ -633,58 +633,43 @@ For each $\alpha\in [0,1]$, $\tilde{x} \colon \Omega \to \Real$, and $\bm{p} \in
 \end{equation}
 \end{proposition}
 \begin{proof}
-To prove \eqref{eq:tvar-correct}, it is sufficient by \cref{prop:coherent-polymatroid}, to show for each $\mathcal{O} \subseteq \Omega$ that
-\begin{equation*}
+The function $f_{\alpha }^{\tvaro}$ is EWS by algebraic manipulation. The equality~\eqref{eq:tvar-correct} for $\alpha = 0$ follows by algebraic manipulation. To prove \eqref{eq:tvar-correct} for $\alpha > 0$, we use \cref{prop:coherent-polymatroid} and show for each $\mathcal{O} \subseteq \Omega$ that
+\begin{equation}\label{eq:tvar-eq-submodular}
+  \begin{aligned}
 f_{\alpha}^{\tvaro}(\mathcal{O}) 
-  =
-  -\tvar{\alpha }{- \tilde{1}_{\mathcal{O}}},
-\end{equation*}
-which is equivalent to 
-\begin{equation} \label{eq:tvar-eq-submodular}
-\min\left\{ \bm{1}_{\mathcal{O}}\tr \bm{p} + \sqrt{\frac{1}{2} \log \frac{1}{\alpha}} ,\; 1 \right\}
-  =
+  &=
+\min\left\{ \bm{1}_{\mathcal{O}}\tr \bm{p} + \sqrt{\frac{1}{2} \log \frac{1}{\alpha}} ,\; 1 \right\} \\
+  &=
 \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
 \bm{q} \in \Delta_n, \,
 \|\bm{p} -\bm{q}\|_1 \le \sqrt{2 \log \frac{1}{\alpha}} 
-\right\}.
+\right\}
+=
+  -\tvar{\alpha }{- \tilde{1}_{\mathcal{O}}},
+  \end{aligned}
 \end{equation}
-Note that the maximum in the right hand side of~\eqref{eq:tvar-eq-submodular} always exists because it equals to TVaR which is well defined.
+using the TVaR formulation in~\eqref{eq:tvar-correct}. We prove~\eqref{eq:tvar-eq-submodular} as two inequalities.
 
-We prove the equality in~\eqref{eq:tvar-eq-submodular} as two inequalities. To prove that 
+(i) To prove that 
 \[
   \min\left\{ \bm{1}_{\mathcal{O}}\tr \bm{p} + \sqrt{\frac{1}{2} \log \frac{1}{\alpha}}  ,\; 1 \right\}
   \ge \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
 \bm{q} \in \Delta_n, \,
 \|\bm{p} -\bm{q}\|_1 \le \sqrt{2 \log \frac{1}{\alpha}}  
-\right\}, \quad \forall \mathcal{O} \subseteq \Omega\]
-observe that the constraints imply that for each $\bm{q} \in \mathcal{Q}_f$ that
-\[
-  \|\bm{p} - \bm{q}\|_1
-  =
-  \bm{1}_{\mathcal{O}}\tr \bm{|p - q|} + (\bm{1} - \bm{1}_{\mathcal{O}})\tr |\bm{p} - \bm{q}| \leq \beta.
+\right\},
 \]
-Since by the simplex constraint, \mm{this needs a bit more rigor}
-\[
-\sum_{i \in \mathcal{O}} (p_i - q_i)
-+
-\sum_{i \in \mathcal{O}^c} (p_i - q_i)
-= 0, 
-\sum_{i \in \mathcal{O}^C} (p_i - q_i)
-=
--
-\sum_{i \in \mathcal{O}} (p_i - q_i).
-\bm{1}_{\mathcal{O}}\tr \bm{|p - q|} = (\bm{1} - \bm{1}_{\mathcal{O}})\tr |\bm{p} - \bm{q}|
-\le
-\sqrt{2 \log \frac{1}{\alpha }}
-,
-\]
-and 
-  \[
-  \bm{1}_{\mathcal{O}}\tr \bm{q} \leq \bm{1}\tr \bm{q}  = 1,
-\]
-and the first inequality holds.  
+observe that $\bm{q}$ feasible in the right-hand side imply that \(  \|\bm{p} - \bm{q}\|_1 = \bm{1}_{\mathcal{O}}\tr \bm{|p - q|} + (\bm{1} - \bm{1}_{\mathcal{O}})\tr |\bm{p} - \bm{q}|
+  \leq \sqrt{2 \log \frac{1}{\alpha }} \) and $(\bm{1} - \bm{1}_{\mathcal{O}}) (\bm{p} - \bm{q}) = \bm{1}_{\mathcal{O}} (\bm{q} - \bm{p})$ since $\bm{p},\bm{q}\in \Delta_n$. Then
+\begin{align*}
+  \bm{1}_{\mathcal{O}}\tr \bm{q}
+  &= \bm{1}_{\mathcal{O}}\tr (\bm{q} - \bm{p}) + \bm{1}_{\mathcal{O}}\tr  \bm{p} 
+  = \frac{1}{2}\left(  \bm{1}_{\mathcal{O}}\tr (\bm{q} - \bm{p})  + (\bm{1} - \bm{1}_{\mathcal{O}}) (\bm{p} - \bm{q}) \right)+ \bm{1}_{\mathcal{O}}\tr  \bm{p} \\
+  &\le \frac{1}{2}\left(  \bm{1}_{\mathcal{O}}\tr |\bm{q} - \bm{p}|  + (\bm{1} - \bm{1}_{\mathcal{O}}) |\bm{p} - \bm{q}| \right)+ \bm{1}_{\mathcal{O}}\tr  \bm{p} 
+  = \sqrt{\frac{1}{2} \log \frac{1}{\alpha }} + \bm{1}_{\mathcal{O}}\tr  \bm{p} ,
+\end{align*}
+and  \(  \bm{1}_{\mathcal{O}}\tr \bm{q} \leq \bm{1}\tr \bm{q}  = 1.\)
 
-To prove that 
+(ii) To prove that 
 \[
   \min\left\{ \bm{1}_{\mathcal{O}}\tr \bm{p} + \sqrt{\frac{1}{2} \log \frac{1}{\alpha }},\; 1 \right\}
 \le \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
@@ -712,8 +697,7 @@ Then, it is easy to verify that $\bm{q} \in \mathcal{Q}_f$ and $\bm{1}_{\mathcal
 
 \section{Experiments}\label{sec:experiments}
 
-To evaluate the algorithms developed in \cref{alg:quick-quantile} we numerically compare their speed up against their sorting based counterparts. For the remainder of the paper we prefix our implementation of the algorithms with a ``Q'' to denote the quick algorithms. 
-The results obtained in this work were all generated on a computer with the following specifications: AMD Ryzen Threadripper 3970X 32-Core (64) @ 4.55 GHz with 256 GB RAM running Julia 1.11.5. We also manually disable the Julia garbage collector to reduce noise in the timing data.
+To evaluate the proposed algorithms, we numerically compare their speed up against their sorting based counterparts. For the remainder of the paper we prefix our implementation of the algorithms with a ``Q'' to denote the quick algorithms. The results obtained in this work were all generated on a computer with the following specifications: AMD Ryzen Threadripper 3970X 32-Core (64) @ 4.55 GHz with 256 GB RAM running Julia 1.11.5. We also manually disable the Julia garbage collector to reduce noise in the timing data.
 
 Our experimental design allows us to verify that our implementation performs well in practice rather than only theoretically. \cref{fig:all_uniform} shows the results of our experiments. The random variables were generated from a uniform distribution with $N$ samples, where $N$ is varied from $10^2$ to $10^6$. The algorithms were run for each value of $N$ 10 times, and the average runtime was recorded. For consistency, we used a risk level of $0.95$, however the results are similar for other risk levels save for $\alpha = 0 \text{ or } 1$.
 

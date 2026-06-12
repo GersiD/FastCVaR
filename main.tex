@@ -582,7 +582,7 @@ using the dual CVaR formulation in \eqref{eq:primal_cvar}. We prove~\eqref{eq:cv
 \]
 holds because $\bm{q}$ feasible in the right-hand side satisfies that 
 \(  \bm{1}_{\mathcal{O}}\tr \bm{q} \le \alpha^{-1} \bm{1}_{\mathcal{O}}\tr \bm{p},
- \text{ and}
+ \text{ and }
   \bm{1}_{\mathcal{O}}\tr \bm{q} \le \bm{1}\tr \bm{q} = 1.
 \)
 
@@ -592,14 +592,14 @@ holds because $\bm{q}$ feasible in the right-hand side satisfies that
 \le \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid \bm{q} \in \Delta_{n}, \, \bm{q} \le \alpha^{-1} \bm{p}
 \right\},
 \end{equation}
-we analyze the following two cases separately for each $\mathcal{O} \subseteq \Omega$.
+we analyze the following two cases.
 \begin{enumerate}[nosep]
-\item[(a)] Suppose that $\bm{1}_{\mathcal{O}}\tr  \bm{p} \ge \alpha$. Then we construct \(\bm{q} :=  (\bm{1}_{\mathcal{O}}\tr \bm{p})^{-1} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}},
-\)
-feasible in the right-hand side of \eqref{eq:cvar-proof-le} where $\otimes$ is the Hadamard vector product. 
-\item[(b)] Suppose that $\bm{1}_{\mathcal{O}}\tr  \bm{p} < \alpha$. Then we construct \(\bm{q} := \alpha^{-1} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}}
-+  d \cdot \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}}), \)
-feasible in the right-hand side of \eqref{eq:cvar-proof-le} where $\otimes$ is the Hadamard vector product and $d\in \Real $ solves that
+\item[(a)] When $\bm{1}_{\mathcal{O}}\tr  \bm{p} \ge \alpha$, let \(\bm{q} :=  (\bm{1}_{\mathcal{O}}\tr \bm{p})^{-1} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}},
+\) which is
+feasible in the right-hand side of \eqref{eq:cvar-proof-le} and $\otimes$ is the Hadamard vector product. 
+\item[(b)] When that $\bm{1}_{\mathcal{O}}\tr  \bm{p} < \alpha$, let construct \(\bm{q} := \alpha^{-1} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}}
++  d \cdot \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}}), \) which is
+feasible in the right-hand side of \eqref{eq:cvar-proof-le} and $d\in \Real $ solves that
 \(d \cdot \bm{1}\tr \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}}) = 1 - \alpha^{-1} \bm{1}_{\mathcal{O}} \bm{p}.
 \)
 Such $d$ always exists because \(\bm{1}\tr \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}}) = 1 - \bm{1}_{\mathcal{O}}\tr \bm{p}  > 1 - \alpha \ge 0.
@@ -675,23 +675,18 @@ and  \(  \bm{1}_{\mathcal{O}}\tr \bm{q} \leq \bm{1}\tr \bm{q}  = 1.\)
 \le \max \left\{ \bm{1}_{\mathcal{O}}\tr \bm{q} \mid 
 \bm{q} \in \Delta_n, \,
 \|\bm{p} -\bm{q}\|_{1} \le  \sqrt{2 \log \frac{1}{\alpha }}
-\right\}, \quad \forall \mathcal{O} \subseteq \Omega,
+\right\},
 \]
-we construct a feasible $\bm{q} \in \widehat{\mathcal{Q}}_{f^{\tvaro}_{\alpha}}$ for which the inequality holds.
-
-We now analyze the following two cases separately for each $\mathcal{O} \subseteq \Omega$.
+we analyze the following two cases:
 \begin{enumerate}[nosep]
-\item Suppose that $\bm{1}_{\mathcal{O}}\tr  \bm{p} +  \sqrt{\frac{1}{2} \log \frac{1}{\alpha }} \ge 1$. Then we construct $\bm{q}$ as
+\item When $\bm{1}_{\mathcal{O}}\tr  \bm{p} +  \sqrt{\frac{1}{2} \log \frac{1}{\alpha }} \ge 1$, let \(\bm{q} \;:=\;  (\bm{1}_{\mathcal{O}}\tr \bm{p})^{-1} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}}, \)
+  where $\otimes$ is the Hadamard vector product. This $\bm{q}$ is feasible in the right-hand side and satisfies the inequality. 
+\item When $\bm{1}_{\mathcal{O}}\tr  \bm{p}  + \sqrt{\frac{1}{2} \log \frac{1}{\alpha }}< 1$, let
 \[
-\bm{q} \;:=\;  (\bm{1}_{\mathcal{O}}\tr \bm{p})^{-1} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}},
+\bm{q} \;:=\; \frac{\bm{1}_{\mathcal{O}} \tr {p} + \sqrt{\frac{1}{2} \log \frac{1}{\alpha }}}{\bm{1}_{\mathcal{O}} \tr {p}} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}}
++  \frac{(\bm{1} - \bm{1}_{\mathcal{O}}) \tr {p} - \sqrt{\frac{1}{2} \log \frac{1}{\alpha }} )}{(\bm{1} - \bm{1}_{\mathcal{O}}) \tr {p}}\cdot \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}}),
 \]
-where $\otimes$ is the Hadamard vector product. It is easy to verify that $\bm{q} \in \mathcal{Q}_f$ and $\bm{1}_{\mathcal{O}}\tr \bm{q} \le 1$. 
-\item Suppose that $\bm{1}_{\mathcal{O}}\tr  \bm{p}  + \beta/2 < 1$. Then we construct $\bm{q}$ as
-\[
-\bm{q} \;:=\; \frac{\bm{1}_{\mathcal{O}} \tr {p} + \beta/2}{\bm{1}_{\mathcal{O}} \tr {p}} \cdot \bm{p} \otimes \bm{1}_{\mathcal{O}}
-+  \frac{(\bm{1} - \bm{1}_{\mathcal{O}}) \tr {p} - \beta/2 )}{(\bm{1} - \bm{1}_{\mathcal{O}}) \tr {p}}\cdot \bm{p} \otimes (\bm{1} - \bm{1}_{\mathcal{O}}),
-\]
-Then, it is easy to verify that $\bm{q} \in \mathcal{Q}_f$ and $\bm{1}_{\mathcal{O}}\tr \bm{q} \le 1$. 
+which is feasible in the right-hand side and satisfies the inequality. 
 \end{enumerate}
 \end{proof}
 

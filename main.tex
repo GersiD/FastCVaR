@@ -30,6 +30,9 @@
 \DeclareMathOperator{\conv}{conv}
 \DeclareMathOperator{\qvar}{QuickVaR}
 \DeclareMathOperator{\ews}{EWS}
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+
 \newcommand{\quant}{{\mathfrak{q}}}
 
 \renewcommand{\cite}{\citep}
@@ -365,7 +368,7 @@ For a submodular $f \colon 2^{1{:}n} \to \Real_{\ge 0}$, a \emph{polymatroid} $\
 and a \emph{normalized polymatroid} is $\widehat{\mathcal{Q}}_f := \mathcal{Q}_f \cap \Delta_n $.
 \end{definition}
 
-Polymatroids are useful in our setting because any coherent, comonotonic monetary risk measure can be formulated as linear optimization over a polymatroid~\cite[corollary~4.89]{Follmer2016}. A risk measure $\rho$ is \emph{coherent} if it is concave and positively homogeneous.  A risk measure $\rho$ is \emph{comonotonic} if for any comonotone $\tilde{x}, \tilde{y}$: $\rho[ \tilde{x} + \tilde{y} ] = \rho[ \tilde{x} ] + \rho[ \tilde{y} ]$, where the random variables $\tilde{x}, \tilde{y} \in \Real^{1{:}n}$ are \emph{comonotone} if $\tilde{x}(i) \ge \tilde{x}(j) \Leftrightarrow \tilde{y}(i) \ge \tilde{y}(j)$ for each $i,j\in 1{:}n$.
+Polymatroids are useful in the optimization because any coherent, comonotonic monetary risk measure can be formulated as linear optimization over a polymatroid~\cite[corollary~4.89]{Follmer2016}. A risk measure $\rho$ is \emph{coherent} if it is concave and positively homogeneous.  A risk measure $\rho$ is \emph{comonotonic} if for any comonotone $\tilde{x}, \tilde{y}$: $\rho[ \tilde{x} + \tilde{y} ] = \rho[ \tilde{x} ] + \rho[ \tilde{y} ]$, where the random variables $\tilde{x}, \tilde{y} \in \Real^{1{:}n}$ are \emph{comonotone} if $\tilde{x}(i) \ge \tilde{x}(j) \Leftrightarrow \tilde{y}(i) \ge \tilde{y}(j)$ for each $i,j\in 1{:}n$.
 
 \begin{proposition} \label{prop:coherent-polymatroid}
 A monetary risk measure $\rho\colon \Delta_n \times  \Real^n \to \Real$ is a coherent comonotonic risk measure if and only if
@@ -378,14 +381,14 @@ A monetary risk measure $\rho\colon \Delta_n \times  \Real^n \to \Real$ is a coh
 \end{equation}
 where $\tilde{1}$ is an indicator random variable. Moreover, if the risk measure is law-invariant then there exists $g\colon \Real \to \Real$ such that $c(\mathcal{A}) = g(\bm{1}\tr \bm{p}_{\mathcal{A}})$ for each $\mathcal{A} \subseteq 1{:}n$.
 \end{proposition}
-\Cref{prop:coherent-polymatroid} follows immediately from \citep[corollary~4.88, theorem~4.94]{Follmer2016}.
+\Cref{prop:coherent-polymatroid} follows  from corollary~4.88 and theorem~4.94 in \citet{Follmer2016}.
 
 The standard solution to the polymatroid optimization problem in~\eqref{eq:comonotonic-optimization} is to use a greedy algorithm, such as \cref{alg:greedy-polymatroid}. This algorithm adapts the standard polymatroid optimization, such as \citet[section~14.9]{Korte2012}, to the normalized polymatroid $\widehat{\mathcal{Q}}_f$. See \cref{prop:standard-polymatroid-works} for the proof of correctness. Note that the greedy approach in \cref{alg:greedy-polymatroid} requires sorting and, therefore, runs in $\Omega(n \log  n)$ time.
 
 \begin{algorithm}
     \caption{Polymatroid greedy minimization.} \label{alg:greedy-polymatroid}
     \Input{submodular monotone function $f \colon  2^{1{:}n} \to \Real$, and an objective $\bm{x}\in \Real^n_{\ge 0}$}
-    \Output{$\hat{\bm{q}} \in \arg\min_{\bm{q}\in \widehat{\mathcal{Q}}_f} \bm{x}\tr \bm{q}$}
+    \Output{$\hat{\bm{q}} \in \argmin_{\bm{q}\in \widehat{\mathcal{Q}}_f} \bm{x}\tr \bm{q}$}
     Use sort to get
     $\sigma \colon 1{:}n \to 1{:}n$ such that
     $i > j \implies x_{\sigma(i)} \ge  x_{\sigma(j)}, \; \forall i, j \in 1{:}n$\;
@@ -427,9 +430,8 @@ $m$.
 \begin{algorithm}
   \caption{\texttt{QuickDivergence}: Algorithm for optimizing linear function on polymatroids} \label{alg:maximum-weight-independent}
   \Input{$\bm{x} \in \Real^n$, $\bm{p} \in \Delta_n$, $\ews(\bm{p}, m, c)$ function $f \colon 2^{1{:}n} \to \Real_{\ge 0}$}
-  \Output{$\bm{q}\opt \in \arg\min \left\{ \bm{x}\tr\bm{q}  \mid  \bm{q} \in \widehat{\mathcal{Q}}_f, \bm{1}\tr \bm{q} = 1\right\}$}
-  Choose $k_{\min} \in \arg\min_{i \in  1{:}n} x_i$ breaking ties by choosing the minimal $i$
-  \tcp*{Assume: $p_{k_{\min}} > 0$}
+  \Output{$\bm{q}\opt \in \argmin_{\bm{q} \in \widehat{\mathcal{Q}}_f} \bm{x}\tr\bm{q}$}
+  Choose $k_{\min} \in \argmin_{i \in  1{:}n} x_i \; \operatorname{s.\,t.}\; p_i > 0$; break ties to choose smallest $i$ \;
   $v \gets \operatorname{QuickVaR}(\bm{x}, \bm{p}, \alpha = (1 - c)/m)$ \mm{what if $\alpha = 1$ and this is $\infty$?} \; 
   $\mathcal{K}_{< v} \gets \{ i \in  1{:}n \mid x_i < v \}$ ; ~
   $\mathcal{K}_{= v} \gets \{ i \in 1{:}n \mid x_i = v \}$ \;
@@ -450,7 +452,7 @@ The following theorem states the correctness and runtime of \cref{alg:maximum-we
 When $p_{k_{\min}} >0$, then \cref{alg:maximum-weight-independent} solves~\eqref{eq:comonotonic-optimization} in expected $O(n)$ runtime. 
 \end{theorem}
 \begin{proof}
-First, to prove the correctness of \cref{alg:maximum-weight-independent}, assume it returns $\bm{q}\opt$. We now show that $\bm{q}\opt$ coincides with $\hat{\bm{q}}$ computed by the standard polymatroid optimization in \cref{alg:greedy-polymatroid} up to arbitrarily breaking of ties. Suppose that \cref{alg:greedy-polymatroid} chooses a permutation $\sigma\colon  1{:}n \to 1{:}n$ is such that $i \le j \Rightarrow x_{\sigma(i)} \le x_{\sigma(j)}$ and $x_{\sigma(i)} = x_{\sigma(j)} \wedge i < j \Rightarrow \sigma(i) < \sigma(j)$ for each $i,j\in 1{:}n$. In other words, the permutation $\sigma$ needs to be generated by a stable sort algorithm. We emphasize that the stability assumption is only needed for our proof technique and the actual implementation does not require it.
+To prove the correctness of \cref{alg:maximum-weight-independent}, we show that its returns $\bm{q}\opt$ that equals to $\hat{\bm{q}}$ returned by the standard \cref{alg:greedy-polymatroid}. Suppose that \cref{alg:greedy-polymatroid} chooses a permutation $\sigma\colon  1{:}n \to 1{:}n$ is such that $i \le j \Rightarrow x_{\sigma(i)} \le x_{\sigma(j)}$ and $x_{\sigma(i)} = x_{\sigma(j)} \wedge i < j \Rightarrow \sigma(i) < \sigma(j)$ for each $i,j\in 1{:}n$. In other words, the permutation $\sigma$ needs to be generated by a stable sort algorithm. We emphasize that the stability assumption is only needed for our proof technique and the actual implementation does not require it.
 
 We now prove that $q\opt_i = \hat{q}_i$ for each $i\in 1{:}n$ by separately analyzing the following four cases.
 
@@ -604,18 +606,58 @@ The computation of risk measures is often done over large random variables where
 Method & Mean (ms) & St. dev. (ms) \\
 \midrule 
 CVaR & 0.3912 & 0.0382 \\ 
-\textbf{QuickCVaR} & \textbf{0.1426} & \textbf{0.0307} \\ 
+\textbf{QCVaR} & \textbf{0.1426} & \textbf{0.0307} \\ 
 \midrule 
 VaR & 0.3733 & 0.0321 \\ 
-\textbf{QuickVaR} & \textbf{0.1199} & \textbf{0.0287} \\
+\textbf{QVaR} & \textbf{0.1199} & \textbf{0.0287} \\
 \midrule 
 TVaR & 0.3993 & 0.0414 \\ 
-\textbf{QuickTVaR} & \textbf{0.1786} & \textbf{0.0356} \\ 
+\textbf{QTVaR} & \textbf{0.1786} & \textbf{0.0356} \\ 
 \midrule 
 Expectation & 0.0144 & 0.0124 \\ 
 \bottomrule
 \end{tabular}
 \end{table}
+
+\begin{figure}
+  \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_linear.pdf}
+  \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_log.pdf}
+  \caption{Comparison of runtime of the algorithms for samples from a \emph{sparse} random variable with linear (left) and logarithmic (right) view.}
+  \label{fig:all_sparse}
+\end{figure}
+Code and results for these experiments as well as the implementations of all contained risk measures can be found at \url{https://github.com/RiskAverseRL/RiskMeasures.jl}.
+
+\begin{table} 
+\begin{tabular}{lccccccc}
+\toprule
+ Size of Prob. & CVaR & QuickCVaR & VaR & QuickVaR & TVaR & QuickTVaR & Expectation \\
+Space (n) &  &  &  &  &  &  &  \\
+\midrule
+1000 & 0.03 ± 0.01 & \textbf{0.01 ± 0.01} & 0.03 ± 0.01 & \textbf{0.01 ± 0.01} & 0.03 ± 0.01 & \textbf{0.02 ± 0.01} & 0.00 ± 0.00 \\
+2000 & 0.07 ± 0.01 & \textbf{0.03 ± 0.02} & 0.06 ± 0.01 & \textbf{0.02 ± 0.01} & 0.06 ± 0.01 & \textbf{0.03 ± 0.01} & 0.00 ± 0.00 \\
+3000 & 0.10 ± 0.01 & \textbf{0.04 ± 0.02} & 0.09 ± 0.02 & \textbf{0.03 ± 0.02} & 0.10 ± 0.01 & \textbf{0.05 ± 0.01} & 0.00 ± 0.00 \\
+4000 & 0.14 ± 0.01 & \textbf{0.05 ± 0.03} & 0.13 ± 0.03 & \textbf{0.04 ± 0.03} & 0.13 ± 0.01 & \textbf{0.07 ± 0.02} & 0.00 ± 0.00 \\
+5000 & 0.18 ± 0.02 & \textbf{0.06 ± 0.03} & 0.17 ± 0.01 & \textbf{0.04 ± 0.03} & 0.17 ± 0.02 & \textbf{0.08 ± 0.02} & 0.00 ± 0.00 \\
+6000 & 0.21 ± 0.02 & \textbf{0.07 ± 0.04} & 0.20 ± 0.02 & \textbf{0.06 ± 0.04} & 0.21 ± 0.02 & \textbf{0.10 ± 0.03} & 0.00 ± 0.01 \\
+7000 & 0.25 ± 0.01 & \textbf{0.09 ± 0.05} & 0.24 ± 0.02 & \textbf{0.06 ± 0.04} & 0.24 ± 0.02 & \textbf{0.12 ± 0.03} & 0.01 ± 0.00 \\
+8000 & 0.29 ± 0.02 & \textbf{0.09 ± 0.05} & 0.27 ± 0.02 & \textbf{0.07 ± 0.05} & 0.28 ± 0.02 & \textbf{0.13 ± 0.04} & 0.01 ± 0.00 \\
+9000 & 0.33 ± 0.02 & \textbf{0.11 ± 0.06} & 0.31 ± 0.02 & \textbf{0.08 ± 0.06} & 0.32 ± 0.02 & \textbf{0.14 ± 0.04} & 0.01 ± 0.00 \\
+10000 & 0.37 ± 0.02 & \textbf{0.11 ± 0.06} & 0.34 ± 0.02 & \textbf{0.09 ± 0.06} & 0.35 ± 0.03 & \textbf{0.16 ± 0.05} & 0.01 ± 0.00 \\
+\bottomrule
+\end{tabular}
+\caption{Mean time (ms) ± 95\% confidence interval of each method.}
+\label{tab:small_results}
+\end{table}
+
+To assure the reader that our algorithm is indeed faster than the sorting based methods, we present the results of our experiments on small scale problems in \cref{tab:small_results}. 
+We test our algorithm on small scale problems where the difference in runtimes is not as significant, however these problems occur frequently in practice. \cref{tab:small_results} is consistent with the experimental results obtained in \cref{sec:experiments}, namely our no-sort methods outperform the sorting based methods in runtime. This assures that the algorithms developed here provide improvements in runtime for inputs of varying sizes.
+
+The results obtained in \cref{tab:small_results} were generated using a similar process to that of \cref{sec:experiments} where instead of 10 trials per experiment, we used 50 trials per experiment. \cref{tab:small_results} shows the mean time in ms $\pm$ the 95\% confidence interval for each method.
+
+\cref{tab:small_results} shows that even for smaller settings our method is faster than the sorting based methods. The results are consistent with the theoretical complexity of the algorithms, which is $O(n \log n)$ for the sorting based methods and $O(n)$ for the QuickSelect based methods.
+
+
+% The activity of other users on the system is minimized to account for scheduling conflicts. The presence of multithreading in our language of choice (Julia) is not used in this work, as while the runtime of the experiments would be shorter, we observed individual threads ``thrashing'', where they would suddenly take twice or three times as long on one particular iteration. We conjecture that this is due to the garbage collector. For this reason, we manually disable the Julia garbage collector, even when running synchronously.
 
 \section{Conclusion}
 
@@ -628,9 +670,11 @@ This speed up is significant in the context of risk measures as they are often u
 \crefalias{section}{appendix}
 \crefalias{Section}{Appendix}
 
-\section{Properties of Discrete Random Variables} \label{sec:prob-discr-rand}
 
-In this section, we summarize some useful properties of discrete random variables which we use in our proofs. 
+\section{Supplemental Results for Section~\ref{sec:var-linear}} \label{sec:stand-var-algor}
+
+In this section, we summarize the standard and supporting algorithms for solving VaR. We also include the selected technical proofs for the correctness of the proposed algorithm. 
+
 \begin{lemma} \label{lem:prob-lumpy}
 For each $t\in \Real$:
   \[
@@ -640,12 +684,10 @@ For each $t\in \Real$:
   \]
 \end{lemma}
 \begin{proof}
-The result follows by induction on the size $|\Omega|$ after generalization that drops the constraint $\bm{1}\tr \bm{p} = 1$.
+The result follows by induction on the size $|\Omega|$, droping the constraint $\bm{1}\tr \bm{p} = 1$.
 \end{proof}
 
-\section{Supplemental Results for Section~\ref{sec:var-linear}} \label{sec:stand-var-algor}
 
-In this section, we summarize the standard and supporting algorithms for solving VaR. We also include the selected technical proofs for the correctness of the proposed algorithm. 
 
 \begin{algorithm}
 \caption{VaR: Standard VaR algorithm}
@@ -765,7 +807,7 @@ The following proposition states the correctness of the standard polymatroid opt
 \begin{proposition} \label{prop:standard-polymatroid-works}
 Suppose that $f\colon  2^{1{:}n} \to \Real$ is submodular, monotone, $f(\emptyset) = 0$ and $f(1{:}n) = 1$, and for $\bm{x}\in \Real^n_{\ge 0}$. Then, \cref{alg:greedy-polymatroid} computes $\bm{q}\opt$ such that
   \begin{equation} \label{eq:normalized-poly-opt}
-    \hat{\bm{q}}  \in  \arg\min_{\bm{q}\in \widehat{\mathcal{Q}}_f}  \bm{x}\tr \bm{q}.
+    \hat{\bm{q}}  \in  \argmin_{\bm{q}\in \widehat{\mathcal{Q}}_f}  \bm{x}\tr \bm{q}.
 \end{equation}
 \end{proposition}
 \begin{proof}
@@ -950,46 +992,6 @@ which is feasible in the right-hand side and satisfies the inequality.
 \end{proof}
 
 
-\section{Experiments}\label{sec:appendix_experiments}
-\begin{figure}
-  \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_linear.pdf}
-  \includegraphics[width=0.5\textwidth]{./code/plots/all_slow_vs_fast_sparse_log.pdf}
-  \caption{Comparison of runtime of the algorithms for samples from a \emph{sparse} random variable with linear (left) and logarithmic (right) view.}
-  \label{fig:all_sparse}
-\end{figure}
-Code and results for these experiments as well as the implementations of all contained risk measures can be found at \url{https://github.com/RiskAverseRL/RiskMeasures.jl}.
-
-\begin{table} 
-\begin{tabular}{lccccccc}
-\toprule
- Size of Prob. & CVaR & QuickCVaR & VaR & QuickVaR & TVaR & QuickTVaR & Expectation \\
-Space (n) &  &  &  &  &  &  &  \\
-\midrule
-1000 & 0.03 ± 0.01 & \textbf{0.01 ± 0.01} & 0.03 ± 0.01 & \textbf{0.01 ± 0.01} & 0.03 ± 0.01 & \textbf{0.02 ± 0.01} & 0.00 ± 0.00 \\
-2000 & 0.07 ± 0.01 & \textbf{0.03 ± 0.02} & 0.06 ± 0.01 & \textbf{0.02 ± 0.01} & 0.06 ± 0.01 & \textbf{0.03 ± 0.01} & 0.00 ± 0.00 \\
-3000 & 0.10 ± 0.01 & \textbf{0.04 ± 0.02} & 0.09 ± 0.02 & \textbf{0.03 ± 0.02} & 0.10 ± 0.01 & \textbf{0.05 ± 0.01} & 0.00 ± 0.00 \\
-4000 & 0.14 ± 0.01 & \textbf{0.05 ± 0.03} & 0.13 ± 0.03 & \textbf{0.04 ± 0.03} & 0.13 ± 0.01 & \textbf{0.07 ± 0.02} & 0.00 ± 0.00 \\
-5000 & 0.18 ± 0.02 & \textbf{0.06 ± 0.03} & 0.17 ± 0.01 & \textbf{0.04 ± 0.03} & 0.17 ± 0.02 & \textbf{0.08 ± 0.02} & 0.00 ± 0.00 \\
-6000 & 0.21 ± 0.02 & \textbf{0.07 ± 0.04} & 0.20 ± 0.02 & \textbf{0.06 ± 0.04} & 0.21 ± 0.02 & \textbf{0.10 ± 0.03} & 0.00 ± 0.01 \\
-7000 & 0.25 ± 0.01 & \textbf{0.09 ± 0.05} & 0.24 ± 0.02 & \textbf{0.06 ± 0.04} & 0.24 ± 0.02 & \textbf{0.12 ± 0.03} & 0.01 ± 0.00 \\
-8000 & 0.29 ± 0.02 & \textbf{0.09 ± 0.05} & 0.27 ± 0.02 & \textbf{0.07 ± 0.05} & 0.28 ± 0.02 & \textbf{0.13 ± 0.04} & 0.01 ± 0.00 \\
-9000 & 0.33 ± 0.02 & \textbf{0.11 ± 0.06} & 0.31 ± 0.02 & \textbf{0.08 ± 0.06} & 0.32 ± 0.02 & \textbf{0.14 ± 0.04} & 0.01 ± 0.00 \\
-10000 & 0.37 ± 0.02 & \textbf{0.11 ± 0.06} & 0.34 ± 0.02 & \textbf{0.09 ± 0.06} & 0.35 ± 0.03 & \textbf{0.16 ± 0.05} & 0.01 ± 0.00 \\
-\bottomrule
-\end{tabular}
-\caption{Mean time (ms) ± 95\% confidence interval of each method.}
-\label{tab:small_results}
-\end{table}
-
-To assure the reader that our algorithm is indeed faster than the sorting based methods, we present the results of our experiments on small scale problems in \cref{tab:small_results}. 
-We test our algorithm on small scale problems where the difference in runtimes is not as significant, however these problems occur frequently in practice. \cref{tab:small_results} is consistent with the experimental results obtained in \cref{sec:experiments}, namely our no-sort methods outperform the sorting based methods in runtime. This assures that the algorithms developed here provide improvements in runtime for inputs of varying sizes.
-
-The results obtained in \cref{tab:small_results} were generated using a similar process to that of \cref{sec:experiments} where instead of 10 trials per experiment, we used 50 trials per experiment. \cref{tab:small_results} shows the mean time in ms $\pm$ the 95\% confidence interval for each method.
-
-\cref{tab:small_results} shows that even for smaller settings our method is faster than the sorting based methods. The results are consistent with the theoretical complexity of the algorithms, which is $O(n \log n)$ for the sorting based methods and $O(n)$ for the QuickSelect based methods.
-
-
-% The activity of other users on the system is minimized to account for scheduling conflicts. The presence of multithreading in our language of choice (Julia) is not used in this work, as while the runtime of the experiments would be shorter, we observed individual threads ``thrashing'', where they would suddenly take twice or three times as long on one particular iteration. We conjecture that this is due to the garbage collector. For this reason, we manually disable the Julia garbage collector, even when running synchronously.
 
 \end{document}
 

@@ -141,7 +141,7 @@ We also study another $\varphi$-divergence risk measure, which we call \emph{Tot
 \end{equation}
 as extended continuously to $\tvaro_{0}[\tilde{x}] = \ess\inf [\tilde{x}]$.
 
-The importance of TVaR is that it bounds the common Entropic-Value-at-Risk~(EVaR)~\cite{Ahmadi-Javid2012,Hau2023a,Su2025} from below as we show next. 
+The importance of TVaR is that it bounds the common Entropic-Value-at-Risk~(EVaR)~\cite{Ahmadi-Javid2012,Hau2023a,Su2025} from below as we show next. \gersi{passive voice}
 \begin{proposition}
 For each $\alpha\in [0,1]$ and $\tilde{x} \in \mathbb{R}^n$:
 \[
@@ -178,7 +178,7 @@ The standard VaR algorithm for a discrete random variable $\bm{x}\in \Real^n$ wi
   \; \le\;
   \sum_{j = 1}^i p_{\sigma(j)}.
 \]
-The value $x_{\sigma(i)}$ is the optimal solution in~\eqref{eq:var-definition} by  \cref{thm:quantile-in-finite-omega} below. The computational complexity of this algorithm is $\Omega(n \log  n)$ because its runtime is dominated by the need to sort the entries of $\bm{x}$. For the sake of completeness, \cref{alg:slow-quantile} in the appendix summarizes the standard greedy approach to linear polymatroid optmization.
+The value $x_{\sigma(i)}$ \gersi{bold x?} is the optimal solution in~\eqref{eq:var-definition} by  \cref{thm:quantile-in-finite-omega} below. The computational complexity of this algorithm is $\Omega(n \log  n)$ because its runtime is dominated by the need to sort the entries of $\bm{x}$. For the sake of completeness, \cref{alg:slow-quantile} in the appendix summarizes the standard greedy approach to linear polymatroid optmization.
 
 \emph{QuickVaR}, described in \cref{alg:quick-quantile}, computes VaR in $O(n)$ time by avoiding the need to sort the elements of the input random variable $\bm{x}$. In particular, QuickVaR partially sorts the indexes of $\bm{x}$, analogous to the Quickselect algorithm~\cite{horowitz1998computer}. 
 
@@ -219,7 +219,7 @@ The following theorem states the correctness of QuickVaR.
 \Cref{alg:quick-quantile} executed with $f = 1$ and $b = n$ and $\alpha\in [0,1)$ returns $\varo_{\alpha}[ \tilde{x} ]$.
 \end{theorem}
 
-Before proving \cref{thm:var-correct}, we need to show several important lemmas. The following lemma shows that the VaR value is the probability atom that satisfies specific probability properties. 
+Before proving \cref{thm:var-correct}, we need to show several important lemmas. The following lemma shows that the VaR value is the probability atom that satisfies specific probability properties. \gersi{we mentioned these top of page 4 but now we are being vague about it.}
 \begin{lemma}\label{thm:quantile-in-finite-omega}
 Assuming $\alpha\in [0,1)$ and a discrete $\tilde{x}$, there exists $\omega\in\Omega$ with $v := \var{\alpha }{\tilde{x}} = x_{\omega}$ and
 \begin{equation} \label{eq:var-property-prob}
@@ -234,7 +234,7 @@ First, we show that any $v$ that satisfies~\eqref{eq:var-property-prob} solves~\
    \le \P {  \tilde{x} < t  }
    \le \alpha.
  \]
-Then, the existence of $\omega$ follows from \cref{lem:prob-lumpy} in \cref{sec:prob-discr-rand} because~\eqref{eq:var-property-prob} implies that 
+ Then, the existence of $\omega$ follows from \cref{lem:prob-lumpy} in \cref{sec:prob-discr-rand} because~\eqref{eq:var-property-prob} implies that \gersi{broken link and sentence doesn't flow}
   \[
     \P{\tilde{x} =
       \var{\alpha }{\tilde{x}}} = \P{\tilde{x} \le \var{\alpha }{\tilde{x}}}  - \P{\tilde{x} < \var{\alpha }{\tilde{x}}} > \alpha - \alpha = 0.
@@ -249,12 +249,12 @@ If $(l, g, \bm{x}', \bm{p}') = \operatorname{partition}(\bm{x}, \bm{p}, v, f, b)
   \bm{x}_{l{:}g} = v,  \qquad
   \bm{x}_{(g+1){:}b} > v.
 \end{align}
-Moreover, $ \bm{x}_{f{:}b} = \bm{x'}_{\sigma(f{:}b)}, \bm{p}_{f{:}b} = \bm{p'}_{\sigma(f{:}b)}$ for some permutation $\sigma\colon f{:}b \to f{:}b$, and $\bm{x}_{1{:}(f-1)} = \bm{x'}_{1{:}(f-1)}, \bm{p}_{1{:}(f-1)} = \bm{p'}_{1{:}(f-1)}$, and $\bm{x}_{(b+1):n} = \bm{x'}_{(b+1):n}, \bm{p}_{(b+1):n} = \bm{p'}_{(b+1):n}$. The elements outside of $f{:}b$ range are not modified. The algorithm runs in $O(b - f + 1)$ time.
+Moreover, $ \bm{x}_{f{:}b} = \bm{x'}_{\sigma(f{:}b)}, \bm{p}_{f{:}b} = \bm{p'}_{\sigma(f{:}b)}$ for some permutation $\sigma\colon f{:}b \to f{:}b$, and $\bm{x}_{1{:}(f-1)} = \bm{x'}_{1{:}(f-1)}, \bm{p}_{1{:}(f-1)} = \bm{p'}_{1{:}(f-1)}$, and $\bm{x}_{(b+1):n} = \bm{x'}_{(b+1):n}, \bm{p}_{(b+1):n} = \bm{p'}_{(b+1):n}$. The elements outside of $f{:}b$ range are not modified. The algorithm runs in $O(b - f + 1)$ time \gersi{this is a faux paux}.
 \end{lemma}
 
 The following lemma shows the recursive property of QuickVaR and is the main building block of \cref{thm:var-correct}.
 \begin{lemma} \label{lem:quickvar-correct}
-Suppose that the input conditions of \cref{alg:quick-quantile} hold and $\bm{x} \in \Real^n$ satisfies that
+  Suppose that the input conditions of \cref{alg:quick-quantile} hold and $\bm{x} \in \Real^n$ satisfies that \gersi{up until now we used sigma notation for the permutation, now we are indexing x directly.}
  \begin{equation} \label{eq:qvar-precondition}
   \mathbf{x}_{1{:}(f-1)} < x_f, \qquad
   x_{f-1} \le \bm{x}_{f{:}b} \le x_{b+1},  \qquad
@@ -264,7 +264,7 @@ where $x_0 = -\infty$ and $x_{n+1} = +\infty$. Then \cref{alg:quick-quantile} re
 \begin{equation} \label{eq:qvar-postcondition}
   \P{\tilde{x} < x_{\omega}}
   \quad \le \quad
-  \alpha + \P{\tilde{x} < x_f}
+  \alpha + \P{\tilde{x} < x_f \gersi{this is 0?}}
   \quad < \quad \P{\tilde{x} \le x_{\omega}}. 
 \end{equation}
 \end{lemma}
@@ -275,7 +275,7 @@ From~\eqref{eq:qvar-precondition} and \cref{lem:hoare-partition}, $t$ and $e$ on
 \end{equation}
 We proceed by induction on $k = b - f$. \emph{Base case}: $k = 0$. Since $b = f$, we have that $v = x_b$ and $l = g = b$, $t = 0$, $e = p_b$, and $\alpha  \ge t$. The input condition implies that $t + e = p_b > \alpha$. Because $t \le \alpha < p_b$, the algorithm returns $v$ on line~\ref{ln:thirdif} that satisfies
 \[
- \P{\tilde{x} < v} \le \alpha + \P{\tilde{x} < x_f} < \P{\tilde{x} \le v}. 
+  \P{\tilde{x} < v} \le \alpha + \P{\tilde{x} < x_f \gersi{this is 0?}} < \P{\tilde{x} \le v}. 
 \]
 Above, the first inequality follows from $v = x_f$ and $0 \le \alpha$. The second inequality follows from the algorithm's input condition.  
 
@@ -694,7 +694,7 @@ The result follows by induction on the size $|\Omega|$, droping the constraint $
 \label{alg:slow-quantile}
 \Input{$\bm{x}\in \Real^n$, $\bm{p}\in \Delta_n$, and $\alpha \in [0,1)$}
 \Output{$\varo_{\alpha}[\tilde{x}]$}
-Sort $\bm{x}$ indexes to get $\sigma \colon 1{:}n \to 1{:}n$ such that $i > j \implies x_{\sigma(i)} \ge  x_{\sigma(j)}, \; \forall i, j \in 1, \dots , n$\;
+Sort the indexes of $\bm{x}$ to get $\sigma \colon 1{:}n \to 1{:}n$ such that $i > j \implies x_{\sigma(i)} \ge  x_{\sigma(j)}, \; \forall i, j \in 1, \dots , n$\;
 $q_0 \gets 0$
 \tcp*{$q_i = \P{\tilde{x} \ge x_{\sigma (i)}}$ if $x_{\sigma(i)}$ unique}
 \For{$i\in 1{:}n$} {
